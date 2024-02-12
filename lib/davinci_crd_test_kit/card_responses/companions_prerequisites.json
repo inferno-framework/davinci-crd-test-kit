@@ -1,0 +1,58 @@
+{
+  "summary": "Additional Orders As Companions/Prerequisites Card",
+  "detail": "This is a Companions/Prerequisites Card that recommends the introduction of additional orders",
+  "indicator": "info",
+  "source": {
+    "label": "Inferno",
+    "url": "https://inferno.healthit.gov/",
+    "topic": {
+      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+      "code": "coverage-info",
+      "display": "Coverage Information"
+    }
+  },
+  "selectionBehavior": "any",
+  "suggestions": [
+    {
+      "label": "Add monthly physical assessment for the first 3 months",
+      "actions": [
+        {
+          "type": "create",
+          "description": "Add order for physical assessment",
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "status": "draft",
+            "intent": "order",
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "409063005",
+                    "display": "Counselling"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "225885004",
+                  "display": "Health assessment (procedure)"
+                }
+              ]
+            },
+            "subject": {
+              "reference": "http://example.org/fhir/Patient/example"
+            },
+            "authoredOn": "2019-02-15",
+            "requester": {
+              "reference": "http://example.org/fhir/PractitionerRole/example"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

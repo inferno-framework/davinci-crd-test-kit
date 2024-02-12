@@ -1,0 +1,14 @@
+{
+  "summary": "Instructions Card",
+  "detail": "This is an Instructions card containing textual guidance to display to the user making the decisions.",
+  "indicator": "info",
+  "source": {
+    "label": "Inferno",
+    "url": "https://inferno.healthit.gov/",
+    "topic": {
+      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+      "code": "coverage-info",
+      "display": "Coverage Information"
+    }
+  }
+}

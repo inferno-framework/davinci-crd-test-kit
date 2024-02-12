@@ -1,0 +1,248 @@
+{
+  "cards": [
+    {
+      "summary": "Appointment Book Instructions Card",
+      "detail": "This is an Instructions card containing textual guidance to display to the user making the decisions.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "url": "https://inferno.healthit.gov/",
+        "topic": {
+          "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+          "code": "appointment-book",
+          "display": "Appointment Book"
+        }
+      }
+    },
+    {
+      "summary": "Appointment Book External Reference Card",
+      "detail": "This is an External Reference Card containing one or more links to external web pages, PDFs, or other resources that provide relevant coverage information.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "url": "https://inferno.healthit.gov/",
+        "topic": {
+          "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+          "code": "appointment-book",
+          "display": "Appointment Book"
+        }
+      },
+      "links": [
+        {
+          "label": "CRD IG External Reference Card Info",
+          "url": "https://build.fhir.org/ig/HL7/davinci-crd/cards.html#external-reference",
+          "type": "absolute"
+        }
+      ]
+    }
+  ],
+  "systemActions": [
+    {
+      "type": "update",
+      "description": "Added coverage information to appointment resource.",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "example",
+        "status": "proposed",
+        "extension": [
+          {
+            "extension": [
+              {
+                "url": "coverage",
+                "valueReference": {
+                  "reference": "http://example.org/fhir/Coverage/example"
+                }
+              },
+              {
+                "url": "covered",
+                "valueCode": "covered"
+              },
+              {
+                "url": "pa-needed",
+                "valueCode": "satisfied"
+              },
+              {
+                "url": "billingCode",
+                "valueCoding": {
+                  "system": "http://www.ama-assn.org/go/cpt",
+                  "code": "77065"
+                }
+              },
+              {
+                "url": "billingCode",
+                "valueCoding": {
+                  "system": "http://www.ama-assn.org/go/cpt",
+                  "code": "77066"
+                }
+              },
+              {
+                "url": "billingCode",
+                "valueCoding": {
+                  "system": "http://www.ama-assn.org/go/cpt",
+                  "code": "77067"
+                }
+              },
+              {
+                "url": "reason",
+                "valueCodeableConcept": {
+                  "text": "In-network required unless exigent circumstances"
+                }
+              },
+              {
+                "extension": [
+                  {
+                    "url": "code",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+                          "code": "auth-out-network-only"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "url": "value",
+                    "valueBoolean": true
+                  },
+                  {
+                    "url": "qualification",
+                    "valueString": "Out-of-network prior auth does not apply if delivery occurs at a service site designated as 'remote'"
+                  }
+                ],
+                "url": "detail"
+              },
+              {
+                "url": "dependency",
+                "valueReference": {
+                  "reference": "http://example.org/fhir/ServiceRequest/example2"
+                }
+              },
+              {
+                "url": "date",
+                "valueDate": "2019-02-15"
+              },
+              {
+                "url": "coverage-assertion-id",
+                "valueString": "12345ABC"
+              },
+              {
+                "url": "satisfied-pa-id",
+                "valueString": "Q8U119"
+              },
+              {
+                "url": "contact",
+                "valueContactPoint": {
+                  "system": "url",
+                  "value": "http://some-payer/xyz-sub-org/get-help-here.html"
+                }
+              }
+            ],
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information"
+          }
+        ],
+        "serviceCategory": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-category",
+                "code": "17",
+                "display": "General Practice"
+              }
+            ]
+          }
+        ],
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-type",
+                "code": "124",
+                "display": "General Practice"
+              }
+            ]
+          }
+        ],
+        "specialty": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "394814009",
+                "display": "General practice (specialty)"
+              }
+            ]
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0276",
+              "code": "FOLLOWUP",
+              "display": "A follow up visit from a previous appointment"
+            }
+          ]
+        },
+        "reasonReference": [
+          {
+            "reference": "http://example.org/fhir/Condition/example",
+            "display": "Heart problem"
+          }
+        ],
+        "priority": 5,
+        "description": "Discussion on the results of your recent MRI",
+        "start": "2013-12-10T09:00:00Z",
+        "end": "2013-12-10T11:00:00Z",
+        "created": "2013-10-10",
+        "comment": "Further expand on the results of the MRI and determine the next actions that may be appropriate.",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/example"
+          }
+        ],
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/example",
+              "display": "Amy Baxter"
+            },
+            "required": "required",
+            "status": "accepted"
+          },
+          {
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                    "code": "ATND"
+                  }
+                ]
+              }
+            ],
+            "actor": {
+              "reference": "Practitioner/example",
+              "display": "Dr Adam Careful"
+            },
+            "required": "required",
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "Location/example",
+              "display": "South Wing, second floor"
+            },
+            "required": "required",
+            "status": "accepted"
+          }
+        ],
+        "requestedPeriod": [
+          {
+            "start": "2020-11-01",
+            "end": "2020-12-15"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+require_relative '../../lib/davinci_crd_test_kit/client_tests/hook_request_required_fields_test'
+require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
+
+RSpec.describe DaVinciCRDTestKit::HookRequestRequiredFieldsTest do
+  let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
+  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
+  let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
+
+  let(:example_client_url) { 'https://cds.example.org' }
+  let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
+  let(:appointment_book_url) { "#{base_url}/cds-services/appointment-book-service" }
+
+  let(:appointment_book_hook_request) do
+    File.read(File.join(
+                __dir__, '..', 'fixtures', 'appointment_book_hook_request.json'
+              ))
+  end
+
+  let(:appointment_book_hook_request_hash) { JSON.parse(appointment_book_hook_request) }
+
+  def run(runnable, inputs = {})
+    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
+    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
+    inputs.each do |name, value|
+      session_data_repo.save(
+        test_session_id: test_session.id,
+        name:,
+        value:,
+        type: runnable.config.input_type(name)
+      )
+    end
+    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
+  end
+
+  def create_appointment_hook_request(url: appointment_book_url, body: nil, status: 200, headers: nil, auth_header: nil)
+    headers ||= [
+      {
+        type: 'request',
+        name: 'Authorization',
+        value: auth_header
+      }
+    ]
+    repo_create(
+      :request,
+      name: 'appointment_book',
+      direction: 'incoming',
+      url:,
+      test_session_id: test_session.id,
+      request_body: body.is_a?(Hash) ? body.to_json : body,
+      status:,
+      headers:
+    )
+  end
+
+  describe 'Appointment Book Hook Request Required Fields' do
+    let(:test) do
+      Class.new(DaVinciCRDTestKit::HookRequestRequiredFieldsTest) do
+        config(
+          options: { hook_path: '/cds-services/appointment-book-service', hook_name: 'appointment-book' },
+          requests: { hook_request: { name: :appointment_book } }
+        )
+      end
+    end
+
+    it 'passes if valid hook request with all required fields included in request' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}")
+
+      result = run(test)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'skips if no appointment-book request can be found' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      result = run(test)
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to eq('Request `appointment_book` was not made in a previous test as expected.')
+    end
+
+    it 'fails if hook request body is not a valid json' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      create_appointment_hook_request(body: 'request_body', auth_header: "Bearer #{token}")
+
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('Invalid JSON. ')
+    end
+
+    it 'fails if hook request is missing a required field' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      invalid_hook_request = appointment_book_hook_request_hash.except('context')
+
+      create_appointment_hook_request(body: invalid_hook_request, auth_header: "Bearer #{token}")
+
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq('Hook request did not contain required field: `context`')
+    end
+
+    it 'fails if hook request contains fhirAuthorization field but not fhirServer field' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      invalid_hook_request = appointment_book_hook_request_hash.except('fhirServer')
+
+      create_appointment_hook_request(body: invalid_hook_request, auth_header: "Bearer #{token}")
+
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to eq(
+        'Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is REQUIRED.'
+      )
+    end
+  end
+end

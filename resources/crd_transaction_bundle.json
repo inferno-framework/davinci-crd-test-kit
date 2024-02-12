@@ -1,0 +1,6094 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Patient/pat014",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat014",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.366+00:00",
+          "source": "#dTLC55ZSUlQu76RV"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\">Theodor Alan Roosevelt <b>ROOSEVELT </b></div><table class=\"hapiPropertyTable\"><tbody><tr><td>Identifier</td><td>0M846129001NF</td></tr><tr><td>Address</td><td><span>7525 Colshire Dr </span><br/><span>McLean </span><span>VA </span></td></tr><tr><td>Date of birth</td><td><span>04 July 1946</span></td></tr></tbody></table></div>"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR"
+                }
+              ],
+              "text": "Medical Record Number"
+            },
+            "system": "http://hl7.org/fhir/sid/us-medicare",
+            "value": "0M846129001NF"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Roosevelt",
+            "given": [
+              "Theodor",
+              "Alan",
+              "Roosevelt"
+            ]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1946-07-04",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": [
+              "7525 Colshire Dr"
+            ],
+            "city": "McLean",
+            "state": "VA",
+            "postalCode": "22102"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/pat014"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Coverage/cov014",
+      "resource": {
+        "resourceType": "Coverage",
+        "id": "cov014",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.445+00:00",
+          "source": "#yQxvq24DvI2jmo5n"
+        },
+        "status": "active",
+        "subscriberId": "10A3D58WH1600",
+        "beneficiary": {
+          "reference": "Patient/pat014"
+        },
+        "payor": [
+          {
+            "reference": "Organization/org1234"
+          }
+        ],
+        "class": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/coverage-class",
+                  "code": "plan"
+                }
+              ]
+            },
+            "value": "Medicare Part B"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Coverage/cov014"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014a",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond014a",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.510+00:00",
+          "source": "#qPRhKqlAgLNBum5S"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "J44.0",
+              "display": "Chronic obstructive pulmonary disease with acute lower respiratory infection"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond014a"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014b",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond014b",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.563+00:00",
+          "source": "#UDRXPRBmh2HWTbyk"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "R12",
+              "display": "Heartburn"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond014b"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014c",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond014c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.641+00:00",
+          "source": "#Da9qr7X5xzN4tMxI"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "A69.21",
+              "display": "Meningitis due to Lyme disease"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond014c"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014a-motor-neuron",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond014a-motor-neuron",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.708+00:00",
+          "source": "#ChYHXD2n8JJKunKx"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "G12.2",
+              "display": "Motor neuron disease"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond014a-motor-neuron"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-cold",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-pat014-cold",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.767+00:00",
+          "source": "#aEdNGk7di1mFG7ND"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185345009",
+                "display": "Encounter for symptom"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "103391001",
+              "display": "Urgent"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Teddy"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra-sstrange"
+            }
+          }
+        ],
+        "period": {
+          "start": "2020-02-14T10:40:10+01:00",
+          "end": "2020-02-14T12:40:10+01:00"
+        },
+        "length": {
+          "value": 56,
+          "unit": "minutes",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "82272006",
+                "display": "Common cold (disorder)"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/cond014b",
+              "display": "The patient is treated for heartburn"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/cond014b",
+              "display": "The patient is treated for heartburn"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/enc-pat014-cold"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-pat014",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.847+00:00",
+          "source": "#CR5TwyaTFzLb9TGC"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185349003",
+                "display": "Encounter for check up"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "103391001",
+              "display": "Urgent"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Teddy"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra1234"
+            }
+          }
+        ],
+        "period": {
+          "start": "2020-01-15T12:40:10+01:00",
+          "end": "2020-01-15T13:40:10+01:00"
+        },
+        "length": {
+          "value": 56,
+          "unit": "minutes",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "42343007",
+                "display": "Congestive heart failure (disorder)"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/cond014a",
+              "display": "Complications from infection on January 9th, 2020"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/cond014a",
+              "display": "The patient is treated for wheezing"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/enc-pat014"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-heartfailure-old",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-pat014-heartfailure-old",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:32.948+00:00",
+          "source": "#FV9NK1ai7wQUIPZw"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185349003",
+                "display": "Encounter for check up"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "103391001",
+              "display": "Urgent"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Teddy"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra1234"
+            }
+          }
+        ],
+        "period": {
+          "start": "2018-08-15T12:40:10+01:00",
+          "end": "2018-08-17T15:40:10+01:00"
+        },
+        "length": {
+          "value": 2,
+          "unit": "days",
+          "system": "http://unitsofmeasure.org",
+          "code": "day"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "42343007",
+                "display": "Congestive heart failure (disorder)"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/cond014a",
+              "display": "Complications from infection on January 9th, 2020"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/cond014a",
+              "display": "The patient is treated for wheezing"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/enc-pat014-heartfailure-old"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.018+00:00",
+          "source": "#x2N3G57AM15OyuGD"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59408-5",
+              "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2019-03-21T15:35:10+01:00",
+        "valueQuantity": {
+          "value": 92,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014B",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014B",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.095+00:00",
+          "source": "#ZEcak5f5L15GUMLD"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "31100-1",
+              "display": "Hematocrit [Volume Fraction] of Blood by Impedance"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-06T15:40:10+01:00",
+        "valueQuantity": {
+          "value": 70,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014B"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014BodyWeight",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014BodyWeight",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.196+00:00",
+          "source": "#D3glEiFpNwwjAsRA"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Body Weight"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-02-11T15:40:10+01:00",
+        "valueQuantity": {
+          "value": 175,
+          "unit": "[lb_av]",
+          "system": "http://unitsofmeasure.org",
+          "code": "[lb_av]"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014BodyWeight"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014BMI",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014BMI",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.260+00:00",
+          "source": "#bZUosIB8rg7rCaHy"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "39156-5",
+              "display": "Body mass index (BMI) [Ratio]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-02-11T15:40:10+01:00",
+        "valueQuantity": {
+          "value": 16.2,
+          "unit": "kg/m2",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg/m2"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014BMI"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-NeckCircumference",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-NeckCircumference",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.356+00:00",
+          "source": "#P60OCBKKioL4tetv"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "56074-8",
+              "display": "Circumference Neck"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-02-11T15:40:10+01:00",
+        "valueQuantity": {
+          "value": 51.2,
+          "unit": "cm",
+          "system": "http://unitsofmeasure.org",
+          "code": "cm"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-NeckCircumference"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat014-pao2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-pat014-pao2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.418+00:00",
+          "source": "#7Gi2I1J4W4nhEeV3"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2703-7",
+              "display": "Oxygen (BldA) [Partial pressure]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-01-20T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 65,
+          "unit": "mm[Hg]",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Normal (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 75,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "high": {
+              "value": 100,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs-pat014-pao2"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra1234",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pra1234",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:49:28.023+00:00",
+          "source": "#Vv2gaGy3gC8yzXSp",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1122334455"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Doe",
+            "given": [
+              "Jane",
+              "Betty"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "716-873-1557"
+          },
+          {
+            "system": "email",
+            "value": "jane.betty@myhospital.com"
+          }
+        ],
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": [
+              "840 Seneca St"
+            ],
+            "city": "Buffalo",
+            "state": "NY",
+            "postalCode": "14210"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner/pra1234"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-sstrange",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pra-sstrange",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:49:28.347+00:00",
+          "source": "#AYtxGKSIbCiHd4sk"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1122334466"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Strange",
+            "given": [
+              "Stephen"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner/pra-sstrange"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org1234",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "org1234",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:49:28.107+00:00",
+          "source": "#3vnjaNXQuIZbazzp"
+        },
+        "name": "Centers for Medicare and Medicaid Services"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/org1234"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq014",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq014",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.492+00:00",
+          "source": "#OVGbW6RkBrAS2SfR",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "600dca50-ddae-482e-b8ac-383e1ab10c18"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0424",
+              "display": "Stationary Compressed Gaseous Oxygen System, Rental"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1255"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq014"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq020",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq020",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.568+00:00",
+          "source": "#s2l91BImIb8CIKyb",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "26889a9f-37cb-4130-9c69-594e4c087996"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0470",
+              "display": "Respiratory Assist Device, Bi-Level Pressure Capacity WITHOUT Backup Rate"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1255"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq020"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-cpape0601",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-pat014-cpape0601",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:41.073+00:00",
+          "source": "#39Cj04jcacyDKG8I"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "HH",
+          "display": "home health"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185345009",
+                "display": "Encounter for symptom"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "103391001",
+              "display": "Urgent"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra1255"
+            }
+          }
+        ],
+        "period": {
+          "start": "2020-07-06T10:40:10+01:00",
+          "end": "2020-07-06T12:40:10+01:00"
+        },
+        "length": {
+          "value": 56,
+          "unit": "minutes",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-10-cm",
+                "code": "G47.33",
+                "display": "Hypopnea, obstructive sleep apnea"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/pat014-cond-osa",
+              "display": "The patient has sleep apnea"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/pat014-cond-osa",
+              "display": "The patient has obstructive sleep apnea"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/enc-pat014-cpape0601"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq021",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq021",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.647+00:00",
+          "source": "#Mfy6hZYZ9pnEuU7K",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "95e7e265-980f-48b7-809f-a0d38a950edc"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0601",
+              "display": "Continuous positive airway pressure (cpap) device"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-pat014-cpape0601"
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1255"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq021"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq-014-e0250",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq-014-e0250",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.719+00:00",
+          "source": "#ZA38zK7U4QhX6KIc",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "d78a846a-5406-4d9c-a96f-bb677fe6a475"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0250",
+              "display": "Hospital bed fixed height with any type of side rails, mattress"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1255"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq-014-e0250"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq01",
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "servreq01",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:47:33.804+00:00",
+          "source": "#SKKFSuk25WnLNvFC"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "63dae4d5-1b48-41f6-b56c-8b2fdea87067"
+          }
+        ],
+        "status": "draft",
+        "intent": "order",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386053000",
+                "display": "Evaluation procedure (procedure)"
+              }
+            ],
+            "text": "Evaluation"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "A0426",
+              "display": "Ambulance service, advanced life support, non-emergency transport, level 1 (als 1)"
+            }
+          ],
+          "text": "Ambulance service Non-Emergency Transport"
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "occurrenceDateTime": "2016-09-27",
+        "authoredOn": "2016-09-20",
+        "requester": {
+          "display": "Smythe Juliette, MD"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/pra1255"
+          }
+        ],
+        "reasonCode": [
+          {
+            "text": "Physical Therapy for Hip Fracture "
+          }
+        ],
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ServiceRequest/servreq01"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-cashew",
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "allergy-pat014-cashew",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:39.997+00:00",
+          "source": "#gU1HBE7QdfQEWP41"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "type": "allergy",
+        "category": [
+          "food"
+        ],
+        "criticality": "high",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "227493005",
+              "display": "Cashew nuts"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/pat014"
+        },
+        "onsetDateTime": "2004",
+        "recordedDate": "2014-10-09T14:58:00+11:00",
+        "lastOccurrence": "2020-04",
+        "note": [
+          {
+            "text": "The criticality is high because of the observed anaphylactic reaction when challenged with cashew extract."
+          }
+        ],
+        "reaction": [
+          {
+            "substance": {
+              "coding": [
+                {
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "1160593",
+                  "display": "cashew nut allergenic extract Injectable Product"
+                }
+              ]
+            },
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "39579001",
+                    "display": "Anaphylactic reaction"
+                  }
+                ]
+              }
+            ],
+            "description": "Challenge Protocol. Severe reaction to subcutaneous cashew extract. Epinephrine administered",
+            "onset": "2012-06-12",
+            "severity": "severe",
+            "exposureRoute": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "34206005",
+                  "display": "Subcutaneous route"
+                }
+              ]
+            }
+          },
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "64305001",
+                    "display": "Urticaria"
+                  }
+                ]
+              }
+            ],
+            "onset": "2004",
+            "severity": "moderate",
+            "note": [
+              {
+                "text": "The patient reports that the onset of urticaria was within 15 minutes of eating cashews."
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "AllergyIntolerance/allergy-pat014-cashew"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-penicillin",
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "allergy-pat014-penicillin",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.092+00:00",
+          "source": "#P7nukkXyVBbO7r8d"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "type": "allergy",
+        "category": [
+          "medication"
+        ],
+        "criticality": "high",
+        "code": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "7980",
+              "display": "Penicillin G"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/pat014"
+        },
+        "onsetDateTime": "2004",
+        "recordedDate": "2014-10-09T14:58:00+11:00",
+        "lastOccurrence": "2020-04",
+        "reaction": [
+          {
+            "manifestation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "247472004",
+                    "display": "Hives"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "AllergyIntolerance/allergy-pat014-penicillin"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/CareTeam/pat014-hhs-careteam",
+      "resource": {
+        "resourceType": "CareTeam",
+        "id": "pat014-hhs-careteam",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:40.271+00:00",
+          "source": "#MX6cYo07f3Z9RbUp"
+        },
+        "status": "active",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "LA28866-4",
+                "display": "Home & Community Based Services (HCBS)-focused care team"
+              }
+            ]
+          }
+        ],
+        "name": "Roosevelt Theodore's Care Team for Home Health Service",
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "period": {
+          "end": "2021-06-01"
+        },
+        "participant": [
+          {
+            "role": [
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "163W00000X",
+                    "display": "Registered Nurse"
+                  }
+                ]
+              }
+            ],
+            "member": {
+              "reference": "Practitioner/pra-hfairchild",
+              "display": "Helen Fairchild"
+            },
+            "onBehalfOf": {
+              "reference": "Organization/org1234"
+            },
+            "period": {
+              "end": "2021-06-01"
+            }
+          }
+        ],
+        "managingOrganization": [
+          {
+            "reference": "Organization/org1234"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "CareTeam/pat014-hhs-careteam"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-hhs",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "enc-pat014-hhs",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:41.196+00:00",
+          "source": "#Di7UtvEeEW3H0cf5"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "HH",
+          "display": "home health"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185345009",
+                "display": "Encounter for symptom"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "103391001",
+              "display": "Urgent"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra1255"
+            }
+          }
+        ],
+        "period": {
+          "start": "2020-06-08T10:40:10+01:00",
+          "end": "2020-06-08T12:40:10+01:00"
+        },
+        "length": {
+          "value": 56,
+          "unit": "minutes",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "230690007",
+                "display": "Cerebrovascular accident (disorder)"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/con-pat014-stroke",
+              "display": "The patient is hospitalized for stroke"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/con-pat014-stroke",
+              "display": "The patient is hospitalized for stroke"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/enc-pat014-hhs"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Goal/pat014-hhs-careplan-goal",
+      "resource": {
+        "resourceType": "Goal",
+        "id": "pat014-hhs-careplan-goal",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:41.287+00:00",
+          "source": "#tVY2TaK0zpRIFl5V"
+        },
+        "lifecycleStatus": "planned",
+        "achievementStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/goal-achievement",
+              "code": "not-achieved",
+              "display": "Not achieved"
+            }
+          ],
+          "text": "Not achieved"
+        },
+        "description": {
+          "text": "Move without restriction"
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "startDate": "2020-06-20",
+        "outcomeCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "1670004",
+                "display": "Cerebral hemiparesis"
+              }
+            ],
+            "text": "Cerebral hemiparesis"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Goal/pat014-hhs-careplan-goal"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/con-pat014-stroke",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "con-pat014-stroke",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:40.919+00:00",
+          "source": "#xWl7KsfPjDl4ICsR"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "1670004",
+              "display": "Cerebral hemiparesis (disorder)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/con-pat014-stroke"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/CarePlan/careplan-pat014-hhs",
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "careplan-pat014-hhs",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.168+00:00",
+          "source": "#zhq5XqL9jFEcvC8a"
+        },
+        "text": {
+          "status": "additional",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>An after acute care plan (for a stroke patient ).</p>\n      <p>The plan has activities to take medication, safety measures, schedule first antenatal,\n and (there would be lots of others of course)</p>\n      <p>Note that where is a proposed 'status' element against each activity</p>\n    </div>"
+        },
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
+                "code": "assess-plan"
+              }
+            ]
+          }
+        ],
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-pat014-hhs"
+        },
+        "author": {
+          "reference": "Practitioner/pra1234",
+          "display": "Dr Jane Doe"
+        },
+        "careTeam": [
+          {
+            "reference": "CareTeam/pat014-hhs-careteam"
+          }
+        ],
+        "addresses": [
+          {
+            "reference": "Condition/con-pat014-stroke",
+            "display": "Stroke"
+          }
+        ],
+        "goal": [
+          {
+            "reference": "Goal/pat014-hhs-careplan-goal"
+          }
+        ],
+        "activity": [
+          {
+            "detail": {
+              "kind": "DeviceRequest",
+              "code": {
+                "coding": [
+                  {
+                    "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+                    "code": "E0143",
+                    "display": "Walker, folding, wheeled, adjustable or fixed height"
+                  }
+                ]
+              },
+              "status": "completed",
+              "doNotPerform": false
+            }
+          },
+          {
+            "detail": {
+              "kind": "NutritionOrder",
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "284093001",
+                    "display": "Potassium supplementation"
+                  }
+                ]
+              },
+              "status": "completed",
+              "doNotPerform": false,
+              "scheduledString": "daily",
+              "productReference": {
+                "reference": "Substance/f203",
+                "display": "Potassium"
+              },
+              "dailyAmount": {
+                "value": 80,
+                "unit": "mmol",
+                "system": "http://snomed.info/sct",
+                "code": "258718000"
+              }
+            }
+          },
+          {
+            "detail": {
+              "kind": "ServiceRequest",
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "306005",
+                    "display": "Echography of kidney"
+                  }
+                ]
+              },
+              "status": "completed",
+              "doNotPerform": false
+            }
+          },
+          {
+            "detail": {
+              "kind": "Task",
+              "code": {
+                "text": "Secure carpets in hallways"
+              },
+              "reasonCode": [
+                {
+                  "coding": [
+                    {
+                      "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+                      "code": "C3824712",
+                      "display": "Patients--Safety measures"
+                    }
+                  ],
+                  "text": "Safety measures"
+                }
+              ],
+              "status": "in-progress",
+              "doNotPerform": false
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "CarePlan/careplan-pat014-hhs"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ClinicalImpression/clinicalimpression-pat014-hhs",
+      "resource": {
+        "resourceType": "ClinicalImpression",
+        "id": "clinicalimpression-pat014-hhs",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.510+00:00",
+          "source": "#UeK3PcdzE5663up1"
+        },
+        "status": "completed",
+        "description": "The patient is evaluated for Home Health Service after stroke",
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-pat014-hhs"
+        },
+        "effectivePeriod": {
+          "start": "2020-06-08T20:00:00+11:00",
+          "end": "2020-12-08T22:33:00+11:00"
+        },
+        "date": "2020-06-08T22:33:00+11:00",
+        "assessor": {
+          "reference": "Practitioner/pra1255"
+        },
+        "problem": [
+          {
+            "display": "Stroke"
+          }
+        ],
+        "investigation": [
+          {
+            "code": {
+              "text": "Initial Examination"
+            },
+            "item": [
+              {
+                "display": "left side paralysis"
+              },
+              {
+                "display": "decreased level of speech and hearing"
+              }
+            ]
+          }
+        ],
+        "summary": "Complication of stroke",
+        "finding": [
+          {
+            "itemCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "1670004",
+                  "display": "Cerebral hemiparesis (disorder)"
+                }
+              ]
+            }
+          }
+        ],
+        "prognosisCodeableConcept": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "65872000",
+                "display": "Fair prognosis"
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ClinicalImpression/clinicalimpression-pat014-hhs"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/condition014-livertransplant",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition014-livertransplant",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.613+00:00",
+          "source": "#0Yq2zjMfBQXjkxfM"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "problem-list-item",
+                "display": "Problem List Item"
+              }
+            ],
+            "text": "Problem List Item"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "161671001",
+              "display": "History of liver recipient"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "recordedDate": "2014-10-09T14:58:00+11:00"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/condition014-livertransplant"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/pat014-cond-osa",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "pat014-cond-osa",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.690+00:00",
+          "source": "#QlPBP0xq4vEwPl4D"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "G47.33",
+              "display": "Hypopnea, obstructive sleep apnea"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/pat014-cond-osa"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/con-pat014-obesity",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "con-pat014-obesity",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.763+00:00",
+          "source": "#95Cv15C0A3SDbhzw"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "83911000119104",
+              "display": "Severe obesity (disorder)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/con-pat014-obesity"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/condition-pat014-shoulder-fracture-open",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "condition-pat014-shoulder-fracture-open",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:40.840+00:00",
+          "source": "#oaQNgHNR3DRTi0S4"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "275337006",
+              "display": "Shoulder fracture - open (disorder)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/condition-pat014-shoulder-fracture-open"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Consent/pat014-consent",
+      "resource": {
+        "resourceType": "Consent",
+        "id": "pat014-consent",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.015+00:00",
+          "source": "#Y8FtmVw3fFGrHSvG"
+        },
+        "status": "active",
+        "scope": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/consentscope",
+              "code": "treatment"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/consentcategorycodes",
+                "code": "acd",
+                "display": "Advance Directive"
+              }
+            ]
+          }
+        ],
+        "patient": {
+          "reference": "Patient/pat014"
+        },
+        "dateTime": "2020-06-08T12:00:10+01:00",
+        "performer": [
+          {
+            "reference": "Patient/pat014"
+          }
+        ],
+        "organization": [
+          {
+            "reference": "Organization/org1234"
+          }
+        ],
+        "policyRule": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/consentpolicycodes",
+              "code": "cric",
+              "display": "Common Rule Informed Consent"
+            }
+          ]
+        },
+        "provision": {
+          "period": {
+            "start": "2020-06-10",
+            "end": "2021-06-10"
+          },
+          "actor": [
+            {
+              "role": {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleClass",
+                    "code": "PROV",
+                    "display": "healthcare provider"
+                  }
+                ]
+              },
+              "reference": {
+                "reference": "Practitioner/pra1234"
+              }
+            }
+          ],
+          "provision": [
+            {
+              "type": "permit",
+              "actor": [
+                {
+                  "role": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-RoleClass",
+                        "code": "AUT"
+                      }
+                    ]
+                  },
+                  "reference": {
+                    "reference": "Practitioner/pra1255"
+                  }
+                }
+              ],
+              "code": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "34133-9"
+                    }
+                  ]
+                },
+                {
+                  "coding": [
+                    {
+                      "system": "http://loinc.org",
+                      "code": "18842-5"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Consent/pat014-consent"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-azathioprine",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "pat014-mr-azathioprine",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:48:41.440+00:00",
+          "source": "#kGtfXGWRMbaPvhPC"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "25839b73-fcc9-4706-8c77-a806995b8109"
+          }
+        ],
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "105611",
+              "display": "azathioprine 50 MG Oral Tablet [Imuran]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Theodor Roosevelt"
+        },
+        "authoredOn": "2020-05-11",
+        "requester": {
+          "reference": "Practitioner/pra1234",
+          "display": "Jane Doe"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "52042003",
+                "display": "Systemic lupus erythematosus glomerulonephritis syndrome, World Health Organization class V (disorder)"
+              }
+            ]
+          }
+        ],
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "50 mg PO daily for remission induction",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route (qualifier value)"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 50,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 3,
+          "quantity": {
+            "value": 90,
+            "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+            "code": "TAB"
+          }
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest/pat014-mr-azathioprine"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationDispense/pat014-meddispsense-azathioprine",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "pat014-meddispsense-azathioprine",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.365+00:00",
+          "source": "#t9fyzoyNapa7ec8g"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "8e1c318e-8518-4488-ab70-89a3ab8cd741"
+          }
+        ],
+        "status": "in-progress",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "105611",
+              "display": "azathioprine 50 MG Oral Tablet [Imuran]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Theodor Roosevelt"
+        },
+        "performer": [
+          {
+            "actor": {
+              "reference": "Practitioner/pra1234"
+            }
+          }
+        ],
+        "authorizingPrescription": [
+          {
+            "reference": "MedicationRequest/pat014-mr-azathioprine"
+          }
+        ],
+        "quantity": {
+          "value": 90,
+          "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+          "code": "TAB"
+        },
+        "daysSupply": {
+          "value": 90,
+          "unit": "Day",
+          "system": "http://unitsofmeasure.org",
+          "code": "d"
+        },
+        "whenHandedOver": "2020-11-11",
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "50 mg PO daily for remission induction",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route (qualifier value)"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 50,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationDispense/pat014-meddispsense-azathioprine"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-methotrexate",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "pat014-mr-methotrexate",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.508+00:00",
+          "source": "#5i44p6a79xInEo1V"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "9ae058cc-ffdc-4680-b39f-6a38bfde01ac"
+          }
+        ],
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "105585",
+              "display": "methotrexate 2.5 MG Oral Tablet"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Theodor Roosevelt"
+        },
+        "authoredOn": "2020-07-11",
+        "requester": {
+          "reference": "Practitioner/pra1234",
+          "display": "Jane Doe"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "52042003",
+                "display": "Systemic lupus erythematosus glomerulonephritis syndrome, World Health Organization class V (disorder)"
+              }
+            ]
+          }
+        ],
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "sequence": 1,
+            "text": "7.5 mg PO daily for remission induction",
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral route (qualifier value)"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity": {
+                  "value": 7.5,
+                  "unit": "mg",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "mg"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest": {
+          "numberOfRepeatsAllowed": 3,
+          "quantity": {
+            "value": 90,
+            "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+            "code": "TAB"
+          }
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationRequest/pat014-mr-methotrexate"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-azathio",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstate-pat014-azathio",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.696+00:00",
+          "source": "#6NsbHDn7Gh79G6V7"
+        },
+        "contained": [
+          {
+            "resourceType": "Medication",
+            "id": "med-azathioprine",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/sid/ndc",
+                  "code": "68462-502-01",
+                  "display": "Azathioprine"
+                }
+              ]
+            },
+            "form": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "385057009",
+                  "display": "Film-coated tablet (qualifier value)"
+                }
+              ]
+            },
+            "ingredient": [
+              {
+                "itemCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "778409008",
+                      "display": "Product containing only azathioprine in oral dose form"
+                    }
+                  ]
+                },
+                "strength": {
+                  "numerator": {
+                    "value": 50,
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  },
+                  "denominator": {
+                    "value": 1,
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "Tab"
+                  }
+                }
+              }
+            ],
+            "batch": {
+              "lotNumber": "9494788",
+              "expirationDate": "2025-05-22"
+            }
+          }
+        ],
+        "status": "active",
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/medication-statement-category",
+              "code": "inpatient",
+              "display": "Inpatient"
+            }
+          ]
+        },
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+              "code": "105611",
+              "display": "azathioprine 50 MG Oral Tablet [Imuran]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "effectiveDateTime": "2020-05-10",
+        "dateAsserted": "2020-05-22",
+        "informationSource": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "derivedFrom": [
+          {
+            "reference": "MedicationRequest/pat014-mr-azathioprine"
+          }
+        ],
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "52042003",
+                "display": "Systemic lupus erythematosus glomerulonephritis syndrome"
+              }
+            ]
+          }
+        ],
+        "dosage": [
+          {
+            "sequence": 1,
+            "text": "1-2 tablets once daily at bedtime as needed for restless legs",
+            "additionalInstruction": [
+              {
+                "text": "Taking at bedtime"
+              }
+            ],
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "32914008",
+                  "display": "Restless Legs"
+                }
+              ]
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral Route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseRange": {
+                  "low": {
+                    "value": 1,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  },
+                  "high": {
+                    "value": 2,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/medstate-pat014-azathio"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-metho",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstate-pat014-metho",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.794+00:00",
+          "source": "#HQsvrl8tBxdRSbf9"
+        },
+        "contained": [
+          {
+            "resourceType": "Medication",
+            "id": "med-methotrexate",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/sid/ndc",
+                  "code": "00555-0928-01",
+                  "display": "Methotrexate"
+                }
+              ]
+            },
+            "form": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "385057009",
+                  "display": "Film-coated tablet (qualifier value)"
+                }
+              ]
+            },
+            "ingredient": [
+              {
+                "itemCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "776732000",
+                      "display": "Product containing only methotrexate (medicinal product)"
+                    }
+                  ]
+                },
+                "strength": {
+                  "numerator": {
+                    "value": 7.5,
+                    "system": "http://unitsofmeasure.org",
+                    "code": "mg"
+                  },
+                  "denominator": {
+                    "value": 1,
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              }
+            ],
+            "batch": {
+              "lotNumber": "12345",
+              "expirationDate": "2026-06-23"
+            }
+          }
+        ],
+        "status": "active",
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/medication-statement-category",
+              "code": "inpatient",
+              "display": "Inpatient"
+            }
+          ]
+        },
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/ndc",
+              "code": "00555-0928-01",
+              "display": "Methotrexate"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "effectiveDateTime": "2020-07-10",
+        "dateAsserted": "2020-07-22",
+        "informationSource": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "derivedFrom": [
+          {
+            "reference": "MedicationRequest/pat014-mr-methotrexate"
+          }
+        ],
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "52042003",
+                "display": "Systemic lupus erythematosus glomerulonephritis syndrome"
+              }
+            ]
+          }
+        ],
+        "dosage": [
+          {
+            "sequence": 1,
+            "text": "1-2 tablets once daily at bedtime as needed for restless legs",
+            "additionalInstruction": [
+              {
+                "text": "Taking at bedtime"
+              }
+            ],
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "32914008",
+                  "display": "Restless Legs"
+                }
+              ]
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral Route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseRange": {
+                  "low": {
+                    "value": 1,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  },
+                  "high": {
+                    "value": 2,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/medstate-pat014-metho"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-tylenol",
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "medstate-pat014-tylenol",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:48:41.870+00:00",
+          "source": "#vj2p7iCA3FQVzM30"
+        },
+        "contained": [
+          {
+            "resourceType": "Medication",
+            "id": "med-azathioprine",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/sid/ndc",
+                  "code": "50580-506-02",
+                  "display": "Tylenol PM"
+                }
+              ]
+            },
+            "form": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "385057009",
+                  "display": "Film-coated tablet (qualifier value)"
+                }
+              ]
+            },
+            "batch": {
+              "lotNumber": "9494788",
+              "expirationDate": "2025-05-22"
+            }
+          }
+        ],
+        "status": "active",
+        "category": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/medication-statement-category",
+              "code": "inpatient",
+              "display": "Inpatient"
+            }
+          ]
+        },
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/ndc",
+              "code": "50580-506-02",
+              "display": "Tylenol PM"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "effectiveDateTime": "2020-09-10",
+        "dateAsserted": "2020-09-22",
+        "informationSource": {
+          "reference": "Patient/pat014",
+          "display": "Roosevelt Theodore"
+        },
+        "derivedFrom": [
+          {
+            "reference": "MedicationRequest/pat014-mr-azathioprine"
+          }
+        ],
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "52042003",
+                "display": "Systemic lupus erythematosus glomerulonephritis syndrome"
+              }
+            ]
+          }
+        ],
+        "dosage": [
+          {
+            "sequence": 1,
+            "text": "1-2 tablets once daily at bedtime as needed for restless legs",
+            "additionalInstruction": [
+              {
+                "text": "Taking at bedtime"
+              }
+            ],
+            "timing": {
+              "repeat": {
+                "frequency": 1,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "asNeededCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "32914008",
+                  "display": "Restless Legs"
+                }
+              ]
+            },
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral Route"
+                }
+              ]
+            },
+            "doseAndRate": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code": "ordered",
+                      "display": "Ordered"
+                    }
+                  ]
+                },
+                "doseRange": {
+                  "low": {
+                    "value": 1,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  },
+                  "high": {
+                    "value": 2,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement/medstate-pat014-tylenol"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-ahi",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-ahi",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:26.940+00:00",
+          "source": "#5OHLnEbidt4Qyzhw"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "69990-0",
+              "display": "Apnea hypopnea index 24 hour"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-07-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 25,
+          "unit": "/h",
+          "system": "http://unitsofmeasure.org",
+          "code": "/h"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "H",
+                "display": "HIGH"
+              }
+            ],
+            "text": "High (applies to non-numeric results)"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-ahi"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-fev1-fvc-ratio",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-fev1-fvc-ratio",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.048+00:00",
+          "source": "#lQY8QqcPGaMFVltV"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "19926-5",
+              "display": "FEV1/FVC"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-05-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 0.5,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Low (applies to non-numeric results)"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-fev1-fvc-ratio"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-fvc",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-fvc",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.158+00:00",
+          "source": "#GPQDX5zLnWd2ebN5"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "20149-1",
+              "display": "FEV1 Predicted"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-05-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 0.5,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Low (applies to non-numeric results)"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-fvc"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-hemocrit-test",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-hemocrit-test",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.240+00:00",
+          "source": "#4Rw3hTRPHW0Wc7lv"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "31100-1",
+              "display": "Hematocrit [Volume Fraction] of Blood by Impedance"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 72,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-hemocrit-test"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-mip",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-mip",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.311+00:00",
+          "source": "#1EPm1dbNtgNwfivm"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "19976-0",
+              "display": "Maximum [Pressure] Respiratory system airway opening --during inspiration on ventilator"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-05-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 10,
+          "unit": "cm[H2O]",
+          "system": "http://unitsofmeasure.org",
+          "code": "cm[H2O]"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Low (applies to non-numeric results)"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-mip"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-o2sat",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-o2sat",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.364+00:00",
+          "source": "#aIEY54f4V1obdT5T"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59408-5",
+              "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 91,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "N",
+                "display": "Normal"
+              }
+            ],
+            "text": "Normal (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 90,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "high": {
+              "value": 99,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-o2sat"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat014-o2excercise",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-pat014-o2excercise",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.427+00:00",
+          "source": "#IisgJV7XkS690oLa"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "89276-0",
+              "display": "Oxygen saturation with exercise"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-06T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 80,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Low (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 90,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "high": {
+              "value": 99,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs-pat014-o2excercise"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-pao2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-pao2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.500+00:00",
+          "source": "#vRiPnHo8rMEbhYbw"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2703-7",
+              "display": "Oxygen (BldA) [Partial pressure]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 65,
+          "unit": "mm[Hg]",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Low (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 75,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "high": {
+              "value": 100,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-pao2"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-pap",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-pap",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.564+00:00",
+          "source": "#n4RZ298wkXdYjfuf"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8414-5",
+              "display": "Pulmonary artery Mean blood pressure"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-04-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 25,
+          "unit": "mm[Hg]",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "H",
+                "display": "HIGH"
+              }
+            ],
+            "text": "High (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 8,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "high": {
+              "value": 20,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-pap"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-rdi",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs014-rdi",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.642+00:00",
+          "source": "#uxymbfPEgMr2hchF"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "90566-1",
+              "display": "Respiratory disturbance index"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "issued": "2020-07-05T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 15,
+          "unit": "/h",
+          "system": "http://unitsofmeasure.org",
+          "code": "/h"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "H",
+                "display": "HIGH"
+              }
+            ],
+            "text": "High (applies to non-numeric results)"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs014-rdi"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Procedure/proced014-kidney-transplant",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "proced014-kidney-transplant",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.742+00:00",
+          "source": "#kP3mBW1ou2ndZT7w"
+        },
+        "status": "completed",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "70536003",
+              "display": "Transplant of kidney"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "performedPeriod": {
+          "start": "2010-01-28T13:31:00+01:00",
+          "end": "2010-01-28T20:27:00+01:00"
+        },
+        "performer": [
+          {
+            "actor": {
+              "reference": "Practitioner/pra1255",
+              "display": "Dr Smythe Juliette"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Procedure/proced014-kidney-transplant"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq-pat014-hhs",
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "servreq-pat014-hhs",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.811+00:00",
+          "source": "#bsuMY04fXFTp1phF"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "f8b50a61-d92e-4fe9-b835-64d52ba6bcfc"
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "CarePlan/careplan-pat014-hhs"
+          }
+        ],
+        "status": "draft",
+        "intent": "order",
+        "code": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "G0180",
+              "display": "Medicare-covered home health services under a home health plan of care"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat014"
+        },
+        "encounter": {
+          "reference": "Encounter/enc-pat014-hhs"
+        },
+        "occurrenceDateTime": "2020-06-08",
+        "authoredOn": "2020-06-08",
+        "requester": {
+          "display": "Smythe Juliette, MD"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/pra1255"
+          }
+        ],
+        "insurance": [
+          {
+            "reference": "Coverage/cov014"
+          }
+        ],
+        "relevantHistory": [
+          {
+            "reference": "Provenance/provenance-pat014-hhs"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ServiceRequest/servreq-pat014-hhs"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/125",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "125",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.874+00:00",
+          "source": "#S9JdYcdm3S80fj13"
+        },
+        "status": "proposed",
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-type",
+                "code": "183",
+                "display": "Sleep Medicine"
+              }
+            ]
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/v2/0276",
+              "code": "FOLLOWUP",
+              "display": "A follow up visit from a previous appointment"
+            }
+          ]
+        },
+        "description": "CPAP adjustments",
+        "start": "2019-08-10T09:00:00Z",
+        "end": "2019-08-10T11:00:00Z",
+        "created": "2019-08-01",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/pat014",
+              "display": "Peter James Chalmers"
+            },
+            "required": "required",
+            "status": "tentative"
+          },
+          {
+            "actor": {
+              "reference": "Practitioner/pra1255",
+              "display": "Dr Adam Careful"
+            },
+            "required": "required",
+            "status": "accepted"
+          }
+        ],
+        "requestedPeriod": [
+          {
+            "start": "2020-05-23",
+            "end": "2020-05-23"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Appointment/125"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/126",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "126",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:49:27.956+00:00",
+          "source": "#E8EGRTyl0ibnPzrl"
+        },
+        "status": "proposed",
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/v2/0276",
+              "code": "CHECKUP",
+              "display": "A routine check-up, such as an annual physical"
+            }
+          ]
+        },
+        "description": "Regular physical",
+        "start": "2020-08-01T11:00:00Z",
+        "end": "2020-08-01T13:00:00Z",
+        "created": "2019-08-01",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/pat014",
+              "display": "Peter James Chalmers"
+            },
+            "required": "required",
+            "status": "tentative"
+          },
+          {
+            "actor": {
+              "reference": "Practitioner/pra1255",
+              "display": "Dr Adam Careful"
+            },
+            "required": "required",
+            "status": "accepted"
+          }
+        ],
+        "requestedPeriod": [
+          {
+            "start": "2021-05-23",
+            "end": "2021-05-23"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Appointment/126"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-hfairchild",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pra-hfairchild",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:49:28.267+00:00",
+          "source": "#5kbu1UT6jnpDD9No"
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1122334467"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Fairchild",
+            "given": [
+              "Helen"
+            ],
+            "prefix": [
+              "Ms."
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner/pra-hfairchild"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra1255",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pra1255",
+        "meta": {
+          "versionId": "3",
+          "lastUpdated": "2024-05-14T14:25:02.747+00:00",
+          "source": "#M62b2hsmczhVXpkZ",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "1234567893"
+          }
+        ],
+        "name": [
+          {
+            "family": "Smythe",
+            "given": [
+              "Juliette"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "781-229-3911"
+          },
+          {
+            "system": "email",
+            "value": "juliette.smythe@myhospital.com"
+          }
+        ],
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": [
+              "108 Middlesex Turnpike"
+            ],
+            "city": "Burlington",
+            "state": "MA",
+            "postalCode": "01803"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner/pra1255"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Patient/pat015",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "pat015",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T17:31:21.364+00:00",
+          "source": "#mEm9MxVmHGhl52L5"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\">William Hale Oster <b>OSTER </b></div><table class=\"hapiPropertyTable\"><tbody><tr><td>Identifier</td><td>0M34355006FW</td></tr><tr><td>Address</td><td><span>202 Burlington Road </span><br/><span>Bedford </span><span>MA </span></td></tr><tr><td>Date of birth</td><td><span>23 February 2015</span></td></tr></tbody></table></div>"
+        },
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR"
+                }
+              ],
+              "text": "Medical Record Number"
+            },
+            "system": "http://hl7.org/fhir/sid/us-medicare",
+            "value": "0M34355006FW"
+          }
+        ],
+        "name": [
+          {
+            "use": "official",
+            "family": "Oster",
+            "given": [
+              "William",
+              "Hale",
+              "Oster"
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "(781) 555-5555",
+            "use": "home",
+            "rank": 1
+          },
+          {
+            "system": "phone",
+            "value": "(781) 555 5613",
+            "use": "work",
+            "rank": 2
+          },
+          {
+            "system": "phone",
+            "value": "(781) 555 8834",
+            "use": "old",
+            "period": {
+              "end": "2014"
+            }
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2015-02-23",
+        "address": [
+          {
+            "use": "home",
+            "type": "both",
+            "line": [
+              "202 Burlington Road"
+            ],
+            "city": "Bedford",
+            "state": "MA",
+            "postalCode": "01730"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/pat015"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Coverage/cov015",
+      "resource": {
+        "resourceType": "Coverage",
+        "id": "cov015",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:46.837+00:00",
+          "source": "#1W1rnm3MCWAjmRUn"
+        },
+        "status": "active",
+        "subscriberId": "10A3D58WH456",
+        "beneficiary": {
+          "reference": "Patient/pat015"
+        },
+        "payor": [
+          {
+            "reference": "Organization/org1234"
+          }
+        ],
+        "class": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/coverage-class",
+                  "code": "plan"
+                }
+              ]
+            },
+            "value": "Medicare Part A"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Coverage/cov015"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015a",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond015a",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:46.945+00:00",
+          "source": "#rL5lIUbrbWs9eQEF"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "J44.9",
+              "display": "Chronic obstructive pulmonary disease, unspecified"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond015a"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015b",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond015b",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.140+00:00",
+          "source": "#Y45TTgUADoowmMO6"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": "R09.02",
+              "display": "Hypoxemia"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond015b"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015c",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cond015c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.216+00:00",
+          "source": "#Si3GCGRb7HZFyMag"
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/condition-category",
+                "code": "encounter-diagnosis",
+                "display": "Encounter Diagnosis"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10-cm",
+              "code": " G30.0",
+              "display": "Alzheimer's disease with early onset"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Condition/cond015c"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.314+00:00",
+          "source": "#ZAjCZWOeWkmnX9VE"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59408-5",
+              "display": "Oxygen saturation in Arterial blood by Pulse oximetry"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "issued": "2020-03-20T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 91,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "N",
+                "display": "Normal"
+              }
+            ],
+            "text": "Normal (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 90,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "high": {
+              "value": 99,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015B",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015B",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.416+00:00",
+          "source": "#SURo5kwhT04xOzUn"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "31100-1",
+              "display": "Hematocrit [Volume Fraction] of Blood by Impedance"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "issued": "2020-03-20T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 69,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "H",
+                "display": "High"
+              }
+            ]
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 42,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "high": {
+              "value": 54,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015B"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/pat015-rad-encounter",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "pat015-rad-encounter",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T18:41:48.687+00:00",
+          "source": "#7mpydc9Fv22P0wWg"
+        },
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "HH",
+          "display": "home health"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "185345009",
+                "display": "Encounter for symptom"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "709122007",
+              "display": "As soon as possible (qualifier value)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015",
+          "display": "Roosevelt Theodore"
+        },
+        "participant": [
+          {
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                    "code": "PPRF",
+                    "display": "primary performer"
+                  }
+                ]
+              }
+            ],
+            "individual": {
+              "reference": "Practitioner/pra1234",
+              "display": "Dr. Jane Doe"
+            }
+          }
+        ],
+        "period": {
+          "start": "2020-07-01T10:40:10+01:00",
+          "end": "2020-07-01T12:40:10+01:00"
+        },
+        "length": {
+          "value": 56,
+          "unit": "minutes",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/sid/icd-10-cm",
+                "code": "J44.9",
+                "display": "Chronic obstructive pulmonary disease, unspecified"
+              }
+            ]
+          }
+        ],
+        "diagnosis": [
+          {
+            "condition": {
+              "reference": "Condition/cond015a",
+              "display": "The patient is hospitalized for stroke"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "AD",
+                  "display": "Admission diagnosis"
+                }
+              ]
+            },
+            "rank": 2
+          },
+          {
+            "condition": {
+              "reference": "Condition/cond015a",
+              "display": "The patient is hospitalized for lung condition"
+            },
+            "use": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diagnosis-role",
+                  "code": "CC",
+                  "display": "Chief complaint"
+                }
+              ]
+            },
+            "rank": 1
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/pat015-rad-encounter"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-hco3",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-hco3",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.494+00:00",
+          "source": "#O0VSX7Jc90xAWK8j"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "1960-4",
+              "display": "HCO3 BldA-sCnc"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-07-01T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Practitioner/pra-dmorgan",
+            "type": "Practitioner",
+            "display": "Dexter Morgan"
+          },
+          {
+            "reference": "Organization/org-lab",
+            "type": "Organization",
+            "display": "Gulf Coast Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 32,
+          "unit": "mmol/L",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmol/L"
+        },
+        "referenceRange": [
+          {
+            "low": {
+              "value": 23,
+              "unit": "mmol/L",
+              "system": "http://unitsofmeasure.org",
+              "code": "mmol/L"
+            },
+            "high": {
+              "value": 30,
+              "unit": "mmol/L",
+              "system": "http://unitsofmeasure.org",
+              "code": "mmol/L"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-hco3"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-overnight",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-o2sat-overnight",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.623+00:00",
+          "source": "#ijw3mqoFPQNSBjBk"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "252568001",
+              "display": "Overnight pulse oximetry (procedure)"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-06-15T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Organization/org-lab",
+            "type": "Organization",
+            "display": "Clinical Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 90,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-o2sat-overnight"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-resting",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-o2sat-resting",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.712+00:00",
+          "source": "#YxUCcR3S5wr8s0AO"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59417-6",
+              "display": "Oxygen saturation in Arterial blood by Pulse oximetry --resting"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-07-01T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Practitioner/pra-dmorgan",
+            "type": "Practitioner",
+            "display": "Dexter Morgan"
+          },
+          {
+            "reference": "Organization/org1234",
+            "type": "Organization",
+            "display": "Gulf Coast Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 95,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-o2sat-resting"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-treatment",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-o2sat-treatment",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.808+00:00",
+          "source": "#dQeLpxWubjwetneg"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59409-3",
+              "display": "Oxygen saturation in Arterial blood by Pulse oximetry --during treatment"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-07-01T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Practitioner/pra-dmorgan",
+            "type": "Practitioner",
+            "display": "Dexter Morgan"
+          },
+          {
+            "reference": "Organization/org1234",
+            "type": "Organization",
+            "display": "Gulf Coast Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 97,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-o2sat-treatment"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat015-pao2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-pat015-pao2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.884+00:00",
+          "source": "#QtjuazDV4ywPg5Wg"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2703-7",
+              "display": "Oxygen (BldA) [Partial pressure]"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "issued": "2020-06-15T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 65,
+          "unit": "mm[Hg]",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Normal (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 75,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "high": {
+              "value": 100,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs-pat015-pao2"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat015-o2excercise",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs-pat015-o2excercise",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.988+00:00",
+          "source": "#0c7NNRXAsTYRaOpx"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "89276-0",
+              "display": "Oxygen saturation with exercise"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "issued": "2020-03-20T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 80,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0078",
+                "code": "L",
+                "display": "LOW"
+              }
+            ],
+            "text": "Normal (applies to non-numeric results)"
+          }
+        ],
+        "referenceRange": [
+          {
+            "low": {
+              "value": 90,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            },
+            "high": {
+              "value": 99,
+              "unit": "%",
+              "system": "http://unitsofmeasure.org",
+              "code": "%"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs-pat015-o2excercise"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-paco2",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-paco2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.096+00:00",
+          "source": "#pVL3MD4587KKl4y6"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2019-8",
+              "display": "Carbon dioxide [Partial pressure] in Arterial blood"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-06-15T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Practitioner/pra-dmorgan",
+            "type": "Practitioner",
+            "display": "Dexter Morgan"
+          },
+          {
+            "reference": "Organization/org-lab",
+            "type": "Organization",
+            "display": "Gulf Coast Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 45,
+          "unit": "mm[Hg]",
+          "system": "http://unitsofmeasure.org",
+          "code": "mm[Hg]"
+        },
+        "referenceRange": [
+          {
+            "low": {
+              "value": 38,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "high": {
+              "value": 42,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-paco2"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-dmorgan",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "pra-dmorgan",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:47.499+00:00",
+          "source": "#O0VSX7Jc90xAWK8j"
+        },
+        "extension": [
+          {
+            "url": "http://hapifhir.io/fhir/StructureDefinition/resource-placeholder",
+            "valueBoolean": true
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner/pra-dmorgan"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org-lab",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "org-lab",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T22:12:20.671+00:00",
+          "source": "#sNhvYZyDMlMJgAXM"
+        },
+        "identifier": [
+          {
+            "system": "http://www.acme.org.au/units",
+            "value": "ClinLab"
+          }
+        ],
+        "name": "Clinical Lab",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "+1 555 234 1234",
+            "use": "work"
+          },
+          {
+            "system": "email",
+            "value": "contact@labs.acme.org",
+            "use": "work"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/org-lab"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-ph",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "obs015-ph",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.195+00:00",
+          "source": "#fcDJw5t7ZWg8ujl1"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "Laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2744-1",
+              "display": "pH of Arterial blood"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "issued": "2020-06-15T15:30:10+01:00",
+        "performer": [
+          {
+            "reference": "Practitioner/pra-dmorgan",
+            "type": "Practitioner",
+            "display": "Dexter Morgan"
+          },
+          {
+            "reference": "Organization/org-lab",
+            "type": "Organization",
+            "display": "Gulf Coast Lab"
+          }
+        ],
+        "valueQuantity": {
+          "value": 7.33,
+          "unit": "pH",
+          "system": "http://unitsofmeasure.org",
+          "code": "pH"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/obs015-ph"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq-015-e0250",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq-015-e0250",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.266+00:00",
+          "source": "#UUx65vQyrJuotcqp",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "be5ed14f-ed52-4a5a-ba94-29f58b14a585"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0250",
+              "display": "Hospital bed fixed height with any type of side rails, mattress"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1234"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov015"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq-015-e0250"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq015",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreq015",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.396+00:00",
+          "source": "#lSS21FKLsnBGm7q7",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "f0fc0619-976e-4e58-a790-a296781d7558"
+          }
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0424",
+              "display": "Stationary Compressed Gaseous Oxygen System, Rental"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "occurrenceTiming": {
+          "repeat": {
+            "boundsDuration": {
+              "value": 8,
+              "unit": "mo",
+              "system": "http://unitsofmeasure.org",
+              "code": "mo"
+            }
+          },
+          "code": {
+            "text": "During sleep AND During exertion"
+          }
+        },
+        "authoredOn": "2023-01-01T00:00:00Z",
+        "requester": {
+          "reference": "Practitioner/pra-hfairchild"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1234"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov015"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreq015"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreqe0470",
+      "resource": {
+        "resourceType": "DeviceRequest",
+        "id": "devreqe0470",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.491+00:00",
+          "source": "#5ErZ3XnHvR7T8NQp",
+          "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest-r4"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "ba5b69af-85c5-4f11-8dff-c4cbf6aa0281"
+          }
+        ],
+        "instantiatesCanonical": [
+          "http://hapi.fhir.org/baseR4/PlanDefinition/1430"
+        ],
+        "status": "draft",
+        "intent": "original-order",
+        "codeCodeableConcept": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "E0470",
+              "display": "Respiratory Assist Device"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "encounter": {
+          "reference": "Encounter/pat015-rad-encounter"
+        },
+        "authoredOn": "2020-03-08",
+        "requester": {
+          "reference": "Practitioner/pra1234"
+        },
+        "performer": {
+          "reference": "Practitioner/pra1234"
+        },
+        "insurance": [
+          {
+            "reference": "Coverage/cov015"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "DeviceRequest/devreqe0470"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq-g0180-1",
+      "resource": {
+        "resourceType": "ServiceRequest",
+        "id": "servreq-g0180-1",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T18:41:48.591+00:00",
+          "source": "#0Y8tfp6tzIxtOit6"
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PLAC"
+                }
+              ]
+            },
+            "value": "11ddab7e-1488-4848-b3d5-512d2f1e3f28"
+          }
+        ],
+        "status": "draft",
+        "intent": "order",
+        "code": {
+          "coding": [
+            {
+              "system": "https://bluebutton.cms.gov/resources/codesystem/hcpcs",
+              "code": "G0180",
+              "display": "Medicare-covered home health services under a home health plan of care"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "occurrenceDateTime": "2017-10-01",
+        "authoredOn": "2017-10-04",
+        "requester": {
+          "display": "Smythe Juliette, MD"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/pra1255"
+          }
+        ],
+        "insurance": [
+          {
+            "reference": "Coverage/cov016"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ServiceRequest/servreq-g0180-1"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/pat015-hemocrit",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "pat015-hemocrit",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T22:12:19.855+00:00",
+          "source": "#dwCZ5COJ1YW55Eig"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "laboratory",
+                "display": "laboratory"
+              }
+            ],
+            "text": "Laboratory"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "32354-3",
+              "display": "Hct VFr BldA"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "issued": "2020-06-15T15:30:10+01:00",
+        "valueQuantity": {
+          "value": 72,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/pat015-hemocrit"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/124",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "124",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T22:12:20.079+00:00",
+          "source": "#9Q01dEEfPR249KjL"
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Appointment</b><a name=\"example\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Appointment &quot;example&quot; </p></div><p><b>status</b>: proposed</p><p><b>serviceCategory</b>: General Practice <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-service-category.html\">Service category</a>#17)</span></p><p><b>serviceType</b>: General Practice <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-service-type.html\">Service type</a>#pat015)</span></p><p><b>specialty</b>: General practice (specialty) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#394814009)</span></p><p><b>appointmentType</b>: A follow up visit from a previous appointment <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-v2-0276.html\">appointmentReason</a>#FOLLOWUP)</span></p><p><b>reasonReference</b>: <a href=\"Condition/cond015a\">Condition/cond015a: Heart problem</a></p><p><b>priority</b>: 5</p><p><b>description</b>: Discussion on the results of your recent MRI</p><p><b>start</b>: Dec 10, 2013, 9:00:00 AM</p><p><b>end</b>: Dec 10, 2013, 11:00:00 AM</p><p><b>created</b>: 2013-10-10</p><p><b>comment</b>: Further expand on the results of the MRI and determine the next actions that may be appropriate.</p><p><b>basedOn</b>: <a href=\"ServiceRequest-example.html\">ServiceRequest/servreq-g0180-1</a></p><blockquote><p><b>participant</b></p><p><b>actor</b>: <a href=\"Patient-example.html\">Patient/pat015: Amy Baxter</a> &quot; SHAW&quot;</p><p><b>required</b>: required</p><p><b>status</b>: accepted</p></blockquote><blockquote><p><b>participant</b></p><p><b>type</b>: attender <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-v3-ParticipationType.html\">ParticipationType</a>#ATND)</span></p><p><b>actor</b>: <a href=\"Practitioner-example.html\">Practitioner/pra1255: Dr Adam Careful</a> &quot; CAREFUL&quot;</p><p><b>required</b>: required</p><p><b>status</b>: accepted</p></blockquote><blockquote><p><b>participant</b></p><p><b>actor</b>: <a href=\"Location-example.html\">Location/example: South Wing, second floor</a> &quot;South Wing, second floor&quot;</p><p><b>required</b>: required</p><p><b>status</b>: accepted</p></blockquote><p><b>requestedPeriod</b>: 2020-11-01 --&gt; 2020-12-15</p></div>"
+        },
+        "status": "proposed",
+        "serviceCategory": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-category",
+                "code": "17",
+                "display": "General Practice"
+              }
+            ]
+          }
+        ],
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-type",
+                "code": "pat015",
+                "display": "General Practice"
+              }
+            ]
+          }
+        ],
+        "specialty": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "394814009",
+                "display": "General practice (specialty)"
+              }
+            ]
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0276",
+              "code": "FOLLOWUP",
+              "display": "A follow up visit from a previous appointment"
+            }
+          ]
+        },
+        "reasonReference": [
+          {
+            "reference": "Condition/cond015a",
+            "display": "Heart problem"
+          }
+        ],
+        "priority": 5,
+        "description": "Discussion on the results of your recent MRI",
+        "start": "2013-12-10T09:00:00Z",
+        "end": "2013-12-10T11:00:00Z",
+        "created": "2013-10-10",
+        "comment": "Further expand on the results of the MRI and determine the next actions that may be appropriate.",
+        "basedOn": [
+          {
+            "reference": "ServiceRequest/servreq-g0180-1"
+          }
+        ],
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/pat015",
+              "display": "Amy Baxter"
+            },
+            "required": "required",
+            "status": "accepted"
+          },
+          {
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                    "code": "ATND"
+                  }
+                ]
+              }
+            ],
+            "actor": {
+              "reference": "Practitioner/pra1255",
+              "display": "Dr Adam Careful"
+            },
+            "required": "required",
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "Location/loc1234",
+              "display": "South Wing, second floor"
+            },
+            "required": "required",
+            "status": "accepted"
+          }
+        ],
+        "requestedPeriod": [
+          {
+            "start": "2020-11-01",
+            "end": "2020-12-15"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Appointment/124"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/127",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "127",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T22:12:20.185+00:00",
+          "source": "#tJqP1EXPSK6HyxAC"
+        },
+        "identifier": [
+          {
+            "use": "official",
+            "system": "http://www.amc.nl/zorgportal/identifiers/visits",
+            "value": "v1451"
+          }
+        ],
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "type": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "270427003",
+                "display": "Patient-initiated encounter"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "310361003",
+              "display": "Non-urgent cardiological admission"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/pat015"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/pra1255"
+            }
+          }
+        ],
+        "length": {
+          "value": 140,
+          "unit": "min",
+          "system": "http://unitsofmeasure.org",
+          "code": "min"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "34068001",
+                "display": "Heart valve replacement"
+              }
+            ]
+          }
+        ],
+        "hospitalization": {
+          "preAdmissionIdentifier": {
+            "use": "official",
+            "system": "http://www.amc.nl/zorgportal/identifiers/pre-admissions",
+            "value": "93042"
+          },
+          "admitSource": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "305956004",
+                "display": "Referral by physician"
+              }
+            ]
+          },
+          "dischargeDisposition": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "306689006",
+                "display": "Discharge to home"
+              }
+            ]
+          }
+        },
+        "serviceProvider": {
+          "reference": "Organization/org123",
+          "display": "University Medical Center"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/127"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Location/loc1234",
+      "resource": {
+        "resourceType": "Location",
+        "id": "loc1234",
+        "meta": {
+          "versionId": "2",
+          "lastUpdated": "2024-05-13T22:12:20.557+00:00",
+          "source": "#mgw17imsWJuB6ayP"
+        },
+        "address": {
+          "line": [
+            "100 Good St"
+          ],
+          "city": "Bedford",
+          "state": "MA",
+          "postalCode": "01730"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Location/loc1234"
+      }
+    },
+    {
+      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org123",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "org123",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2024-05-13T22:12:20.191+00:00",
+          "source": "#tJqP1EXPSK6HyxAC"
+        },
+        "extension": [
+          {
+            "url": "http://hapifhir.io/fhir/StructureDefinition/resource-placeholder",
+            "valueBoolean": true
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/org123"
+      }
+    }
+  ]
+}

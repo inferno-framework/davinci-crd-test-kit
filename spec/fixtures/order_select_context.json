@@ -1,0 +1,334 @@
+{
+  "userId": "Practitioner/123",
+  "patientId": "1288992",
+  "encounterId": "89284",
+  "selections": [
+    "NutritionOrder/pureeddiet-simple",
+    "MedicationRequest/smart-MedicationRequest-103"
+  ],
+  "draftOrders": {
+    "resourceType": "Bundle",
+    "entry": [
+      {
+        "resource": {
+          "resourceType": "NutritionOrder",
+          "id": "pureeddiet-simple",
+          "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: NutritionOrder</b><a name=\"example\"> </a><a name=\"hcexample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource NutritionOrder &quot;example&quot; </p></div><p><b>identifier</b>: <code>http://goodhealthhospital.org/nutrition-requests</code>/123</p><p><b>status</b>: draft</p><p><b>intent</b>: order</p><p><b>patient</b>: <a href=\"Patient-example.html\">Patient/example</a> &quot; SHAW&quot;</p><p><b>encounter</b>: <a href=\"Encounter-example.html\">Encounter/example</a></p><p><b>dateTime</b>: 2014-09-17</p><p><b>orderer</b>: <a href=\"Practitioner-example.html\">Practitioner/example</a> &quot; CAREFUL&quot;</p><p><b>allergyIntolerance</b>: <a href=\"http://example.org/fhir/AllergyIntolerance/example\">http://example.org/fhir/AllergyIntolerance/example: Cashew Nuts</a></p><p><b>foodPreferenceModifier</b>: Dairy Free <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-diet.html\">Diet</a>#dairy-free)</span></p><p><b>excludeFoodModifier</b>: Cashew Nut <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#227493005)</span></p><blockquote><p><b>oralDiet</b></p><p><b>type</b>: Fiber restricted diet <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#15108003 &quot;Restricted fiber diet&quot;)</span>, Low fat diet <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#16208003)</span></p><p><b>schedule</b>: Starting 2015-02-10, 3 per 1 days</p><h3>Nutrients</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Modifier</b></td><td><b>Amount</b></td></tr><tr><td style=\"display: none\">*</td><td>Fat <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#256674009)</span></td><td>50 grams<span style=\"background: LightGoldenRodYellow\"> (Details: UCUM code g = 'g')</span></td></tr></table></blockquote></div>"
+          },
+          "identifier": [
+            {
+              "system": "http://goodhealthhospital.org/nutrition-requests",
+              "value": "123"
+            }
+          ],
+          "status": "draft",
+          "intent": "order",
+          "patient": {
+            "reference": "Patient/1288992"
+          },
+          "encounter": {
+            "reference": "Encounter/89284"
+          },
+          "dateTime": "2014-09-17",
+          "orderer": {
+            "reference": "Practitioner/1234"
+          },
+          "allergyIntolerance": [
+            {
+              "reference": "http://example.org/fhir/AllergyIntolerance/example",
+              "display": "Cashew Nuts"
+            }
+          ],
+          "foodPreferenceModifier": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/diet",
+                  "code": "dairy-free"
+                }
+              ]
+            }
+          ],
+          "excludeFoodModifier": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "227493005",
+                  "display": "Cashew Nut"
+                }
+              ]
+            }
+          ],
+          "oralDiet": {
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "15108003",
+                    "display": "Restricted fiber diet"
+                  }
+                ],
+                "text": "Fiber restricted diet"
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "16208003",
+                    "display": "Low fat diet"
+                  }
+                ],
+                "text": "Low fat diet"
+              }
+            ],
+            "schedule": [
+              {
+                "repeat": {
+                  "boundsPeriod": {
+                    "start": "2015-02-10"
+                  },
+                  "frequency": 3,
+                  "period": 1,
+                  "periodUnit": "d"
+                }
+              }
+            ],
+            "nutrient": [
+              {
+                "modifier": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "256674009",
+                      "display": "Fat"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 50,
+                  "unit": "grams",
+                  "system": "http://unitsofmeasure.org",
+                  "code": "g"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "resource": {
+          "resourceType": "MedicationRequest",
+          "id": "smart-MedicationRequest-103",
+          "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: MedicationRequest</b><a name=\"example\"> </a><a name=\"hcexample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource MedicationRequest &quot;example&quot; </p></div><p><b>identifier</b>: <code>http://www.bmc.nl/portal/prescriptions</code>/12345689 (use: OFFICIAL)</p><p><b>status</b>: draft</p><p><b>intent</b>: order</p><p><b>medication</b>: <a name=\"hcmed0320\"> </a></p><blockquote><p/><p><a name=\"med0320\"> </a></p><p><a name=\"hcmed0320\"> </a></p><p><b>code</b>: Azithromycin 250 mg oral tablet <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#1145423002)</span></p></blockquote><p><b>subject</b>: <a href=\"Patient-example.html\">Patient/example</a> &quot; SHAW&quot;</p><p><b>encounter</b>: <a href=\"Encounter-example.html\">Encounter/example</a></p><p><b>authoredOn</b>: 2015-01-15</p><p><b>requester</b>: <a href=\"Practitioner-example.html\">Practitioner/example</a> &quot; CAREFUL&quot;</p><p><b>reasonCode</b>: Traveler's Diarrhea (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#11840006)</span></p><p><b>insurance</b>: <a href=\"Coverage-example.html\">Coverage/example</a></p><p><b>note</b>: Patient told to take with food</p><blockquote><p><b>dosageInstruction</b></p><p><b>sequence</b>: 1</p><p><b>text</b>: Two tablets at once</p><p><b>additionalInstruction</b>: With or after food <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#311504000)</span></p><p><b>timing</b>: Once per 1 days</p><p><b>route</b>: Oral Route <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#26643006)</span></p><p><b>method</b>: Swallow - dosing instruction imperative (qualifier value) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#421521009)</span></p><blockquote><p><b>doseAndRate</b></p></blockquote></blockquote><blockquote><p><b>dosageInstruction</b></p><p><b>sequence</b>: 2</p><p><b>text</b>: One tablet daily for 4 days</p><p><b>additionalInstruction</b>: With or after food <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#311504000)</span></p><p><b>timing</b>: 4 per 1 days</p><p><b>route</b>: Oral Route <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#26643006)</span></p><blockquote><p><b>doseAndRate</b></p></blockquote></blockquote><blockquote><p><b>dispenseRequest</b></p><p><b>validityPeriod</b>: 2015-01-15 --&gt; 2016-01-15</p><p><b>numberOfRepeatsAllowed</b>: 1</p><p><b>quantity</b>: 6 TAB<span style=\"background: LightGoldenRodYellow\"> (Details: http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm code TAB = 'Tablet')</span></p><h3>ExpectedSupplyDurations</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Value</b></td><td><b>Unit</b></td><td><b>System</b></td><td><b>Code</b></td></tr><tr><td style=\"display: none\">*</td><td>5</td><td>days</td><td><a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-v3-ucum.html\">Unified Code for Units of Measure (UCUM)</a></td><td>d</td></tr></table></blockquote><h3>Substitutions</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Allowed[x]</b></td><td><b>Reason</b></td></tr><tr><td style=\"display: none\">*</td><td>true</td><td>formulary policy <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-v3-ActReason.html\">ActReason</a>#FP)</span></td></tr></table><hr/><blockquote><p><b>Generated Narrative: Medication #med0320</b><a name=\"med0320\"> </a><a name=\"hcmed0320\"> </a></p><p><b>code</b>: Azithromycin 250 mg oral tablet <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#1145423002)</span></p></blockquote></div>"
+          },
+          "contained": [
+            {
+              "resourceType": "Medication",
+              "id": "med0320",
+              "code": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "1145423002",
+                    "display": "Azithromycin 250 mg oral tablet"
+                  }
+                ]
+              }
+            }
+          ],
+          "identifier": [
+            {
+              "use": "official",
+              "system": "http://www.bmc.nl/portal/prescriptions",
+              "value": "12345689"
+            }
+          ],
+          "status": "draft",
+          "intent": "order",
+          "medicationReference": {
+            "reference": "#med0320"
+          },
+          "subject": {
+            "reference": "Patient/1288992"
+          },
+          "encounter": {
+            "reference": "Encounter/89284"
+          },
+          "authoredOn": "2015-01-15",
+          "requester": {
+            "reference": "Practitioner/1234"
+          },
+          "reasonCode": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "11840006",
+                  "display": "Traveler's Diarrhea (disorder)"
+                }
+              ]
+            }
+          ],
+          "insurance": [
+            {
+              "reference": "Coverage/example"
+            }
+          ],
+          "note": [
+            {
+              "text": "Patient told to take with food"
+            }
+          ],
+          "dosageInstruction": [
+            {
+              "sequence": 1,
+              "text": "Two tablets at once",
+              "additionalInstruction": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "311504000",
+                      "display": "With or after food"
+                    }
+                  ]
+                }
+              ],
+              "timing": {
+                "repeat": {
+                  "frequency": 1,
+                  "period": 1,
+                  "periodUnit": "d"
+                }
+              },
+              "route": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "26643006",
+                    "display": "Oral Route"
+                  }
+                ]
+              },
+              "method": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "421521009",
+                    "display": "Swallow - dosing instruction imperative (qualifier value)"
+                  }
+                ]
+              },
+              "doseAndRate": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                        "code": "ordered",
+                        "display": "Ordered"
+                      }
+                    ]
+                  },
+                  "doseQuantity": {
+                    "value": 2,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              ]
+            },
+            {
+              "sequence": 2,
+              "text": "One tablet daily for 4 days",
+              "additionalInstruction": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "311504000",
+                      "display": "With or after food"
+                    }
+                  ]
+                }
+              ],
+              "timing": {
+                "repeat": {
+                  "frequency": 4,
+                  "period": 1,
+                  "periodUnit": "d"
+                }
+              },
+              "route": {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "26643006",
+                    "display": "Oral Route"
+                  }
+                ]
+              },
+              "doseAndRate": [
+                {
+                  "type": {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                        "code": "ordered",
+                        "display": "Ordered"
+                      }
+                    ]
+                  },
+                  "doseQuantity": {
+                    "value": 1,
+                    "unit": "TAB",
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+                    "code": "TAB"
+                  }
+                }
+              ]
+            }
+          ],
+          "dispenseRequest": {
+            "validityPeriod": {
+              "start": "2015-01-15",
+              "end": "2016-01-15"
+            },
+            "numberOfRepeatsAllowed": 1,
+            "quantity": {
+              "value": 6,
+              "unit": "TAB",
+              "system": "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+              "code": "TAB"
+            },
+            "expectedSupplyDuration": {
+              "value": 5,
+              "unit": "days",
+              "system": "http://unitsofmeasure.org",
+              "code": "d"
+            }
+          },
+          "substitution": {
+            "allowedBoolean": true,
+            "reason": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+                  "code": "FP",
+                  "display": "formulary policy"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

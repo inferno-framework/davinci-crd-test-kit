@@ -1,0 +1,39 @@
+{
+  "resourceType" : "ServiceRequest",
+  "id" : "example",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: ServiceRequest</b><a name=\"example\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource ServiceRequest &quot;example&quot; </p></div><p><b>basedOn</b>: <a href=\"http://example.org/fhir/ServiceRequest/someReferral\">http://example.org/fhir/ServiceRequest/someReferral</a></p><p><b>status</b>: draft</p><p><b>intent</b>: order</p><p><b>code</b>: Implant Pacemaker <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#25267002 &quot;Insertion of intracardiac pacemaker (procedure)&quot;)</span></p><p><b>subject</b>: <a href=\"Patient-example.html\">Patient/example</a> &quot; SHAW&quot;</p><p><b>authoredOn</b>: 2015-03-30</p><p><b>requester</b>: <a href=\"Practitioner-example.html\">Practitioner/example: Dr. Beverly Crusher</a> &quot; CAREFUL&quot;</p><p><b>performer</b>: <a href=\"http://example.org/fhir/Practitioner/example2\">http://example.org/fhir/Practitioner/example2: Dr Cecil Surgeon</a></p><p><b>locationReference</b>: <a href=\"Location-example.html\">Location/example</a> &quot;South Wing, second floor&quot;</p><p><b>reasonCode</b>: Bradycardia <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> ()</span></p></div>"
+  },
+  "basedOn" : [{
+    "reference" : "http://example.org/fhir/ServiceRequest/someReferral"
+  }],
+  "status" : "draft",
+  "intent" : "order",
+  "code" : {
+    "coding" : [{
+      "system" : "http://snomed.info/sct",
+      "code" : "25267002",
+      "display" : "Insertion of intracardiac pacemaker (procedure)"
+    }],
+    "text" : "Implant Pacemaker"
+  },
+  "subject" : {
+    "reference" : "Patient/example"
+  },
+  "authoredOn" : "2015-03-30",
+  "requester" : {
+    "reference" : "Practitioner/example",
+    "display" : "Dr. Beverly Crusher"
+  },
+  "performer" : [{
+    "reference" : "http://example.org/fhir/Practitioner/example2",
+    "display" : "Dr Cecil Surgeon"
+  }],
+  "locationReference" : [{
+    "reference" : "Location/example"
+  }],
+  "reasonCode" : [{
+    "text" : "Bradycardia"
+  }]
+}

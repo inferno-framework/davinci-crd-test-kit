@@ -1,0 +1,21 @@
+{
+  "summary": "External Reference Card",
+  "detail": "This is an External Reference Card containing one or more links to external web pages, PDFs, or other resources that provide relevant coverage information.",
+  "indicator": "info",
+  "source": {
+    "label": "Inferno",
+    "url": "https://inferno.healthit.gov/",
+    "topic": {
+      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+      "code": "guideline",
+      "display": "Guideline"
+    }
+  },
+  "links": [
+    {
+      "label": "CRD IG External Reference Card Info",
+      "url": "https://build.fhir.org/ig/HL7/davinci-crd/cards.html#external-reference",
+      "type": "absolute"
+    }
+  ]
+}

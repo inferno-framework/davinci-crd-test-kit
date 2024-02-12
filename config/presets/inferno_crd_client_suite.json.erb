@@ -1,0 +1,102 @@
+{
+  "title": "Inferno CRD Client Suite",
+  "id": "inferno-crd-client-suite",
+  "test_suite_id": "crd_server",
+  "inputs": [
+    {
+      "name": "base_url",
+      "title": "CRD server base URL",
+      "type": "text",
+      "value": "<%= Inferno::Application['base_url'] %>/custom/crd_client"
+    },
+    {
+      "name": "authentication_required",
+      "default": "no",
+      "options": {
+        "list_options": [
+          {
+            "label": "No",
+            "value": "no"
+          },
+          {
+            "label": "Yes",
+            "value": "yes"
+          }
+        ]
+      },
+      "title": "Discovery endpoint requires authentication?",
+      "type": "radio",
+      "value": "no"
+    },
+    {
+      "name": "encryption_method",
+      "default": "ES384",
+      "description": "CDS Hooks recommends ES384 and RS384 for JWT signature verification. Select which method to use.",
+      "options": {
+        "list_options": [
+          {
+            "label": "ES384",
+            "value": "ES384"
+          },
+          {
+            "label": "RS384",
+            "value": "RS384"
+          }
+        ]
+      },
+      "title": "JWT Signing Algorithm",
+      "type": "radio",
+      "value": "ES384"
+    },
+    {
+      "name": "jwks_kid",
+      "description": "The key ID of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint requiring authentication. Defaults to the first JWK in the list if no kid is supplied.",
+      "optional": true,
+      "title": "CDS Services JWKS kid",
+      "type": "text",
+      "value": ""
+    },
+    {
+      "name": "appointment_book_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `appointment-book` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"d1577c69-dfbe-44ad-ba6d-3e05e953b2ea\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"appointment-book\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"user/Patient.read user/Observation.read\",\n      \"subject\": \"cds-service\"\n    },\n    \"context\": {\n      \"userId\": \"Practitioner/pra1255\",\n      \"patientId\": \"pat014\",\n      \"encounterId\": \"enc-pat014-cold\",\n      \"appointments\": {\n        \"resourceType\": \"Bundle\",\n        \"id\": \"2a020b2f-1577-4ccb-8ee8-1dc09060f727\",\n        \"meta\": {\n          \"lastUpdated\": \"2024-05-10T03:55:33.823+00:00\"\n        },\n        \"type\": \"searchset\",\n        \"total\": 2,\n        \"link\": [\n          {\n            \"relation\": \"self\",\n            \"url\": \"https://inferno-qa.healthit.gov/reference-server/r4/Appointment?patient=pat014\"\n          }\n        ],\n        \"entry\": [\n          {\n            \"fullUrl\": \"https://inferno-qa.healthit.gov/reference-server/r4/Appointment/125\",\n            \"resource\": {\n              \"resourceType\": \"Appointment\",\n              \"id\": \"125\",\n              \"meta\": {\n                \"versionId\": \"1\",\n                \"lastUpdated\": \"2024-05-10T03:52:09.983+00:00\",\n                \"source\": \"#KIaKP1Pfw7EVpLjl\"\n              },\n              \"status\": \"proposed\",\n              \"serviceType\": [\n                {\n                  \"coding\": [\n                    {\n                      \"system\": \"http://terminology.hl7.org/CodeSystem/service-type\",\n                      \"code\": \"183\",\n                      \"display\": \"Sleep Medicine\"\n                    }\n                  ]\n                }\n              ],\n              \"appointmentType\": {\n                \"coding\": [\n                  {\n                    \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0276\",\n                    \"code\": \"FOLLOWUP\",\n                    \"display\": \"A follow up visit from a previous appointment\"\n                  }\n                ]\n              },\n              \"description\": \"CPAP adjustments\",\n              \"start\": \"2019-08-10T09:00:00Z\",\n              \"end\": \"2019-08-10T11:00:00Z\",\n              \"created\": \"2019-08-01\",\n              \"participant\": [\n                {\n                  \"actor\": {\n                    \"reference\": \"Patient/pat014\",\n                    \"display\": \"Peter James Chalmers\"\n                  },\n                  \"required\": \"required\",\n                  \"status\": \"tentative\"\n                },\n                {\n                  \"actor\": {\n                    \"reference\": \"Practitioner/pra1255\",\n                    \"display\": \"Dr Adam Careful\"\n                  },\n                  \"required\": \"required\",\n                  \"status\": \"accepted\"\n                }\n              ],\n              \"requestedPeriod\": [\n                {\n                  \"start\": \"2020-05-23\",\n                  \"end\": \"2020-05-23\"\n                }\n              ]\n            },\n            \"search\": {\n              \"mode\": \"match\"\n            }\n          },\n          {\n            \"fullUrl\": \"https://inferno-qa.healthit.gov/reference-server/r4/Appointment/126\",\n            \"resource\": {\n              \"resourceType\": \"Appointment\",\n              \"id\": \"126\",\n              \"meta\": {\n                \"versionId\": \"1\",\n                \"lastUpdated\": \"2024-05-10T03:55:17.405+00:00\",\n                \"source\": \"#RTJWuip7OTKyTjG7\"\n              },\n              \"status\": \"proposed\",\n              \"appointmentType\": {\n                \"coding\": [\n                  {\n                    \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0276\",\n                    \"code\": \"CHECKUP\",\n                    \"display\": \"A routine check-up, such as an annual physical\"\n                  }\n                ]\n              },\n              \"description\": \"Regular physical\",\n              \"start\": \"2020-08-01T11:00:00Z\",\n              \"end\": \"2020-08-01T13:00:00Z\",\n              \"created\": \"2019-08-01\",\n              \"participant\": [\n                {\n                  \"actor\": {\n                    \"reference\": \"Patient/pat014\",\n                    \"display\": \"Peter James Chalmers\"\n                  },\n                  \"required\": \"required\",\n                  \"status\": \"tentative\"\n                },\n                {\n                  \"actor\": {\n                    \"reference\": \"Practitioner/pra1255\",\n                    \"display\": \"Dr Adam Careful\"\n                  },\n                  \"required\": \"required\",\n                  \"status\": \"accepted\"\n                }\n              ],\n              \"requestedPeriod\": [\n                {\n                  \"start\": \"2021-05-23\",\n                  \"end\": \"2021-05-23\"\n                }\n              ]\n            },\n            \"search\": {\n              \"mode\": \"match\"\n            }\n          }\n        ]\n      }\n    }\n  }\n]\n"
+    },
+    {
+      "name": "encounter_start_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `encounter-start` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"f3945c69-dfbe-44vf-ba6d-3e05e953b2ea\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"encounter-start\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"user/Patient.read user/Practitioner.read user/Encounter.read\",\n      \"subject\": \"cds-service\"\n    },\n    \"context\": {\n      \"userId\": \"Practitioner/pra1255\",\n      \"patientId\": \"pat015\",\n      \"encounterId\": \"127\"\n    }\n  }\n]\n"
+    },
+    {
+      "name": "encounter_discharge_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `encounter-discharge` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"f3945c69-dfbe-44vf-ba6d-3e05e123b2ea\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"encounter-discharge\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"user/Patient.read user/Practitioner.read user/Encounter.read\",\n      \"subject\": \"cds-service\"\n    },\n    \"context\": {\n      \"userId\": \"Practitioner/pra1255\",\n      \"patientId\": \"pat014\",\n      \"encounterId\": \"enc-pat014-cold\"\n    }\n  }\n]\n"
+    },
+    {
+      "name": "order_select_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `order-select` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"d1577c69-dfbe-44ad-ba6d-3e05e953b2ea\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"order-select\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"patient/Patient.read patient/Observation.read\",\n      \"subject\": \"cds-service4\"\n    },\n    \"context\": {\n      \"userId\": \"Practitioner/pra1234\",\n      \"patientId\": \"pat014\",\n      \"encounterId\": \"enc-pat014-cold\",\n      \"selections\": [\n        \"MedicationRequest/pat014-mr-azathioprine\"\n      ],\n      \"draftOrders\": {\n        \"resourceType\": \"Bundle\",\n        \"entry\": [\n          {\n            \"fullUrl\": \"https://inferno-qa.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-azathioprine\",\n            \"resource\": {\n              \"resourceType\": \"MedicationRequest\",\n              \"id\": \"pat014-mr-azathioprine\",\n              \"meta\": {\n                \"versionId\": \"1\",\n                \"lastUpdated\": \"2024-04-25T17:48:34.896+00:00\",\n                \"source\": \"#R0SZmSGTb4YcV7ig\"\n              },\n              \"identifier\": [\n                {\n                  \"type\": {\n                    \"coding\": [\n                      {\n                        \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n                        \"code\": \"PLAC\"\n                      }\n                    ]\n                  },\n                  \"value\": \"25839b73-fcc9-4706-8c77-a806995b8109\"\n                }\n              ],\n              \"status\": \"draft\",\n              \"intent\": \"order\",\n              \"medicationCodeableConcept\": {\n                \"coding\": [\n                  {\n                    \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n                    \"code\": \"105611\",\n                    \"display\": \"azathioprine 50 MG Oral Tablet [Imuran]\"\n                  }\n                ]\n              },\n              \"subject\": {\n                \"reference\": \"Patient/pat014\",\n                \"display\": \"Theodor Roosevelt\"\n              },\n              \"authoredOn\": \"2020-05-11\",\n              \"requester\": {\n                \"reference\": \"Practitioner/pra1234\",\n                \"display\": \"Jane Doe\"\n              },\n              \"reasonCode\": [\n                {\n                  \"coding\": [\n                    {\n                      \"system\": \"http://snomed.info/sct\",\n                      \"code\": \"52042003\",\n                      \"display\": \"Systemic lupus erythematosus glomerulonephritis syndrome, World Health Organization class V (disorder)\"\n                    }\n                  ]\n                }\n              ],\n              \"insurance\": [\n                {\n                  \"reference\": \"Coverage/cov014\"\n                }\n              ],\n              \"dosageInstruction\": [\n                {\n                  \"sequence\": 1,\n                  \"text\": \"50 mg PO daily for remission induction\",\n                  \"timing\": {\n                    \"repeat\": {\n                      \"frequency\": 1,\n                      \"period\": 1,\n                      \"periodUnit\": \"d\"\n                    }\n                  },\n                  \"route\": {\n                    \"coding\": [\n                      {\n                        \"system\": \"http://snomed.info/sct\",\n                        \"code\": \"26643006\",\n                        \"display\": \"Oral route (qualifier value)\"\n                      }\n                    ]\n                  },\n                  \"doseAndRate\": [\n                    {\n                      \"type\": {\n                        \"coding\": [\n                          {\n                            \"system\": \"http://terminology.hl7.org/CodeSystem/dose-rate-type\",\n                            \"code\": \"ordered\",\n                            \"display\": \"Ordered\"\n                          }\n                        ]\n                      },\n                      \"doseQuantity\": {\n                        \"value\": 50,\n                        \"unit\": \"mg\",\n                        \"system\": \"http://unitsofmeasure.org\",\n                        \"code\": \"mg\"\n                      }\n                    }\n                  ]\n                }\n              ],\n              \"dispenseRequest\": {\n                \"numberOfRepeatsAllowed\": 3,\n                \"quantity\": {\n                  \"value\": 90,\n                  \"system\": \"http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm\",\n                  \"code\": \"TAB\"\n                }\n              }\n            },\n            \"search\": {\n              \"mode\": \"match\"\n            }\n          }\n        ]\n      }\n    }\n  }\n]\n"
+    },
+    {
+      "name": "order_dispatch_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `order-dispatch` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"f3945c39-dfbe-44vf-ba6d-3e05e123b2va\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"order-dispatch\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"user/Patient.read user/Practitioner.read user/ServiceRequest.read\",\n      \"subject\": \"cds-service\"\n    },\n    \"context\": {\n      \"patientId\": \"pat015\",\n      \"order\": \"DeviceRequest/devreq-015-e0250\",\n      \"performer\": \"Practitioner/pra1255\"\n    }\n  }\n]\n"
+    },
+    {
+      "name": "order_sign_request_bodies",
+      "description": "Provide a list of request bodies send multiple requests. e.g. [json_body_1, json_body_2]",
+      "title": "Request bodies collection to use to invoke the `order-sign` hook",
+      "type": "textarea",
+      "value": "[\n  {\n    \"hookInstance\": \"d1577c69-dfbe-44ad-ba6d-3e05e953b2ea\",\n    \"fhirServer\": \"https://inferno-qa.healthit.gov/reference-server/r4\",\n    \"hook\": \"order-sign\",\n    \"fhirAuthorization\": {\n      \"access_token\": \"SAMPLE_TOKEN\",\n      \"token_type\": \"Bearer\",\n      \"expires_in\": 300,\n      \"scope\": \"patient/Patient.read patient/Observation.read\",\n      \"subject\": \"cds-service4\"\n    },\n    \"context\": {\n      \"userId\": \"Practitioner/pra1234\",\n      \"patientId\": \"pat015\",\n      \"encounterId\": \"enc-pat014\",\n      \"draftOrders\": {\n        \"resourceType\": \"Bundle\",\n        \"entry\": [\n          {\n            \"resource\": {\n              \"resourceType\": \"DeviceRequest\",\n              \"id\": \"devreq-015-e0250\",\n              \"meta\": {\n                \"versionId\": \"1\",\n                \"lastUpdated\": \"2024-05-08T09:47:16.992-04:00\",\n                \"source\": \"#Odh5ejWjud85tvNJ\",\n                \"profile\": [\n                  \"http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4\"\n                ]\n              },\n              \"identifier\": [\n                {\n                  \"type\": {\n                    \"coding\": [\n                      {\n                        \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n                        \"code\": \"PLAC\"\n                      }\n                    ]\n                  },\n                  \"value\": \"f105372f-bbef-442c-ad7a-708fee7f8c93\"\n                }\n              ],\n              \"status\": \"draft\",\n              \"intent\": \"original-order\",\n              \"codeCodeableConcept\": {\n                \"coding\": [\n                  {\n                    \"system\": \"https://bluebutton.cms.gov/resources/codesystem/hcpcs\",\n                    \"code\": \"E0250\",\n                    \"display\": \"Hospital bed fixed height with any type of side rails, mattress\"\n                  }\n                ]\n              },\n              \"subject\": {\n                \"reference\": \"Patient/pat015\"\n              },\n              \"authoredOn\": \"2023-01-01T00:00:00Z\",\n              \"requester\": {\n                \"reference\": \"Practitioner/pra-hfairchild\"\n              },\n              \"performer\": {\n                \"reference\": \"Practitioner/pra1234\"\n              },\n              \"insurance\": [\n                {\n                  \"reference\": \"Coverage/cov015\"\n                }\n              ]\n            }\n          }\n        ]\n      }\n    }\n  }\n]\n"
+    }
+  ]
+}

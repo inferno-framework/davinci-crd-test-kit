@@ -1,0 +1,173 @@
+{
+  "title": "Inferno CRD Server Suite",
+  "id": "inferno-crd-server-suite",
+  "test_suite_id": "crd_client",
+  "inputs": [
+    {
+      "name": "iss",
+      "title": "URI of the issuer of the JWT used to authorize CDS Hooks calls",
+      "type": "text",
+      "value": "<%= Inferno::Application['base_url'] %>/custom/crd_server"
+    },
+    {
+      "name": "url",
+      "description": "URL of the FHIR endpoint used by SMART applications",
+      "title": "FHIR Endpoint",
+      "type": "text",
+      "value": "<%= ENV.fetch('INFERNO_REFERENCE_SERVER_URI', 'https://inferno-qa.healthit.gov') %>/reference-server/r4"
+    },
+    {
+      "name": "ehr_smart_credentials",
+      "optional": true,
+      "title": "OAuth Credentials",
+      "type": "oauth_credentials",
+      "value": {
+        "access_token": "SAMPLE_TOKEN",
+        "refresh_token": "",
+        "expires_in": "",
+        "client_id": "",
+        "client_secret": "",
+        "token_url": ""
+      }
+    },
+    {
+      "name": "ehr_client_id",
+      "description": "Client ID provided during registration of Inferno as an EHR launch application",
+      "title": "EHR Launch Client ID",
+      "type": "text",
+      "value": "SAMPLE_PUBLIC_CLIENT_ID"
+    },
+    {
+      "name": "ehr_requested_scopes",
+      "default": "launch openid fhirUser offline_access user/*.rs",
+      "description": "OAuth 2.0 scope provided by system to enable all required functionality",
+      "title": "EHR Launch Scope",
+      "type": "textarea",
+      "value": "launch openid fhirUser offline_access user/*.rs"
+    },
+    {
+      "name": "patient_ids",
+      "description": "Comma separated list of Patient IDs that in sum contain all MUST SUPPORT elements",
+      "optional": true,
+      "title": "Patient IDs",
+      "type": "text",
+      "value": "pat015"
+    },
+    {
+      "name": "device_ids",
+      "description": "Comma separated list of Device IDs that in sum contain all MUST SUPPORT elements",
+      "title": "Device IDs",
+      "type": "text",
+      "value": "example"
+    },
+    {
+      "name": "encounter_ids",
+      "description": "Comma separated list of Encounter IDs that in sum contain all MUST SUPPORT elements",
+      "optional": true,
+      "title": "Encounter IDs",
+      "type": "text",
+      "value": "pat015-rad-encounter"
+    },
+    {
+      "name": "organization_ids",
+      "description": "Comma separated list of Organization IDs that in sum contain all MUST SUPPORT elements",
+      "optional": true,
+      "title": "Organization IDs",
+      "type": "text",
+      "value": "org1234"
+    },
+    {
+      "name": "practitioner_ids",
+      "description": "Comma separated list of Practitioner IDs that in sum contain all MUST SUPPORT elements",
+      "optional": true,
+      "title": "Practitioner IDs",
+      "type": "text",
+      "value": "pra1234"
+    },
+    {
+      "name": "practitioner_role_ids",
+      "description": "Comma separated list of Practitioner IDs that in sum contain all MUST SUPPORT elements",
+      "optional": true,
+      "title": "PractitionerRole IDs",
+      "type": "text",
+      "value": "prarol1234"
+    },
+    {
+      "name": "location_ids",
+      "description": "Comma separated list of Location IDs that in sum contain all MUST SUPPORT elements",
+      "title": "Location IDs",
+      "type": "text",
+      "value": "loc1234"
+    },
+    {
+      "name": "appointment_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "Appointment Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"Appointment\",\n  \"id\": \"125\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-18T17:20:39.156+00:00\"\n  },\n  \"status\": \"proposed\",\n  \"serviceType\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://terminology.hl7.org/CodeSystem/service-type\",\n          \"code\": \"183\",\n          \"display\": \"Sleep Medicine\"\n        }\n      ]\n    }\n  ],\n  \"appointmentType\": {\n    \"coding\": [\n      {\n        \"system\": \"http://hl7.org/fhir/v2/0276\",\n        \"code\": \"FOLLOWUP\",\n        \"display\": \"A follow up visit from a previous appointment\"\n      }\n    ]\n  },\n  \"description\": \"CPAP adjustments\",\n  \"start\": \"2019-08-10T09:00:00Z\",\n  \"end\": \"2019-08-10T11:00:00Z\",\n  \"created\": \"2019-08-01\",\n  \"participant\": [\n    {\n      \"actor\": {\n        \"reference\": \"Patient/pat014\",\n        \"display\": \"Peter James Chalmers\"\n      },\n      \"required\": \"required\",\n      \"status\": \"tentative\"\n    },\n    {\n      \"actor\": {\n        \"reference\": \"Practitioner/pra1255\",\n        \"display\": \"Dr Adam Careful\"\n      },\n      \"required\": \"required\",\n      \"status\": \"accepted\"\n    }\n  ],\n  \"requestedPeriod\": [\n    {\n      \"start\": \"2020-05-23\",\n      \"end\": \"2020-05-23\"\n    }\n  ]\n}]"
+    },
+    {
+      "name": "communication_request_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "CommunicationRequest Resources",
+      "type": "textarea",
+      "value": "[\n  {\n    \"resourceType\": \"CommunicationRequest\",\n    \"id\": \"134\",\n    \"identifier\": [\n      {\n        \"system\": \"http://www.jurisdiction.com/insurer/123456\",\n        \"value\": \"ABC123\"\n      }\n    ],\n    \"basedOn\": [\n      {\n        \"display\": \"EligibilityRequest\"\n      }\n    ],\n    \"groupIdentifier\": {\n      \"value\": \"12345\"\n    },\n    \"status\": \"draft\",\n    \"category\": [\n      {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/communication-category\",\n            \"code\": \"instruction\"\n          }\n        ]\n      }\n    ],\n    \"priority\": \"routine\",\n    \"medium\": [\n      {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ParticipationMode\",\n            \"code\": \"WRITTEN\",\n            \"display\": \"written\"\n          }\n        ],\n        \"text\": \"written\"\n      }\n    ],\n    \"subject\": {\n      \"reference\": \"Patient/pat015\"\n    },\n    \"encounter\": {\n      \"reference\": \"Encounter/pat015-rad-encounter\"\n    },\n    \"payload\": [\n      {\n        \"extension\": [\n          {\n            \"url\": \"http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content[x]\",\n            \"valueCodeableConcept\": {\n              \"coding\": [\n                {\n                  \"system\": \"http://loinc.org\",\n                  \"code\": \"65752-8\",\n                  \"display\": \"Liver Pathology biopsy report\"\n                }\n              ]\n            }\n          }\n        ],\n        \"contentString\": \"Liver pathology biopsy report\"\n      }\n    ],\n    \"occurrenceDateTime\": \"2016-06-10T11:01:10-08:00\",\n    \"authoredOn\": \"2016-06-10T11:01:10-08:00\",\n    \"requester\": {\n      \"reference\": \"Practitioner/pra1234\"\n    },\n    \"recipient\": [\n      {\n        \"reference\": \"Organization/org1234\"\n      }\n    ]\n  }\n]"
+    },
+    {
+      "name": "device_request_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "DeviceRequest Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"DeviceRequest\",\n  \"id\": \"devreq014\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-18T17:20:39.156+00:00\",\n    \"profile\": [\n      \"http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-devicerequest-r4\"\n    ]\n  },\n  \"identifier\": [\n    {\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"PLAC\"\n          }\n        ]\n      },\n      \"value\": \"600dca50-ddae-482e-b8ac-383e1ab10c18\"\n    }\n  ],\n  \"status\": \"draft\",\n  \"intent\": \"original-order\",\n  \"codeCodeableConcept\": {\n    \"coding\": [\n      {\n        \"system\": \"https://bluebutton.cms.gov/resources/codesystem/hcpcs\",\n        \"code\": \"E0424\",\n        \"display\": \"Stationary Compressed Gaseous Oxygen System, Rental\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/pat014\"\n  },\n  \"authoredOn\": \"2023-01-01T00:00:00Z\",\n  \"requester\": {\n    \"reference\": \"Practitioner/pra-hfairchild\"\n  },\n  \"performer\": {\n    \"reference\": \"Practitioner/pra1255\"\n  },\n  \"insurance\": [\n    {\n      \"reference\": \"Coverage/cov014\"\n    }\n  ]\n}]"
+    },
+    {
+      "name": "encounter_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "Encounter Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"Encounter\",\n  \"id\": \"pat015-rad-encounter\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-18T17:20:39.156+00:00\"\n  },\n  \"status\": \"finished\",\n  \"class\": {\n    \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ActCode\",\n    \"code\": \"HH\",\n    \"display\": \"home health\"\n  },\n  \"type\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://snomed.info/sct\",\n          \"code\": \"185345009\",\n          \"display\": \"Encounter for symptom\"\n        }\n      ]\n    }\n  ],\n  \"priority\": {\n    \"coding\": [\n      {\n        \"system\": \"http://snomed.info/sct\",\n        \"code\": \"709122007\",\n        \"display\": \"As soon as possible (qualifier value)\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/pat015\",\n    \"display\": \"Roosevelt Theodore\"\n  },\n  \"participant\": [\n    {\n      \"type\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/v3-ParticipationType\",\n              \"code\": \"PPRF\",\n              \"display\": \"primary performer\"\n            }\n          ]\n        }\n      ],\n      \"individual\": {\n        \"reference\": \"Practitioner/pra1234\",\n        \"display\": \"Dr. Jane Doe\"\n      }\n    }\n  ],\n  \"period\": {\n    \"start\": \"2020-07-01T10:40:10+01:00\",\n    \"end\": \"2020-07-01T12:40:10+01:00\"\n  },\n  \"length\": {\n    \"value\": 56,\n    \"unit\": \"minutes\",\n    \"system\": \"http://unitsofmeasure.org\",\n    \"code\": \"min\"\n  },\n  \"reasonCode\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://hl7.org/fhir/sid/icd-10-cm\",\n          \"code\": \"J44.9\",\n          \"display\": \"Chronic obstructive pulmonary disease, unspecified\"\n        }\n      ]\n    }\n  ],\n  \"diagnosis\": [\n    {\n      \"condition\": {\n        \"reference\": \"Condition/cond015a\",\n        \"display\": \"The patient is hospitalized for stroke\"\n      },\n      \"use\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/diagnosis-role\",\n            \"code\": \"AD\",\n            \"display\": \"Admission diagnosis\"\n          }\n        ]\n      },\n      \"rank\": 2\n    },\n    {\n      \"condition\": {\n        \"reference\": \"Condition/cond015a\",\n        \"display\": \"The patient is hospitalized for lung condition\"\n      },\n      \"use\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/diagnosis-role\",\n            \"code\": \"CC\",\n            \"display\": \"Chief complaint\"\n          }\n        ]\n      },\n      \"rank\": 1\n    }\n  ]\n}]"
+    },
+    {
+      "name": "medication_request_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "MedicationRequest Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"MedicationRequest\",\n  \"id\": \"pat014-mr-azathioprine\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-18T17:20:39.156+00:00\"\n  },\n  \"identifier\": [\n    {\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"PLAC\"\n          }\n        ]\n      },\n      \"value\": \"25839b73-fcc9-4706-8c77-a806995b8109\"\n    }\n  ],\n  \"status\": \"active\",\n  \"intent\": \"order\",\n  \"medicationCodeableConcept\": {\n    \"coding\": [\n      {\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n        \"code\": \"105611\",\n        \"display\": \"azathioprine 50 MG Oral Tablet [Imuran]\"\n      }\n    ]\n  },\n  \"subject\": {\n    \"reference\": \"Patient/pat014\",\n    \"display\": \"Theodor Roosevelt\"\n  },\n  \"authoredOn\": \"2020-05-11\",\n  \"requester\": {\n    \"reference\": \"Practitioner/pra1234\",\n    \"display\": \"Jane Doe\"\n  },\n  \"reasonCode\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://snomed.info/sct\",\n          \"code\": \"52042003\",\n          \"display\": \"Systemic lupus erythematosus glomerulonephritis syndrome, World Health Organization class V (disorder)\"\n        }\n      ]\n    }\n  ],\n  \"insurance\": [\n    {\n      \"reference\": \"Coverage/cov014\"\n    }\n  ],\n  \"dosageInstruction\": [\n    {\n      \"sequence\": 1,\n      \"text\": \"50 mg PO daily for remission induction\",\n      \"timing\": {\n        \"repeat\": {\n          \"frequency\": 1,\n          \"period\": 1,\n          \"periodUnit\": \"d\"\n        }\n      },\n      \"route\": {\n        \"coding\": [\n          {\n            \"system\": \"http://snomed.info/sct\",\n            \"code\": \"26643006\",\n            \"display\": \"Oral route (qualifier value)\"\n          }\n        ]\n      },\n      \"doseAndRate\": [\n        {\n          \"type\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/dose-rate-type\",\n                \"code\": \"ordered\",\n                \"display\": \"Ordered\"\n              }\n            ]\n          },\n          \"doseQuantity\": {\n            \"value\": 50,\n            \"unit\": \"mg\",\n            \"system\": \"http://unitsofmeasure.org\",\n            \"code\": \"mg\"\n          }\n        }\n      ]\n    }\n  ],\n  \"dispenseRequest\": {\n    \"numberOfRepeatsAllowed\": 3,\n    \"quantity\": {\n      \"value\": 90,\n      \"system\": \"http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm\",\n      \"code\": \"TAB\"\n    }\n  }\n}]"
+    },
+    {
+      "name": "nutrition_order_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "NutritionOrder Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"NutritionOrder\",\n  \"id\": \"135\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-23T15:32:28.628+00:00\"\n  },\n  \"identifier\": [\n    {\n      \"system\": \"http://goodhealthhospital.org/nutrition-requests\",\n      \"value\": \"123\"\n    }\n  ],\n  \"status\": \"draft\",\n  \"intent\": \"order\",\n  \"patient\": {\n    \"reference\": \"Patient/pat014\"\n  },\n  \"encounter\": {\n    \"reference\": \"Encounter/enc-pat014\"\n  },\n  \"dateTime\": \"2014-09-17\",\n  \"orderer\": {\n    \"reference\": \"Practitioner/pra1234\"\n  },\n  \"allergyIntolerance\": [\n    {\n      \"reference\": \"AllergyIntolerance/allergy-pat014-cashew\",\n      \"display\": \"Cashew Nuts\"\n    }\n  ],\n  \"foodPreferenceModifier\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://terminology.hl7.org/CodeSystem/diet\",\n          \"code\": \"dairy-free\"\n        }\n      ]\n    }\n  ],\n  \"excludeFoodModifier\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://snomed.info/sct\",\n          \"code\": \"227493005\",\n          \"display\": \"Cashew Nut\"\n        }\n      ]\n    }\n  ],\n  \"oralDiet\": {\n    \"type\": [\n      {\n        \"coding\": [\n          {\n            \"system\": \"http://snomed.info/sct\",\n            \"code\": \"15108003\",\n            \"display\": \"Restricted fiber diet\"\n          }\n        ],\n        \"text\": \"Fiber restricted diet\"\n      },\n      {\n        \"coding\": [\n          {\n            \"system\": \"http://snomed.info/sct\",\n            \"code\": \"16208003\",\n            \"display\": \"Low fat diet\"\n          }\n        ],\n        \"text\": \"Low fat diet\"\n      }\n    ],\n    \"schedule\": [\n      {\n        \"repeat\": {\n          \"boundsPeriod\": {\n            \"start\": \"2015-02-10\"\n          },\n          \"frequency\": 3,\n          \"period\": 1,\n          \"periodUnit\": \"d\"\n        }\n      }\n    ],\n    \"nutrient\": [\n      {\n        \"modifier\": {\n          \"coding\": [\n            {\n              \"system\": \"http://snomed.info/sct\",\n              \"code\": \"256674009\",\n              \"display\": \"Fat\"\n            }\n          ]\n        },\n        \"amount\": {\n          \"value\": 50,\n          \"unit\": \"grams\",\n          \"system\": \"http://unitsofmeasure.org\",\n          \"code\": \"g\"\n        }\n      }\n    ]\n  }\n}]"
+    },
+    {
+      "name": "service_request_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "ServiceRequest Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"ServiceRequest\",\n  \"id\": \"servreq01\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-18T17:20:39.156+00:00\"\n  },\n  \"identifier\": [\n    {\n      \"type\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/v2-0203\",\n            \"code\": \"PLAC\"\n          }\n        ]\n      },\n      \"value\": \"63dae4d5-1b48-41f6-b56c-8b2fdea87067\"\n    }\n  ],\n  \"status\": \"draft\",\n  \"intent\": \"order\",\n  \"category\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://snomed.info/sct\",\n          \"code\": \"386053000\",\n          \"display\": \"Evaluation procedure (procedure)\"\n        }\n      ],\n      \"text\": \"Evaluation\"\n    }\n  ],\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"https://bluebutton.cms.gov/resources/codesystem/hcpcs\",\n        \"code\": \"A0426\",\n        \"display\": \"Ambulance service, advanced life support, non-emergency transport, level 1 (als 1)\"\n      }\n    ],\n    \"text\": \"Ambulance service Non-Emergency Transport\"\n  },\n  \"subject\": {\n    \"reference\": \"Patient/pat014\"\n  },\n  \"occurrenceDateTime\": \"2016-09-27\",\n  \"authoredOn\": \"2016-09-20\",\n  \"requester\": {\n    \"display\": \"Smythe Juliette, MD\"\n  },\n  \"performer\": [\n    {\n      \"reference\": \"Practitioner/pra1255\"\n    }\n  ],\n  \"reasonCode\": [\n    {\n      \"text\": \"Physical Therapy for Hip Fracture \"\n    }\n  ],\n  \"insurance\": [\n    {\n      \"reference\": \"Coverage/cov014\"\n    }\n  ]\n}]"
+    },
+    {
+      "name": "claim_response_create_resources",
+      "description": "Provide a list of resources to create. e.g., [json_resource_1, json_resource_2]",
+      "title": "ClaimResponse Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"ClaimResponse\",\n  \"status\": \"active\",\n  \"type\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/claim-type\",\n        \"code\": \"professional\"\n      }\n    ]\n  },\n  \"use\": \"preauthorization\",\n  \"patient\": {\n    \"reference\": \"Patient/pat015\"\n  },\n  \"created\": \"2023-05-02T11:02:00+05:00\",\n  \"insurer\": {\n    \"reference\": \"Organization/org1234\"\n  },\n  \"requestor\": {\n    \"reference\": \"Practitioner/pra1234\"\n  },\n  \"outcome\": \"complete\",\n  \"preAuthRef\": \"A1B2C3D4\",\n  \"addItem\": [\n    {\n      \"extension\": [\n        {\n          \"url\": \"http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/extension-itemAuthorizedDate\",\n          \"valuePeriod\": {\n            \"start\": \"2005-05-02\",\n            \"end\": \"2005-06-02\"\n          }\n        },\n        {\n          \"url\": \"http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/extension-itemPreAuthIssueDate\",\n          \"valueDate\": \"2005-05-02\"\n        },\n        {\n          \"url\": \"http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/extension-itemAuthorizedProvider\",\n          \"valueReference\": {\n            \"reference\": \"Practitioner/pra1234\"\n          }\n        }\n      ],\n      \"itemSequence\": [\n        1\n      ],\n      \"productOrService\": {\n        \"coding\": [\n          {\n            \"system\": \"http://codesystem.x12.org/005010/1365\",\n            \"code\": \"3\",\n            \"display\": \"Consultation\"\n          }\n        ]\n      },\n      \"locationCodeableConcept\": {\n        \"coding\": [\n          {\n            \"system\": \"https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set\",\n            \"code\": \"11\"\n          }\n        ]\n      },\n      \"adjudication\": [\n        {\n          \"extension\": [\n            {\n              \"url\": \"http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/extension-reviewAction\",\n              \"extension\": [\n                {\n                  \"url\": \"number\",\n                  \"valueString\": \"AUTH0001\"\n                },\n                {\n                  \"url\": \"http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/extension-reviewActionCode\",\n                  \"valueCodeableConcept\": {\n                    \"coding\": [\n                      {\n                        \"system\": \"http://codesystem.x12.org/005010/306\",\n                        \"code\": \"A1\",\n                        \"display\": \"Certified in total\"\n                      }\n                    ]\n                  }\n                }\n              ]\n            }\n          ],\n          \"category\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/adjudication\",\n                \"code\": \"submitted\"\n              }\n            ]\n          }\n        }\n      ]\n    }\n  ]\n}]"
+    },
+    {
+      "name": "task_create_resources",
+      "description": "Provide a list of resources to create. e.g., [json_resource_1, json_resource_2]",
+      "title": "Task Resources",
+      "type": "textarea",
+      "value": "[\n  {\n    \"resourceType\": \"Task\",\n    \"basedOn\": [\n      {\n        \"reference\": \"MedicationRequest/pat014-mr-azathioprine\"\n      }\n    ],\n    \"status\": \"ready\",\n    \"intent\": \"order\",\n    \"code\": {\n      \"coding\": [\n        {\n          \"system\": \"http://hl7.org/fhir/uv/sdc/CodeSystem/temp\",\n          \"code\": \"complete-questionnaire\"\n        }\n      ]\n    },\n    \"for\": {\n      \"reference\": \"Patient/pat015\"\n    },\n    \"encounter\": {\n      \"reference\": \"Encounter/pat015-rad-encounter\"\n    },\n    \"authoredOn\": \"2018-08-09\",\n    \"requester\": {\n      \"reference\": \"Organization/org1234\"\n    },\n    \"reasonCode\": {\n      \"coding\": [\n        {\n          \"system\": \"http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp\",\n          \"code\": \"reason-prior-auth\"\n        }\n      ],\n      \"text\": \"Needed for prior authorization\"\n    },\n    \"input\": [\n      {\n        \"type\": {\n          \"coding\": [\n            {\n              \"system\": \"http://hl7.org/fhir/uv/sdc/CodeSystem/temp\",\n              \"code\": \"questionnaire\"\n            }\n          ]\n        },\n        \"valueCanonical\": \"https://crd-test.davinci.hl7.org/test-ehr/r4/Questionnaire/cdex-questionnaire-example1\"\n      },\n      {\n        \"type\": {\n          \"coding\": [\n            {\n              \"system\": \"http://hl7.org/fhir/uv/sdc/CodeSystem/temp\",\n              \"code\": \"response-endpoint\"\n            }\n          ]\n        },\n        \"valueUrl\": \"https://crd-test.davinci.hl7.org/test-ehr\"\n      },\n      {\n        \"type\": {\n          \"coding\": [\n            {\n              \"system\": \"http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp\",\n              \"code\": \"after-completion-action\"\n            }\n          ]\n        },\n        \"valueCodeableConcept\": {\n          \"coding\": [\n            {\n              \"system\": \"http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp\",\n              \"code\": \"prior-auth-include\",\n              \"display\": \"Include in prior authorization\"\n            }\n          ]\n        }\n      }\n    ]\n  }\n]"
+    },
+    {
+      "name": "vision_prescription_update_resources",
+      "description": "Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]",
+      "title": "VisionPrescription Resources",
+      "type": "textarea",
+      "value": "[{\n  \"resourceType\": \"VisionPrescription\",\n  \"id\": \"136\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2024-05-23T15:34:54.580+00:00\"\n  },\n  \"identifier\": [\n    {\n      \"system\": \"http://www.happysight.com/prescription\",\n      \"value\": \"15013\"\n    }\n  ],\n  \"status\": \"draft\",\n  \"created\": \"2014-06-15\",\n  \"patient\": {\n    \"reference\": \"Patient/pat015\"\n  },\n  \"dateWritten\": \"2014-06-15\",\n  \"prescriber\": {\n    \"reference\": \"Practitioner/pra1234\"\n  },\n  \"lensSpecification\": [\n    {\n      \"product\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/ex-visionprescriptionproduct\",\n            \"code\": \"lens\"\n          }\n        ]\n      },\n      \"eye\": \"right\",\n      \"sphere\": -2,\n      \"prism\": [\n        {\n          \"amount\": 0.5,\n          \"base\": \"down\"\n        }\n      ],\n      \"add\": 2\n    },\n    {\n      \"product\": {\n        \"coding\": [\n          {\n            \"system\": \"http://terminology.hl7.org/CodeSystem/ex-visionprescriptionproduct\",\n            \"code\": \"lens\"\n          }\n        ]\n      },\n      \"eye\": \"left\",\n      \"sphere\": -1,\n      \"cylinder\": -0.5,\n      \"axis\": 180,\n      \"prism\": [\n        {\n          \"amount\": 0.5,\n          \"base\": \"up\"\n        }\n      ],\n      \"add\": 2\n    }\n  ]\n}]"
+    }
+  ]
+}

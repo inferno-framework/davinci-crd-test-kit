@@ -1,0 +1,57 @@
+{
+  "resourceType" : "Location",
+  "id" : "example",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Location</b><a name=\"example\"> </a><a name=\"hcexample\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Location &quot;example&quot; </p></div><p><b>identifier</b>: B1-S.F2</p><p><b>status</b>: active</p><p><b>name</b>: South Wing, second floor</p><p><b>alias</b>: MC, SW, F2, University Medical Center, South Wing, second floor</p><p><b>description</b>: Second floor of the Old South Wing, formerly in use by Psychiatry</p><p><b>mode</b>: instance</p><p><b>telecom</b>: ph: 2328(WORK), fax: 2329(WORK), <a href=\"mailto:second-wing-admissions@sampleorg.com\">second-wing-admissions@sampleorg.com</a>, <a href=\"http://sampleorg.com/southwing\">http://sampleorg.com/southwing</a></p><p><b>address</b>: Galapagosweg 91, Building A San Francisco CA 94107 US (WORK)</p><p><b>physicalType</b>: Wing <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.3.0/CodeSystem-location-physical-type.html\">Location type</a>#wi)</span></p><p><b>managingOrganization</b>: <a href=\"Organization-example.html\">Organization/example</a> &quot;University Medical Center&quot;</p><p><b>endpoint</b>: <a href=\"http://example.org/fhir/Endpoint/example\">http://example.org/fhir/Endpoint/example</a></p></div>"
+  },
+  "identifier" : [{
+    "value" : "B1-S.F2"
+  }],
+  "status" : "active",
+  "name" : "South Wing, second floor",
+  "alias" : ["MC, SW, F2",
+  "University Medical Center, South Wing, second floor"],
+  "description" : "Second floor of the Old South Wing, formerly in use by Psychiatry",
+  "mode" : "instance",
+  "telecom" : [{
+    "system" : "phone",
+    "value" : "2328",
+    "use" : "work"
+  },
+  {
+    "system" : "fax",
+    "value" : "2329",
+    "use" : "work"
+  },
+  {
+    "system" : "email",
+    "value" : "second-wing-admissions@sampleorg.com"
+  },
+  {
+    "system" : "url",
+    "value" : "http://sampleorg.com/southwing",
+    "use" : "work"
+  }],
+  "address" : {
+    "use" : "work",
+    "line" : ["Galapagosweg 91, Building A"],
+    "city" : "San Francisco",
+    "state" : "CA",
+    "postalCode" : "94107",
+    "country" : "US"
+  },
+  "physicalType" : {
+    "coding" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/location-physical-type",
+      "code" : "wi",
+      "display" : "Wing"
+    }]
+  },
+  "managingOrganization" : {
+    "reference" : "Organization/example"
+  },
+  "endpoint" : [{
+    "reference" : "http://example.org/fhir/Endpoint/example"
+  }]
+}

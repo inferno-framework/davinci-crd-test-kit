@@ -1,0 +1,21 @@
+{
+  "summary": "Launch SMART Application Card",
+  "detail": "This is a Launch SMART Application Card which can cause the launching of SMART apps to occur in the context in which they are relevant to patient care and/or to payment-related decision-making.",
+  "indicator": "info",
+  "source": {
+    "label": "Inferno",
+    "url": "https://inferno.healthit.gov/",
+    "topic": {
+      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+      "code": "coverage-info",
+      "display": "Coverage Information"
+    }
+  },
+  "links": [
+    {
+      "label": "Inferno",
+      "url": "INFERNO_PLACEHOLDER",
+      "type": "smart"
+    }
+  ]
+}

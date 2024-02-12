@@ -1,0 +1,119 @@
+{
+  "hookInstance": "d1577c69-dfbe-44ad-ba6d-3e05e953b2ea",
+  "fhirServer": "https://example/r4",
+  "hook": "appointment-book",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/Patient.read user/Observation.read",
+    "subject": "cds-service"
+  },
+  "context": {
+    "userId": "Practitioner/example",
+    "patientId": "example",
+    "appointments": {
+      "resourceType": "Bundle",
+      "id": "bundle-example",
+      "type": "searchset",
+      "total": 2,
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/Appointment/apt1",
+          "resource": {
+            "resourceType": "Appointment",
+            "id": "apt1",
+            "status": "proposed",
+            "serviceType": [
+              {
+                "coding": [
+                  {
+                    "code": "183",
+                    "display": "Sleep Medicine"
+                  }
+                ]
+              }
+            ],
+            "appointmentType": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/v2/0276",
+                  "code": "FOLLOWUP",
+                  "display": "A follow up visit from a previous appointment"
+                }
+              ]
+            },
+            "reason": {
+              "coding": {
+                "system": "",
+                "code": "1023001",
+                "display": "Apnea"
+              }
+            },
+            "description": "CPAP adjustments",
+            "start": "2019-08-10T09:00:00-06:00",
+            "end": "2019-08-10T09:10:00:00-06:00",
+            "created": "2019-08-01",
+            "participant": [
+              {
+                "actor": {
+                  "reference": "Patient/example",
+                  "display": "Peter James Chalmers"
+                },
+                "required": "required",
+                "status": "tentative"
+              },
+              {
+                "actor": {
+                  "reference": "Practitioner/example",
+                  "display": "Dr Adam Careful"
+                },
+                "required": "required",
+                "status": "accepted"
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "https://example.com/Appointment/apt2",
+          "resource": {
+            "resourceType": "Appointment",
+            "id": "apt2",
+            "status": "proposed",
+            "appointmentType": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/v2/0276",
+                  "code": "CHECKUP",
+                  "display": "A routine check-up, such as an annual physical"
+                }
+              ]
+            },
+            "description": "Regular physical",
+            "start": "2020-08-01T13:00:00-06:00",
+            "end": "2020-08-01T13:30:00:00-06:00",
+            "created": "2019-08-01",
+            "participant": [
+              {
+                "actor": {
+                  "reference": "Patient/example",
+                  "display": "Peter James Chalmers"
+                },
+                "required": "required",
+                "status": "tentative"
+              },
+              {
+                "actor": {
+                  "reference": "Practitioner/example",
+                  "display": "Dr Adam Careful"
+                },
+                "required": "required",
+                "status": "accepted"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
