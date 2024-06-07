@@ -22,6 +22,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     )
   end
 
+  let(:appointment_book_context) do
+    appointment_book_hook_request['context']
+  end
+
   let(:crd_patient) do
     JSON.parse(
       File.read(File.join(
@@ -83,34 +87,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
-  def create_appointment_hook_request(url: appointment_book_url, body: nil, status: 200)
-    auth_token = jwt_helper.build(
-      aud: appointment_book_url,
-      iss: example_client_url,
-      jku: "#{example_client_url}/jwks.json",
-      encryption_method: 'RS384'
-    )
-
-    headers = [
-      {
-        type: 'request',
-        name: 'Authorization',
-        value: "Bearer #{auth_token}"
-      }
-    ]
-
-    repo_create(
-      :request,
-      name: 'appointment_book',
-      direction: 'incoming',
-      url:,
-      test_session_id: test_session.id,
-      request_body: body.is_a?(Hash) ? body.to_json : body,
-      status:,
-      headers:
-    )
-  end
-
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -134,10 +110,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
           igs('hl7.fhir.us.davinci-crd', 'hl7.fhir.us.core')
         end
         config(
-          options: { hook_name: 'appointment-book' },
-          requests: {
-            hook_request: { name: :appointment_book }
-          }
+          options: { hook_name: 'appointment-book' }
         )
       end
     end
@@ -156,85 +129,132 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_practitioner.to_json)
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-      result = run(test, client_fhir_server:, client_access_token:)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made
     end
 
-    it 'skips if no client fhir server url is found' do
-      create_appointment_hook_request(body: appointment_book_hook_request)
+    it 'passes if multiple hook requests have `context` that contains all required fields and valid fhir resources' do
+      validation_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_patient.to_json)
+      practitioner_resource_request = stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_practitioner.to_json)
 
-      result = run(test)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches:
+                         [{ context: appointment_book_context }, { context: appointment_book_context }].to_json)
+      expect(result.result).to eq('pass')
+      expect(validation_request).to have_been_made.times(8)
+      expect(patient_resource_request).to have_been_made.times(2)
+      expect(practitioner_resource_request).to have_been_made.times(2)
+    end
+
+    it 'fails if one of multiple hook requests are invalid' do
+      validation_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_patient.to_json)
+      practitioner_resource_request = stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_practitioner.to_json)
+
+      invalid_hook_request = appointment_book_context.except('patientId')
+
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches:
+                         [{ context: appointment_book_context }, { context: invalid_hook_request }].to_json)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to match(
+        /Request 2: appointment-book request context does not contain required field `patientId`/
+      )
+      expect(validation_request).to have_been_made.times(7)
+      expect(patient_resource_request).to have_been_made
+      expect(practitioner_resource_request).to have_been_made.times(2)
+    end
+
+    it 'skips if no client fhir server url is found' do
+      result = run(test, contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to match("Input 'client_fhir_server' is nil, skipping test.")
     end
 
-    it 'fails if request body is not a valid json' do
-      create_appointment_hook_request(body: 'invalid_request')
-
-      result = run(test, client_fhir_server:, client_access_token:)
-
+    it 'fails if context is not a valid json' do
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: '[[' }].to_json)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('Invalid JSON. ')
+      expect(entity_result_message(test)).to match(/Context is in an incorrect format./)
     end
 
-    it 'fails if request body is does not contain the `context` field' do
-      invalid_hook_request = appointment_book_hook_request.except('context')
-      create_appointment_hook_request(body: invalid_hook_request)
-
-      result = run(test, client_fhir_server:, client_access_token:)
+    it 'fails if no request contains the `context` field' do
+      result = run(test, client_fhir_server:, client_access_token:, contexts_prefetches: [{ context: nil }].to_json)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('Hook request does not contain required `context` field')
+      expect(result.result_message).to eq('No appointment-book requests contained the `context` field.')
     end
 
     it 'fails if context does not contain all required fields' do
-      appointment_book_hook_request['context'].delete('patientId')
       stub_request(:get, "#{client_fhir_server}/Practitioner/example")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 200, body: crd_practitioner.to_json)
-      create_appointment_hook_request(body: appointment_book_hook_request)
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
-      result = run(test, client_fhir_server:, client_access_token:)
+
+      appointment_book_context.delete('patientId')
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/context does not contain required field `patientId`/)
     end
 
     it 'fails if resource type and id cannot be extracted from context `userId` field' do
-      appointment_book_hook_request['context']['userId'] = '/'
       stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
 
-      result = run(test, client_fhir_server:, client_access_token:)
+      appointment_book_context['userId'] = '/'
+
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Invalid `userId` format/)
     end
 
     it 'fails if context `userId` field resource type is not valid' do
-      appointment_book_hook_request['context']['userId'] = 'Observation/example'
       stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
 
-      result = run(test, client_fhir_server:, client_access_token:)
+      appointment_book_context['userId'] = 'Observation/example'
+
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Unsupported resource type: `userId` type should be/)
@@ -254,17 +274,15 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 404)
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token:)
+                   client_access_token:, contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match('Context is not valid')
-      expect(messages.length).to eq(1)
+      expect(messages.length).to eq(2)
       expect(messages.first.message).to match('expected 200, but received 404')
       expect(validation_request).to have_been_made.at_least_once
       expect(patient_resource_request).to have_been_made
@@ -285,9 +303,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
-      result = run(test, client_fhir_server:, client_access_token:)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match('Resource does not conform to profile')
@@ -317,12 +334,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
       appointment_book_hook_request['context']['encounterId'] = 'example'
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token:)
-
+                   client_access_token:, contexts_prefetches: [{ context: appointment_book_context }].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(5)
       expect(patient_resource_request).to have_been_made
@@ -344,11 +358,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      appointment_book_hook_request['context']['appointments'] = crd_patient
+      appointment_book_context['appointments'] = crd_patient
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
-      result = run(test, client_fhir_server:, client_access_token:)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Wrong context resource type: Expected `Bundle`, got `Patient`/)
     end
@@ -367,13 +380,12 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      appointment_book_hook_request['context']['appointments']['entry'].each do |entry|
+      appointment_book_context['appointments']['entry'].each do |entry|
         entry['resource'] = crd_patient
       end
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
-      result = run(test, client_fhir_server:, client_access_token:)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -395,11 +407,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_patient.to_json)
 
-      appointment_book_hook_request['context']['appointments']['entry'][0]['resource']['status'] = 'confirmed'
+      appointment_book_context['appointments']['entry'][0]['resource']['status'] = 'confirmed'
 
-      create_appointment_hook_request(body: appointment_book_hook_request)
-
-      result = run(test, client_fhir_server:, client_access_token:)
+      result = run(test, client_fhir_server:, client_access_token:,
+                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(

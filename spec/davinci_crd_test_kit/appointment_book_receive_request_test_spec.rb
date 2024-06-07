@@ -14,6 +14,9 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
+  let(:resume_pass_url) do
+    "#{Inferno::Application['base_url']}/custom/crd_client/resume_pass?token=appointment-book%20#{example_client_url}"
+  end
   let(:appointment_book_url) { "#{base_url}/cds-services/appointment-book-service" }
   let(:client_fhir_server) { 'https://example/r4' }
   let(:patient_id) { 'example' }
@@ -48,6 +51,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
+
     inputs.each do |name, value|
       session_data_repo.save(
         test_session_id: test_session.id,
@@ -76,8 +80,8 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
-
     expect(last_response).to be_ok
+    get(resume_pass_url)
     result = results_repo.find(result.id)
     expect(result.result).to eq('pass')
   end

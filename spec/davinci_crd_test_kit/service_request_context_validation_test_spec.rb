@@ -419,7 +419,7 @@ RSpec.describe DaVinciCRDTestKit::ServiceRequestContextValidationTest do
       context_dup['task'] = { resourceType: 'Patient' }
       result = run(runnable, contexts: [context_dup].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Field `task` must be a `Task`. Got `Patient`/)
+      expect(entity_result_message.message).to match(/Field `task` must be a `Task`/)
     end
   end
 

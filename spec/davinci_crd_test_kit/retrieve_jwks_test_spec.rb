@@ -4,6 +4,8 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
   let(:test) { Inferno::Repositories::Tests.new.find('crd_retrieve_jwks') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
+  let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_retrieve_jwks') }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
@@ -45,26 +47,55 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
+  def entity_result_message
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+      .first
+      .messages
+      .first
+  end
+
   it 'passes if it receives a valid JWT Authorization header with jku field populated' do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: jwks_hash.to_json)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('pass')
     expect(jwks_request).to have_been_made
+  end
+
+  it 'passes if it receives multiple valid JWT Authorization headers with jku field populated' do
+    jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_tokens_header_json: [token_header.to_json, token_header.to_json])
+    expect(result.result).to eq('pass')
+    expect(jwks_request).to have_been_made.times(2)
+  end
+
+  it 'fails if it receives at least 1 invalid JWT Authorization headers' do
+    jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
+      .to_return(status: 200, body: jwks_hash.to_json).then
+      .to_return(status: 404, body: jwks_hash.to_json)
+
+    result = run(test, auth_tokens_header_json: [token_header.to_json, token_header.to_json])
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(
+      /Request 2: Unexpected response status: expected 200, but received 404/
+    )
+    expect(jwks_request).to have_been_made.times(2)
   end
 
   it 'passes if it receives a valid jwk_set input' do
     token_header_no_jku = token_header.except(:jku)
 
-    result = run(test, auth_token_header_json: token_header_no_jku.to_json, jwk_set: jwks_hash.to_json)
+    result = run(test, auth_tokens_header_json: [token_header_no_jku.to_json], jwk_set: jwks_hash.to_json)
     expect(result.result).to eq('pass')
   end
 
   it 'skips if jku field is not set, and no jwk_set is provided' do
     token_header_no_jku = token_header.except(:jku)
 
-    result = run(test, auth_token_header_json: token_header_no_jku.to_json)
+    result = run(test, auth_tokens_header_json: [token_header_no_jku.to_json])
     expect(result.result).to eq('skip')
     expect(result.result_message).to match("JWK Set must be inputted if Client's JWK Set is not available")
   end
@@ -73,9 +104,9 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 404, body: jwks_hash.to_json)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Unexpected response status: expected 200, but received 404')
+    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received 404/)
     expect(jwks_request).to have_been_made
   end
 
@@ -83,9 +114,9 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: nil)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Invalid JSON. ')
+    expect(entity_result_message.message).to match(/Invalid JSON./)
     expect(jwks_request).to have_been_made
   end
 
@@ -93,9 +124,9 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: jwk.to_json)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('JWKS `keys` field must be an array')
+    expect(entity_result_message.message).to match(/JWKS `keys` field must be an array/)
     expect(jwks_request).to have_been_made
   end
 
@@ -103,9 +134,9 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: jwks_hash_no_keys.to_json)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('The JWK set returned contains no public keys')
+    expect(entity_result_message.message).to match(/The JWK set returned contains no public keys/)
     expect(jwks_request).to have_been_made
   end
 
@@ -113,18 +144,20 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: jwks_hash_no_kids.to_json)
 
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('`kid` field must be present in each key if JWKS contains multiple keys')
+    expect(entity_result_message.message).to match(
+      /`kid` field must be present in each key if JWKS contains multiple keys/
+    )
     expect(jwks_request).to have_been_made
   end
 
   it 'fails if jwks returned contains duplicate kid fields' do
     jwks_request = stub_request(:get, "#{example_client_url}/jwks.json")
       .to_return(status: 200, body: jwks_hash_dup_kids.to_json)
-    result = run(test, auth_token_header_json: token_header.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq("`kid` must be unique within the client' JWK Set.")
+    expect(entity_result_message.message).to match(/`kid` must be unique within the client' JWK Set./)
     expect(jwks_request).to have_been_made
   end
 end

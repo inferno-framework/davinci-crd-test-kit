@@ -31,6 +31,10 @@ module DaVinciCRDTestKit
       end
     end
 
+    def resume_test_run?
+      find_result&.result != 'wait'
+    end
+
     # Header expected to be a bearer token of the form "Bearer <token>"
     def extract_bearer_token(request)
       request.headers['authorization']&.delete_prefix('Bearer ')
@@ -87,7 +91,7 @@ module DaVinciCRDTestKit
     end
 
     def update_result
-      results_repo.update(result.id, result: 'pass')
+      results_repo.update(result.id, result: 'pass') unless test.config.options[:accepts_multiple_requests]
     end
   end
 end

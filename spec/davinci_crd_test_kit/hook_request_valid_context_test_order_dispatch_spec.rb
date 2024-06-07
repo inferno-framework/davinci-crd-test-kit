@@ -23,6 +23,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     )
   end
 
+  let(:order_dispatch_context) do
+    order_dispatch_hook_request['context']
+  end
+
   let(:crd_patient) do
     JSON.parse(
       File.read(File.join(
@@ -84,34 +88,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
-  def create_order_dispatch_hook_request(url: order_dispatch_url, body: nil, status: 200)
-    auth_token = klass.build(
-      aud: order_dispatch_url,
-      iss: example_client_url,
-      jku: "#{example_client_url}/jwks.json",
-      encryption_method: 'RS384'
-    )
-
-    headers = [
-      {
-        type: 'request',
-        name: 'Authorization',
-        value: "Bearer #{auth_token}"
-      }
-    ]
-
-    repo_create(
-      :request,
-      name: 'order_dispatch',
-      direction: 'incoming',
-      url:,
-      test_session_id: test_session.id,
-      request_body: body.is_a?(Hash) ? body.to_json : body,
-      status:,
-      headers:
-    )
-  end
-
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -135,10 +111,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
           igs('hl7.fhir.us.davinci-crd', 'hl7.fhir.us.core')
         end
         config(
-          options: { hook_name: 'order-dispatch' },
-          requests: {
-            hook_request: { name: :order_dispatch }
-          }
+          options: { hook_name: 'order-dispatch' }
         )
       end
     end
@@ -162,11 +135,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_service_request.to_json)
 
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
@@ -175,10 +147,71 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       expect(service_request_resource_request).to have_been_made
     end
 
-    it 'skips if no client fhir server url is found' do
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
+    it 'passes if multiple hook requests have `context` that contains all required fields and valid fhir resources' do
+      validation_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_patient.to_json)
+      practitioner_resource_request = stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_practitioner.to_json)
+      service_request_resource_request = stub_request(:get, "#{client_fhir_server}/ServiceRequest/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_service_request.to_json)
 
-      result = run(test)
+      result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
+                         contexts_prefetches:
+                         [{ context: order_dispatch_context }, { context: order_dispatch_context }].to_json)
+      expect(result.result).to eq('pass')
+      expect(validation_request).to have_been_made.times(8)
+      expect(patient_resource_request).to have_been_made.times(2)
+      expect(practitioner_resource_request).to have_been_made.times(2)
+      expect(service_request_resource_request).to have_been_made.times(2)
+    end
+
+    it 'fails if one of multiple hook requests are invalid' do
+      validation_request = stub_request(:post, "#{validator_url}/validate")
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_patient.to_json)
+      practitioner_resource_request = stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_practitioner.to_json)
+      service_request_resource_request = stub_request(:get, "#{client_fhir_server}/ServiceRequest/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_service_request.to_json)
+
+      invalid_hook_request = order_dispatch_context.except('patientId')
+
+      result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
+                         contexts_prefetches:
+                         [{ context: order_dispatch_context }, { context: invalid_hook_request }].to_json)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to match(
+        /Request 2: order-dispatch request context does not contain required field `patientId`/
+      )
+      expect(validation_request).to have_been_made.times(7)
+      expect(patient_resource_request).to have_been_made
+      expect(practitioner_resource_request).to have_been_made.times(2)
+      expect(service_request_resource_request).to have_been_made.times(2)
+    end
+
+    it 'skips if no client fhir server url is found' do
+      result = run(test, contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
@@ -186,27 +219,21 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       )
     end
 
-    it 'fails if request body is not a valid json' do
-      create_order_dispatch_hook_request(body: 'invalid_request')
-
-      result = run(test,
-                   client_fhir_server:,
-                   client_access_token: client_bearer_token)
-
+    it 'fails if context is not a valid json' do
+      result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
+                         contexts_prefetches: [{ context: '[[' }].to_json)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('Invalid JSON. ')
+      expect(entity_result_message(test)).to match(/Context is in an incorrect format./)
     end
 
     it 'fails if request body is does not contain the `context` field' do
-      invalid_hook_request = order_dispatch_hook_request.except('context')
-      create_order_dispatch_hook_request(body: invalid_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: nil }].to_json)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to eq('Hook request does not contain required `context` field')
+      expect(result.result_message).to eq('No order-dispatch requests contained the `context` field.')
     end
 
     it 'fails if context does not contain all required fields' do
@@ -222,12 +249,12 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_practitioner.to_json)
 
-      order_dispatch_hook_request['context'].delete('patientId')
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
+      order_dispatch_context.delete('patientId')
 
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -248,12 +275,12 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_service_request.to_json)
 
-      order_dispatch_hook_request['context']['performer'] = '/'
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
+      order_dispatch_context['performer'] = '/'
 
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Invalid `performer` format./)
@@ -277,11 +304,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_practitioner.to_json)
 
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Unexpected response status: expected 200, but received 404/)
@@ -309,11 +335,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_service_request.to_json)
 
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Resource does not conform to/)
@@ -341,16 +366,15 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         .to_return(status: 200, body: crd_service_request.to_json)
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
 
-      order_dispatch_hook_request['context']['task'] = crd_patient
-
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
+      order_dispatch_context['task'] = crd_patient
 
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Field `task` must be a `Task`. Got `Patient`/)
+      expect(entity_result_message(test)).to match(/Field `task` must be a `Task`/)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made
       expect(service_request_resource_request).to have_been_made
@@ -379,11 +403,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         )
         .to_return(status: 200, body: crd_service_request.to_json)
 
-      create_order_dispatch_hook_request(body: order_dispatch_hook_request)
-
       result = run(test,
                    client_fhir_server:,
-                   client_access_token: client_bearer_token)
+                   client_access_token: client_bearer_token,
+                   contexts_prefetches: [{ context: order_dispatch_context }].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Resource does not conform to/)

@@ -121,10 +121,6 @@ module DaVinciCRDTestKit
                    }
                  ]
 
-    def self.test_resumes?(test)
-      !test.config.options[:accepts_multiple_requests]
-    end
-
     def self.extract_token_from_query_params(request)
       request.query_parameters['token']
     end

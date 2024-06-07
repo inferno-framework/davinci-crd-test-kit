@@ -13,6 +13,9 @@ RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest do
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
 
   let(:example_client_url) { 'https://cds.example.org' }
+  let(:resume_pass_url) do
+    "#{Inferno::Application['base_url']}/custom/crd_client/resume_pass?token=order-sign%20#{example_client_url}"
+  end
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
   let(:order_sign_url) { "#{base_url}/cds-services/order-sign-service" }
   let(:client_fhir_server) { 'https://example/r4' }
@@ -71,8 +74,9 @@ RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest do
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
-
     expect(last_response).to be_ok
+    get(resume_pass_url)
+
     result = results_repo.find(result.id)
     expect(result.result).to eq('pass')
   end

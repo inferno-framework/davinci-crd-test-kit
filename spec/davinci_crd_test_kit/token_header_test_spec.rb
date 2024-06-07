@@ -4,6 +4,8 @@ RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
   let(:test) { Inferno::Repositories::Tests.new.find('crd_token_header') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
+  let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_token_header') }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
@@ -33,48 +35,72 @@ RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
+  def entity_result_message
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+      .first
+      .messages
+      .first
+  end
+
   it 'passes if it receives a valid JWT Authorization header' do
-    result = run(test, auth_token_header_json: token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('pass')
+  end
+
+  it 'passes if it receives multiple requests with valid JWT Authorization headers' do
+    result = run(test, auth_tokens_header_json: [token_header.to_json, token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json, jwks_hash_keys.to_json])
+    expect(result.result).to eq('pass')
+  end
+
+  it 'fails if it receives at least 1 request with invalid JWT Authorization headers' do
+    invalid_token_header = token_header.except(:alg)
+    result = run(test, auth_tokens_header_json: [token_header.to_json, invalid_token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json, jwks_hash_keys.to_json])
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(/Request 2: Token header must have the `alg` field/)
   end
 
   it 'fails if it receives a JWT header without the `alg` field' do
     invalid_token_header = token_header.except(:alg)
 
-    result = run(test, auth_token_header_json: invalid_token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [invalid_token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Token header must have the `alg` field')
+    expect(entity_result_message.message).to match(/Token header must have the `alg` field/)
   end
 
   it 'fails if it receives a JWT header without the `typ` field' do
     invalid_token_header = token_header.except(:typ)
 
-    result = run(test, auth_token_header_json: invalid_token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [invalid_token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Token header must have the `typ` field')
+    expect(entity_result_message.message).to match(/Token header must have the `typ` field/)
   end
 
   it 'fails if it receives a JWT header with the `typ` field not set to JWT' do
     token_header[:typ] = 'Bearer'
 
-    result = run(test, auth_token_header_json: token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq("Token header `typ` field must be set to 'JWT', instead was Bearer")
+    expect(entity_result_message.message).to match(/Token header `typ` field must be set to 'JWT', instead was Bearer/)
   end
 
   it 'fails if it receives a JWT header without the `kid` field' do
     invalid_token_header = token_header.except(:kid)
 
-    result = run(test, auth_token_header_json: invalid_token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [invalid_token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('Token header must have the `kid` field')
+    expect(entity_result_message.message).to match(/Token header must have the `kid` field/)
   end
 
   it 'fails if it receives a JWT header that does not contain a kid found in the jwks' do
     token_header[:kid] = '12345'
 
-    result = run(test, auth_token_header_json: token_header.to_json, crd_jwks_keys_json: jwks_hash_keys.to_json)
+    result = run(test, auth_tokens_header_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(result.result_message).to eq('JWKS did not contain a public key with an id of `12345`')
+    expect(entity_result_message.message).to match(/JWKS did not contain a public key with an id of `12345`/)
   end
 end

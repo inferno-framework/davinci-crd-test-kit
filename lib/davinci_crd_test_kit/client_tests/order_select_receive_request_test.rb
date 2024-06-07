@@ -7,10 +7,11 @@ module DaVinciCRDTestKit
     id :crd_order_select_request
     title 'Request received for order-select hook'
     description %(
-      This test waits for an incoming [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
-      hook request and responds to the client with the response types selected as an input.
+      This test waits for multiple incoming [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
+      hook requests and responds to the client with the response types selected as an input.
       )
-    receives_request :order_select
+
+    config options: { accepts_multiple_requests: true }
 
     input :iss
     input :order_select_selected_response_types,
@@ -64,11 +65,13 @@ module DaVinciCRDTestKit
         message: %(
           **Order Select CDS Service Test**:
 
-          Invoke the order-select hook and send a request to:
+          Invoke the order-select hook and send requests to:
 
           `#{order_select_url}`
 
-          Inferno will process the request and return CDS cards if successful.
+          Inferno will process the requests and return CDS cards if successful.
+
+          [Click here](#{resume_pass_url}?token=order-select%20#{iss}) when you have finished submitting requests.
         )
       )
     end
