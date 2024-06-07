@@ -7,6 +7,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
 
   let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
   let(:test) { Inferno::Repositories::Tests.new.find('crd_appointment_book_request') }
+  let(:test_group) { Inferno::Repositories::TestGroups.new.find('crd_client_hooks') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
@@ -64,7 +65,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
   end
 
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do
-    allow(test).to receive(:suite).and_return(suite)
+    allow(test).to receive_messages(suite:, parent: test_group)
 
     token = jwt_helper.build(
       aud: appointment_book_url,
