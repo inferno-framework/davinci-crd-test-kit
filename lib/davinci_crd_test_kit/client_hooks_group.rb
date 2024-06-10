@@ -48,6 +48,10 @@ module DaVinciCRDTestKit
         each hook type
         * OPTIONAL: If the incoming hook contains the optional `prefetch` field with valid resources
         * If the client can properly display the cards returned as a result of the hook request
+
+        Note: In order to successfully return a `Coverage Information` system action, a Coverage resource must either be
+        provided in the service request's `prefetch` field, or must be fetchable from the client's FHIR server for
+        the patient provided in the service request.
     DESCRIPTION
     id :crd_client_hooks
 

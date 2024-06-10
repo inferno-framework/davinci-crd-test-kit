@@ -14,12 +14,12 @@
   "selectionBehavior": "any",
   "suggestions": [
     {
-      "label" : "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
-      "actions" : [
+      "label": "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
+      "actions": [
         {
-          "type" : "create",
-          "description" : "Add version 2 of the XYZ form to the clinical system's repository (if it doesn't already exist)",
-          "resource" : {
+          "type": "create",
+          "description": "Add version 2 of the XYZ form to the clinical system's repository (if it doesn't already exist)",
+          "resource": {
             "resourceType": "Questionnaire",
             "id": "XYZ",
             "url": "http://example.org/Questionnaire/XYZ",
@@ -178,42 +178,57 @@
           }
         },
         {
-          "type" : "create",
-          "description" : "Add 'Complete ABC form' to the task list",
-          "resource" : {
-            "resourceType" : "Task",
-            "status" : "ready",
-            "intent" : "order",
-            "code" : {
-              "coding" : [
+          "type": "create",
+          "description": "Add 'Complete ABC form' to the task list",
+          "resource": {
+            "resourceType": "Task",
+            "status": "ready",
+            "intent": "order",
+            "code": {
+              "coding": [
                 {
-                  "system" : "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
-                  "code" : "complete-questionnaire"
+                  "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                  "code": "complete-questionnaire"
                 }
               ]
             },
-            "description" : "Complete XYZ form for local retention",
-            "for" : {
-              "reference" : "http://example.org/fhir/Patient/123"
+            "description": "Complete XYZ form for local retention",
+            "for": {
+              "reference": "http://example.org/fhir/Patient/123"
             },
-            "authoredOn" : "2018-08-09",
-            "input" : [
+            "authoredOn": "2018-08-09",
+            "requester": {
+              "reference": "http://example.org/fhir/Organization/payer"
+            },
+            "input": [
               {
-                "type" : {
-                  "text" : "questionnaire"
+                "type": {
+                  "text": "questionnaire",
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                      "code": "questionnaire"
+                    }
+                  ]
                 },
-                "valueCanonical" : "http://example.org/Questionnaire/XYZ|2"
+                "valueCanonical": "http://example.org/Questionnaire/XYZ"
               },
               {
-                "type" : {
-                  "text" : "afterCompletion"
-                },
-                "valueCodeableConcept" : {
-                  "coding" : [
+                "type": {
+                  "text": "afterCompletion",
+                  "coding": [
                     {
-                      "system" : "http://example.org/fhir/CodeSystem/SomeCodes",
-                      "code" : "987",
-                      "display" : "Local Use"
+                      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+                      "code": "after-completion-action"
+                    }
+                  ]
+                },
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+                      "code": "prior-auth-include",
+                      "display": "Include in prior authorization"
                     }
                   ]
                 }

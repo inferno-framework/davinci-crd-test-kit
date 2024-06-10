@@ -23,7 +23,7 @@ module DaVinciCRDTestKit
             response type that will be returned for this hook is the `Coverage Information` card type.
           ),
           type: 'checkbox',
-          default: ['coverage_information'],
+          default: ['coverage_information', 'external_reference', 'instructions'],
           options: {
             list_options: [
               {

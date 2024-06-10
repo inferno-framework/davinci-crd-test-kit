@@ -301,7 +301,11 @@ module DaVinciCRDTestKit
             ),
             FHIR::Extension.new(
               url: 'covered',
-              valueCode: 'conditional'
+              valueCode: 'covered'
+            ),
+            FHIR::Extension.new(
+              url: 'pa-needed',
+              valueCode: 'no-auth'
             ),
             FHIR::Extension.new(
               url: 'date',
@@ -407,14 +411,18 @@ module DaVinciCRDTestKit
       order_resource_id = order_resource.id
 
       card_actions = propose_alternate_request_card['suggestions'][0]['actions']
-      card_actions.append(
+      card_actions.push(
         {
           'type' => 'delete',
           'description' => 'Remove current order until health assessment has been done',
           'resourceId' => ["#{order_resource_type}/#{order_resource_id}"]
+        },
+        {
+          'type' => 'create',
+          'description' => 'Order for patient health assessment',
+          'resource' => order_resource
         }
       )
-      update_service_request(card_actions[0]['resource'], context)
       propose_alternate_request_card
     end
   end
