@@ -1,5 +1,8 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class DecodeAuthTokenTest < Inferno::Test
+    include ClientHookRequestValidation
     id :crd_decode_auth_token
     title 'Bearer token can be decoded'
     description %(
@@ -58,9 +61,9 @@ module DaVinciCRDTestKit
              auth_tokens_header_json: auth_tokens_header_json.to_json
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Decoding Authorization header Bearer tokens failed.'
+      no_error_validation('Decoding Authorization header Bearer tokens failed.')
     end
   end
 end

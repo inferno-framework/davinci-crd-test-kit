@@ -1,5 +1,8 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class TokenPayloadTest < Inferno::Test
+    include ClientHookRequestValidation
     include URLs
     id :crd_token_payload
     title 'Authorization token payload has required claims and a valid signature'
@@ -68,9 +71,9 @@ module DaVinciCRDTestKit
       end
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Token payload is missing required claims or does not have a valid signiture.'
+      no_error_validation('Token payload is missing required claims or does not have a valid signiture.')
     end
   end
 end

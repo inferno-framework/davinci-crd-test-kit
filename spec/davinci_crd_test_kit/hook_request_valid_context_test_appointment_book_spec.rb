@@ -130,7 +130,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         .to_return(status: 200, body: crd_practitioner.to_json)
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
       expect(patient_resource_request).to have_been_made
@@ -152,8 +152,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         .to_return(status: 200, body: crd_practitioner.to_json)
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches:
-                         [{ context: appointment_book_context }, { context: appointment_book_context }].to_json)
+                         contexts:
+                         [appointment_book_context, appointment_book_context].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(8)
       expect(patient_resource_request).to have_been_made.times(2)
@@ -177,8 +177,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       invalid_hook_request = appointment_book_context.except('patientId')
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches:
-                         [{ context: appointment_book_context }, { context: invalid_hook_request }].to_json)
+                         contexts:
+                         [appointment_book_context, invalid_hook_request].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
         /Request 2: appointment-book request context does not contain required field `patientId`/
@@ -189,7 +189,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'skips if no client fhir server url is found' do
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to match("Input 'client_fhir_server' is nil, skipping test.")
@@ -197,15 +197,15 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
     it 'fails if context is not a valid json' do
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: '[[' }].to_json)
+                         contexts: ['[['].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Context is in an incorrect format./)
     end
 
     it 'fails if no request contains the `context` field' do
-      result = run(test, client_fhir_server:, client_access_token:, contexts_prefetches: [{ context: nil }].to_json)
+      result = run(test, client_fhir_server:, client_access_token:, contexts: [nil].to_json)
 
-      expect(result.result).to eq('fail')
+      expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No appointment-book requests contained the `context` field.')
     end
 
@@ -219,7 +219,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
       appointment_book_context.delete('patientId')
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/context does not contain required field `patientId`/)
@@ -237,7 +237,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       appointment_book_context['userId'] = '/'
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Invalid `userId` format/)
     end
@@ -254,7 +254,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       appointment_book_context['userId'] = 'Observation/example'
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Unsupported resource type: `userId` type should be/)
@@ -276,13 +276,13 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
       result = run(test,
                    client_fhir_server:,
-                   client_access_token:, contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                   client_access_token:, contexts: [appointment_book_context].to_json)
 
       messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match('Context is not valid')
-      expect(messages.length).to eq(2)
+      expect(messages.length).to eq(1)
       expect(messages.first.message).to match('expected 200, but received 404')
       expect(validation_request).to have_been_made.at_least_once
       expect(patient_resource_request).to have_been_made
@@ -304,7 +304,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         .to_return(status: 200, body: crd_patient.to_json)
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match('Resource does not conform to profile')
@@ -336,7 +336,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
       result = run(test,
                    client_fhir_server:,
-                   client_access_token:, contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                   client_access_token:, contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(5)
       expect(patient_resource_request).to have_been_made
@@ -361,7 +361,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       appointment_book_context['appointments'] = crd_patient
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Wrong context resource type: Expected `Bundle`, got `Patient`/)
     end
@@ -385,7 +385,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       end
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -410,7 +410,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       appointment_book_context['appointments']['entry'][0]['resource']['status'] = 'confirmed'
 
       result = run(test, client_fhir_server:, client_access_token:,
-                         contexts_prefetches: [{ context: appointment_book_context }].to_json)
+                         contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(

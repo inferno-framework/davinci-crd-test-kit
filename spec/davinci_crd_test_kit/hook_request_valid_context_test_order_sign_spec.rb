@@ -133,7 +133,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
@@ -156,8 +156,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
         .to_return(status: 200, body: crd_practitioner.to_json)
 
       result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
-                         contexts_prefetches:
-                         [{ context: order_sign_context }, { context: order_sign_context }].to_json)
+                         contexts:
+                         [order_sign_context, order_sign_context].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(8)
       expect(patient_resource_request).to have_been_made.times(2)
@@ -181,8 +181,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       invalid_hook_request = order_sign_context.except('patientId')
 
       result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
-                         contexts_prefetches:
-                         [{ context: order_sign_context }, { context: invalid_hook_request }].to_json)
+                         contexts:
+                         [order_sign_context, invalid_hook_request].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
         /Request 2: order-sign request context does not contain required field `patientId`/
@@ -193,7 +193,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'skips if no client fhir server url is found' do
-      result = run(test, contexts_prefetches: [{ context: order_sign_context }].to_json)
+      result = run(test, contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
@@ -203,7 +203,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
     it 'fails if context is not a valid json' do
       result = run(test, client_fhir_server:, client_access_token: client_bearer_token,
-                         contexts_prefetches: [{ context: '[[' }].to_json)
+                         contexts: ['[['].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Context is in an incorrect format./)
     end
@@ -212,9 +212,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: nil }].to_json)
+                   contexts: [nil].to_json)
 
-      expect(result.result).to eq('fail')
+      expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No order-sign requests contained the `context` field.')
     end
 
@@ -230,7 +230,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -251,7 +251,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Invalid `userId` format./)
@@ -270,7 +270,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Unsupported resource type: `userId` type should be/)
@@ -293,7 +293,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Unexpected response status: expected 200, but received 404/)
@@ -319,7 +319,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match('Resource does not conform to profile')
@@ -351,7 +351,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(5)
@@ -378,7 +378,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Wrong context resource type: Expected `Bundle`, got `Patient`/)
@@ -404,7 +404,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -446,7 +446,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       result = run(test,
                    client_fhir_server:,
                    client_access_token: client_bearer_token,
-                   contexts_prefetches: [{ context: order_sign_context }].to_json)
+                   contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/NutritionOrder#pureeddiet-simple is invalid/)

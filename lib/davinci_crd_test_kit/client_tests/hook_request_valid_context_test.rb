@@ -1,4 +1,5 @@
 require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class HookRequestValidContextTest < Inferno::Test
     include URLs
@@ -34,8 +35,7 @@ module DaVinciCRDTestKit
       this test.
     )
 
-    input :contexts_prefetches
-    input :client_fhir_server
+    input :contexts, :client_fhir_server
     input :client_access_token,
           optional: true
 
@@ -49,25 +49,22 @@ module DaVinciCRDTestKit
     end
 
     run do
-      assert_valid_json(contexts_prefetches)
-      hook_contexts_prefetches = JSON.parse(contexts_prefetches)
-      assert(hook_contexts_prefetches.any? { |context_prefetch| context_prefetch['context'].present? },
-             "No #{hook_name} requests contained the `context` field.")
+      assert_valid_json(contexts)
+      hook_contexts = JSON.parse(contexts)
+      skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
       error_messages = []
-      hook_contexts_prefetches.each_with_index do |context_prefetch, index|
-        context = context_prefetch['context']
+      hook_contexts.each_with_index do |context, index|
         assert(context.present?, 'Missing required context field.')
         assert(context.is_a?(Hash), 'Context is in an incorrect format.')
         hook_request_context_check(context, hook_name, index + 1)
-        no_error_validation('Context is not valid.')
       rescue Inferno::Exceptions::AssertionException => e
         error_messages << "Request #{index + 1}: #{e.message}"
       end
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Context is not valid.'
+      no_error_validation('Context is not valid.')
     end
   end
 end

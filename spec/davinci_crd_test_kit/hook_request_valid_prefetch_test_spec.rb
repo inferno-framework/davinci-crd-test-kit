@@ -190,8 +190,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test,
-                   contexts_prefetches: [{ context: appointment_book_context,
-                                           prefetch: appointment_book_prefetch }].to_json)
+                   contexts: [appointment_book_context].to_json,
+                   prefetches: [appointment_book_prefetch].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(3)
     end
@@ -201,10 +201,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test,
-                   contexts_prefetches: [{ context: appointment_book_context,
-                                           prefetch: appointment_book_prefetch },
-                                         { context: appointment_book_context,
-                                           prefetch: appointment_book_prefetch }].to_json)
+                   contexts: [appointment_book_context, appointment_book_context].to_json,
+                   prefetches: [appointment_book_prefetch, appointment_book_prefetch].to_json)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(6)
     end
@@ -216,10 +214,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       invalid_prefetch = { user: crd_practitioner, patient: crd_practitioner, coverage: crd_coverage_bundle }
 
       result = run(test,
-                   contexts_prefetches: [{ context: appointment_book_context,
-                                           prefetch: appointment_book_prefetch },
-                                         { context: appointment_book_context,
-                                           prefetch: invalid_prefetch }].to_json)
+                   contexts: [appointment_book_context, appointment_book_context].to_json,
+                   prefetches: [appointment_book_prefetch, invalid_prefetch].to_json)
       expect(result.result).to eq('fail')
       expect(validation_request).to have_been_made.times(4)
       expect(entity_result_message(test)).to match(
@@ -228,8 +224,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'skips if hook request does not contain the `prefetch` field' do
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: nil }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [nil].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(
@@ -238,8 +233,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'skips if hook request does not contain the `context` field' do
-      result = run(test, contexts_prefetches: [{ context: nil,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [nil].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(
@@ -252,8 +246,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       appointment_book_prefetch[:user]['resourceType'] = 'Observation'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -268,8 +261,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch.delete(:patient)
       appointment_book_prefetch.delete(:coverage)
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
@@ -281,8 +273,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       appointment_book_prefetch[:user]['id'] = 'incorrect_id'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Expected `user` field's FHIR resource to have an `id` of 'example'/)
@@ -293,8 +284,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       appointment_book_prefetch[:patient]['resourceType'] = 'Practitioner'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -309,8 +299,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch.delete(:user)
       appointment_book_prefetch.delete(:coverage)
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
@@ -322,8 +311,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       appointment_book_prefetch[:patient]['id'] = 'incorrect_id'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -337,8 +325,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch[:coverage].entry.first.resource =
         FHIR.from_contents(crd_practitioner.to_json)
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -353,8 +340,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch.delete(:user)
       appointment_book_prefetch.delete(:patient)
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
@@ -367,8 +353,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch[:coverage].entry.first.resource.beneficiary.reference =
         'Patient/incorrect_id'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
@@ -381,8 +366,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       appointment_book_prefetch[:coverage].entry.first.resource.status =
         'draft'
 
-      result = run(test, contexts_prefetches: [{ context: appointment_book_context,
-                                                 prefetch: appointment_book_prefetch }].to_json)
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Expected `coverage` field's Coverage resource to have a `status`/)
     end
@@ -412,8 +396,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       validation_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
-      result = run(test, contexts_prefetches: [{ context: encounter_start_context,
-                                                 prefetch: encounter_start_hook_prefetch }].to_json)
+      result = run(test, contexts: [encounter_start_context].to_json,
+                         prefetches: [encounter_start_hook_prefetch].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
@@ -444,8 +428,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       validation_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
-      result = run(test, contexts_prefetches: [{ context: order_dispatch_context,
-                                                 prefetch: order_dispatch_hook_prefetch }].to_json)
+      result = run(test, contexts: [order_dispatch_context].to_json, prefetches: [order_dispatch_hook_prefetch].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
@@ -476,8 +459,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       validation_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
-      result = run(test, contexts_prefetches: [{ context: order_select_context,
-                                                 prefetch: order_select_hook_prefetch }].to_json)
+      result = run(test, contexts: [order_select_context].to_json, prefetches: [order_select_hook_prefetch].to_json)
 
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(3)

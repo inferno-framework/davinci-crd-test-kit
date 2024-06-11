@@ -1,8 +1,8 @@
-require_relative '../urls'
+require_relative '../client_hook_request_validation'
 
 module DaVinciCRDTestKit
   class HookRequestValidPrefetchTest < Inferno::Test
-    include DaVinciCRDTestKit::ClientHookRequestValidation
+    include ClientHookRequestValidation
     include URLs
 
     id :crd_hook_request_valid_prefetch
@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
     )
     optional
 
-    input :contexts_prefetches
+    input :contexts, :prefetches
 
     def hook_name
       config.options[:hook_name]
@@ -38,35 +38,37 @@ module DaVinciCRDTestKit
     end
 
     run do
-      assert_valid_json(contexts_prefetches)
-      hook_contexts_prefetches = JSON.parse(contexts_prefetches)
-      skip_if(hook_contexts_prefetches.none? do |context_prefetch|
-                context_prefetch['prefetch'].present? && context_prefetch['context'].present?
-              end,
-              "No #{hook_name} requests contained both the `context` and `prefetch` field.")
+      assert_valid_json(contexts)
+      assert_valid_json(prefetches)
+
+      hook_contexts = JSON.parse(contexts)
+      hook_prefetches = JSON.parse(prefetches)
+
+      skip_if(hook_prefetches.none? do |prefetch|
+        prefetch_index = hook_prefetches.find_index(prefetch)
+        prefetch.present? && hook_contexts[prefetch_index].present?
+      end, "No #{hook_name} requests contained both the `context` and `prefetch` field.")
       error_messages = []
-      hook_contexts_prefetches.each_with_index do |context_prefetch, index|
-        received_prefetch = context_prefetch['prefetch']
-        received_context = context_prefetch['context']
+      hook_prefetches.each_with_index do |prefetch, index|
+        context = hook_contexts[index]
 
         info do
-          assert received_prefetch.present?, "Received hook request #{index + 1} does not contain the `prefetch` field."
-          assert received_context.present?, %(Received hook request  #{index + 1} does not contain the `context` field
+          assert prefetch.present?, "Received hook request #{index + 1} does not contain the `prefetch` field."
+          assert context.present?, %(Received hook request  #{index + 1} does not contain the `context` field
           which is needed to validate the `prefetch` field)
         end
 
-        next if received_prefetch.blank? || received_context.blank?
+        next if prefetch.blank? || context.blank?
 
-        hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
-        no_error_validation('Prefetch is not valid.')
+        hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context)
       rescue Inferno::Exceptions::AssertionException => e
         error_messages << "Request #{index + 1}: #{e.message}"
       end
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Prefetch is not valid.'
+      no_error_validation('Prefetch is not valid.')
     end
   end
 end

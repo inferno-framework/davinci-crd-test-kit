@@ -2,7 +2,7 @@ require_relative '../client_hook_request_validation'
 
 module DaVinciCRDTestKit
   class HookRequestRequiredFieldsTest < Inferno::Test
-    include DaVinciCRDTestKit::ClientHookRequestValidation
+    include ClientHookRequestValidation
     include URLs
 
     id :crd_hook_request_required_fields
@@ -24,31 +24,31 @@ module DaVinciCRDTestKit
       config.options[:hook_name]
     end
 
-    output :contexts_prefetches
+    output :contexts, :prefetches
 
     run do
       load_tagged_requests(hook_name)
       skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
       error_messages = []
-      contexts_prefetches = []
+      contexts = []
+      prefetches = []
       requests.each_with_index do |request, index|
         assert_valid_json(request.request_body)
         request_body = JSON.parse(request.request_body)
-        context = request_body['context'] if request_body['context'].is_a?(Hash)
-        prefetch = request_body['prefetch'] if request_body['prefetch'].present? &&
-                                               request_body['prefetch'].is_a?(Hash)
-        contexts_prefetches << { context:, prefetch: }
+        contexts << request_body['context'] if request_body['context'].is_a?(Hash)
+        prefetches << request_body['prefetch'] if request_body['prefetch'].is_a?(Hash)
         hook_request_required_fields_check(request_body, hook_name)
       rescue Inferno::Exceptions::AssertionException => e
         error_messages << "Request #{index + 1}: #{e.message}"
       end
 
-      output contexts_prefetches: contexts_prefetches.to_json
+      output contexts: contexts.to_json,
+             prefetches: prefetches.to_json
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Some service requests made are not valid.'
+      no_error_validation('Some service requests made are not valid.')
     end
   end
 end

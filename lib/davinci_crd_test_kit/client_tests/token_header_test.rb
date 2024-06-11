@@ -1,5 +1,9 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class TokenHeaderTest < Inferno::Test
+    include ClientHookRequestValidation
+
     id :crd_token_header
     title 'Authorization token header contains required information'
     description %(
@@ -43,9 +47,9 @@ module DaVinciCRDTestKit
       output auth_tokens_jwk_json: auth_tokens_jwk_json.to_json
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Token headers missing required information.'
+      no_error_validation('Token headers missing required information.')
     end
   end
 end

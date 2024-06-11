@@ -1,5 +1,9 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class RetrieveJWKSTest < Inferno::Test
+    include ClientHookRequestValidation
+
     id :crd_retrieve_jwks
     title 'JWKS can be retrieved'
     description %(
@@ -72,9 +76,9 @@ module DaVinciCRDTestKit
              crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Retrieving JWKS failed.'
+      no_error_validation('Retrieving JWKS failed.')
     end
   end
 end

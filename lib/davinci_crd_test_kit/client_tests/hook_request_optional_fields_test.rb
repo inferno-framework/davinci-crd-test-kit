@@ -2,7 +2,7 @@ require_relative '../client_hook_request_validation'
 
 module DaVinciCRDTestKit
   class HookRequestOptionalFieldsTest < Inferno::Test
-    include DaVinciCRDTestKit::ClientHookRequestValidation
+    include ClientHookRequestValidation
     include URLs
 
     id :crd_hook_request_optional_fields
@@ -51,9 +51,9 @@ module DaVinciCRDTestKit
       end
 
       error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
+        add_message('error', msg)
       end
-      assert error_messages.empty?, 'Some service requests contain invalid optional fields.'
+      no_error_validation('Some service requests contain invalid optional fields.')
     end
   end
 end
