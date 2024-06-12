@@ -70,6 +70,7 @@ module DaVinciCRDTestKit
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
 
+      optional
       run_as_group
 
       test from: :crd_appointment_book_request
@@ -177,6 +178,7 @@ module DaVinciCRDTestKit
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
 
+      optional
       run_as_group
 
       test from: :crd_encounter_start_request
@@ -285,6 +287,7 @@ module DaVinciCRDTestKit
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
 
+      optional
       run_as_group
 
       test from: :crd_encounter_discharge_request
@@ -393,6 +396,8 @@ module DaVinciCRDTestKit
 
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
+
+      optional
       run_as_group
 
       test from: :crd_order_select_request
@@ -501,6 +506,7 @@ module DaVinciCRDTestKit
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
 
+      optional
       run_as_group
 
       test from: :crd_order_dispatch_request
@@ -610,6 +616,7 @@ module DaVinciCRDTestKit
         was not available as a snapshot. Therefore the preceding link refers to the CDS hooks current build.
       DESCRIPTION
 
+      optional
       run_as_group
 
       test from: :crd_order_sign_request
