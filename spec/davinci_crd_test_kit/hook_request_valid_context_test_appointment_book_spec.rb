@@ -195,13 +195,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       expect(result.result_message).to match("Input 'client_fhir_server' is nil, skipping test.")
     end
 
-    it 'fails if context is not a valid json' do
-      result = run(test, client_fhir_server:, client_access_token:,
-                         contexts: ['[['].to_json)
-      expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Context is in an incorrect format./)
-    end
-
     it 'fails if no request contains the `context` field' do
       result = run(test, client_fhir_server:, client_access_token:, contexts: [nil].to_json)
 

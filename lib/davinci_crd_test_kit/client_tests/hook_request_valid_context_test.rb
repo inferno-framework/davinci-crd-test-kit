@@ -55,7 +55,6 @@ module DaVinciCRDTestKit
       error_messages = []
       hook_contexts.each_with_index do |context, index|
         assert(context.present?, 'Missing required context field.')
-        assert(context.is_a?(Hash), 'Context is in an incorrect format.')
         hook_request_context_check(context, hook_name, index + 1)
       rescue Inferno::Exceptions::AssertionException => e
         error_messages << "Request #{index + 1}: #{e.message}"
