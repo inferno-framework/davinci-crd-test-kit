@@ -24,7 +24,6 @@ module DaVinciCRDTestKit
       and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response).
 
       This group includes tests to validate the following CRD response types:
-      - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) - optional
       - [Create or update coverage information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)\
       - optional
       - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) - optional
@@ -116,29 +115,6 @@ module DaVinciCRDTestKit
            inputs: {
              valid_cards: {
                name: :encounter_start_valid_cards
-             }
-           }
-         }
-    test from: :crd_coverage_info_system_action_received,
-         optional: true,
-         config: {
-           inputs: {
-             valid_system_actions: {
-               name: :encounter_start_valid_system_actions
-             }
-           },
-           outputs: {
-             coverage_info: {
-               name: :encounter_start_coverage_info
-             }
-           }
-         }
-    test from: :crd_coverage_info_system_action_validation,
-         optional: true,
-         config: {
-           inputs: {
-             coverage_info: {
-               name: :encounter_start_coverage_info
              }
            }
          }
