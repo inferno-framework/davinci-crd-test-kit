@@ -38,7 +38,6 @@ module DaVinciCRDTestKit
       skip_if auth_tokens_list.empty?, 'No Authorization tokens produced from the previous tests.'
       skip_if auth_tokens_jwk.empty?, 'No Authorization token JWK produced from the previous test.'
 
-      error_messages = []
       auth_tokens_jwk.each_with_index do |auth_token_jwk, index|
         begin
           jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys
@@ -59,19 +58,17 @@ module DaVinciCRDTestKit
               verify_aud: true
             )
         rescue StandardError => e
-          assert false, "Token validation error: #{e.message}"
+          add_message('error', "Request #{index + 1}: Token validation error: #{e.message}")
+          next
         end
 
         missing_claims = required_claims - payload.keys
         missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
 
-        assert missing_claims.empty?, "JWT payload missing required claims: #{missing_claims_string}"
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
-      end
-
-      error_messages.each do |msg|
-        add_message('error', msg)
+        unless missing_claims.empty?
+          add_message('error', "Request #{index + 1}: JWT payload missing required claims: #{missing_claims_string}")
+          next
+        end
       end
       no_error_validation('Token payload is missing required claims or does not have a valid signiture.')
     end

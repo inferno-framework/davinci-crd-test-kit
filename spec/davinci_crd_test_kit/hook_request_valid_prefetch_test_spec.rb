@@ -217,9 +217,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
                    contexts: [appointment_book_context, appointment_book_context].to_json,
                    prefetches: [appointment_book_prefetch, invalid_prefetch].to_json)
       expect(result.result).to eq('fail')
-      expect(validation_request).to have_been_made.times(4)
+      expect(validation_request).to have_been_made.times(5)
       expect(entity_result_message(test)).to match(
-        /Request 2: Unexpected resource type: expected Patient, but received Practitioner/
+        /Request 2: Unexpected resource type: Expected `Patient`. Got/
       )
     end
 
@@ -250,7 +250,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Unexpected resource type: expected Practitioner, but received Observation/
+        /Unexpected resource type: Expected `Practitioner`. Got/
       )
     end
 
@@ -276,7 +276,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Expected `user` field's FHIR resource to have an `id` of 'example'/)
+      expect(entity_result_message(test)).to match(/Expected `user` field's FHIR resource to have an `id` of/)
     end
 
     it 'fails if prefetch `patient` is not a Patient resource' do
@@ -288,7 +288,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Unexpected resource type: expected Patient, but received Practitioner/
+        /Unexpected resource type: Expected `Patient`. Got/
       )
     end
 
@@ -315,7 +315,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Expected `patient` field's FHIR resource to have an `id` of 'example'/
+        /Expected `patient` field's FHIR resource to have an `id` of/
       )
     end
 
@@ -329,7 +329,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Unexpected resource type: expected Coverage, but received Practitioner/
+        /Unexpected resource type: Expected `Coverage`. Got/
       )
     end
 
@@ -357,7 +357,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Expected `coverage` field's Coverage resource to have a `beneficiary` reference id of/
+        /Expected `coverage` field's Coverage resource to have a `beneficiary`/
       )
     end
 

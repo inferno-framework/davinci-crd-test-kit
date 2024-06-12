@@ -29,7 +29,6 @@ module DaVinciCRDTestKit
       auth_token_headers = JSON.parse(auth_tokens_header_json)
       skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous test.'
 
-      error_messages = []
       crd_jwks_json = []
       crd_jwks_keys_json = []
       auth_token_headers.each_with_index do |token_header, index|
@@ -37,47 +36,63 @@ module DaVinciCRDTestKit
         if jku.present?
           get(jku)
 
-          assert_response_status(200)
-          assert_valid_json(response[:body])
+          if response[:status] != 200
+            add_message('error', %(
+                        Request #{index + 1}: Unexpected response status: expected 200, but received
+                        #{response[:status]}))
+            next
+          end
+
+          jwks = json_parse(response[:body], index + 1)
+          next unless jwks
+
           crd_jwks_json << response[:body]
 
           jwks = JSON.parse(response[:body])
         else
           skip_if jwk_set.blank?,
-                  %(JWK Set must be inputted if Client's JWK Set is not available via a URL identified by the jku header
-                  field)
+                  %(Request #{index + 1}: JWK Set must be inputted if Client's JWK Set is not available via a URL
+                  identified by the jku header field)
 
           jwks = JSON.parse(jwk_set)
         end
 
         keys = jwks['keys']
-        assert keys.is_a?(Array), 'JWKS `keys` field must be an array'
+        unless keys.is_a?(Array)
+          add_message('error', "Request #{index + 1}: JWKS `keys` field must be an array")
+          next
+        end
 
-        assert keys.present?, 'The JWK set returned contains no public keys'
+        unless keys.present?
+          add_message('error', "Request #{index + 1}: The JWK set returned contains no public keys")
+          next
+        end
 
         keys.each do |jwk|
           JWT::JWK.import(jwk.deep_symbolize_keys)
         rescue StandardError
-          assert false, "Invalid JWK: #{jwk.to_json}"
+          add_message('error', "Request #{index + 1}: Invalid JWK: #{jwk.to_json}")
         end
 
         kid_presence = keys.all? { |key| key['kid'].present? }
-        assert kid_presence, '`kid` field must be present in each key if JWKS contains multiple keys'
+        unless kid_presence
+          add_message('error',
+                      "Request #{index + 1}: `kid` field must be present in each key if JWKS contains multiple keys")
+          next
+        end
 
         kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
-        assert kid_uniqueness, '`kid` must be unique within the client\' JWK Set.'
+        unless kid_uniqueness
+          add_message('error', "Request #{index + 1}: `kid` must be unique within the client's JWK Set.")
+          next
+        end
 
         crd_jwks_keys_json << keys.to_json
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
       end
 
       output crd_jwks_json: crd_jwks_json.to_json,
              crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
-      error_messages.each do |msg|
-        add_message('error', msg)
-      end
       no_error_validation('Retrieving JWKS failed.')
     end
   end

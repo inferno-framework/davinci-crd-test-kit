@@ -22,20 +22,21 @@ module DaVinciCRDTestKit
       skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
       skip_if(requests.none? { |request| request.request_header('Authorization')&.value.present? },
               "No #{hook_name} requests contained the Authorization header")
-      error_messages = []
       auth_tokens = []
       auth_token_payloads_json = []
       auth_tokens_header_json = []
 
       requests.each_with_index do |request, index|
         authorization_header = request.request_header('Authorization')&.value
-        info do
-          assert authorization_header.present?, "Request #{index + 1} does not include an Authorization header"
-        end
-        next if authorization_header.blank?
 
-        assert(authorization_header.start_with?('Bearer '),
-               'Authorization token must be a JWT presented as a `Bearer` token')
+        unless authorization_header.present?
+          add_message('info', "Request #{index + 1}: Request does not include an Authorization header")
+          next
+        end
+
+        unless authorization_header.start_with?('Bearer ')
+          add_message('error', "Request #{index + 1}: Authorization token must be a JWT presented as a `Bearer` token")
+        end
 
         auth_token = authorization_header.delete_prefix('Bearer ')
         auth_tokens << auth_token
@@ -51,18 +52,13 @@ module DaVinciCRDTestKit
           auth_token_payloads_json << payload.to_json
           auth_tokens_header_json << header.to_json
         rescue StandardError => e
-          assert false, "Token is not a properly constructed JWT: #{e.message}"
+          add_message('error', "Request #{index + 1}: Token is not a properly constructed JWT: #{e.message}")
         end
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
       end
       output auth_tokens: auth_tokens.to_json,
              auth_token_payloads_json: auth_token_payloads_json.to_json,
              auth_tokens_header_json: auth_tokens_header_json.to_json
 
-      error_messages.each do |msg|
-        add_message('error', msg)
-      end
       no_error_validation('Decoding Authorization header Bearer tokens failed.')
     end
   end

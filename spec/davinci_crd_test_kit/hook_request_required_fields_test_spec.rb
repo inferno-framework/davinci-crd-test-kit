@@ -188,7 +188,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestRequiredFieldsTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(
-        /Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is REQUIRED./
+        /Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is/
       )
     end
   end

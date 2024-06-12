@@ -84,7 +84,7 @@ RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
 
     result = run(test, auth_tokens_header_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Token header `typ` field must be set to 'JWT', instead was Bearer/)
+    expect(entity_result_message.message).to match(/Token header `typ` field must be set to 'JWT', instead was/)
   end
 
   it 'fails if it receives a JWT header without the `kid` field' do

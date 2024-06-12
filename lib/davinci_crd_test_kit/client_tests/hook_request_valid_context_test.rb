@@ -49,19 +49,16 @@ module DaVinciCRDTestKit
     end
 
     run do
-      assert_valid_json(contexts)
-      hook_contexts = JSON.parse(contexts)
-      skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
-      error_messages = []
-      hook_contexts.each_with_index do |context, index|
-        assert(context.present?, 'Missing required context field.')
-        hook_request_context_check(context, hook_name, index + 1)
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
-      end
+      hook_contexts = json_parse(contexts)
+      next unless hook_contexts
 
-      error_messages.each do |msg|
-        add_message('error', msg)
+      skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
+      hook_contexts.each_with_index do |context, index|
+        unless context.present?
+          add_message('error', "Request #{index + 1}: Missing required context field.")
+          next
+        end
+        hook_request_context_check(context, hook_name, index + 1)
       end
       no_error_validation('Context is not valid.')
     end

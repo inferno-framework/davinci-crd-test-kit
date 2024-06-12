@@ -38,35 +38,31 @@ module DaVinciCRDTestKit
     end
 
     run do
-      assert_valid_json(contexts)
-      assert_valid_json(prefetches)
+      hook_contexts = json_parse(contexts)
+      next unless hook_contexts
 
-      hook_contexts = JSON.parse(contexts)
-      hook_prefetches = JSON.parse(prefetches)
+      hook_prefetches = json_parse(prefetches)
+      next unless hook_prefetches
 
       skip_if(hook_prefetches.none? do |prefetch|
         prefetch_index = hook_prefetches.find_index(prefetch)
         prefetch.present? && hook_contexts[prefetch_index].present?
       end, "No #{hook_name} requests contained both the `context` and `prefetch` field.")
-      error_messages = []
+
       hook_prefetches.each_with_index do |prefetch, index|
         context = hook_contexts[index]
 
-        info do
-          assert prefetch.present?, "Received hook request #{index + 1} does not contain the `prefetch` field."
-          assert context.present?, %(Received hook request  #{index + 1} does not contain the `context` field
-          which is needed to validate the `prefetch` field)
+        unless prefetch.present?
+          add_message('info', "Request #{index + 1}: Received hook request does not contain the `prefetch` field.")
+        end
+        unless context.present?
+          add_message('info', %(Request #{index + 1}: Received hook request does not contain the `context` field
+          which is needed to validate the `prefetch` field))
         end
 
         next if prefetch.blank? || context.blank?
 
-        hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context)
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
-      end
-
-      error_messages.each do |msg|
-        add_message('error', msg)
+        hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context, index + 1)
       end
       no_error_validation('Prefetch is not valid.')
     end

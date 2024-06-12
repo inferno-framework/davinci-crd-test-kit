@@ -80,7 +80,7 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
     result = run(test, auth_tokens_header_json: [token_header.to_json, token_header.to_json])
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(
-      /Request 2: Unexpected response status: expected 200, but received 404/
+      /Request 2: Unexpected response status: expected 200, but received/
     )
     expect(jwks_request).to have_been_made.times(2)
   end
@@ -106,7 +106,7 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
 
     result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received 404/)
+    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received/)
     expect(jwks_request).to have_been_made
   end
 
@@ -157,7 +157,7 @@ RSpec.describe DaVinciCRDTestKit::RetrieveJWKSTest do
       .to_return(status: 200, body: jwks_hash_dup_kids.to_json)
     result = run(test, auth_tokens_header_json: [token_header.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/`kid` must be unique within the client' JWK Set./)
+    expect(entity_result_message.message).to match(/`kid` must be unique within the client's JWK Set./)
     expect(jwks_request).to have_been_made
   end
 end
