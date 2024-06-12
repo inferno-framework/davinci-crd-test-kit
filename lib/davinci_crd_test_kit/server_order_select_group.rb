@@ -28,6 +28,7 @@ module DaVinciCRDTestKit
       This group includes tests to validate the following CRD response types:
       - [additional orders as companions/prerequisites](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)\
       - optional
+      - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) - optional
       - [Create or update coverage information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)\
       - optional
       - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) - optional
@@ -121,6 +122,29 @@ module DaVinciCRDTestKit
            inputs: {
              valid_cards: {
                name: :order_select_valid_cards
+             }
+           }
+         }
+    test from: :crd_coverage_info_system_action_received,
+         optional: true,
+         config: {
+           inputs: {
+             valid_system_actions: {
+               name: :order_select_valid_system_actions
+             }
+           },
+           outputs: {
+             coverage_info: {
+               name: :order_select_coverage_info
+             }
+           }
+         }
+    test from: :crd_coverage_info_system_action_validation,
+         optional: true,
+         config: {
+           inputs: {
+             coverage_info: {
+               name: :order_select_coverage_info
              }
            }
          }
