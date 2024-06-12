@@ -30,10 +30,7 @@ module DaVinciCRDTestKit
       {
         'appointment-book' => ['Appointment'],
         'order-sign' => shared_resources,
-        'order-dispatch' => shared_resources,
-        'order-select' => shared_resources,
-        'encounter-start' => ['Encounter'],
-        'encounter-discharge' => ['Encounter']
+        'order-dispatch' => shared_resources
       }
     end
 
