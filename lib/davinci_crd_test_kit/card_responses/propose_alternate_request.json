@@ -15,57 +15,7 @@
   "suggestions": [
     {
       "label": "Replace order with a health assessment first",
-      "actions": [
-        {
-          "type": "create",
-          "description": "Order for patient health assessment",
-          "resource": {
-            "resourceType": "ServiceRequest",
-            "status": "draft",
-            "intent": "order",
-            "category": [
-              {
-                "coding": [
-                  {
-                    "system": "http://snomed.info/sct",
-                    "code": "409063005",
-                    "display": "Counselling"
-                  }
-                ]
-              }
-            ],
-            "code": {
-              "coding": [
-                {
-                  "system": "http://snomed.info/sct",
-                  "code": "225885004",
-                  "display": "Health assessment (procedure)"
-                }
-              ]
-            },
-            "subject": {
-              "reference": "http://example.org/fhir/Patient/123"
-            },
-            "occurrenceTiming": {
-              "repeat": {
-                "boundsDuration": {
-                  "value": 3,
-                  "unit": "months",
-                  "system": "http://unitsofmeasure.org",
-                  "code": "mo"
-                },
-                "frequency": 1,
-                "period": 1,
-                "periodUnit": "mo"
-              }
-            },
-            "authoredOn": "2019-02-15",
-            "requester": {
-              "reference": "http://example.org/fhir/PractitionerRole/987"
-            }
-          }
-        }
-      ]
+      "actions": []
     }
   ]
 }
