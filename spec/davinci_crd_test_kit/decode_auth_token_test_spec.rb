@@ -118,14 +118,6 @@ RSpec.describe DaVinciCRDTestKit::DecodeAuthTokenTest do
       )
     end
 
-    it 'skips if no authorization header included in request' do
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: nil)
-
-      result = run(test)
-      expect(result.result).to eq('skip')
-      expect(result.result_message).to eq('No appointment-book requests contained the Authorization header')
-    end
-
     it 'fails if authorization header does not present the JWT as a `Bearer` token' do
       token = jwt_helper.build(
         aud: appointment_book_url,

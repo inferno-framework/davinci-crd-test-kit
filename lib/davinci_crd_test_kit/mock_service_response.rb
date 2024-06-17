@@ -177,7 +177,7 @@ module DaVinciCRDTestKit
     def get_context_resource(request_body, resource_type, update_resource_id)
       update_resource_id = "#{resource_type}/#{update_resource_id}" unless update_resource_id.include? '/'
       fhir_server = request_body['fhirServer']
-      return unless fhir_server.present?
+      return if fhir_server.blank?
 
       access_token = request_body['fhirAuthorization']['access_token'] if request_body['fhirAuthorization']
       make_resource_request(

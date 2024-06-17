@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
         include an Authorization header presenting the JWT as a "Bearer" token.
       )
 
-    output :auth_tokens, :auth_token_payloads_json, :auth_tokens_header_json
+    output :auth_tokens, :auth_token_payloads_json, :auth_token_headers_json
 
     def hook_name
       config.options[:hook_name]
@@ -20,19 +20,12 @@ module DaVinciCRDTestKit
     run do
       load_tagged_requests(hook_name)
       skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
-      skip_if(requests.none? { |request| request.request_header('Authorization')&.value.present? },
-              "No #{hook_name} requests contained the Authorization header")
       auth_tokens = []
       auth_token_payloads_json = []
-      auth_tokens_header_json = []
+      auth_token_headers_json = []
 
       requests.each_with_index do |request, index|
         authorization_header = request.request_header('Authorization')&.value
-
-        unless authorization_header.present?
-          add_message('info', "Request #{index + 1}: Request does not include an Authorization header")
-          next
-        end
 
         unless authorization_header.start_with?('Bearer ')
           add_message('error', "Request #{index + 1}: Authorization token must be a JWT presented as a `Bearer` token")
@@ -50,14 +43,14 @@ module DaVinciCRDTestKit
             )
 
           auth_token_payloads_json << payload.to_json
-          auth_tokens_header_json << header.to_json
+          auth_token_headers_json << header.to_json
         rescue StandardError => e
           add_message('error', "Request #{index + 1}: Token is not a properly constructed JWT: #{e.message}")
         end
       end
       output auth_tokens: auth_tokens.to_json,
              auth_token_payloads_json: auth_token_payloads_json.to_json,
-             auth_tokens_header_json: auth_tokens_header_json.to_json
+             auth_token_headers_json: auth_token_headers_json.to_json
 
       no_error_validation('Decoding Authorization header Bearer tokens failed.')
     end

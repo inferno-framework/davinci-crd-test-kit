@@ -1,18 +1,16 @@
 module DaVinciCRDTestKit
   module HookRequestFieldValidation
-    def request_number(request_index = '')
-      @request_number ||= if request_index.blank?
-                            ''
-                          else
-                            "Request #{request_index}: "
-                          end
+    def request_number
+      if @request_number.blank?
+        ''
+      else
+        "Request #{@request_number}: "
+      end
     end
 
-    def json_parse(json, index = '')
+    def json_parse(json)
       JSON.parse(json)
     rescue JSON::ParserError
-      @request_number = nil
-      request_number(index)
       add_message('error', "#{request_number}Invalid JSON.")
       false
     end
@@ -106,12 +104,9 @@ module DaVinciCRDTestKit
       }.freeze
     end
 
-    def hook_request_required_fields_check(request_body, hook_name, request_index = '')
-      @request_number = nil
-      request_number(request_index)
-
+    def hook_request_required_fields_check(request_body, hook_name)
       hook_required_fields.each do |field, type|
-        unless request_body[field].present?
+        if request_body[field].blank?
           add_message('error', "#{request_number}Hook request did not contain required field: `#{field}`")
           next
         end
@@ -135,26 +130,27 @@ module DaVinciCRDTestKit
                   #REQUIRED.))
     end
 
-    def fhir_auth_fields_check(fhir_authorization_required_fields, fhir_authorization)
-      fhir_authorization_required_fields.all? do |field, type|
-        unless fhir_authorization[field]
+    def fhir_auth_fields_valid?(fhir_authorization_required_fields, fhir_authorization)
+      fhir_auth_valid = true
+      fhir_authorization_required_fields.each do |field, type|
+        if fhir_authorization[field].blank?
           add_message('error', "#{request_number}`fhirAuthorization` did not contain required field: `#{field}`")
-          false
+          fhir_auth_valid = false
         end
         unless fhir_authorization[field].is_a?(type)
           add_message('error', "#{request_number}`fhirAuthorization` field #{field} is not of type #{type}")
-          false
+          fhir_auth_valid = false
         end
-        true
       end
+      fhir_auth_valid
     end
 
     def check_patient_scope_requirement(scopes, fhir_authorization)
       if scopes.any? { |scope| scope.start_with?('patient/') } &&
          !(fhir_authorization['patient'] && fhir_authorization['patient'].is_a?(String))
-        add_message('info', %(
+        info %(
            #{request_number}The `patient` field for request SHOULD be populated to identify the FHIR id of that
-           patient when the granted SMART scopes include patient scopes))
+           patient when the granted SMART scopes include patient scopes)
       end
     end
 
@@ -163,11 +159,10 @@ module DaVinciCRDTestKit
 
         fhir_authorization = request_body['fhirAuthorization']
 
-        return unless fhir_auth_fields_check(fhir_authorization_required_fields, fhir_authorization)
+        return unless fhir_auth_fields_valid?(fhir_authorization_required_fields, fhir_authorization)
 
         if fhir_authorization['token_type'] != 'Bearer'
           add_message('error', "#{request_number}`fhirAuthorization` `token_type` field is not set to 'Bearer'")
-          return
         end
 
         access_token = fhir_authorization['access_token']
@@ -179,14 +174,9 @@ module DaVinciCRDTestKit
       { fhir_server_uri: request_body['fhirServer'], fhir_access_token: access_token }
     end
 
-    def hook_request_optional_fields_check(request_body, request_index = '')
-      @request_number = nil
-      request_number(request_index)
-
+    def hook_request_optional_fields_check(request_body)
       hook_optional_fields.each do |field, type|
-        unless request_body[field]
-          add_message('info', "#{request_number}Hook request did not contain optional field: `#{field}`")
-        end
+        info "#{request_number}Hook request did not contain optional field: `#{field}`" if request_body[field].blank?
 
         if request_body[field] && !request_body[field].is_a?(type)
           add_message('error', "#{request_number}Hook request field #{field} is not of type #{type}")
@@ -216,10 +206,7 @@ module DaVinciCRDTestKit
       add_message('error', error_msg)
     end
 
-    def hook_request_context_check(context, hook_name, request_index = '')
-      @request_number = nil
-      request_number(request_index)
-
+    def hook_request_context_check(context, hook_name)
       required_fields = context_required_fields_by_hook[hook_name]
       required_fields.each do |field, type|
         validate_presence_and_type(context, field, type,
@@ -300,7 +287,7 @@ module DaVinciCRDTestKit
 
     def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil)
       target_resources = bundle.entry.map(&:resource).select { |r| resource_types.include?(r.resourceType) }
-      unless target_resources.present?
+      if target_resources.blank?
         error_msg = "#{request_number}`#{context_field_name}` bundle must contain at least one of the " \
                     "expected resource types: #{resource_types.to_sentence}. In Context `#{context}`"
         add_message('error', error_msg)
@@ -324,7 +311,7 @@ module DaVinciCRDTestKit
 
     def parse_fhir_bundle_from_context(context_field_name, context)
       fhir_bundle = FHIR.from_contents(context[context_field_name].to_json)
-      unless fhir_bundle
+      if fhir_bundle.blank?
         error_msg = "#{request_number}`#{context_field_name}` field is not a FHIR resource: " \
                     "`#{context[context_field_name]}`. In Context `#{context}`"
         add_message('error', error_msg)
@@ -357,7 +344,7 @@ module DaVinciCRDTestKit
       id_only_fields_check('appointment-book', context, ['patientId'])
 
       appointment_bundle = parse_fhir_bundle_from_context('appointments', context)
-      return unless appointment_bundle
+      return if appointment_bundle.blank?
 
       expected_resource_types = ['Appointment']
       bundle_entries_check(context, 'appointments', appointment_bundle, expected_resource_types, 'proposed')
@@ -373,7 +360,7 @@ module DaVinciCRDTestKit
       id_only_fields_check(hook_name, context, ['patientId'])
 
       draft_orders_bundle = parse_fhir_bundle_from_context('draftOrders', context)
-      return unless draft_orders_bundle
+      return if draft_orders_bundle.blank?
 
       expected_resource_types = [
         'DeviceRequest', 'MedicationRequest', 'NutritionOrder',
@@ -438,7 +425,7 @@ module DaVinciCRDTestKit
 
     def context_validate_optional_fields(hook_context, hook_name)
       hook_optional_context_fields = context_optional_fields_by_hook[hook_name]
-      return unless hook_optional_context_fields.present?
+      return if hook_optional_context_fields.blank?
 
       hook_optional_context_fields.each do |field, type|
         validate_presence_and_type(hook_context, field, type, "#{hook_name} request context") if hook_context[field]
@@ -462,7 +449,7 @@ module DaVinciCRDTestKit
       hash_context_fields.each do |field, entry|
         resource_json = entry.to_json
         fhir_resource = FHIR.from_contents(resource_json)
-        unless fhir_resource
+        if fhir_resource.blank?
           add_message('error', "#{request_number}Field `#{field}` is not a FHIR resource.")
           next
         end
@@ -478,12 +465,9 @@ module DaVinciCRDTestKit
       end
     end
 
-    def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context, request_index = '')
-      @request_number = nil
-      request_number(request_index)
-
+    def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
       advertised_prefetch_fields.each do |advertised_prefetch_key, advertised_prefetch_template|
-        next unless received_prefetch[advertised_prefetch_key].present?
+        next if received_prefetch[advertised_prefetch_key].blank?
 
         unless received_prefetch[advertised_prefetch_key].is_a?(Hash)
           add_message('error', "#{request_number}Prefetch field `#{advertised_prefetch_key}` is not of type `Hash`.")
@@ -555,7 +539,7 @@ module DaVinciCRDTestKit
 
       coverage_beneficiary_reference = coverage_resource.beneficiary
       coverage_beneficiary_patient_id = coverage_beneficiary_reference.reference_id
-      unless coverage_beneficiary_patient_id.present?
+      if coverage_beneficiary_patient_id.blank?
         add_message('error', %(
           #{request_number}Could not get beneficiary reference id from `#{advertised_prefetch_key}` field's Coverage
           resource
@@ -598,7 +582,7 @@ module DaVinciCRDTestKit
       end
 
       received_prefetch_resource_id = received_resource.id
-      unless received_prefetch_resource_id.present?
+      if received_prefetch_resource_id.blank?
         add_message('error', %(
           #{request_number}#{advertised_prefetch_key}` field's FHIR resource does not contain the `id` field
         ))

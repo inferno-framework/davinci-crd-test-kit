@@ -50,15 +50,16 @@ module DaVinciCRDTestKit
 
     run do
       hook_contexts = json_parse(contexts)
-      next unless hook_contexts
-
-      skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
-      hook_contexts.each_with_index do |context, index|
-        unless context.present?
-          add_message('error', "Request #{index + 1}: Missing required context field.")
-          next
+      if hook_contexts
+        skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
+        hook_contexts.each_with_index do |context, index|
+          @request_number = index + 1
+          if context.blank?
+            add_message('error', "Request #{index + 1}: Missing required context field.")
+            next
+          end
+          hook_request_context_check(context, hook_name)
         end
-        hook_request_context_check(context, hook_name, index + 1)
       end
       no_error_validation('Context is not valid.')
     end

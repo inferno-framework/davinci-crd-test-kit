@@ -32,12 +32,13 @@ module DaVinciCRDTestKit
       contexts = []
       prefetches = []
       requests.each_with_index do |request, index|
-        request_body = json_parse(request.request_body, index + 1)
-        next unless request_body
+        @request_number = index + 1
+        request_body = json_parse(request.request_body)
+        next if request_body.blank?
 
         contexts << request_body['context'] if request_body['context'].is_a?(Hash)
         prefetches << request_body['prefetch'] if request_body['prefetch'].is_a?(Hash)
-        hook_request_required_fields_check(request_body, hook_name, index + 1)
+        hook_request_required_fields_check(request_body, hook_name)
       end
 
       output contexts: contexts.to_json,

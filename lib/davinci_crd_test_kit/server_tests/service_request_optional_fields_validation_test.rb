@@ -24,10 +24,11 @@ module DaVinciCRDTestKit
       skip_if requests.empty?, "No #{hook_name} request was made in a previous test as expected."
 
       requests.each_with_index do |request, index|
-        request_body = json_parse(request.request_body, index + 1)
-        next unless request_body
+        @request_number = index + 1
+        request_body = json_parse(request.request_body)
+        next if request_body.blank?
 
-        hook_request_optional_fields_check(request_body, index + 1)
+        hook_request_optional_fields_check(request_body)
       end
       no_error_validation('Some service requests have invalid optional fields.')
     end

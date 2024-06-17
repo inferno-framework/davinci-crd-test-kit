@@ -36,10 +36,11 @@ module DaVinciCRDTestKit
       skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
       client_fhir_server = nil
       requests.each_with_index do |request, index|
-        request_body = json_parse(request.request_body, index + 1)
-        next unless request_body
+        @request_number = index + 1
+        request_body = json_parse(request.request_body)
+        next if request_body.blank?
 
-        fhir_server_info = hook_request_optional_fields_check(request_body, index + 1)
+        fhir_server_info = hook_request_optional_fields_check(request_body)
         client_fhir_server ||= fhir_server_info
       end
 

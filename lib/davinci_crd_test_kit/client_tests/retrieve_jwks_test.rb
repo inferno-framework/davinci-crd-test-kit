@@ -14,7 +14,7 @@ module DaVinciCRDTestKit
         submit the jwk_set as an input to the test.
       )
 
-    input :auth_tokens_header_json
+    input :auth_token_headers_json
     input :jwk_set,
           title: "The Client's JWK Set containing it's public key",
           description: %(
@@ -26,7 +26,7 @@ module DaVinciCRDTestKit
     output :crd_jwks_json, :crd_jwks_keys_json
 
     run do
-      auth_token_headers = JSON.parse(auth_tokens_header_json)
+      auth_token_headers = JSON.parse(auth_token_headers_json)
       skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous test.'
 
       crd_jwks_json = []
@@ -43,8 +43,9 @@ module DaVinciCRDTestKit
             next
           end
 
-          jwks = json_parse(response[:body], index + 1)
-          next unless jwks
+          @request_number = index + 1
+          jwks = json_parse(response[:body])
+          next if jwks.blank?
 
           crd_jwks_json << response[:body]
 
@@ -63,7 +64,7 @@ module DaVinciCRDTestKit
           next
         end
 
-        unless keys.present?
+        if keys.blank?
           add_message('error', "Request #{index + 1}: The JWK set returned contains no public keys")
           next
         end
@@ -75,14 +76,14 @@ module DaVinciCRDTestKit
         end
 
         kid_presence = keys.all? { |key| key['kid'].present? }
-        unless kid_presence
+        if kid_presence.blank?
           add_message('error',
                       "Request #{index + 1}: `kid` field must be present in each key if JWKS contains multiple keys")
           next
         end
 
         kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
-        unless kid_uniqueness
+        if kid_uniqueness.blank?
           add_message('error', "Request #{index + 1}: `kid` must be unique within the client's JWK Set.")
           next
         end

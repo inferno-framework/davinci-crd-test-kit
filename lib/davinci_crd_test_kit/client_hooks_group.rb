@@ -82,13 +82,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :appointment_book_auth_tokens },
                auth_token_payloads_json: { name: :appointment_book_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :appointment_book_auth_tokens_header_json }
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :appointment_book_auth_tokens_header_json }
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :appointment_book_crd_jwks_json },
@@ -98,7 +98,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :appointment_book_auth_tokens_header_json },
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json },
                crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
              },
              outputs: {
@@ -179,13 +179,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :encounter_start_auth_tokens },
                auth_token_payloads_json: { name: :encounter_start_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :encounter_start_auth_tokens_header_json }
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :encounter_start_auth_tokens_header_json }
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :encounter_start_crd_jwks_json },
@@ -195,7 +195,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :encounter_start_auth_tokens_header_json },
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json },
                crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json }
              },
              outputs: {
@@ -277,13 +277,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :encounter_discharge_auth_tokens },
                auth_token_payloads_json: { name: :encounter_discharge_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :encounter_discharge_auth_tokens_header_json }
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :encounter_discharge_auth_tokens_header_json }
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :encounter_discharge_crd_jwks_json },
@@ -293,7 +293,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :encounter_discharge_auth_tokens_header_json },
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json },
                crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json }
              },
              outputs: {
@@ -375,13 +375,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :order_select_auth_tokens },
                auth_token_payloads_json: { name: :order_select_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :order_select_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_select_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_select_crd_jwks_json },
@@ -391,7 +391,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_select_auth_tokens_header_json },
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
              },
              outputs: {
@@ -472,13 +472,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :order_dispatch_auth_tokens },
                auth_token_payloads_json: { name: :order_dispatch_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :order_dispatch_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_dispatch_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_dispatch_crd_jwks_json },
@@ -488,7 +488,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_dispatch_auth_tokens_header_json },
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json }
              },
              outputs: {
@@ -570,13 +570,13 @@ module DaVinciCRDTestKit
              outputs: {
                auth_tokens: { name: :order_sign_auth_tokens },
                auth_token_payloads_json: { name: :order_sign_auth_token_payloads_json },
-               auth_tokens_header_json: { name: :order_sign_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_sign_auth_tokens_header_json }
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_sign_crd_jwks_json },
@@ -586,7 +586,7 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_tokens_header_json: { name: :order_sign_auth_tokens_header_json },
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
              },
              outputs: {
