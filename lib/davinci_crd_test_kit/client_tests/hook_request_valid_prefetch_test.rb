@@ -51,9 +51,9 @@ module DaVinciCRDTestKit
           @request_number = index + 1
           context = hook_contexts[index]
 
-          info "Request #{index + 1}: Received hook request does not contain the `prefetch` field." if prefetch.blank?
+          info "#{request_number}Received hook request does not contain the `prefetch` field." if prefetch.blank?
           if context.blank?
-            info %(Request #{index + 1}: Received hook request does not contain the `context` field
+            info %(#{request_number}Received hook request does not contain the `context` field
             which is needed to validate the `prefetch` field)
           end
 

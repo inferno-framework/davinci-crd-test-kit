@@ -55,7 +55,7 @@ module DaVinciCRDTestKit
         hook_contexts.each_with_index do |context, index|
           @request_number = index + 1
           if context.blank?
-            add_message('error', "Request #{index + 1}: Missing required context field.")
+            add_message('error', "#{request_number}Missing required context field.")
             next
           end
           hook_request_context_check(context, hook_name)

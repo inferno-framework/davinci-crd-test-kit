@@ -38,7 +38,10 @@ module DaVinciCRDTestKit
       requests.each_with_index do |request, index|
         @request_number = index + 1
         request_body = json_parse(request.request_body)
-        next if request_body.blank?
+        if request_body.blank?
+          add_message('error', "#{request_number}Hook request body cannot be empty.")
+          next
+        end
 
         fhir_server_info = hook_request_optional_fields_check(request_body)
         client_fhir_server ||= fhir_server_info

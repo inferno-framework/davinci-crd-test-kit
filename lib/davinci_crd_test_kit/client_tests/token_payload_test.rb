@@ -39,6 +39,8 @@ module DaVinciCRDTestKit
       skip_if auth_tokens_jwk.empty?, 'No Authorization token JWK produced from the previous test.'
 
       auth_tokens_jwk.each_with_index do |auth_token_jwk, index|
+        @request_number = index + 1
+
         begin
           jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys
 
@@ -58,7 +60,7 @@ module DaVinciCRDTestKit
               verify_aud: true
             )
         rescue StandardError => e
-          add_message('error', "Request #{index + 1}: Token validation error: #{e.message}")
+          add_message('error', "#{request_number}Token validation error: #{e.message}")
           next
         end
 
@@ -66,7 +68,7 @@ module DaVinciCRDTestKit
         missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
 
         unless missing_claims.empty?
-          add_message('error', "Request #{index + 1}: JWT payload missing required claims: #{missing_claims_string}")
+          add_message('error', "#{request_number}JWT payload missing required claims: #{missing_claims_string}")
           next
         end
       end

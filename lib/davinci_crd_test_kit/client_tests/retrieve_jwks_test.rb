@@ -32,13 +32,15 @@ module DaVinciCRDTestKit
       crd_jwks_json = []
       crd_jwks_keys_json = []
       auth_token_headers.each_with_index do |token_header, index|
+        @request_number = index + 1
+
         jku = JSON.parse(token_header)['jku']
         if jku.present?
           get(jku)
 
           if response[:status] != 200
             add_message('error', %(
-                        Request #{index + 1}: Unexpected response status: expected 200, but received
+                        #{request_number}Unexpected response status: expected 200, but received
                         #{response[:status]}))
             next
           end
@@ -52,7 +54,7 @@ module DaVinciCRDTestKit
           jwks = JSON.parse(response[:body])
         else
           skip_if jwk_set.blank?,
-                  %(Request #{index + 1}: JWK Set must be inputted if Client's JWK Set is not available via a URL
+                  %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
                   identified by the jku header field)
 
           jwks = JSON.parse(jwk_set)
@@ -60,31 +62,31 @@ module DaVinciCRDTestKit
 
         keys = jwks['keys']
         unless keys.is_a?(Array)
-          add_message('error', "Request #{index + 1}: JWKS `keys` field must be an array")
+          add_message('error', "#{request_number}JWKS `keys` field must be an array")
           next
         end
 
         if keys.blank?
-          add_message('error', "Request #{index + 1}: The JWK set returned contains no public keys")
+          add_message('error', "#{request_number}The JWK set returned contains no public keys")
           next
         end
 
         keys.each do |jwk|
           JWT::JWK.import(jwk.deep_symbolize_keys)
         rescue StandardError
-          add_message('error', "Request #{index + 1}: Invalid JWK: #{jwk.to_json}")
+          add_message('error', "#{request_number}Invalid JWK: #{jwk.to_json}")
         end
 
         kid_presence = keys.all? { |key| key['kid'].present? }
         if kid_presence.blank?
           add_message('error',
-                      "Request #{index + 1}: `kid` field must be present in each key if JWKS contains multiple keys")
+                      "#{request_number}`kid` field must be present in each key if JWKS contains multiple keys")
           next
         end
 
         kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
         if kid_uniqueness.blank?
-          add_message('error', "Request #{index + 1}: `kid` must be unique within the client's JWK Set.")
+          add_message('error', "#{request_number}`kid` must be unique within the client's JWK Set.")
           next
         end
 

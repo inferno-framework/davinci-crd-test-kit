@@ -25,10 +25,12 @@ module DaVinciCRDTestKit
       auth_token_headers_json = []
 
       requests.each_with_index do |request, index|
+        @request_number = index + 1
+
         authorization_header = request.request_header('Authorization')&.value
 
         unless authorization_header.start_with?('Bearer ')
-          add_message('error', "Request #{index + 1}: Authorization token must be a JWT presented as a `Bearer` token")
+          add_message('error', "#{request_number}Authorization token must be a JWT presented as a `Bearer` token")
         end
 
         auth_token = authorization_header.delete_prefix('Bearer ')
@@ -45,7 +47,7 @@ module DaVinciCRDTestKit
           auth_token_payloads_json << payload.to_json
           auth_token_headers_json << header.to_json
         rescue StandardError => e
-          add_message('error', "Request #{index + 1}: Token is not a properly constructed JWT: #{e.message}")
+          add_message('error', "#{request_number}Token is not a properly constructed JWT: #{e.message}")
         end
       end
       output auth_tokens: auth_tokens.to_json,
