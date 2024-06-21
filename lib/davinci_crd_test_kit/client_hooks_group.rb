@@ -81,19 +81,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :appointment_book }
+             options: {
+               hook_name: 'appointment-book'
              },
              outputs: {
-               auth_token: { name: :appointment_book_auth_token },
-               auth_token_payload_json: { name: :appointment_book_auth_token_payload_json },
-               auth_token_header_json: { name: :appointment_book_auth_token_header_json }
+               auth_tokens: { name: :appointment_book_auth_tokens },
+               auth_token_payloads_json: { name: :appointment_book_auth_token_payloads_json },
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :appointment_book_auth_token_header_json }
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :appointment_book_crd_jwks_json },
@@ -103,40 +103,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :appointment_book_auth_token_header_json },
+               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json },
                crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :appointment_book_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: APPOINTMENT_BOOK_PATH },
              inputs: {
-               auth_token: { name: :appointment_book_auth_token },
-               auth_token_jwk_json: { name: :appointment_book_auth_token_jwk_json }
+               auth_tokens: { name: :appointment_book_auth_tokens },
+               auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: APPOINTMENT_BOOK_PATH,
                hook_name: 'appointment-book'
-             },
-             requests: {
-               hook_request: { name: :appointment_book }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'appointment-book'
+             },
              outputs: {
                client_fhir_server: { name: :appointment_book_client_fhir_server },
                client_access_token: { name: :appointment_book_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :appointment_book }
              }
            }
 
@@ -146,18 +142,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :appointment_book_client_fhir_server },
                client_access_token: { name: :appointment_book_client_access_token }
              },
-             options: { hook_name: 'appointment-book' },
-             requests: {
-               hook_request: { name: :appointment_book }
-             }
+             options: { hook_name: 'appointment-book' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'appointment-book' },
-             requests: {
-               hook_request: { name: :appointment_book }
-             }
+             options: { hook_name: 'appointment-book' }
            }
 
       test from: :crd_card_display_attest_test,
@@ -189,19 +179,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :encounter_start }
+             options: {
+               hook_name: 'encounter-discharge'
              },
              outputs: {
-               auth_token: { name: :encounter_start_auth_token },
-               auth_token_payload_json: { name: :encounter_start_auth_token_payload_json },
-               auth_token_header_json: { name: :encounter_start_auth_token_header_json }
+               auth_tokens: { name: :encounter_start_auth_tokens },
+               auth_token_payloads_json: { name: :encounter_start_auth_token_payloads_json },
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :encounter_start_auth_token_header_json }
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :encounter_start_crd_jwks_json },
@@ -211,40 +201,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :encounter_start_auth_token_header_json },
+               auth_token_headers_json: { name: :encounter_start_auth_token_headers_json },
                crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :encounter_start_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :encounter_start_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: ENCOUNTER_START_PATH },
              inputs: {
-               auth_token: { name: :encounter_start_auth_token },
-               auth_token_jwk_json: { name: :encounter_start_auth_token_jwk_json }
+               auth_tokens: { name: :encounter_start_auth_tokens },
+               auth_tokens_jwk_json: { name: :encounter_start_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: ENCOUNTER_START_PATH,
                hook_name: 'encounter-start'
-             },
-             requests: {
-               hook_request: { name: :encounter_start }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'encounter-start'
+             },
              outputs: {
                client_fhir_server: { name: :encounter_start_client_fhir_server },
                client_access_token: { name: :encounter_start_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :encounter_start }
              }
            }
 
@@ -254,18 +240,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :encounter_start_client_fhir_server },
                client_access_token: { name: :encounter_start_client_access_token }
              },
-             options: { hook_name: 'encounter-start' },
-             requests: {
-               hook_request: { name: :encounter_start }
-             }
+             options: { hook_name: 'encounter-start' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'encounter-start' },
-             requests: {
-               hook_request: { name: :encounter_start }
-             }
+             options: { hook_name: 'encounter-discharge' }
            }
 
       test from: :crd_card_display_attest_test,
@@ -298,19 +278,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :encounter_discharge }
+             options: {
+               hook_name: 'encounter-discharge'
              },
              outputs: {
-               auth_token: { name: :encounter_discharge_auth_token },
-               auth_token_payload_json: { name: :encounter_discharge_auth_token_payload_json },
-               auth_token_header_json: { name: :encounter_discharge_auth_token_header_json }
+               auth_tokens: { name: :encounter_discharge_auth_tokens },
+               auth_token_payloads_json: { name: :encounter_discharge_auth_token_payloads_json },
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :encounter_discharge_auth_token_header_json }
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :encounter_discharge_crd_jwks_json },
@@ -320,40 +300,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :encounter_discharge_auth_token_header_json },
+               auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json },
                crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :encounter_discharge_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: ENCOUNTER_DISCHARGE_PATH },
              inputs: {
-               auth_token: { name: :encounter_discharge_auth_token },
-               auth_token_jwk_json: { name: :encounter_discharge_auth_token_jwk_json }
+               auth_tokens: { name: :encounter_discharge_auth_tokens },
+               auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: ENCOUNTER_DISCHARGE_PATH,
                hook_name: 'encounter-discharge'
-             },
-             requests: {
-               hook_request: { name: :encounter_discharge }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'encounter-discharge'
+             },
              outputs: {
                client_fhir_server: { name: :encounter_discharge_client_fhir_server },
                client_access_token: { name: :encounter_discharge_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :encounter_discharge }
              }
            }
 
@@ -363,18 +339,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :encounter_discharge_client_fhir_server },
                client_access_token: { name: :encounter_discharge_client_access_token }
              },
-             options: { hook_name: 'encounter-discharge' },
-             requests: {
-               hook_request: { name: :encounter_discharge }
-             }
+             options: { hook_name: 'encounter-discharge' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'encounter-discharge' },
-             requests: {
-               hook_request: { name: :encounter_discharge }
-             }
+             options: { hook_name: 'encounter-discharge' }
            }
 
       test from: :crd_card_display_attest_test,
@@ -408,20 +378,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :order_select }
+             options: {
+               hook_name: 'order-select'
              },
              outputs: {
-               auth_token: { name: :order_select_auth_token },
-               auth_token_payload_json: { name: :order_select_auth_token_payload_json },
-               auth_token_header_json: { name: :order_select_auth_token_header_json }
+               auth_tokens: { name: :order_select_auth_tokens },
+               auth_token_payloads_json: { name: :order_select_auth_token_payloads_json },
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
              }
            }
-
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_select_auth_token_header_json }
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_select_crd_jwks_json },
@@ -431,40 +400,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_select_auth_token_header_json },
+               auth_token_headers_json: { name: :order_select_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :order_select_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :order_select_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: ORDER_SELECT_PATH },
              inputs: {
-               auth_token: { name: :order_select_auth_token },
-               auth_token_jwk_json: { name: :order_select_auth_token_jwk_json }
+               auth_tokens: { name: :order_select_auth_tokens },
+               auth_tokens_jwk_json: { name: :order_select_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: ORDER_SELECT_PATH,
                hook_name: 'order-select'
-             },
-             requests: {
-               hook_request: { name: :order_select }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'order-select'
+             },
              outputs: {
                client_fhir_server: { name: :order_select_client_fhir_server },
                client_access_token: { name: :order_select_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :order_select }
              }
            }
 
@@ -474,18 +439,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :order_select_client_fhir_server },
                client_access_token: { name: :order_select_client_access_token }
              },
-             options: { hook_name: 'order-select' },
-             requests: {
-               hook_request: { name: :order_select }
-             }
+             options: { hook_name: 'order-select' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'order-select' },
-             requests: {
-               hook_request: { name: :order_select }
-             }
+             options: { hook_name: 'order-select' }
            }
 
       test from: :crd_card_display_attest_test,
@@ -517,20 +476,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :order_dispatch }
+             options: {
+               hook_name: 'order-dispatch'
              },
              outputs: {
-               auth_token: { name: :order_dispatch_auth_token },
-               auth_token_payload_json: { name: :order_dispatch_auth_token_payload_json },
-               auth_token_header_json: { name: :order_dispatch_auth_token_header_json }
+               auth_tokens: { name: :order_dispatch_auth_tokens },
+               auth_token_payloads_json: { name: :order_dispatch_auth_token_payloads_json },
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json }
              }
            }
-
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_dispatch_auth_token_header_json }
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_dispatch_crd_jwks_json },
@@ -540,40 +498,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_dispatch_auth_token_header_json },
+               auth_token_headers_json: { name: :order_dispatch_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :order_dispatch_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :order_dispatch_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: ORDER_DISPATCH_PATH },
              inputs: {
-               auth_token: { name: :order_dispatch_auth_token },
-               auth_token_jwk_json: { name: :order_dispatch_auth_token_jwk_json }
+               auth_tokens: { name: :order_dispatch_auth_tokens },
+               auth_tokens_jwk_json: { name: :order_dispatch_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: ORDER_DISPATCH_PATH,
                hook_name: 'order-dispatch'
-             },
-             requests: {
-               hook_request: { name: :order_dispatch }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'order-dispatch'
+             },
              outputs: {
                client_fhir_server: { name: :order_dispatch_client_fhir_server },
                client_access_token: { name: :order_dispatch_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :order_dispatch }
              }
            }
 
@@ -583,18 +537,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :order_dispatch_client_fhir_server },
                client_access_token: { name: :order_dispatch_client_access_token }
              },
-             options: { hook_name: 'order-dispatch' },
-             requests: {
-               hook_request: { name: :order_dispatch }
-             }
+             options: { hook_name: 'order-dispatch' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'order-dispatch' },
-             requests: {
-               hook_request: { name: :order_dispatch }
-             }
+             options: { hook_name: 'order-dispatch' }
            }
 
       test from: :crd_card_display_attest_test,
@@ -627,19 +575,19 @@ module DaVinciCRDTestKit
 
       test from: :crd_decode_auth_token,
            config: {
-             requests: {
-               hook_request: { name: :order_sign }
+             options: {
+               hook_name: 'order-sign'
              },
              outputs: {
-               auth_token: { name: :order_sign_auth_token },
-               auth_token_payload_json: { name: :order_sign_auth_token_payload_json },
-               auth_token_header_json: { name: :order_sign_auth_token_header_json }
+               auth_tokens: { name: :order_sign_auth_tokens },
+               auth_token_payloads_json: { name: :order_sign_auth_token_payloads_json },
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
              }
            }
       test from: :crd_retrieve_jwks,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_sign_auth_token_header_json }
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
              },
              outputs: {
                crd_jwks_json: { name: :order_sign_crd_jwks_json },
@@ -649,40 +597,36 @@ module DaVinciCRDTestKit
       test from: :crd_token_header,
            config: {
              inputs: {
-               auth_token_header_json: { name: :order_sign_auth_token_header_json },
+               auth_token_headers_json: { name: :order_sign_auth_token_headers_json },
                crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
              },
              outputs: {
-               auth_token_jwk_json: { name: :order_sign_auth_token_jwk_json }
+               auth_tokens_jwk_json: { name: :order_sign_auth_tokens_jwk_json }
              }
            }
       test from: :crd_token_payload,
            config: {
              options: { hook_path: ORDER_SIGN_PATH },
              inputs: {
-               auth_token: { name: :order_sign_auth_token },
-               auth_token_jwk_json: { name: :order_sign_auth_token_jwk_json }
+               auth_tokens: { name: :order_sign_auth_tokens },
+               auth_tokens_jwk_json: { name: :order_sign_auth_tokens_jwk_json }
              }
            }
 
       test from: :crd_hook_request_required_fields,
            config: {
              options: {
-               hook_path: ORDER_SIGN_PATH,
                hook_name: 'order-sign'
-             },
-             requests: {
-               hook_request: { name: :order_sign }
              }
            }
       test from: :crd_hook_request_optional_fields,
            config: {
+             options: {
+               hook_name: 'order-sign'
+             },
              outputs: {
                client_fhir_server: { name: :order_sign_client_fhir_server },
                client_access_token: { name: :order_sign_client_access_token }
-             },
-             requests: {
-               hook_request: { name: :order_sign }
              }
            }
 
@@ -692,18 +636,12 @@ module DaVinciCRDTestKit
                client_fhir_server: { name: :order_sign_client_fhir_server },
                client_access_token: { name: :order_sign_client_access_token }
              },
-             options: { hook_name: 'order-sign' },
-             requests: {
-               hook_request: { name: :order_sign }
-             }
+             options: { hook_name: 'order-sign' }
            }
 
       test from: :crd_hook_request_valid_prefetch,
            config: {
-             options: { hook_name: 'order-sign' },
-             requests: {
-               hook_request: { name: :order_sign }
-             }
+             options: { hook_name: 'order-sign' }
            }
 
       test from: :crd_card_display_attest_test,

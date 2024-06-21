@@ -7,13 +7,14 @@ module DaVinciCRDTestKit
     id :crd_order_sign_request
     title 'Request received for order-sign hook'
     description %(
-        This test waits for an incoming [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
-        hook request and responds to the client with the response types selected as an input. This hook is a 'primary'
+        This test waits for multiple incoming [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
+        hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
         hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
       )
-    receives_request :order_sign
+
+    config options: { accepts_multiple_requests: true }
 
     input :iss
     input :order_sign_selected_response_types,
@@ -67,11 +68,13 @@ module DaVinciCRDTestKit
         message: %(
           **Order Sign CDS Service Test**:
 
-          Invoke the order-sign hook and send a request to:
+          Invoke the order-sign hook and send requests to:
 
           `#{order_sign_url}`
 
-          Inferno will process the request and return CDS cards if successful.
+          Inferno will process the requests and return CDS cards if successful.
+
+          [Click here](#{resume_pass_url}?token=order-sign%20#{iss}) when you have finished submitting requests.
         )
       )
     end

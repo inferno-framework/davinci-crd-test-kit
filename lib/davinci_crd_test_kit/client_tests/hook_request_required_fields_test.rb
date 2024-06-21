@@ -2,7 +2,7 @@ require_relative '../client_hook_request_validation'
 
 module DaVinciCRDTestKit
   class HookRequestRequiredFieldsTest < Inferno::Test
-    include DaVinciCRDTestKit::ClientHookRequestValidation
+    include ClientHookRequestValidation
     include URLs
 
     id :crd_hook_request_required_fields
@@ -20,21 +20,30 @@ module DaVinciCRDTestKit
         a request for
     )
 
-    uses_request :hook_request
-
-    def hook_url
-      base_url + config.options[:hook_path]
-    end
-
     def hook_name
       config.options[:hook_name]
     end
 
-    run do
-      assert_valid_json(request.request_body)
-      request_body = JSON.parse(request.request_body)
+    output :contexts, :prefetches
 
-      hook_request_required_fields_check(request_body, hook_name)
+    run do
+      load_tagged_requests(hook_name)
+      skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
+      contexts = []
+      prefetches = []
+      requests.each_with_index do |request, index|
+        @request_number = index + 1
+        request_body = json_parse(request.request_body)
+        next if request_body.blank?
+
+        contexts << request_body['context'] if request_body['context'].is_a?(Hash)
+        prefetches << request_body['prefetch'] if request_body['prefetch'].is_a?(Hash)
+        hook_request_required_fields_check(request_body, hook_name)
+      end
+
+      output contexts: contexts.to_json,
+             prefetches: prefetches.to_json
+      no_error_validation('Some service requests made are not valid.')
     end
   end
 end

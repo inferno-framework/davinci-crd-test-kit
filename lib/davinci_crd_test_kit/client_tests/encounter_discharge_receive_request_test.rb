@@ -7,10 +7,11 @@ module DaVinciCRDTestKit
     id :crd_encounter_discharge_request
     title 'Request received for encounter-discharge hook'
     description %(
-        This test waits for an incoming [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
-        hook request and responds to the client with the response types selected as an input.
+        This test waits for multiple incoming [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
+        hook requests and responds to the client with the response types selected as an input.
       )
-    receives_request :encounter_discharge
+
+    config options: { accepts_multiple_requests: true }
 
     input :iss
     input :encounter_discharge_selected_response_types,
@@ -56,11 +57,14 @@ module DaVinciCRDTestKit
         message: %(
           **Encounter Discharge CDS Service Test**:
 
-          Invoke the encounter-discharge hook and send a request to:
+          Invoke the encounter-discharge hook and send requests to:
 
           `#{encounter_discharge_url}`
 
-          Inferno will process the request and return CDS cards if successful.
+          Inferno will process the requests and return CDS cards if successful.
+
+          [Click here](#{resume_pass_url}?token=encounter-discharge%20#{iss}) when you have finished submitting
+          requests.
         )
       )
     end

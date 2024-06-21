@@ -1,5 +1,8 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class DecodeAuthTokenTest < Inferno::Test
+    include ClientHookRequestValidation
     id :crd_decode_auth_token
     title 'Bearer token can be decoded'
     description %(
@@ -8,33 +11,50 @@ module DaVinciCRDTestKit
         include an Authorization header presenting the JWT as a "Bearer" token.
       )
 
-    output :auth_token, :auth_token_payload_json, :auth_token_header_json
+    output :auth_tokens, :auth_token_payloads_json, :auth_token_headers_json
 
-    uses_request :hook_request
+    def hook_name
+      config.options[:hook_name]
+    end
 
     run do
-      authorization_header = request.request_header('Authorization')&.value
-      skip_if authorization_header.blank?, 'Request does not include an Authorization header'
+      load_tagged_requests(hook_name)
+      skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
+      auth_tokens = []
+      auth_token_payloads_json = []
+      auth_token_headers_json = []
 
-      assert(authorization_header.start_with?('Bearer '),
-             'Authorization token must be a JWT presented as a `Bearer` token')
+      requests.each_with_index do |request, index|
+        @request_number = index + 1
 
-      auth_token = authorization_header.delete_prefix('Bearer ')
-      output(auth_token:)
+        authorization_header = request.request_header('Authorization')&.value
 
-      begin
-        payload, header =
-          JWT.decode(
-            auth_token,
-            nil,
-            false
-          )
+        unless authorization_header.start_with?('Bearer ')
+          add_message('error', "#{request_number}Authorization token must be a JWT presented as a `Bearer` token")
+        end
 
-        output auth_token_payload_json: payload.to_json,
-               auth_token_header_json: header.to_json
-      rescue StandardError => e
-        assert false, "Token is not a properly constructed JWT: #{e.message}"
+        auth_token = authorization_header.delete_prefix('Bearer ')
+        auth_tokens << auth_token
+
+        begin
+          payload, header =
+            JWT.decode(
+              auth_token,
+              nil,
+              false
+            )
+
+          auth_token_payloads_json << payload.to_json
+          auth_token_headers_json << header.to_json
+        rescue StandardError => e
+          add_message('error', "#{request_number}Token is not a properly constructed JWT: #{e.message}")
+        end
       end
+      output auth_tokens: auth_tokens.to_json,
+             auth_token_payloads_json: auth_token_payloads_json.to_json,
+             auth_token_headers_json: auth_token_headers_json.to_json
+
+      no_error_validation('Decoding Authorization header Bearer tokens failed.')
     end
   end
 end

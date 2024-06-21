@@ -85,9 +85,5 @@ module DaVinciCRDTestKit
     def name
       extract_hook_name(request).gsub('-', '_')
     end
-
-    def update_result
-      results_repo.update(result.id, result: 'pass')
-    end
   end
 end

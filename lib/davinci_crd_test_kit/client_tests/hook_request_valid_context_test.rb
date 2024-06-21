@@ -1,4 +1,5 @@
 require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class HookRequestValidContextTest < Inferno::Test
     include URLs
@@ -33,9 +34,8 @@ module DaVinciCRDTestKit
       The client must provide its FHIR server URL and access token in the hook request in order to run
       this test.
     )
-    uses_request :hook_request
 
-    input :client_fhir_server
+    input :contexts, :client_fhir_server
     input :client_access_token,
           optional: true
 
@@ -49,14 +49,18 @@ module DaVinciCRDTestKit
     end
 
     run do
-      assert_valid_json(request.request_body)
-      request_body = JSON.parse(request.request_body)
-
-      hook_context = request_body['context']
-
-      assert(hook_context, 'Hook request does not contain required `context` field')
-
-      hook_request_context_check(hook_context, hook_name)
+      hook_contexts = json_parse(contexts)
+      if hook_contexts
+        skip_if(hook_contexts.none?(&:present?), "No #{hook_name} requests contained the `context` field.")
+        hook_contexts.each_with_index do |context, index|
+          @request_number = index + 1
+          if context.blank?
+            add_message('error', "#{request_number}Missing required context field.")
+            next
+          end
+          hook_request_context_check(context, hook_name)
+        end
+      end
       no_error_validation('Context is not valid.')
     end
   end

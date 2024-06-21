@@ -7,6 +7,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
 
   let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
   let(:test) { Inferno::Repositories::Tests.new.find('crd_appointment_book_request') }
+  let(:test_group) { Inferno::Repositories::TestGroups.new.find('crd_client_hooks') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
@@ -14,6 +15,9 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
+  let(:resume_pass_url) do
+    "#{Inferno::Application['base_url']}/custom/crd_client/resume_pass?token=appointment-book%20#{example_client_url}"
+  end
   let(:appointment_book_url) { "#{base_url}/cds-services/appointment-book-service" }
   let(:client_fhir_server) { 'https://example/r4' }
   let(:patient_id) { 'example' }
@@ -48,6 +52,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
+
     inputs.each do |name, value|
       session_data_repo.save(
         test_session_id: test_session.id,
@@ -60,7 +65,7 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
   end
 
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do
-    allow(test).to receive(:suite).and_return(suite)
+    allow(test).to receive_messages(suite:, parent: test_group)
 
     token = jwt_helper.build(
       aud: appointment_book_url,
@@ -76,8 +81,8 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
-
     expect(last_response).to be_ok
+    get(resume_pass_url)
     result = results_repo.find(result.id)
     expect(result.result).to eq('pass')
   end

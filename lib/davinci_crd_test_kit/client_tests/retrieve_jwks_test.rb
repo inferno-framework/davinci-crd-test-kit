@@ -1,5 +1,9 @@
+require_relative '../client_hook_request_validation'
+
 module DaVinciCRDTestKit
   class RetrieveJWKSTest < Inferno::Test
+    include ClientHookRequestValidation
+
     id :crd_retrieve_jwks
     title 'JWKS can be retrieved'
     description %(
@@ -10,7 +14,7 @@ module DaVinciCRDTestKit
         submit the jwk_set as an input to the test.
       )
 
-    input :auth_token_header_json
+    input :auth_token_headers_json
     input :jwk_set,
           title: "The Client's JWK Set containing it's public key",
           description: %(
@@ -20,46 +24,79 @@ module DaVinciCRDTestKit
           type: 'textarea',
           optional: true
     output :crd_jwks_json, :crd_jwks_keys_json
-    makes_request :crd_client_jwks
 
     run do
-      token_header = JSON.parse(auth_token_header_json)
-      jku = token_header['jku']
+      auth_token_headers = JSON.parse(auth_token_headers_json)
+      skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous test.'
 
-      if jku.present?
-        get(jku, name: :crd_client_jwks)
+      crd_jwks_json = []
+      crd_jwks_keys_json = []
+      auth_token_headers.each_with_index do |token_header, index|
+        @request_number = index + 1
 
-        assert_response_status(200)
-        assert_valid_json(response[:body])
-        output crd_jwks_json: response[:body]
+        jku = JSON.parse(token_header)['jku']
+        if jku.present?
+          get(jku)
 
-        jwks = JSON.parse(response[:body])
-      else
-        skip_if jwk_set.blank?,
-                %(JWK Set must be inputted if Client's JWK Set is not available via a URL identified by the jku header
-                field)
+          if response[:status] != 200
+            add_message('error', %(
+                        #{request_number}Unexpected response status: expected 200, but received
+                        #{response[:status]}))
+            next
+          end
 
-        jwks = JSON.parse(jwk_set)
+          @request_number = index + 1
+          jwks = json_parse(response[:body])
+          next if jwks.blank?
+
+          crd_jwks_json << response[:body]
+
+          jwks = JSON.parse(response[:body])
+        else
+          skip_if jwk_set.blank?,
+                  %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
+                  identified by the jku header field)
+
+          jwks = JSON.parse(jwk_set)
+        end
+
+        keys = jwks['keys']
+        unless keys.is_a?(Array)
+          add_message('error', "#{request_number}JWKS `keys` field must be an array")
+          next
+        end
+
+        if keys.blank?
+          add_message('error', "#{request_number}The JWK set returned contains no public keys")
+          next
+        end
+
+        keys.each do |jwk|
+          JWT::JWK.import(jwk.deep_symbolize_keys)
+        rescue StandardError
+          add_message('error', "#{request_number}Invalid JWK: #{jwk.to_json}")
+        end
+
+        kid_presence = keys.all? { |key| key['kid'].present? }
+        if kid_presence.blank?
+          add_message('error',
+                      "#{request_number}`kid` field must be present in each key if JWKS contains multiple keys")
+          next
+        end
+
+        kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
+        if kid_uniqueness.blank?
+          add_message('error', "#{request_number}`kid` must be unique within the client's JWK Set.")
+          next
+        end
+
+        crd_jwks_keys_json << keys.to_json
       end
 
-      keys = jwks['keys']
-      assert keys.is_a?(Array), 'JWKS `keys` field must be an array'
+      output crd_jwks_json: crd_jwks_json.to_json,
+             crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
-      assert keys.present?, 'The JWK set returned contains no public keys'
-
-      keys.each do |jwk|
-        JWT::JWK.import(jwk.deep_symbolize_keys)
-      rescue StandardError
-        assert false, "Invalid JWK: #{jwk.to_json}"
-      end
-
-      kid_presence = keys.all? { |key| key['kid'].present? }
-      assert kid_presence, '`kid` field must be present in each key if JWKS contains multiple keys'
-
-      kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
-      assert kid_uniqueness, '`kid` must be unique within the client\' JWK Set.'
-
-      output crd_jwks_keys_json: keys.to_json
+      no_error_validation('Retrieving JWKS failed.')
     end
   end
 end

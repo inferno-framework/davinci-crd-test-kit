@@ -7,13 +7,13 @@ module DaVinciCRDTestKit
     id :crd_appointment_book_request
     title 'Request received for appointment-book hook'
     description %(
-        This test waits for an incoming [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
-        hook request and responds to the client with the response types selected as an input. This hook is a 'primary'
+        This test waits for multiple incoming [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
+        hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
         hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
       )
-    receives_request :appointment_book
+    config options: { accepts_multiple_requests: true }
 
     input :iss
     input :appointment_book_selected_response_types,
@@ -59,11 +59,13 @@ module DaVinciCRDTestKit
         message: %(
           **Appointment Book CDS Service Test**:
 
-          Invoke the appointment-book hook and send a request to:
+          Invoke the appointment-book hook and send requests to:
 
           `#{appointment_book_url}`
 
-          Inferno will process the request and return CDS cards if successful.
+          Inferno will process the requests and return CDS cards if successful.
+
+          [Click here](#{resume_pass_url}?token=appointment-book%20#{iss}) when you have finished submitting requests.
         )
       )
     end

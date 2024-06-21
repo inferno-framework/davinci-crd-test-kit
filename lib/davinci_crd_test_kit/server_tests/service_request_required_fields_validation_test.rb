@@ -20,24 +20,19 @@ module DaVinciCRDTestKit
     run do
       load_tagged_requests(hook_name)
       skip_if requests.empty?, "No #{hook_name} request was made in a previous test as expected."
-
-      error_messages = []
       contexts = []
       requests.each_with_index do |request, index|
-        assert_valid_json(request.request_body)
-        request_body = JSON.parse(request.request_body)
+        @request_number = index + 1
+        request_body = json_parse(request.request_body)
+        next if request_body.blank?
+
         contexts << request_body['context'] if request_body['context'].is_a?(Hash)
         hook_request_required_fields_check(request_body, hook_name)
-      rescue Inferno::Exceptions::AssertionException => e
-        error_messages << "Request #{index + 1}: #{e.message}"
       end
 
       output contexts: contexts.to_json
 
-      error_messages.each do |msg|
-        messages << { type: 'error', message: msg }
-      end
-      assert error_messages.empty?, 'Some service requests made are not valid.'
+      no_error_validation('Some service requests made are not valid.')
     end
   end
 end
