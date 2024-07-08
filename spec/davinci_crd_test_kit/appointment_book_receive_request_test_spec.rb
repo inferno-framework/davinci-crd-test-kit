@@ -82,9 +82,17 @@ RSpec.describe DaVinciCRDTestKit::AppointmentBookReceiveRequestTest do
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
     expect(last_response).to be_ok
+
+    tagged_requests_before_resume = Inferno::Repositories::Requests.new.tagged_requests(test_session.id, ['appointment-book'])
+    
     get(resume_pass_url)
     result = results_repo.find(result.id)
     expect(result.result).to eq('pass')
+
+    tagged_requests_after_resume = Inferno::Repositories::Requests.new.tagged_requests(test_session.id, ['appointment-book'])
+
+    expect(tagged_requests_before_resume.size).to eq(1) # failing because the post is not getting recorded
+    expect(tagged_requests_after_resume.size).to eq(1) # failing because the post is not getting recorded
   end
 
   it 'returns cards and systemActions and uses client information to build request' do
