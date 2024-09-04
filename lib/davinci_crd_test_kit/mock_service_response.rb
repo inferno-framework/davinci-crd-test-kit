@@ -44,7 +44,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def get_missing_response_types(selected_response_types, hook_card_response, hook_name)
+    def get_missing_response_types(hook_card_response, hook_name)
       if coverage_information_required_hooks.include?(hook_name)
         selected_response_types.append('coverage_information').uniq!
       end
@@ -60,11 +60,11 @@ module DaVinciCRDTestKit
         end
     end
 
-    def create_warning_messages(selected_response_types, hook_card_response, hook_name)
+    def create_warning_messages(hook_card_response, hook_name)
       missing_response_types = if hook_card_response.nil?
                                  selected_response_types
                                else
-                                 get_missing_response_types(selected_response_types, hook_card_response, hook_name)
+                                 get_missing_response_types(hook_card_response, hook_name)
                                end
 
       return if missing_response_types.empty?
@@ -101,47 +101,47 @@ module DaVinciCRDTestKit
       card_response
     end
 
-    def appointment_book_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'appointment-book', 'appointments')
+    def appointment_book_response
+      cards_response = create_cards_and_system_actions('appointment-book', 'appointments')
       hook_card_response = update_specific_hook_card_info(cards_response, 'appointment-book')
-      create_warning_messages(selected_response_types, hook_card_response, 'appointment-book')
+      create_warning_messages(hook_card_response, 'appointment-book')
       create_card_response(hook_card_response)
     end
 
-    def encounter_start_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'encounter-start', 'encounterId',
+    def encounter_start_response
+      cards_response = create_cards_and_system_actions('encounter-start', 'encounterId',
                                                        'Encounter')
       hook_card_response = update_specific_hook_card_info(cards_response, 'encounter-start')
-      create_warning_messages(selected_response_types, hook_card_response, 'encounter-start')
+      create_warning_messages(hook_card_response, 'encounter-start')
       create_card_response(hook_card_response)
     end
 
-    def encounter_discharge_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'encounter-discharge', 'encounterId',
+    def encounter_discharge_response
+      cards_response = create_cards_and_system_actions('encounter-discharge', 'encounterId',
                                                        'Encounter')
       hook_card_response = update_specific_hook_card_info(cards_response, 'encounter-discharge')
-      create_warning_messages(selected_response_types, hook_card_response, 'encounter-discharge')
+      create_warning_messages(hook_card_response, 'encounter-discharge')
       create_card_response(hook_card_response)
     end
 
-    def order_dispatch_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-dispatch', 'order')
+    def order_dispatch_response
+      cards_response = create_cards_and_system_actions('order-dispatch', 'order')
       hook_card_response = update_specific_hook_card_info(cards_response, 'order-dispatch')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-dispatch')
+      create_warning_messages(hook_card_response, 'order-dispatch')
       create_card_response(hook_card_response)
     end
 
-    def order_select_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-select', 'draftOrders')
+    def order_select_response
+      cards_response = create_cards_and_system_actions('order-select', 'draftOrders')
       hook_card_response = update_specific_hook_card_info(cards_response, 'order-select')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-select')
+      create_warning_messages(hook_card_response, 'order-select')
       create_card_response(hook_card_response)
     end
 
-    def order_sign_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-sign', 'draftOrders')
+    def order_sign_response
+      cards_response = create_cards_and_system_actions('order-sign', 'draftOrders')
       hook_card_response = update_specific_hook_card_info(cards_response, 'order-sign')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-sign')
+      create_warning_messages(hook_card_response, 'order-sign')
       create_card_response(hook_card_response)
     end
 
@@ -186,23 +186,23 @@ module DaVinciCRDTestKit
       )
     end
 
-    def add_coverage_cards?(selected_response_types, hook_name)
+    def add_coverage_cards?(hook_name)
       (['coverage_information', 'create_update_coverage_info'].any? { |x| selected_response_types.include?(x) }) ||
         coverage_information_required_hooks.include?(hook_name)
     end
 
-    def create_cards_and_system_actions(selected_response_types, hook_name, update_resource_name, resource_type = nil)
+    def create_cards_and_system_actions(hook_name, update_resource_name, resource_type = nil)
       request_body = JSON.parse(request.params.to_json)
       context = request_body['context']
       return if context.nil?
 
       cards = []
 
-      add_basic_cards(selected_response_types, cards, context)
+      add_basic_cards(cards, context)
 
-      add_order_hook_cards(selected_response_types, cards, request_body, hook_name)
+      add_order_hook_cards(cards, request_body, hook_name)
 
-      system_actions = add_coverage_cards(selected_response_types, cards, request_body, hook_name,
+      system_actions = add_coverage_cards(cards, request_body, hook_name,
                                           update_resource_name, resource_type)
 
       cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
@@ -214,7 +214,7 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def add_order_hook_cards(selected_response_types, cards, request_body, hook_name)
+    def add_order_hook_cards(cards, request_body, hook_name)
       if selected_response_types.include?('companions_prerequisites')
         cards.append(create_companions_prerequisites_card(request_body['context']))
       end
@@ -224,15 +224,15 @@ module DaVinciCRDTestKit
       cards.append(create_alternate_request_card(request_body, hook_name))
     end
 
-    def add_basic_cards(selected_response_types, cards, context)
+    def add_basic_cards(cards, context)
       cards.append(create_form_completion_card(context)) if selected_response_types.include?('request_form_completion')
       cards.append(get_card_json('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
       cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
-    def add_coverage_cards(selected_response_types, cards, request_body, hook_name, update_resource_name,
+    def add_coverage_cards(cards, request_body, hook_name, update_resource_name,
                            resource_type = nil)
-      return unless add_coverage_cards?(selected_response_types, hook_name)
+      return unless add_coverage_cards?(hook_name)
 
       coverage = get_patient_coverage(request_body)
       if coverage.present?

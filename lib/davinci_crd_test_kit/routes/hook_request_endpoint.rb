@@ -5,9 +5,10 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::MockServiceResponse
 
     def selected_response_types
-      inputs = JSON.parse(result.input_json)
-      selected_response_types_input = inputs.detect { |input| input['name'].include?('selected_response_types') }
-      selected_response_types_input['value']
+      @selected_response_types ||=
+        JSON.parse(result.input_json)
+          .find { |input| input['name'].include?('selected_response_types') }
+          &.dig('value')
     end
 
     def test_run_identifier
@@ -44,17 +45,17 @@ module DaVinciCRDTestKit
       hook_name = extract_hook_name(request)
       case hook_name
       when 'appointment-book'
-        appointment_book_response(selected_response_types)
+        appointment_book_response
       when 'encounter-start'
-        encounter_start_response(selected_response_types)
+        encounter_start_response
       when 'encounter-discharge'
-        encounter_discharge_response(selected_response_types)
+        encounter_discharge_response
       when 'order-select'
-        order_select_response(selected_response_types)
+        order_select_response
       when 'order-sign'
-        order_sign_response(selected_response_types)
+        order_sign_response
       when 'order-dispatch'
-        order_dispatch_response(selected_response_types)
+        order_dispatch_response
       else
         response.status = 400
         response.body = 'Invalid Request: Request did not contain a valid hook in the `hook` field.'
