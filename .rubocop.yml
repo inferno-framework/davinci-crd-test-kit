@@ -63,10 +63,6 @@ RSpec/AnyInstance:
 RSpec/ExampleLength:
   Enabled: false
 
-RSpec/FilePath:
-  CustomTransform:
-    DaVinciCRDTestKit: davinci_crd_test_kit
-
 RSpec/MultipleExpectations:
   Enabled: false
 
