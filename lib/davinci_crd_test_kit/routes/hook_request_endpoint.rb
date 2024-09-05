@@ -12,37 +12,28 @@ module DaVinciCRDTestKit
     end
 
     def test_run_identifier
-      extract_iss_claim_and_hook(request)
+      "#{hook_name} #{iss}"
     end
 
-    def extract_iss_claim_and_hook(request)
-      hook = extract_hook_name(request).to_s
-      iss = extract_iss_claim_from_token(request).to_s
-
-      "#{hook} #{iss}"
+    def hook_name
+      @hook_name ||= request.params[:hook]
     end
 
-    def extract_iss_claim_from_token(request)
-      token = extract_bearer_token(request)
-      begin
-        payload, = JWT.decode(token, nil, false)
-        payload['iss']
-      rescue JWT::DecodeError
-        nil
-      end
+    def iss
+      @iss ||=
+        begin
+          payload, = JWT.decode(token, nil, false)
+          payload['iss']
+        rescue JWT::DecodeError
+          nil
+        end
     end
 
-    # Header expected to be a bearer token of the form "Bearer <token>"
-    def extract_bearer_token(request)
-      request.headers['authorization']&.delete_prefix('Bearer ')
-    end
-
-    def extract_hook_name(request)
-      request.params[:hook]
+    def token
+      @token ||= request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
     def make_response
-      hook_name = extract_hook_name(request)
       case hook_name
       when 'appointment-book'
         appointment_book_response
@@ -63,7 +54,6 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      hook_name = extract_hook_name(request)
       case hook_name
       when 'appointment-book'
         [APPOINTMENT_BOOK_TAG]
@@ -84,7 +74,7 @@ module DaVinciCRDTestKit
     end
 
     def name
-      extract_hook_name(request).gsub('-', '_')
+      hook_name.gsub('-', '_')
     end
   end
 end
