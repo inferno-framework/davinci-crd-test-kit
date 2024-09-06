@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
       ['appointment-book', 'order-dispatch', 'order-sign']
     end
 
-    def get_card_json(filename)
+    def load_json_file(filename)
       json = JSON.parse(File.read(File.join(__dir__, 'card_responses', filename)))
       return json unless filename == 'launch_smart_app.json'
 
@@ -197,7 +197,7 @@ module DaVinciCRDTestKit
 
       system_actions = add_coverage_cards(cards)
 
-      cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
+      cards.append(load_json_file('instructions.json')) if selected_response_types.include?('instructions') ||
                                                           (cards.empty? && system_actions.nil?)
       cards_response = { 'cards' => cards }
       cards_response['systemActions'] = system_actions if system_actions.present?
@@ -216,8 +216,8 @@ module DaVinciCRDTestKit
 
     def add_basic_cards(cards)
       cards.append(create_form_completion_card) if selected_response_types.include?('request_form_completion')
-      cards.append(get_card_json('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
-      cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
+      cards.append(load_json_file('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
+      cards.append(load_json_file('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
     def add_coverage_cards(cards)
@@ -356,7 +356,7 @@ module DaVinciCRDTestKit
         new_coverage = create_coverage_resource(context['patientId'])
         action['resource'] = new_coverage
       end
-      coverage_info_card = get_card_json('create_update_coverage_information.json')
+      coverage_info_card = load_json_file('create_update_coverage_information.json')
       coverage_info_card['suggestions'][0]['actions'] = [action]
       coverage_info_card
     end
@@ -364,7 +364,7 @@ module DaVinciCRDTestKit
     def create_form_completion_card
       return if context.nil?
 
-      request_form_completion_card = get_card_json('request_form_completion.json')
+      request_form_completion_card = load_json_file('request_form_completion.json')
       form_completion_task = request_form_completion_card['suggestions'][0]['actions'].find do |action|
         action['resource']['resourceType'] == 'Task'
       end['resource']
@@ -385,7 +385,7 @@ module DaVinciCRDTestKit
     def create_companions_prerequisites_card
       return if context.nil?
 
-      companions_prerequisites_card = get_card_json('companions_prerequisites.json')
+      companions_prerequisites_card = load_json_file('companions_prerequisites.json')
       card_service_request = companions_prerequisites_card['suggestions'][0]['actions'][0]['resource']
       update_service_request(card_service_request)
       companions_prerequisites_card
@@ -394,7 +394,7 @@ module DaVinciCRDTestKit
     def create_alternate_request_card
       return if context.nil?
 
-      propose_alternate_request_card = get_card_json('propose_alternate_request.json')
+      propose_alternate_request_card = load_json_file('propose_alternate_request.json')
 
       if hook_name == 'order-dispatch'
         order_resource = get_context_resource(context['order'])
