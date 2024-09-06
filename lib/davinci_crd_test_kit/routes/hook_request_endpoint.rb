@@ -35,18 +35,8 @@ module DaVinciCRDTestKit
 
     def make_response
       case hook_name
-      when 'appointment-book'
-        appointment_book_response
-      when 'encounter-start'
-        encounter_start_response
-      when 'encounter-discharge'
-        encounter_discharge_response
-      when 'order-select'
-        order_select_response
-      when 'order-sign'
-        order_sign_response
-      when 'order-dispatch'
-        order_dispatch_response
+      when 'appointment-book', 'encounter-start', 'encounter-discharge', 'order-select', 'order-sign', 'order-dispatch'
+        hook_response
       else
         response.status = 400
         response.body = 'Invalid Request: Request did not contain a valid hook in the `hook` field.'

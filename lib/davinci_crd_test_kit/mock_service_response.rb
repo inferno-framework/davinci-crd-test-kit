@@ -133,42 +133,7 @@ module DaVinciCRDTestKit
       }[hook_name]
     end
 
-    def appointment_book_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
-      create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
-    end
-
-    def encounter_start_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
-      create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
-    end
-
-    def encounter_discharge_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
-      create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
-    end
-
-    def order_dispatch_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
-      create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
-    end
-
-    def order_select_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
-      create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
-    end
-
-    def order_sign_response
+    def hook_response
       cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
