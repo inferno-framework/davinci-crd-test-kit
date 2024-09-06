@@ -115,43 +115,54 @@ module DaVinciCRDTestKit
       card_response
     end
 
+    def resource_to_update_field_name
+      {
+        'appointment-book' => 'appointments',
+        'encounter-start' => 'encounterId',
+        'encounter-discharge' => 'encounterId',
+        'order-dispatch' => 'order',
+        'order-select' => 'draftOrders',
+        'order-sign' => 'draftOrders'
+      }[hook_name]
+    end
+
     def appointment_book_response
-      cards_response = create_cards_and_system_actions('appointments')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def encounter_start_response
-      cards_response = create_cards_and_system_actions('encounterId', 'Encounter')
+      cards_response = create_cards_and_system_actions('Encounter')
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def encounter_discharge_response
-      cards_response = create_cards_and_system_actions('encounterId', 'Encounter')
+      cards_response = create_cards_and_system_actions('Encounter')
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def order_dispatch_response
-      cards_response = create_cards_and_system_actions('order')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def order_select_response
-      cards_response = create_cards_and_system_actions('draftOrders')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def order_sign_response
-      cards_response = create_cards_and_system_actions('draftOrders')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
@@ -203,7 +214,7 @@ module DaVinciCRDTestKit
         coverage_information_required?
     end
 
-    def create_cards_and_system_actions(update_resource_name, resource_type = nil)
+    def create_cards_and_system_actions(resource_type = nil)
       return if context.nil?
 
       cards = []
@@ -212,7 +223,7 @@ module DaVinciCRDTestKit
 
       add_order_hook_cards(cards)
 
-      system_actions = add_coverage_cards(cards, update_resource_name, resource_type)
+      system_actions = add_coverage_cards(cards, resource_type)
 
       cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
                                                           (cards.empty? && system_actions.nil?)
@@ -237,7 +248,7 @@ module DaVinciCRDTestKit
       cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
-    def add_coverage_cards(cards, update_resource_name, resource_type = nil)
+    def add_coverage_cards(cards, resource_type = nil)
       return unless add_coverage_cards?
 
       coverage = get_patient_coverage
@@ -245,7 +256,6 @@ module DaVinciCRDTestKit
         if selected_response_types.include?('coverage_information') || coverage_information_required?
           system_actions =
             create_coverage_extension_system_actions(
-              update_resource_name,
               coverage.id,
               resource_type
             )
@@ -258,9 +268,9 @@ module DaVinciCRDTestKit
       system_actions
     end
 
-    def create_coverage_extension_system_actions(update_resource_name, coverage_id, resource_type = nil)
-      update_resource = context[update_resource_name]
-      prefetch_id = update_resource_name.split(/(?=[A-Z])/).first
+    def create_coverage_extension_system_actions(coverage_id, resource_type = nil)
+      update_resource = context[resource_to_update_field_name]
+      prefetch_id = resource_to_update_field_name.split(/(?=[A-Z])/).first
 
       fhir_resource =
         if update_resource.is_a? Hash
