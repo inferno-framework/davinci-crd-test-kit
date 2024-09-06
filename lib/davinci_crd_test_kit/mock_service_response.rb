@@ -18,6 +18,11 @@ module DaVinciCRDTestKit
       json
     end
 
+    def request_body
+      @request_body ||=
+        JSON.parse(request.params.to_json)
+    end
+
     def format_missing_response_types(missing_response_types)
       missing_response_types
         .map do |response_type|
@@ -159,7 +164,7 @@ module DaVinciCRDTestKit
       resource.entry.first.resource
     end
 
-    def get_patient_coverage(request_body)
+    def get_patient_coverage
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
         FHIR.from_contents(prefetch['coverage'].to_json)
@@ -177,7 +182,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def get_context_resource(request_body, resource_type, update_resource_id)
+    def get_context_resource(resource_type, update_resource_id)
       update_resource_id = "#{resource_type}/#{update_resource_id}" unless update_resource_id.include? '/'
       fhir_server = request_body['fhirServer']
       return if fhir_server.blank?
@@ -195,7 +200,6 @@ module DaVinciCRDTestKit
     end
 
     def create_cards_and_system_actions(update_resource_name, resource_type = nil)
-      request_body = JSON.parse(request.params.to_json)
       context = request_body['context']
       return if context.nil?
 
@@ -203,9 +207,9 @@ module DaVinciCRDTestKit
 
       add_basic_cards(cards, context)
 
-      add_order_hook_cards(cards, request_body)
+      add_order_hook_cards(cards)
 
-      system_actions = add_coverage_cards(cards, request_body, update_resource_name, resource_type)
+      system_actions = add_coverage_cards(cards, update_resource_name, resource_type)
 
       cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
                                                           (cards.empty? && system_actions.nil?)
@@ -216,14 +220,14 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def add_order_hook_cards(cards, request_body)
+    def add_order_hook_cards(cards)
       if selected_response_types.include?('companions_prerequisites')
         cards.append(create_companions_prerequisites_card(request_body['context']))
       end
 
       return unless selected_response_types.include?('propose_alternate_request')
 
-      cards.append(create_alternate_request_card(request_body))
+      cards.append(create_alternate_request_card)
     end
 
     def add_basic_cards(cards, context)
@@ -232,15 +236,14 @@ module DaVinciCRDTestKit
       cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
-    def add_coverage_cards(cards, request_body, update_resource_name, resource_type = nil)
+    def add_coverage_cards(cards, update_resource_name, resource_type = nil)
       return unless add_coverage_cards?
 
-      coverage = get_patient_coverage(request_body)
+      coverage = get_patient_coverage
       if coverage.present?
         if selected_response_types.include?('coverage_information') || coverage_information_required?
           system_actions =
             create_coverage_extension_system_actions(
-              request_body,
               update_resource_name,
               coverage.id,
               resource_type
@@ -254,7 +257,7 @@ module DaVinciCRDTestKit
       system_actions
     end
 
-    def create_coverage_extension_system_actions(request_body, update_resource_name, coverage_id, resource_type = nil)
+    def create_coverage_extension_system_actions(update_resource_name, coverage_id, resource_type = nil)
       context = request_body['context']
       update_resource = context[update_resource_name]
       prefetch_id = update_resource_name.split(/(?=[A-Z])/).first
@@ -265,7 +268,7 @@ module DaVinciCRDTestKit
         elsif request_body['prefetch'] && request_body['prefetch'][prefetch_id]
           FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
         else
-          get_context_resource(request_body, resource_type, update_resource)
+          get_context_resource(resource_type, update_resource)
         end
 
       create_system_actions(fhir_resource, coverage_id)
@@ -409,14 +412,14 @@ module DaVinciCRDTestKit
       companions_prerequisites_card
     end
 
-    def create_alternate_request_card(request_body)
+    def create_alternate_request_card
       context = request_body['context']
       return if context.nil?
 
       propose_alternate_request_card = get_card_json('propose_alternate_request.json')
 
       if hook_name == 'order-dispatch'
-        order_resource = get_context_resource(request_body, nil, context['order'])
+        order_resource = get_context_resource(nil, context['order'])
       else
         draft_orders = context['draftOrders']['entry']
         draft_order_resource = draft_orders[0]['resource']
