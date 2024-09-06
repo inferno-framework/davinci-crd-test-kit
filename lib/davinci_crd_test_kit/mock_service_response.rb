@@ -23,6 +23,10 @@ module DaVinciCRDTestKit
         JSON.parse(request.params.to_json)
     end
 
+    def context
+      request_body['context']
+    end
+
     def format_missing_response_types(missing_response_types)
       missing_response_types
         .map do |response_type|
@@ -172,7 +176,7 @@ module DaVinciCRDTestKit
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
           access_token = request_body['fhirAuthorization']['access_token'] if request_body['fhirAuthorization']
-          patient_id = request_body['context']['patientId']
+          patient_id = context['patientId']
 
           make_resource_request(
             "#{fhir_server}/Coverage?patient=#{patient_id}&status=active",
@@ -200,12 +204,11 @@ module DaVinciCRDTestKit
     end
 
     def create_cards_and_system_actions(update_resource_name, resource_type = nil)
-      context = request_body['context']
       return if context.nil?
 
       cards = []
 
-      add_basic_cards(cards, context)
+      add_basic_cards(cards)
 
       add_order_hook_cards(cards)
 
@@ -221,17 +224,15 @@ module DaVinciCRDTestKit
     end
 
     def add_order_hook_cards(cards)
-      if selected_response_types.include?('companions_prerequisites')
-        cards.append(create_companions_prerequisites_card(request_body['context']))
-      end
+      cards.append(create_companions_prerequisites_card) if selected_response_types.include?('companions_prerequisites')
 
       return unless selected_response_types.include?('propose_alternate_request')
 
       cards.append(create_alternate_request_card)
     end
 
-    def add_basic_cards(cards, context)
-      cards.append(create_form_completion_card(context)) if selected_response_types.include?('request_form_completion')
+    def add_basic_cards(cards)
+      cards.append(create_form_completion_card) if selected_response_types.include?('request_form_completion')
       cards.append(get_card_json('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
       cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
     end
@@ -251,14 +252,13 @@ module DaVinciCRDTestKit
         end
 
         if selected_response_types.include?('create_update_coverage_info')
-          cards.append(create_or_update_coverage(coverage, request_body['context']))
+          cards.append(create_or_update_coverage(coverage))
         end
       end
       system_actions
     end
 
     def create_coverage_extension_system_actions(update_resource_name, coverage_id, resource_type = nil)
-      context = request_body['context']
       update_resource = context[update_resource_name]
       prefetch_id = update_resource_name.split(/(?=[A-Z])/).first
 
@@ -361,7 +361,7 @@ module DaVinciCRDTestKit
       )
     end
 
-    def create_or_update_coverage(coverage, context)
+    def create_or_update_coverage(coverage)
       return if context.nil?
 
       if coverage.present?
@@ -382,7 +382,7 @@ module DaVinciCRDTestKit
       coverage_info_card
     end
 
-    def create_form_completion_card(context)
+    def create_form_completion_card
       return if context.nil?
 
       request_form_completion_card = get_card_json('request_form_completion.json')
@@ -395,7 +395,7 @@ module DaVinciCRDTestKit
       request_form_completion_card
     end
 
-    def update_service_request(service_request, context)
+    def update_service_request(service_request)
       return if context.nil?
 
       service_request['subject']['reference'] = "Patient/#{context['patientId']}"
@@ -403,17 +403,16 @@ module DaVinciCRDTestKit
       service_request['authoredOn'] = current_time.strftime('%Y-%m-%d')
     end
 
-    def create_companions_prerequisites_card(context)
+    def create_companions_prerequisites_card
       return if context.nil?
 
       companions_prerequisites_card = get_card_json('companions_prerequisites.json')
       card_service_request = companions_prerequisites_card['suggestions'][0]['actions'][0]['resource']
-      update_service_request(card_service_request, context)
+      update_service_request(card_service_request)
       companions_prerequisites_card
     end
 
     def create_alternate_request_card
-      context = request_body['context']
       return if context.nil?
 
       propose_alternate_request_card = get_card_json('propose_alternate_request.json')
