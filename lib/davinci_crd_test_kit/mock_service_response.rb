@@ -126,6 +126,13 @@ module DaVinciCRDTestKit
       }[hook_name]
     end
 
+    def resource_type_to_update
+      {
+        'encounter-start' => 'Encounter',
+        'encounter-discharge' => 'Encounter'
+      }[hook_name]
+    end
+
     def appointment_book_response
       cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
@@ -134,14 +141,14 @@ module DaVinciCRDTestKit
     end
 
     def encounter_start_response
-      cards_response = create_cards_and_system_actions('Encounter')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
     def encounter_discharge_response
-      cards_response = create_cards_and_system_actions('Encounter')
+      cards_response = create_cards_and_system_actions
       hook_card_response = update_specific_hook_card_info(cards_response)
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
@@ -197,8 +204,8 @@ module DaVinciCRDTestKit
       end
     end
 
-    def get_context_resource(resource_type, update_resource_id)
-      update_resource_id = "#{resource_type}/#{update_resource_id}" unless update_resource_id.include? '/'
+    def get_context_resource(update_resource_id)
+      update_resource_id = "#{resource_type_to_update}/#{update_resource_id}" unless update_resource_id.include? '/'
       fhir_server = request_body['fhirServer']
       return if fhir_server.blank?
 
@@ -214,7 +221,7 @@ module DaVinciCRDTestKit
         coverage_information_required?
     end
 
-    def create_cards_and_system_actions(resource_type = nil)
+    def create_cards_and_system_actions
       return if context.nil?
 
       cards = []
@@ -223,7 +230,7 @@ module DaVinciCRDTestKit
 
       add_order_hook_cards(cards)
 
-      system_actions = add_coverage_cards(cards, resource_type)
+      system_actions = add_coverage_cards(cards)
 
       cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
                                                           (cards.empty? && system_actions.nil?)
@@ -248,17 +255,14 @@ module DaVinciCRDTestKit
       cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
-    def add_coverage_cards(cards, resource_type = nil)
+    def add_coverage_cards(cards)
       return unless add_coverage_cards?
 
       coverage = get_patient_coverage
       if coverage.present?
         if selected_response_types.include?('coverage_information') || coverage_information_required?
           system_actions =
-            create_coverage_extension_system_actions(
-              coverage.id,
-              resource_type
-            )
+            create_coverage_extension_system_actions(coverage.id)
         end
 
         if selected_response_types.include?('create_update_coverage_info')
@@ -268,7 +272,7 @@ module DaVinciCRDTestKit
       system_actions
     end
 
-    def create_coverage_extension_system_actions(coverage_id, resource_type = nil)
+    def create_coverage_extension_system_actions(coverage_id)
       update_resource = context[resource_to_update_field_name]
       prefetch_id = resource_to_update_field_name.split(/(?=[A-Z])/).first
 
@@ -278,7 +282,7 @@ module DaVinciCRDTestKit
         elsif request_body['prefetch'] && request_body['prefetch'][prefetch_id]
           FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
         else
-          get_context_resource(resource_type, update_resource)
+          get_context_resource(update_resource)
         end
 
       create_system_actions(fhir_resource, coverage_id)
@@ -428,7 +432,7 @@ module DaVinciCRDTestKit
       propose_alternate_request_card = get_card_json('propose_alternate_request.json')
 
       if hook_name == 'order-dispatch'
-        order_resource = get_context_resource(nil, context['order'])
+        order_resource = get_context_resource(context['order'])
       else
         draft_orders = context['draftOrders']['entry']
         draft_order_resource = draft_orders[0]['resource']
