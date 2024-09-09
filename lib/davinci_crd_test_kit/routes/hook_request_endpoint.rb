@@ -11,6 +11,13 @@ module DaVinciCRDTestKit
           &.dig('value')
     end
 
+    def custom_response
+      @custom_response ||=
+        JSON.parse(result.input_json)
+          .find { |input| input['name'].include?('custom_response') }
+          &.dig('value')
+    end
+
     def test_run_identifier
       "#{hook_name} #{iss}"
     end

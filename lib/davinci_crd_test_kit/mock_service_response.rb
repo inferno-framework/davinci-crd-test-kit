@@ -72,6 +72,8 @@ module DaVinciCRDTestKit
     end
 
     def create_warning_messages(hook_card_response)
+      return if custom_response.present?
+
       missing_response_types =
         if hook_card_response.nil?
           selected_response_types
@@ -134,8 +136,14 @@ module DaVinciCRDTestKit
     end
 
     def hook_response
-      cards_response = create_cards_and_system_actions
-      hook_card_response = update_specific_hook_card_info(cards_response)
+      hook_card_response =
+        if custom_response.present?
+          custom_response
+        else
+          cards_response = create_cards_and_system_actions
+          update_specific_hook_card_info(cards_response)
+        end
+
       create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
@@ -151,7 +159,7 @@ module DaVinciCRDTestKit
       resource.entry.first.resource
     end
 
-    def get_patient_coverage
+    def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
         FHIR.from_contents(prefetch['coverage'].to_json)
@@ -198,7 +206,7 @@ module DaVinciCRDTestKit
       system_actions = add_coverage_cards(cards)
 
       cards.append(load_json_file('instructions.json')) if selected_response_types.include?('instructions') ||
-                                                          (cards.empty? && system_actions.nil?)
+                                                           (cards.empty? && system_actions.nil?)
       cards_response = { 'cards' => cards }
       cards_response['systemActions'] = system_actions if system_actions.present?
       cards_response

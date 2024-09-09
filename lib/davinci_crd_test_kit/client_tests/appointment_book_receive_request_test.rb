@@ -24,6 +24,7 @@ module DaVinciCRDTestKit
           ),
           type: 'checkbox',
           default: ['coverage_information', 'external_reference', 'instructions'],
+          optional: true,
           options: {
             list_options: [
               {
@@ -52,6 +53,14 @@ module DaVinciCRDTestKit
               }
             ]
           }
+    input :appointment_book_custom_response,
+          title: 'Custom response for appointment-book hook requests',
+          description: %(
+            A JSON string may be provided here to replace the normal response
+            from the hook request endpoint
+          ),
+          type: 'textarea',
+          optional: true
 
     run do
       wait(
