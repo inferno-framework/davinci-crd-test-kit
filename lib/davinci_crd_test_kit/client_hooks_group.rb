@@ -76,96 +76,42 @@ module DaVinciCRDTestKit
 
       config(
         inputs: {
-          custom_response: { name: :appointment_book_custom_response }
+          auth_token_headers_json: { name: :appointment_book_auth_token_headers_json },
+          auth_tokens: { name: :appointment_book_auth_tokens },
+          auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json },
+          client_access_token: { name: :appointment_book_client_access_token },
+          client_fhir_server: { name: :appointment_book_client_fhir_server },
+          crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json },
+          custom_response: { name: :appointment_book_custom_response },
+          selected_response_types: { name: :appointment_book_selected_response_types }
+        },
+        outputs: {
+          auth_token_headers_json: { name: :appointment_book_auth_token_headers_json },
+          auth_token_payloads_json: { name: :appointment_book_auth_token_payloads_json },
+          auth_tokens: { name: :appointment_book_auth_tokens },
+          auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json },
+          client_access_token: { name: :appointment_book_client_access_token },
+          client_fhir_server: { name: :appointment_book_client_fhir_server },
+          crd_jwks_json: { name: :appointment_book_crd_jwks_json },
+          crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
+        },
+        options: {
+          hook_name: 'appointment-book',
+          hook_path: APPOINTMENT_BOOK_PATH
         }
       )
 
-      test from: :crd_submitted_response_validation,
-           config: {
-             options: {
-               hook_name: 'appointment-book'
-             }
-           }
-
+      test from: :crd_submitted_response_validation
       test from: :crd_appointment_book_request
-
-      test from: :crd_decode_auth_token,
-           config: {
-             options: {
-               hook_name: 'appointment-book'
-             },
-             outputs: {
-               auth_tokens: { name: :appointment_book_auth_tokens },
-               auth_token_payloads_json: { name: :appointment_book_auth_token_payloads_json },
-               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
-             }
-           }
-      test from: :crd_retrieve_jwks,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json }
-             },
-             outputs: {
-               crd_jwks_json: { name: :appointment_book_crd_jwks_json },
-               crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
-             }
-           }
-      test from: :crd_token_header,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :appointment_book_auth_token_headers_json },
-               crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
-             },
-             outputs: {
-               auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json }
-             }
-           }
-      test from: :crd_token_payload,
-           config: {
-             options: { hook_path: APPOINTMENT_BOOK_PATH },
-             inputs: {
-               auth_tokens: { name: :appointment_book_auth_tokens },
-               auth_tokens_jwk_json: { name: :appointment_book_auth_tokens_jwk_json }
-             }
-           }
-
-      test from: :crd_hook_request_required_fields,
-           config: {
-             options: {
-               hook_name: 'appointment-book'
-             }
-           }
-      test from: :crd_hook_request_optional_fields,
-           config: {
-             options: {
-               hook_name: 'appointment-book'
-             },
-             outputs: {
-               client_fhir_server: { name: :appointment_book_client_fhir_server },
-               client_access_token: { name: :appointment_book_client_access_token }
-             }
-           }
-
-      test from: :crd_hook_request_valid_context,
-           config: {
-             inputs: {
-               client_fhir_server: { name: :appointment_book_client_fhir_server },
-               client_access_token: { name: :appointment_book_client_access_token }
-             },
-             options: { hook_name: 'appointment-book' }
-           }
-
-      test from: :crd_hook_request_valid_prefetch,
-           config: {
-             options: { hook_name: 'appointment-book' }
-           }
-
-      test from: :crd_card_display_attest_test,
-           config: {
-             inputs: {
-               selected_response_types: { name: :appointment_book_selected_response_types }
-             }
-           }
+      test from: :crd_decode_auth_token
+      test from: :crd_retrieve_jwks
+      test from: :crd_token_header
+      test from: :crd_token_payload
+      test from: :crd_hook_request_required_fields
+      test from: :crd_hook_request_optional_fields
+      test from: :crd_hook_request_valid_context
+      test from: :crd_hook_request_valid_prefetch
+      test from: :crd_card_display_attest_test
     end
 
     group do
