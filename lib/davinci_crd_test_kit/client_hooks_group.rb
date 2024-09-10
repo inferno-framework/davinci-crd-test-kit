@@ -1,22 +1,19 @@
 require_relative 'client_tests/appointment_book_receive_request_test'
-require_relative 'client_tests/encounter_start_receive_request_test'
+require_relative 'client_tests/client_display_cards_attest'
+require_relative 'client_tests/decode_auth_token_test'
 require_relative 'client_tests/encounter_discharge_receive_request_test'
+require_relative 'client_tests/encounter_start_receive_request_test'
+require_relative 'client_tests/hook_request_optional_fields_test'
+require_relative 'client_tests/hook_request_required_fields_test'
+require_relative 'client_tests/hook_request_valid_context_test'
+require_relative 'client_tests/hook_request_valid_prefetch_test'
 require_relative 'client_tests/order_dispatch_receive_request_test'
 require_relative 'client_tests/order_select_receive_request_test'
 require_relative 'client_tests/order_sign_receive_request_test'
-require_relative 'client_tests/client_display_cards_attest'
-
-require_relative 'client_tests/decode_auth_token_test'
 require_relative 'client_tests/retrieve_jwks_test'
+require_relative 'client_tests/submitted_response_validation'
 require_relative 'client_tests/token_header_test'
 require_relative 'client_tests/token_payload_test'
-
-require_relative 'client_tests/hook_request_required_fields_test'
-require_relative 'client_tests/hook_request_optional_fields_test'
-
-require_relative 'client_tests/hook_request_valid_context_test'
-
-require_relative 'client_tests/hook_request_valid_prefetch_test'
 
 require_relative 'jwt_helper'
 require_relative 'urls'
@@ -76,6 +73,19 @@ module DaVinciCRDTestKit
 
       optional
       run_as_group
+
+      config(
+        inputs: {
+          custom_response: { name: :appointment_book_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'appointment-book'
+             }
+           }
 
       test from: :crd_appointment_book_request
 
@@ -175,6 +185,19 @@ module DaVinciCRDTestKit
       optional
       run_as_group
 
+      config(
+        inputs: {
+          custom_response: { name: :encounter_start_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'encounter-start'
+             }
+           }
+
       test from: :crd_encounter_start_request
 
       test from: :crd_decode_auth_token,
@@ -273,6 +296,19 @@ module DaVinciCRDTestKit
 
       optional
       run_as_group
+
+      config(
+        inputs: {
+          custom_response: { name: :encounter_discharge_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'encounter-discharge'
+             }
+           }
 
       test from: :crd_encounter_discharge_request
 
@@ -374,6 +410,19 @@ module DaVinciCRDTestKit
       optional
       run_as_group
 
+      config(
+        inputs: {
+          custom_response: { name: :order_select_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'order-select'
+             }
+           }
+
       test from: :crd_order_select_request
 
       test from: :crd_decode_auth_token,
@@ -471,6 +520,19 @@ module DaVinciCRDTestKit
 
       optional
       run_as_group
+
+      config(
+        inputs: {
+          custom_response: { name: :order_dispatch_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'order-dispatch'
+             }
+           }
 
       test from: :crd_order_dispatch_request
 
@@ -570,6 +632,19 @@ module DaVinciCRDTestKit
 
       optional
       run_as_group
+
+      config(
+        inputs: {
+          custom_response: { name: :order_sign_custom_response }
+        }
+      )
+
+      test from: :crd_submitted_response_validation,
+           config: {
+             options: {
+               hook_name: 'order-sign'
+             }
+           }
 
       test from: :crd_order_sign_request
 

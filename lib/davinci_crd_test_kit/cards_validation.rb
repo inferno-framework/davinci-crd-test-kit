@@ -191,17 +191,21 @@ module DaVinciCRDTestKit
       end
     end
 
+    def response_label(index = nil)
+      "Server response #{index}"
+    end
+
     def perform_cards_validation(cards, response_index = 0)
       unless cards
-        add_message('error', "Server response #{response_index + 1} did not have the `cards` field.")
+        add_message('error', "#{response_label(response_index + 1)} did not have the `cards` field.")
         return
       end
       unless cards.is_a?(Array)
-        add_message('error', "`cards` field of server response #{response_index + 1} is not an array.")
+        add_message('error', "`cards` field of #{response_label(response_index + 1).downcase} is not an array.")
         return
       end
       warning do
-        assert cards.present?, "Server response #{response_index + 1} has no decision support."
+        assert cards.present?, "#{response_label(response_index + 1)} has no decision support."
       end
       cards_check(cards)
     end
@@ -219,7 +223,7 @@ module DaVinciCRDTestKit
         service_response = JSON.parse(request.response_body)
         perform_cards_validation(service_response['cards'], index)
       rescue JSON::ParserError
-        add_message('error', "Invalid JSON: server response #{index + 1} is not a valid JSON.")
+        add_message('error', "Invalid JSON: #{response_label(response_index + 1).downcase} is not a valid JSON.")
       end
     end
 

@@ -138,7 +138,7 @@ module DaVinciCRDTestKit
     def hook_response
       hook_card_response =
         if custom_response.present?
-          custom_response
+          JSON.parse(custom_response)
         else
           cards_response = create_cards_and_system_actions
           update_specific_hook_card_info(cards_response)
