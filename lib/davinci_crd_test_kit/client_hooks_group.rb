@@ -4,6 +4,7 @@ require_relative 'client_tests/client_encounter_discharge_group'
 require_relative 'client_tests/client_encounter_start_group'
 require_relative 'client_tests/client_order_dispatch_group'
 require_relative 'client_tests/client_order_select_group'
+require_relative 'client_tests/client_order_sign_group'
 require_relative 'client_tests/decode_auth_token_test'
 require_relative 'client_tests/encounter_discharge_receive_request_test'
 require_relative 'client_tests/encounter_start_receive_request_test'
@@ -76,116 +77,7 @@ module DaVinciCRDTestKit
     group from: :crd_client_order_dispatch,
           optional: true
 
-    group do
-      title 'order-sign'
-      description <<~DESCRIPTION
-        The order-sign hook fires when a clinician is ready to sign one or more orders for a patient, (including orders
-        for medications, procedures, labs and other orders). These tests are based on the following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign),
-          which includes the profiles that are expected to be used for the resources resolved to by `context`
-          FHIR ID fields
-          * Specific [order-sign `context` requirements](https://cds-hooks.org/hooks/order-sign/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.1 of the hook which, at the time of publication,
-        was not available as a snapshot. Therefore the preceding link refers to the CDS hooks current build.
-      DESCRIPTION
-
-      optional
-      run_as_group
-
-      config(
-        inputs: {
-          custom_response: { name: :order_sign_custom_response }
-        }
-      )
-
-      test from: :crd_submitted_response_validation,
-           config: {
-             options: {
-               hook_name: 'order-sign'
-             }
-           }
-
-      test from: :crd_order_sign_request
-
-      test from: :crd_decode_auth_token,
-           config: {
-             options: {
-               hook_name: 'order-sign'
-             },
-             outputs: {
-               auth_tokens: { name: :order_sign_auth_tokens },
-               auth_token_payloads_json: { name: :order_sign_auth_token_payloads_json },
-               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
-             }
-           }
-      test from: :crd_retrieve_jwks,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :order_sign_auth_token_headers_json }
-             },
-             outputs: {
-               crd_jwks_json: { name: :order_sign_crd_jwks_json },
-               crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
-             }
-           }
-      test from: :crd_token_header,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :order_sign_auth_token_headers_json },
-               crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
-             },
-             outputs: {
-               auth_tokens_jwk_json: { name: :order_sign_auth_tokens_jwk_json }
-             }
-           }
-      test from: :crd_token_payload,
-           config: {
-             options: { hook_path: ORDER_SIGN_PATH },
-             inputs: {
-               auth_tokens: { name: :order_sign_auth_tokens },
-               auth_tokens_jwk_json: { name: :order_sign_auth_tokens_jwk_json }
-             }
-           }
-
-      test from: :crd_hook_request_required_fields,
-           config: {
-             options: {
-               hook_name: 'order-sign'
-             }
-           }
-      test from: :crd_hook_request_optional_fields,
-           config: {
-             options: {
-               hook_name: 'order-sign'
-             },
-             outputs: {
-               client_fhir_server: { name: :order_sign_client_fhir_server },
-               client_access_token: { name: :order_sign_client_access_token }
-             }
-           }
-
-      test from: :crd_hook_request_valid_context,
-           config: {
-             inputs: {
-               client_fhir_server: { name: :order_sign_client_fhir_server },
-               client_access_token: { name: :order_sign_client_access_token }
-             },
-             options: { hook_name: 'order-sign' }
-           }
-
-      test from: :crd_hook_request_valid_prefetch,
-           config: {
-             options: { hook_name: 'order-sign' }
-           }
-
-      test from: :crd_card_display_attest_test,
-           config: {
-             inputs: {
-               selected_response_types: { name: :order_sign_selected_response_types }
-             }
-           }
-    end
+    group from: :crd_client_order_sign,
+          optional: true
   end
 end
