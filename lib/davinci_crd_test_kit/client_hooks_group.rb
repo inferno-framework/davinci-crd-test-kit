@@ -2,6 +2,7 @@ require_relative 'client_tests/client_appointment_book_group'
 require_relative 'client_tests/client_display_cards_attest'
 require_relative 'client_tests/client_encounter_discharge_group'
 require_relative 'client_tests/client_encounter_start_group'
+require_relative 'client_tests/client_order_select_group'
 require_relative 'client_tests/decode_auth_token_test'
 require_relative 'client_tests/encounter_discharge_receive_request_test'
 require_relative 'client_tests/encounter_start_receive_request_test'
@@ -68,118 +69,8 @@ module DaVinciCRDTestKit
     group from: :crd_client_encounter_discharge,
           optional: true
 
-    group do
-      title 'order-select'
-      description <<~DESCRIPTION
-        The order-select hook fires when a clinician selects one or more orders to place for a patient,
-        (including orders for medications, procedures, labs and other orders). If supported by the CDS Client, this
-        hook may also be invoked each time the clinician selects a detail regarding the order. These tests are based on
-        the following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-selecte),
-          which includes the profiles that are expected to be used for the resources resolved to by `context`
-          FHIR ID fields
-          * Specific [order-select `context` requirements](https://cds-hooks.hl7.org/hooks/order-select/2023SepSTU1Ballot/order-select/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.0 of the hook.
-      DESCRIPTION
-
-      optional
-      run_as_group
-
-      config(
-        inputs: {
-          custom_response: { name: :order_select_custom_response }
-        }
-      )
-
-      test from: :crd_submitted_response_validation,
-           config: {
-             options: {
-               hook_name: 'order-select'
-             }
-           }
-
-      test from: :crd_order_select_request
-
-      test from: :crd_decode_auth_token,
-           config: {
-             options: {
-               hook_name: 'order-select'
-             },
-             outputs: {
-               auth_tokens: { name: :order_select_auth_tokens },
-               auth_token_payloads_json: { name: :order_select_auth_token_payloads_json },
-               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
-             }
-           }
-      test from: :crd_retrieve_jwks,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :order_select_auth_token_headers_json }
-             },
-             outputs: {
-               crd_jwks_json: { name: :order_select_crd_jwks_json },
-               crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
-             }
-           }
-      test from: :crd_token_header,
-           config: {
-             inputs: {
-               auth_token_headers_json: { name: :order_select_auth_token_headers_json },
-               crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
-             },
-             outputs: {
-               auth_tokens_jwk_json: { name: :order_select_auth_tokens_jwk_json }
-             }
-           }
-      test from: :crd_token_payload,
-           config: {
-             options: { hook_path: ORDER_SELECT_PATH },
-             inputs: {
-               auth_tokens: { name: :order_select_auth_tokens },
-               auth_tokens_jwk_json: { name: :order_select_auth_tokens_jwk_json }
-             }
-           }
-
-      test from: :crd_hook_request_required_fields,
-           config: {
-             options: {
-               hook_name: 'order-select'
-             }
-           }
-      test from: :crd_hook_request_optional_fields,
-           config: {
-             options: {
-               hook_name: 'order-select'
-             },
-             outputs: {
-               client_fhir_server: { name: :order_select_client_fhir_server },
-               client_access_token: { name: :order_select_client_access_token }
-             }
-           }
-
-      test from: :crd_hook_request_valid_context,
-           config: {
-             inputs: {
-               client_fhir_server: { name: :order_select_client_fhir_server },
-               client_access_token: { name: :order_select_client_access_token }
-             },
-             options: { hook_name: 'order-select' }
-           }
-
-      test from: :crd_hook_request_valid_prefetch,
-           config: {
-             options: { hook_name: 'order-select' }
-           }
-
-      test from: :crd_card_display_attest_test,
-           config: {
-             inputs: {
-               selected_response_types: { name: :order_select_selected_response_types }
-             }
-           }
-    end
+    group from: :crd_client_order_select,
+          optional: true
 
     group do
       title 'order-dispatch'
