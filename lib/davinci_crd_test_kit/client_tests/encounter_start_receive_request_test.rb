@@ -22,6 +22,7 @@ module DaVinciCRDTestKit
           ),
           type: 'checkbox',
           default: ['coverage_information', 'external_reference', 'instructions'],
+          optional: true,
           options: {
             list_options: [
               {
@@ -50,6 +51,14 @@ module DaVinciCRDTestKit
               }
             ]
           }
+    input :encounter_start_custom_response,
+          title: 'Custom response for encounter-start hook requests',
+          description: %(
+            A JSON string may be provided here to replace the normal response
+            from the hook request endpoint
+          ),
+          type: 'textarea',
+          optional: true
 
     run do
       wait(

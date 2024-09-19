@@ -9,13 +9,22 @@ module DaVinciCRDTestKit
       ['appointment-book', 'order-dispatch', 'order-sign']
     end
 
-    def get_card_json(filename)
+    def load_json_file(filename)
       json = JSON.parse(File.read(File.join(__dir__, 'card_responses', filename)))
       return json unless filename == 'launch_smart_app.json'
 
       json['links'].first['url'] = "#{Inferno::Application['base_url']}/custom/smart/launch"
 
       json
+    end
+
+    def request_body
+      @request_body ||=
+        JSON.parse(request.params.to_json)
+    end
+
+    def context
+      request_body['context']
     end
 
     def format_missing_response_types(missing_response_types)
@@ -44,10 +53,12 @@ module DaVinciCRDTestKit
       end
     end
 
-    def get_missing_response_types(selected_response_types, hook_card_response, hook_name)
-      if coverage_information_required_hooks.include?(hook_name)
-        selected_response_types.append('coverage_information').uniq!
-      end
+    def coverage_information_required?
+      coverage_information_required_hooks.include? hook_name
+    end
+
+    def get_missing_response_types(hook_card_response)
+      selected_response_types.append('coverage_information').uniq! if coverage_information_required?
 
       selected_response_types
         .select do |response_type|
@@ -60,20 +71,25 @@ module DaVinciCRDTestKit
         end
     end
 
-    def create_warning_messages(selected_response_types, hook_card_response, hook_name)
-      missing_response_types = if hook_card_response.nil?
-                                 selected_response_types
-                               else
-                                 get_missing_response_types(selected_response_types, hook_card_response, hook_name)
-                               end
+    def create_warning_messages(hook_card_response)
+      return if custom_response.present?
+
+      missing_response_types =
+        if hook_card_response.nil?
+          selected_response_types
+        else
+          get_missing_response_types(hook_card_response)
+        end
 
       return if missing_response_types.empty?
 
       missing_response_types = format_missing_response_types(missing_response_types)
       missing_response_types.each do |missing_response_type|
-        Inferno::Repositories::Messages.new.create(result_id: result.id, type: 'warning',
-                                                   message: %(Unable to return response type: `#{missing_response_type}`
-                                                   for #{hook_name} hook))
+        Inferno::Repositories::Messages.new.create(
+          result_id: result.id,
+          type: 'warning',
+          message: %(Unable to return response type: `#{missing_response_type}` for #{hook_name} hook)
+        )
       end
     end
 
@@ -90,7 +106,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def update_specific_hook_card_info(card_response, hook_name)
+    def update_specific_hook_card_info(card_response)
       return if card_response.nil?
 
       hook_display = hook_name.split('-').map(&:capitalize).join(' ')
@@ -101,47 +117,34 @@ module DaVinciCRDTestKit
       card_response
     end
 
-    def appointment_book_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'appointment-book', 'appointments')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'appointment-book')
-      create_warning_messages(selected_response_types, hook_card_response, 'appointment-book')
-      create_card_response(hook_card_response)
+    def resource_to_update_field_name
+      {
+        'appointment-book' => 'appointments',
+        'encounter-start' => 'encounterId',
+        'encounter-discharge' => 'encounterId',
+        'order-dispatch' => 'order',
+        'order-select' => 'draftOrders',
+        'order-sign' => 'draftOrders'
+      }[hook_name]
     end
 
-    def encounter_start_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'encounter-start', 'encounterId',
-                                                       'Encounter')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'encounter-start')
-      create_warning_messages(selected_response_types, hook_card_response, 'encounter-start')
-      create_card_response(hook_card_response)
+    def resource_type_to_update
+      {
+        'encounter-start' => 'Encounter',
+        'encounter-discharge' => 'Encounter'
+      }[hook_name]
     end
 
-    def encounter_discharge_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'encounter-discharge', 'encounterId',
-                                                       'Encounter')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'encounter-discharge')
-      create_warning_messages(selected_response_types, hook_card_response, 'encounter-discharge')
-      create_card_response(hook_card_response)
-    end
+    def hook_response
+      hook_card_response =
+        if custom_response.present?
+          JSON.parse(custom_response)
+        else
+          cards_response = create_cards_and_system_actions
+          update_specific_hook_card_info(cards_response)
+        end
 
-    def order_dispatch_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-dispatch', 'order')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'order-dispatch')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-dispatch')
-      create_card_response(hook_card_response)
-    end
-
-    def order_select_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-select', 'draftOrders')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'order-select')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-select')
-      create_card_response(hook_card_response)
-    end
-
-    def order_sign_response(selected_response_types)
-      cards_response = create_cards_and_system_actions(selected_response_types, 'order-sign', 'draftOrders')
-      hook_card_response = update_specific_hook_card_info(cards_response, 'order-sign')
-      create_warning_messages(selected_response_types, hook_card_response, 'order-sign')
+      create_warning_messages(hook_card_response)
       create_card_response(hook_card_response)
     end
 
@@ -156,7 +159,7 @@ module DaVinciCRDTestKit
       resource.entry.first.resource
     end
 
-    def get_patient_coverage(request_body)
+    def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
         FHIR.from_contents(prefetch['coverage'].to_json)
@@ -164,7 +167,7 @@ module DaVinciCRDTestKit
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
           access_token = request_body['fhirAuthorization']['access_token'] if request_body['fhirAuthorization']
-          patient_id = request_body['context']['patientId']
+          patient_id = context['patientId']
 
           make_resource_request(
             "#{fhir_server}/Coverage?patient=#{patient_id}&status=active",
@@ -174,8 +177,8 @@ module DaVinciCRDTestKit
       end
     end
 
-    def get_context_resource(request_body, resource_type, update_resource_id)
-      update_resource_id = "#{resource_type}/#{update_resource_id}" unless update_resource_id.include? '/'
+    def get_context_resource(update_resource_id)
+      update_resource_id = "#{resource_type_to_update}/#{update_resource_id}" unless update_resource_id.include? '/'
       fhir_server = request_body['fhirServer']
       return if fhir_server.blank?
 
@@ -186,27 +189,24 @@ module DaVinciCRDTestKit
       )
     end
 
-    def add_coverage_cards?(selected_response_types, hook_name)
+    def add_coverage_cards?
       (['coverage_information', 'create_update_coverage_info'].any? { |x| selected_response_types.include?(x) }) ||
-        coverage_information_required_hooks.include?(hook_name)
+        coverage_information_required?
     end
 
-    def create_cards_and_system_actions(selected_response_types, hook_name, update_resource_name, resource_type = nil)
-      request_body = JSON.parse(request.params.to_json)
-      context = request_body['context']
+    def create_cards_and_system_actions
       return if context.nil?
 
       cards = []
 
-      add_basic_cards(selected_response_types, cards, context)
+      add_basic_cards(cards)
 
-      add_order_hook_cards(selected_response_types, cards, request_body, hook_name)
+      add_order_hook_cards(cards)
 
-      system_actions = add_coverage_cards(selected_response_types, cards, request_body, hook_name,
-                                          update_resource_name, resource_type)
+      system_actions = add_coverage_cards(cards)
 
-      cards.append(get_card_json('instructions.json')) if selected_response_types.include?('instructions') ||
-                                                          (cards.empty? && system_actions.nil?)
+      cards.append(load_json_file('instructions.json')) if selected_response_types.include?('instructions') ||
+                                                           (cards.empty? && system_actions.nil?)
       cards_response = { 'cards' => cards }
       cards_response['systemActions'] = system_actions if system_actions.present?
       cards_response
@@ -214,53 +214,50 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def add_order_hook_cards(selected_response_types, cards, request_body, hook_name)
-      if selected_response_types.include?('companions_prerequisites')
-        cards.append(create_companions_prerequisites_card(request_body['context']))
-      end
+    def add_order_hook_cards(cards)
+      cards.append(create_companions_prerequisites_card) if selected_response_types.include?('companions_prerequisites')
 
       return unless selected_response_types.include?('propose_alternate_request')
 
-      cards.append(create_alternate_request_card(request_body, hook_name))
+      cards.append(create_alternate_request_card)
     end
 
-    def add_basic_cards(selected_response_types, cards, context)
-      cards.append(create_form_completion_card(context)) if selected_response_types.include?('request_form_completion')
-      cards.append(get_card_json('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
-      cards.append(get_card_json('external_reference.json')) if selected_response_types.include?('external_reference')
+    def add_basic_cards(cards)
+      cards.append(create_form_completion_card) if selected_response_types.include?('request_form_completion')
+      cards.append(load_json_file('launch_smart_app.json')) if selected_response_types.include?('launch_smart_app')
+      cards.append(load_json_file('external_reference.json')) if selected_response_types.include?('external_reference')
     end
 
-    def add_coverage_cards(selected_response_types, cards, request_body, hook_name, update_resource_name,
-                           resource_type = nil)
-      return unless add_coverage_cards?(selected_response_types, hook_name)
+    def add_coverage_cards(cards)
+      return unless add_coverage_cards?
 
-      coverage = get_patient_coverage(request_body)
+      coverage = get_patient_coverage
       if coverage.present?
-        if selected_response_types.include?('coverage_information') ||
-           coverage_information_required_hooks.include?(hook_name)
-          system_actions = create_coverage_extension_system_actions(request_body, update_resource_name,
-                                                                    coverage.id, resource_type)
+        if selected_response_types.include?('coverage_information') || coverage_information_required?
+          system_actions =
+            create_coverage_extension_system_actions(coverage.id)
         end
 
         if selected_response_types.include?('create_update_coverage_info')
-          cards.append(create_or_update_coverage(coverage, request_body['context']))
+          cards.append(create_or_update_coverage(coverage))
         end
       end
       system_actions
     end
 
-    def create_coverage_extension_system_actions(request_body, update_resource_name, coverage_id, resource_type = nil)
-      context = request_body['context']
-      update_resource = context[update_resource_name]
-      prefetch_id = update_resource_name.split(/(?=[A-Z])/).first
+    def create_coverage_extension_system_actions(coverage_id)
+      update_resource = context[resource_to_update_field_name]
+      prefetch_id = resource_to_update_field_name.split(/(?=[A-Z])/).first
 
-      fhir_resource = if update_resource.is_a? Hash
-                        FHIR.from_contents(update_resource.to_json)
-                      elsif request_body['prefetch'] && request_body['prefetch'][prefetch_id]
-                        FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
-                      else
-                        get_context_resource(request_body, resource_type, update_resource)
-                      end
+      fhir_resource =
+        if update_resource.is_a? Hash
+          FHIR.from_contents(update_resource.to_json)
+        elsif request_body['prefetch'] && request_body['prefetch'][prefetch_id]
+          FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
+        else
+          get_context_resource(update_resource)
+        end
+
       create_system_actions(fhir_resource, coverage_id)
     rescue StandardError
       nil
@@ -274,16 +271,23 @@ module DaVinciCRDTestKit
         resource.entry.each do |entry|
           entry_resource = entry.resource
           add_coverage_extension(entry_resource, coverage_id)
-          system_actions.append({ 'type' => 'update',
-                                  'description' =>
-                                  "Added coverage information to #{entry_resource.resourceType} resource.",
-                                  'resource' => entry_resource })
+          system_actions.append(
+            {
+              'type' => 'update',
+              'description' => "Added coverage information to #{entry_resource.resourceType} resource.",
+              'resource' => entry_resource
+            }
+          )
         end
       else
         add_coverage_extension(resource, coverage_id)
-        system_actions.append({ 'type' => 'update',
-                                'description' => "Added coverage information to #{resource.resourceType} resource.",
-                                'resource' => resource })
+        system_actions.append(
+          {
+            'type' => 'update',
+            'description' => "Added coverage information to #{resource.resourceType} resource.",
+            'resource' => resource
+          }
+        )
       end
       system_actions
     end
@@ -344,28 +348,31 @@ module DaVinciCRDTestKit
       )
     end
 
-    def create_or_update_coverage(coverage, context)
+    def create_or_update_coverage(coverage)
       return if context.nil?
 
       if coverage.present?
         action = { 'type' => 'update', 'description' => 'Update current coverage record' }
-        coverage.period = FHIR::Period.new(start: current_time.strftime('%Y-%m-%d'),
-                                           end: (current_time + 1.month).strftime('%Y-%m-%d'))
+        coverage.period =
+          FHIR::Period.new(
+            start: current_time.strftime('%Y-%m-%d'),
+            end: (current_time + 1.month).strftime('%Y-%m-%d')
+          )
         action['resource'] = coverage
       else
         action = { 'type' => 'create', 'description' => 'Create coverage record' }
         new_coverage = create_coverage_resource(context['patientId'])
         action['resource'] = new_coverage
       end
-      coverage_info_card = get_card_json('create_update_coverage_information.json')
+      coverage_info_card = load_json_file('create_update_coverage_information.json')
       coverage_info_card['suggestions'][0]['actions'] = [action]
       coverage_info_card
     end
 
-    def create_form_completion_card(context)
+    def create_form_completion_card
       return if context.nil?
 
-      request_form_completion_card = get_card_json('request_form_completion.json')
+      request_form_completion_card = load_json_file('request_form_completion.json')
       form_completion_task = request_form_completion_card['suggestions'][0]['actions'].find do |action|
         action['resource']['resourceType'] == 'Task'
       end['resource']
@@ -375,7 +382,7 @@ module DaVinciCRDTestKit
       request_form_completion_card
     end
 
-    def update_service_request(service_request, context)
+    def update_service_request(service_request)
       return if context.nil?
 
       service_request['subject']['reference'] = "Patient/#{context['patientId']}"
@@ -383,23 +390,22 @@ module DaVinciCRDTestKit
       service_request['authoredOn'] = current_time.strftime('%Y-%m-%d')
     end
 
-    def create_companions_prerequisites_card(context)
+    def create_companions_prerequisites_card
       return if context.nil?
 
-      companions_prerequisites_card = get_card_json('companions_prerequisites.json')
+      companions_prerequisites_card = load_json_file('companions_prerequisites.json')
       card_service_request = companions_prerequisites_card['suggestions'][0]['actions'][0]['resource']
-      update_service_request(card_service_request, context)
+      update_service_request(card_service_request)
       companions_prerequisites_card
     end
 
-    def create_alternate_request_card(request_body, hook_name)
-      context = request_body['context']
+    def create_alternate_request_card
       return if context.nil?
 
-      propose_alternate_request_card = get_card_json('propose_alternate_request.json')
+      propose_alternate_request_card = load_json_file('propose_alternate_request.json')
 
       if hook_name == 'order-dispatch'
-        order_resource = get_context_resource(request_body, nil, context['order'])
+        order_resource = get_context_resource(context['order'])
       else
         draft_orders = context['draftOrders']['entry']
         draft_order_resource = draft_orders[0]['resource']
