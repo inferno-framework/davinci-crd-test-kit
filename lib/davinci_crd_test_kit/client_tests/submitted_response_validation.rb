@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
     end
 
     def validate_system_actions(system_actions)
-      return if system_actions.blank?
+      return if system_actions.nil?
 
       system_actions.each do |action|
         action_fields_validation(action)
@@ -37,6 +37,8 @@ module DaVinciCRDTestKit
       perform_cards_validation(custom_response_hash['cards'])
 
       validate_system_actions(custom_response_hash['systemActions'])
+
+      no_error_validation('Custom response is not valid. Check messages for issues found.')
     end
   end
 end
