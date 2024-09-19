@@ -1,3 +1,3 @@
 module DaVinciCRDTestKit
-  VERSION = '0.9.0'.freeze
+  VERSION = '0.9.1.rc'.freeze
 end
