@@ -1,7 +1,8 @@
 RSpec.describe DaVinciCRDTestKit::ServiceCallTest do
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
+  let(:suite_id) { 'crd_server' }
+  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
   let(:runnable) do
     Class.new(DaVinciCRDTestKit::ServiceCallTest) do
       input :inferno_base_url

@@ -1,7 +1,8 @@
 RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionReceivedTest do
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_coverage_info_system_action_received') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
+  let(:suite_id) { 'crd_server' }
+  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
   let(:coverage_info_system_action) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(json)['systemActions'].first
