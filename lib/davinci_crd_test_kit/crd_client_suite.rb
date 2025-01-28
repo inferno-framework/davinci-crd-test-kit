@@ -6,7 +6,6 @@ require_relative 'urls'
 require_relative 'crd_options'
 require_relative 'routes/hook_request_endpoint'
 require_relative 'ext/inferno_core/runnable'
-require_relative 'version'
 
 module DaVinciCRDTestKit
   class CRDClientSuite < Inferno::TestSuite
@@ -82,8 +81,6 @@ module DaVinciCRDTestKit
       to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
       Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
     SUMMARY
-
-    version VERSION
 
     links [
       {
