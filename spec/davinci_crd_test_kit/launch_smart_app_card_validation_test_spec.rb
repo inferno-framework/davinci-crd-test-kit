@@ -1,27 +1,11 @@
 RSpec.describe DaVinciCRDTestKit::LaunchSmartAppCardValidationTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_launch_smart_app_card_validation') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:suite_id) { 'crd_server' }
+  let(:suite_id) { 'crd_client' }
+  let(:runnable) { described_class }
   let(:valid_cards) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'valid_cards.json'))
     JSON.parse(json)
   end
   let(:valid_cards_with_links) { valid_cards.filter { |card| card['links'].present? } }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   it 'passes if cards contain a valid Launch SMART App card' do
     result = run(runnable, valid_cards_with_links: valid_cards_with_links.to_json)

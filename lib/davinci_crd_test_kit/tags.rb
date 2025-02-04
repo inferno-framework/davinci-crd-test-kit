@@ -5,4 +5,6 @@ module DaVinciCRDTestKit
   ORDER_DISPATCH_TAG = 'order-dispatch'.freeze
   ORDER_SELECT_TAG = 'order-select'.freeze
   ORDER_SIGN_TAG = 'order-sign'.freeze
+  DISCOVERY_TAG = 'cds_discovery'.freeze
+  ANY_HOOK_TAG = 'any_hook'.freeze
 end

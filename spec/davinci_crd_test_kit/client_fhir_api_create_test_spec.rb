@@ -1,10 +1,7 @@
 require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_create_test'
 
 RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
-
+  let(:suite_id) { 'crd_client' }
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:client_smart_credentials) do
     {
@@ -67,20 +64,6 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
   end
 
   let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   describe 'Task FHIR Create Test' do
     let(:test) do

@@ -1,8 +1,7 @@
 RSpec.describe DaVinciCRDTestKit::CardOptionalFieldsValidationTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_card_optional_fields_validation') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'crd_client' }
+  let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:suite_id) { 'crd_server' }
   let(:valid_cards) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'valid_cards.json'))
     JSON.parse(json)
@@ -11,20 +10,6 @@ RSpec.describe DaVinciCRDTestKit::CardOptionalFieldsValidationTest do
   let(:override_reasons_required_fields) { ['code', 'system', 'display'] }
   let(:suggestions_required_fields) { ['label'] }
   let(:actions_required_fields) { ['type', 'description'] }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   def entity_result_messages
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])

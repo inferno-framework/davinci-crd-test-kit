@@ -1,16 +1,9 @@
 require_relative '../../lib/davinci_crd_test_kit/client_tests/order_sign_receive_request_test'
-require_relative '../request_helper'
 
-RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest do
-  include Rack::Test::Methods
-  include RequestHelpers
-
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
-  let(:test) { Inferno::Repositories::Tests.new.find('crd_order_sign_request') }
-  let(:test_group) { Inferno::Repositories::TestGroups.new.find('crd_client_hooks') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest, :request do
+  let(:suite_id) { 'crd_client' }
+  let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
 
   let(:example_client_url) { 'https://cds.example.org' }
@@ -44,23 +37,7 @@ RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest do
     bundle
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do
-    allow(test).to receive_messages(suite:, parent: test_group)
-
     token = jwt_helper.build(
       aud: order_sign_url,
       iss: example_client_url,

@@ -2,9 +2,7 @@ require_relative '../../lib/davinci_crd_test_kit/client_tests/token_payload_test
 require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
 
 RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
-  let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
+  let(:suite_id) { 'crd_client' }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_token_payload') }
@@ -37,20 +35,6 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
       exp: 5.minutes.from_now.to_i,
       jti: SecureRandom.hex(32)
     }
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   def entity_result_message

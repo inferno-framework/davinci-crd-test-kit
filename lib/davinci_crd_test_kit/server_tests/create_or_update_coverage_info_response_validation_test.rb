@@ -1,10 +1,12 @@
 require_relative '../test_helper'
 require_relative '../suggestion_actions_validation'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class CreateOrUpdateCoverageInfoResponseValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid Create or Update Coverage Information cards or system actions received'
     id :crd_create_or_update_coverage_info_response_validation
@@ -29,10 +31,6 @@ module DaVinciCRDTestKit
     optional
     input :valid_cards_with_suggestions, :valid_system_actions
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     def coverage_actions(actions)
       return [] if actions.nil?
 
@@ -53,7 +51,7 @@ module DaVinciCRDTestKit
       create_or_update_coverage_info_cards = parsed_cards.filter { |card| create_or_update_coverage_info_card?(card) }
       create_or_update_coverage_info_actions = coverage_actions(parsed_actions)
 
-      skip_msg = "#{hook_name} hook response does not contain any Create or Update Coverage Information " \
+      skip_msg = "#{tested_hook_name} hook response does not contain any Create or Update Coverage Information " \
                  'cards or system actions.'
       skip_if create_or_update_coverage_info_cards.blank? && create_or_update_coverage_info_actions.blank?, skip_msg
 

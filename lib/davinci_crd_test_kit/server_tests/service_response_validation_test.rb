@@ -1,8 +1,10 @@
 require_relative '../cards_validation'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class ServiceResponseValidationTest < Inferno::Test
     include DaVinciCRDTestKit::CardsValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'All service responses contain valid cards and optional systemActions'
     id :crd_service_response_validation
@@ -14,13 +16,10 @@ module DaVinciCRDTestKit
       Each card must contain the following required fields: `summary`, `indicator`, and `source`.
       The required fields must have a valid data structure.
     )
+    input :invoked_hook
     output :valid_cards, :valid_system_actions
 
     SYSTEM_ACTIONS_HOOK_NAMES = ['appointment-book', 'order-sign'].freeze
-
-    def hook_name
-      config.options[:hook_name]
-    end
 
     def valid_cards
       @valid_cards ||= []
@@ -39,9 +38,9 @@ module DaVinciCRDTestKit
     end
 
     def perform_system_actions_validation(system_actions, response_index)
-      if SYSTEM_ACTIONS_HOOK_NAMES.include?(hook_name) && system_actions.nil?
+      if SYSTEM_ACTIONS_HOOK_NAMES.include?(invoked_hook) && system_actions.nil?
         msg = "Server response #{response_index + 1} did not have `systemActions` field." \
-              "Must be present for #{hook_name}."
+              "Must be present for #{invoked_hook}."
         add_message('error', msg)
       end
       return if system_actions.nil?
@@ -54,8 +53,8 @@ module DaVinciCRDTestKit
     end
 
     run do
-      load_tagged_requests(hook_name)
-      skip_if requests.blank?, "No #{hook_name} request was made in a previous test as expected."
+      load_tagged_requests(tested_hook_name)
+      skip_if requests.blank?, "No #{tested_hook_name} request was made in a previous test as expected."
       successful_requests = requests.select { |request| request.status == 200 }
       skip_if successful_requests.empty?, 'All service requests were unsuccessful.'
 

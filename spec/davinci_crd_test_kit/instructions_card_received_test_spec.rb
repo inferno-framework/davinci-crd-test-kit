@@ -1,24 +1,9 @@
 RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_valid_instructions_card_received') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:suite_id) { 'crd_server' }
+  let(:suite_id) { 'crd_client' }
+  let(:runnable) { described_class }
   let(:cards) do
     response_body = File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(response_body)['cards']
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   it 'passes if cards contain an Instructions card' do

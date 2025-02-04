@@ -2,10 +2,9 @@ require_relative '../../lib/davinci_crd_test_kit/client_tests/hook_request_optio
 require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
 
 RSpec.describe DaVinciCRDTestKit::HookRequestOptionalFieldsTest do
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_hook_request_optional_fields') }
   let(:suite_id) { 'crd_client' }
+  let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:runnable) { described_class }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
@@ -21,20 +20,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestOptionalFieldsTest do
               ))
   end
   let(:appointment_book_hook_request_hash) { JSON.parse(appointment_book_hook_request) }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   def create_appointment_hook_request(url: appointment_book_url, body: nil, status: 200, headers: nil, auth_header: nil)
     headers ||= [

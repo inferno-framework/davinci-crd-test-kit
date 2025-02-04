@@ -49,11 +49,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_dispatch_service_ids,
-               title: 'Service id for the service that invokes `order-dispatch` hook'
+               title: 'Service id for the service that implements the `order-dispatch` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :order_dispatch_request_bodies,
-               title: 'Request bodies collection to use to invoke the `order-dispatch` hook'
+               title: 'Request body or bodies for invoking the `order-dispatch` hook'
              }
            }
          }

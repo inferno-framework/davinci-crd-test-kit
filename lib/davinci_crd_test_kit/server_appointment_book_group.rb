@@ -49,11 +49,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :appointment_book_service_ids,
-               title: 'Service id for the service that invokes `appointment-book` hook'
+               title: 'Service id for the service that implements the `appointment-book` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :appointment_book_request_bodies,
-               title: 'Request bodies collection to use to invoke the `appointment-book` hook'
+               title: 'Request body or bodies for invoking the `appointment-book` hook'
              }
            }
          }

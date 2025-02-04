@@ -1,8 +1,7 @@
 RSpec.describe DaVinciCRDTestKit::ProposeAlternateRequestCardValidationTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_propose_alternate_request_card_validation') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'crd_client' }
+  let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:suite_id) { 'crd_server' }
   let(:order_select_context) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'order_select_context.json'))
     JSON.parse(json)
@@ -12,20 +11,6 @@ RSpec.describe DaVinciCRDTestKit::ProposeAlternateRequestCardValidationTest do
     JSON.parse(json)
   end
   let(:cards_with_suggestions) { valid_cards.filter { |card| card['suggestions'].present? } }
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
 
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])

@@ -1,11 +1,9 @@
 require_relative '../../lib/davinci_crd_test_kit/client_tests/token_header_test'
 
 RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
-  let(:test) { Inferno::Repositories::Tests.new.find('crd_token_header') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:suite_id) { 'crd_client' }
+  let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_token_header') }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
@@ -21,22 +19,8 @@ RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
     }
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   def entity_result_message
-    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [test])
       .first
       .messages
       .first

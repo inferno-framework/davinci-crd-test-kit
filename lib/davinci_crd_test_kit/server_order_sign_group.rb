@@ -55,11 +55,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_sign_service_ids,
-               title: 'Service id for the service that invokes `order-sign` hook'
+               title: 'Service id for the service that implements the `order-sign` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :order_sign_request_bodies,
-               title: 'Request bodies collection to use to invoke the `order-sign` hook'
+               title: 'Request body or bodies for invoking the `order-sign` hook'
              }
            }
          }
