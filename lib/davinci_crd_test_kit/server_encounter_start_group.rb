@@ -43,11 +43,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :encounter_start_service_ids,
-               title: 'Service id for the service that invokes `encounter-start` hook'
+               title: 'Service id for the service that implements the `encounter-start` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :encounter_start_request_bodies,
-               title: 'Request bodies collection to use to invoke the `encounter-start` hook'
+               title: 'Request body or bodies for invoking the `encounter-start` hook'
              }
            }
          }

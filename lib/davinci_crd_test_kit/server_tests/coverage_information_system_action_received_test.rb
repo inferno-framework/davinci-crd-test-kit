@@ -1,7 +1,10 @@
 require_relative '../test_helper'
+require_relative '../server_hook_helper'
+
 module DaVinciCRDTestKit
   class CoverageInformationSystemActionReceivedTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Coverage Information system action was received'
     id :crd_coverage_info_system_action_received
@@ -15,12 +18,8 @@ module DaVinciCRDTestKit
       - Then, among the target actions, checking if their resource has the [coverage-information extension](http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information).
     )
 
-    input :valid_system_actions
+    input :valid_system_actions, :invoked_hook
     output :coverage_info
-
-    def hook_name
-      config.options[:hook_name]
-    end
 
     def resources_by_hook
       shared_resources = [
@@ -39,7 +38,7 @@ module DaVinciCRDTestKit
 
     run do
       parsed_actions = parse_json(valid_system_actions)
-      target_resources = resources_by_hook[hook_name]
+      target_resources = resources_by_hook[invoked_hook]
 
       target_actions = parsed_actions.select do |action|
         resource = FHIR.from_contents(action['resource'].to_json)
@@ -53,7 +52,7 @@ module DaVinciCRDTestKit
       end
 
       assert coverage_info_system_actions.present?,
-             "Coverage Information system action was not returned in the #{hook_name} hook response."
+             "Coverage Information system action was not returned in the #{tested_hook_name} hook response."
 
       output coverage_info: coverage_info_system_actions.to_json
     end

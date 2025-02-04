@@ -1,6 +1,7 @@
 require_relative 'jwt_helper'
 require_relative 'routes/jwk_set_endpoint_handler'
 require_relative 'server_discovery_group'
+require_relative 'server_demonstrate_hook_response_group'
 require_relative 'server_hooks_group'
 require_relative 'version'
 
@@ -14,12 +15,14 @@ module DaVinciCRDTestKit
       Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
 
       ## Overview
-      This suite contains two groups of tests. The Discovery group validates a
-      CRD server's discovery response. The Hooks group makes CDS Hooks calls to
-      the server and validates the responses. By default, the hook requests are
-      based on examples from the CDS Hooks specification, but testers can
-      replace these with request bodies to elicit a particular response from
-      their system.
+      This suite contains three groups of tests:
+      1. The *Discovery* group validates a CRD server's discovery response.
+      2. The *Demonstrate A Hook Response* group validates that the server
+         can respond to a single hook invocation and return conformant cards.
+      3. The *Hooks* group makes one or more CDS Hooks calls for each hook
+         type that the tester provides request bodies for. It then validates that the
+         responses are conformant and cover the full range of cards as
+         required by the hook type.
 
       ## Trusting CDS Clients
       As specified in the [CDS Hooks Spec](https://cds-hooks.hl7.org/2.0/#trusting-cds-clients),
@@ -109,6 +112,8 @@ module DaVinciCRDTestKit
     route :get, '/jwks.json', Routes::JWKSetEndpointHandler
 
     group from: :crd_server_discovery_group
+
+    group from: :crd_server_demonstrate_hook_response
 
     group from: :crd_server_hooks
   end

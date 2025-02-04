@@ -1,4 +1,5 @@
 RSpec.describe DaVinciCRDTestKit::ExternalReferenceCardAcrossHooksValidationTest do
+  let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
     id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \
          '-crd_external_reference_card_across_hooks_validation'
@@ -18,6 +19,8 @@ RSpec.describe DaVinciCRDTestKit::ExternalReferenceCardAcrossHooksValidationTest
   let(:external_ref_card) { cards.find { |card| card['links'].present? } }
   let(:base_url) { 'http://example.com' }
 
+  # TODO: replace with inferno core version, but need to get inputs
+  # right in the test invocations below first.
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)

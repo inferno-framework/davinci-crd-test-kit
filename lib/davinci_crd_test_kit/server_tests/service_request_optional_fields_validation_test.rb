@@ -1,8 +1,10 @@
 require_relative '../server_hook_request_validation'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class ServiceRequestOptionalFieldsValidationTest < Inferno::Test
     include DaVinciCRDTestKit::ServerHookRequestValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'All service requests contain optional fields'
     id :crd_service_request_optional_fields_validation
@@ -15,13 +17,9 @@ module DaVinciCRDTestKit
     )
     optional
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     run do
-      load_tagged_requests(hook_name)
-      skip_if requests.empty?, "No #{hook_name} request was made in a previous test as expected."
+      load_tagged_requests(tested_hook_name)
+      skip_if requests.empty?, "No #{tested_hook_name} request was made in a previous test as expected."
 
       requests.each_with_index do |request, index|
         @request_number = index + 1

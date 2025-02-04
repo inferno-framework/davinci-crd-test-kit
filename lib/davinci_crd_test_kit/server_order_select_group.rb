@@ -49,11 +49,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_select_service_ids,
-               title: 'Service id for the service that invokes `order-select` hook'
+               title: 'Service id for the service that implements the `order-select` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :order_select_request_bodies,
-               title: 'Request bodies collection to use to invoke the `order-select` hook'
+               title: 'Request body or bodies for invoking the `order-select` hook'
              }
            }
          }

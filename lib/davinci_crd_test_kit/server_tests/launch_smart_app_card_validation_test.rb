@@ -1,8 +1,10 @@
 require_relative '../test_helper'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class LaunchSmartAppCardValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid Launch SMART Application cards received'
     id :crd_launch_smart_app_card_validation
@@ -21,10 +23,6 @@ module DaVinciCRDTestKit
     optional
     input :valid_cards_with_links
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     run do
       parsed_cards = parse_json(valid_cards_with_links)
       external_reference_cards = parsed_cards.select do |card|
@@ -32,7 +30,8 @@ module DaVinciCRDTestKit
         links.present? && links.all? { |link| link['type'] == 'smart' }
       end
 
-      skip_if external_reference_cards.blank?, "#{hook_name} hook response does not contain any Launch SMART App cards."
+      skip_if external_reference_cards.blank?,
+              "#{tested_hook_name} hook response does not contain any Launch SMART App cards."
     end
   end
 end

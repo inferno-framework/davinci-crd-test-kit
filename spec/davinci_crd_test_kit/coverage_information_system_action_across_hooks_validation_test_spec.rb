@@ -1,4 +1,5 @@
 RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionAcrossHooksValidationTest do
+  let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
     id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \
          '-crd_coverage_info_system_action_across_hooks_validation'
@@ -17,6 +18,8 @@ RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionAcrossHooksVali
   let(:valid_coverage_info_system_action) { JSON.parse(valid_response_body)['systemActions'].first }
   let(:base_url) { 'http://example.com/' }
 
+  # TODO: replace with inferno core version, but need to get inputs
+  # right in the test invocations below first.
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
@@ -32,7 +35,6 @@ RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionAcrossHooksVali
   end
 
   before do
-    allow_any_instance_of(runnable_within).to receive(:hook_name).and_return('appointment-book')
     allow_any_instance_of(runnable_within).to receive(:assert_valid_resource).and_return(true)
   end
 

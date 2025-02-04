@@ -1,29 +1,13 @@
 RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionValidationTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_coverage_info_system_action_validation') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'crd_server' }
+  let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
   let(:valid_coverage_info_system_action) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(json)['systemActions'].first
   end
 
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   before do
-    allow_any_instance_of(runnable).to receive(:hook_name).and_return('appointment-book')
     allow_any_instance_of(runnable).to receive(:assert_valid_resource).and_return(true)
   end
 

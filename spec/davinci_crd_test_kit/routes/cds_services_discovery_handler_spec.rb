@@ -1,6 +1,6 @@
 require 'request_helper'
 
-RSpec.describe DaVinciCRDTestKit::Routes::CDSServicesDiscoveryHandler do
+RSpec.describe DaVinciCRDTestKit::Routes::CDSServicesDiscoveryHandler, :request do
   let(:router) { Inferno::Web::Router }
 
   describe 'GET /cds-services' do

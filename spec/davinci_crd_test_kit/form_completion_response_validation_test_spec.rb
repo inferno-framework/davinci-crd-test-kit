@@ -1,8 +1,7 @@
 RSpec.describe DaVinciCRDTestKit::FormCompletionResponseValidationTest do
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_request_form_completion_response_validation') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:suite_id) { 'crd_client' }
+  let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
   let(:valid_cards) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'valid_cards.json'))
     JSON.parse(json)
@@ -11,20 +10,6 @@ RSpec.describe DaVinciCRDTestKit::FormCompletionResponseValidationTest do
   let(:valid_system_actions) do
     cards_with_suggestions.filter { |card| card['summary'].include?('Request Form Completion') }
       .flat_map { |card| card['suggestions'].flat_map { |suggestion| suggestion['actions'] } }
-  end
-
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name:,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
   end
 
   def entity_result_message

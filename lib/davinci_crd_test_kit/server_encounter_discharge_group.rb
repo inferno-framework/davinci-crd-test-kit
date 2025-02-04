@@ -43,11 +43,12 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :encounter_discharge_service_ids,
-               title: 'Service id for the service that invokes `encounter-discharge` hook'
+               title: 'Service id for the service that implements the `encounter-discharge` hook',
+               optional: true
              },
              service_request_bodies: {
                name: :encounter_discharge_request_bodies,
-               title: 'Request bodies collection to use to invoke the `encounter-discharge` hook'
+               title: 'Request body or bodies for invoking the `encounter-discharge` hook'
              }
            }
          }

@@ -1,8 +1,10 @@
 require_relative '../test_helper'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class ExternalReferenceCardValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid External Reference cards received'
     id :crd_external_reference_card_validation
@@ -19,10 +21,6 @@ module DaVinciCRDTestKit
     input :valid_cards_with_links
     optional
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     run do
       parsed_cards = parse_json(valid_cards_with_links)
       external_reference_cards = parsed_cards.select do |card|
@@ -30,7 +28,8 @@ module DaVinciCRDTestKit
         links.present? && links.all? { |link| link['type'] == 'absolute' }
       end
 
-      assert external_reference_cards.present?, "#{hook_name} hook response did not contain an External Reference card."
+      assert external_reference_cards.present?,
+             "#{tested_hook_name} hook response did not contain an External Reference card."
     end
   end
 end

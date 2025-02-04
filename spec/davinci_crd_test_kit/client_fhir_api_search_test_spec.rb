@@ -2,8 +2,6 @@ require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_se
 
 RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
   let(:suite) { Inferno::Repositories::TestSuites.new.find('crd_client') }
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
 
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:ehr_smart_credentials) do
@@ -214,6 +212,11 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
   let(:empty_bundle) do
     FHIR::Bundle.new(type: 'searchset')
   end
+
+  # TODO: replace with inferno core version, but need to get inputs
+  # right in the test invocations below first.
+  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
+  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
 
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
