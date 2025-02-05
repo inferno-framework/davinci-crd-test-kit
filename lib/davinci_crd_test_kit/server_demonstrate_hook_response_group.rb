@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
              },
              service_request_bodies: {
                name: :any_hook_request_body,
-               title: 'Request body to use tfor the "Demonstrate a Hook Response" test',
+               title: 'Request body to use for the "Demonstrate a Hook Response" test',
                description: %(
                 Provide a single JSON request body to submit for the hook invocation. The type of hook invoked
                 will be inferred based on the `hook` element in the request.
