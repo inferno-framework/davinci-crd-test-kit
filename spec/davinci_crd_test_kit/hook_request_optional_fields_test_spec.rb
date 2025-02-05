@@ -6,7 +6,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestOptionalFieldsTest do
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_hook_request_optional_fields') }
   let(:suite_id) { 'crd_client' }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 

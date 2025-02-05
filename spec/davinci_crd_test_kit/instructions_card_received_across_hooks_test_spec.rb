@@ -10,7 +10,6 @@ RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
   end
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:suite_id) { 'crd_server' }
-  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end
