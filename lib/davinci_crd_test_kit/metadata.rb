@@ -66,7 +66,7 @@ module DaVinciCRDTestKit
     DESCRIPTION
     suite_ids [:crd_client, :crd_server]
     tags ['Da Vinci', 'CRD']
-    last_updated '2025-01-28'
+    last_updated LAST_UPDATED
     version VERSION
     maturity 'Low'
     authors ['Stephen MacVicar', 'Vanessa Fotso', 'Emily Michaud']
