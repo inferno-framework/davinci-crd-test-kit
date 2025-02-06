@@ -11,6 +11,7 @@ require_relative 'server_tests/service_request_context_validation_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/launch_smart_app_card_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerAppointmentBookGroup < Inferno::TestGroup
@@ -41,7 +42,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'appointment-book' }
+    config options: { hook_name: APPOINTMENT_BOOK_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -49,8 +50,7 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :appointment_book_service_ids,
-               title: 'Service id for the service that implements the `appointment-book` hook',
-               optional: true
+               title: 'Service id for the service that implements the `appointment-book` hook'
              },
              service_request_bodies: {
                name: :appointment_book_request_bodies,

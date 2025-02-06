@@ -9,6 +9,7 @@ require_relative 'server_tests/launch_smart_app_card_validation_test'
 require_relative 'server_tests/instructions_card_received_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerEncounterStartGroup < Inferno::TestGroup
@@ -35,7 +36,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'encounter-start' }
+    config options: { hook_name: ENCOUNTER_START_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -43,8 +44,7 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :encounter_start_service_ids,
-               title: 'Service id for the service that implements the `encounter-start` hook',
-               optional: true
+               title: 'Service id for the service that implements the `encounter-start` hook'
              },
              service_request_bodies: {
                name: :encounter_start_request_bodies,

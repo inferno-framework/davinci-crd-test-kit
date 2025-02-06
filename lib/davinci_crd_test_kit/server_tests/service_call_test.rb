@@ -1,4 +1,5 @@
 require_relative '../server_hook_helper'
+require_relative '../tags'
 
 module DaVinciCRDTestKit
   class ServiceCallTest < Inferno::Test
@@ -69,7 +70,7 @@ module DaVinciCRDTestKit
       assert_valid_json(service_request_bodies)
 
       payloads = [JSON.parse(service_request_bodies)].flatten
-      skip_if tested_hook_name == 'any' && payloads.length != 1,
+      skip_if tested_hook_name == ANY_HOOK_TAG && payloads.length != 1,
               'The *Demonstrate a Hook Invocation* test supports only one request body.'
       invoked_hook = identify_hook(payloads)
       service_id = target_service_id(service_ids, invoked_hook)

@@ -103,7 +103,7 @@ RSpec.describe DaVinciCRDTestKit::ServiceCallTest do
     end
 
     before do
-      allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('any')
+      allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return(DaVinciCRDTestKit::ANY_HOOK_TAG)
     end
 
     it 'only allows a single request' do

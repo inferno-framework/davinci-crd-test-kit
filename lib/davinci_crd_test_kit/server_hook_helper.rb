@@ -1,3 +1,5 @@
+require_relative 'tags'
+
 module DaVinciCRDTestKit
   module ServerHookHelper
     # configured hook
@@ -9,7 +11,7 @@ module DaVinciCRDTestKit
 
     # identify the hook to invoke
     def identify_hook(payloads)
-      if tested_hook_name == 'any'
+      if tested_hook_name == ANY_HOOK_TAG
         hook_list_from_payloads = payloads.map { |body| body['hook'] }.uniq
 
         assert hook_list_from_payloads.length == 1,
