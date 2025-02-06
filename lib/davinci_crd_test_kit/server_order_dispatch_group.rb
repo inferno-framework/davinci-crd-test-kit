@@ -11,6 +11,7 @@ require_relative 'server_tests/coverage_information_system_action_received_test'
 require_relative 'server_tests/coverage_information_system_action_validation_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerOrderDispatchGroup < Inferno::TestGroup
@@ -41,7 +42,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'order-dispatch' }
+    config options: { hook_name: ORDER_DISPATCH_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -49,8 +50,7 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_dispatch_service_ids,
-               title: 'Service id for the service that implements the `order-dispatch` hook',
-               optional: true
+               title: 'Service id for the service that implements the `order-dispatch` hook'
              },
              service_request_bodies: {
                name: :order_dispatch_request_bodies,

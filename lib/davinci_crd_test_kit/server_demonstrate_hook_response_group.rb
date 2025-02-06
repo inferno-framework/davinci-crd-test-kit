@@ -11,9 +11,10 @@ require_relative 'server_tests/coverage_information_system_action_received_test'
 require_relative 'server_tests/coverage_information_system_action_validation_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
-  class ServeDemonstrateHookResponseGroup < Inferno::TestGroup
+  class ServerDemonstrateHookResponseGroup < Inferno::TestGroup
     title 'Demonstrate A Hook Response'
     id :crd_server_demonstrate_hook_response
     description %(
@@ -25,7 +26,7 @@ module DaVinciCRDTestKit
       and the [CDS Hooks](https://cds-hooks.hl7.org/) hook specification for the corresponding hook.
     )
 
-    config options: { hook_name: 'any' }
+    config options: { hook_name: ANY_HOOK_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -38,8 +39,7 @@ module DaVinciCRDTestKit
                 If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
                 Discovery response for the hook indicated in the provided request body. If it cannot be inferred,
                 the tests will be skipped.
-               ),
-               optional: true
+               )
              },
              service_request_bodies: {
                name: :any_hook_request_body,
