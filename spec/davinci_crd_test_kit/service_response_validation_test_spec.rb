@@ -2,7 +2,7 @@ RSpec.describe DaVinciCRDTestKit::ServiceResponseValidationTest do
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_service_response_validation') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
+  let(:suite_id) { 'crd_server' }
   let(:discovery_url) { 'http://example.com/cds-services' }
   let(:service_id) { 'service_id' }
   let(:valid_response_body_json) do

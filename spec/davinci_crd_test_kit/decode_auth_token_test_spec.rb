@@ -3,7 +3,7 @@ require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
 
 RSpec.describe DaVinciCRDTestKit::DecodeAuthTokenTest do
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_client') }
+  let(:suite_id) { 'crd_client' }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }

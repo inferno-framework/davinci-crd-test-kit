@@ -2,7 +2,7 @@ RSpec.describe DaVinciCRDTestKit::ExternalReferenceCardValidationTest do
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_external_reference_card_validation') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
+  let(:suite_id) { 'crd_server' }
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end

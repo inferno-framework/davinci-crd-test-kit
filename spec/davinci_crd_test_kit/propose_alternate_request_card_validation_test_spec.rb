@@ -2,7 +2,7 @@ RSpec.describe DaVinciCRDTestKit::ProposeAlternateRequestCardValidationTest do
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_propose_alternate_request_card_validation') }
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:test_session) { repo_create(:test_session, test_suite_id: 'crd_server') }
+  let(:suite_id) { 'crd_server' }
   let(:order_select_context) do
     json = File.read(File.join(__dir__, '..', 'fixtures', 'order_select_context.json'))
     JSON.parse(json)

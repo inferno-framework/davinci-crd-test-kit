@@ -2,7 +2,6 @@ require_relative 'jwt_helper'
 require_relative 'routes/jwk_set_endpoint_handler'
 require_relative 'server_discovery_group'
 require_relative 'server_hooks_group'
-require_relative 'version'
 
 module DaVinciCRDTestKit
   class CRDServerSuite < Inferno::TestSuite
@@ -72,8 +71,6 @@ module DaVinciCRDTestKit
       to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
       Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
     SUMMARY
-
-    version VERSION
 
     links [
       {
