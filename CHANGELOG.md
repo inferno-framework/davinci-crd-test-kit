@@ -1,3 +1,7 @@
+# 0.11.0
+* FI-3648: Add Spec for Shared Tests and Implement Features for the Failing Tests by @vanessuniq in https://github.com/inferno-framework/davinci-crd-test-kit/pull/14
+* Fi 3718 hook demonstration test by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/15
+
 # 0.10.0
 * FI-3410: Update inferno core requirement by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/11
 
