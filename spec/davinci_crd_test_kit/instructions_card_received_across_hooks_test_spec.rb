@@ -1,4 +1,5 @@
 RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
+  let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
     id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \
          '-crd_valid_instructions_card_received_across_hooks'
@@ -9,7 +10,6 @@ RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
       .find('crd_server-crd_server_hooks-crd_server_order_dispatch-crd_valid_instructions_card_received')
   end
   let(:session_data_repo) { Inferno::Repositories::SessionData.new }
-  let(:suite_id) { 'crd_server' }
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end
@@ -18,6 +18,8 @@ RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
   end
   let(:base_url) { 'http://example.com/' }
 
+  # TODO: replace with inferno core version, but need to get inputs
+  # right in the test invocations below first.
   def run(runnable, inputs = {})
     test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
     test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)

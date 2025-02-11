@@ -78,7 +78,7 @@ module DaVinciCRDTestKit
         )
         headers['Authorization'] = "Bearer #{token}"
       end
-      get(discovery_url, headers:)
+      get(discovery_url, headers:, tags: [DISCOVERY_TAG])
       assert_response_status(200)
       assert_valid_json(request.response_body)
 

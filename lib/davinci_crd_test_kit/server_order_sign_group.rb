@@ -13,6 +13,7 @@ require_relative 'server_tests/propose_alternate_request_card_validation_test'
 require_relative 'server_tests/additional_orders_validation_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerOrderSignGroup < Inferno::TestGroup
@@ -47,7 +48,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'order-sign' }
+    config options: { hook_name: ORDER_SIGN_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -55,11 +56,11 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_sign_service_ids,
-               title: 'Service id for the service that invokes `order-sign` hook'
+               title: 'Service id for the service that implements the `order-sign` hook'
              },
              service_request_bodies: {
                name: :order_sign_request_bodies,
-               title: 'Request bodies collection to use to invoke the `order-sign` hook'
+               title: 'Request body or bodies for invoking the `order-sign` hook'
              }
            }
          }

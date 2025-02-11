@@ -1,10 +1,12 @@
 require_relative '../test_helper'
 require_relative '../suggestion_actions_validation'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class FormCompletionResponseValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid Request Form Completion cards or system actions received'
     id :crd_request_form_completion_response_validation
@@ -30,10 +32,6 @@ module DaVinciCRDTestKit
     )
     optional
     input :valid_cards_with_suggestions, :valid_system_actions
-
-    def hook_name
-      config.options[:hook_name]
-    end
 
     def task_actions(actions)
       actions&.select { |action| action['type'] == 'create' && action_resource_type_check(action, ['Task']) }
@@ -61,7 +59,7 @@ module DaVinciCRDTestKit
       form_completion_actions = task_actions(parsed_actions).select { |action| task_questionnaire?(action) }
 
       skip_if form_completion_cards.blank? && form_completion_actions.blank?,
-              "#{hook_name} hook response does not contain any Request Form Completion cards or system actions."
+              "#{tested_hook_name} hook response does not contain any Request Form Completion cards or system actions."
 
       actions_check(form_completion_actions) if form_completion_actions.present?
 

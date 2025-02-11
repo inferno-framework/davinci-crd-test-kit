@@ -1,10 +1,12 @@
 require_relative '../test_helper'
 require_relative '../suggestion_actions_validation'
+require_relative '../server_hook_helper'
 
 module DaVinciCRDTestKit
   class ProposeAlternateRequestCardValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid Propose Alternate Request cards received'
     id :crd_propose_alternate_request_card_validation
@@ -23,10 +25,6 @@ module DaVinciCRDTestKit
       MedicationRequest NutritionOrder ServiceRequest
       VisionPrescription
     ].freeze
-
-    def hook_name
-      config.options[:hook_name]
-    end
 
     def check_action_type(actions, action_type)
       actions&.any? do |action|
@@ -51,7 +49,7 @@ module DaVinciCRDTestKit
       proposed_alternate_cards = parsed_cards.filter { |card| propose_alternate_request_card?(card) }
 
       skip_if proposed_alternate_cards.blank?,
-              "#{hook_name} hook response does not contain a Propose Alternate Request card."
+              "#{tested_hook_name} hook response does not contain a Propose Alternate Request card."
 
       proposed_alternate_cards.each do |card|
         card['suggestions'].each do |suggestion|

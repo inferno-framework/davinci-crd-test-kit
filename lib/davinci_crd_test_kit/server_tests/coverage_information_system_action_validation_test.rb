@@ -22,10 +22,6 @@ module DaVinciCRDTestKit
     )
     input :coverage_info
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     def find_extension_value(extension, url, *properties)
       found_extension = extension.extension.find { |ext| ext.url == url }
       return nil unless found_extension

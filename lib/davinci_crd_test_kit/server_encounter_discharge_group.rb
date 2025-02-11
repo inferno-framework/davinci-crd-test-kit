@@ -9,6 +9,7 @@ require_relative 'server_tests/launch_smart_app_card_validation_test'
 require_relative 'server_tests/instructions_card_received_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerEncounterDischargeGroup < Inferno::TestGroup
@@ -35,7 +36,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'encounter-discharge' }
+    config options: { hook_name: ENCOUNTER_DISCHARGE_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -43,11 +44,11 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :encounter_discharge_service_ids,
-               title: 'Service id for the service that invokes `encounter-discharge` hook'
+               title: 'Service id for the service that implements the `encounter-discharge` hook'
              },
              service_request_bodies: {
                name: :encounter_discharge_request_bodies,
-               title: 'Request bodies collection to use to invoke the `encounter-discharge` hook'
+               title: 'Request body or bodies for invoking the `encounter-discharge` hook'
              }
            }
          }

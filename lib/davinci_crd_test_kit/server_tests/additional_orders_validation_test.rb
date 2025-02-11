@@ -1,10 +1,12 @@
 require_relative '../test_helper'
+require_relative '../server_hook_helper'
 require_relative '../suggestion_actions_validation'
 
 module DaVinciCRDTestKit
   class AdditionalOrdersValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
+    include DaVinciCRDTestKit::ServerHookHelper
 
     title 'Valid Additional Orders as companions/prerequisites cards received'
     id :crd_additional_orders_card_validation
@@ -39,10 +41,6 @@ module DaVinciCRDTestKit
       VisionPrescription
     ].freeze
 
-    def hook_name
-      config.options[:hook_name]
-    end
-
     def additional_orders_card?(card)
       card['suggestions'].all? do |suggestion|
         actions = suggestion['actions']
@@ -56,7 +54,7 @@ module DaVinciCRDTestKit
       parsed_cards = parse_json(valid_cards_with_suggestions)
       additional_orders_cards = parsed_cards.filter { |card| additional_orders_card?(card) }
       skip_if additional_orders_cards.blank?,
-              "#{hook_name} hook response does not contain an Additional Orders as companions/prerequisites card."
+              "#{tested_hook_name} hook response does not include Additional Orders as companion/prerequisite cards."
 
       additional_orders_cards.each do |card|
         card['suggestions'].each do |suggestion|
@@ -64,7 +62,7 @@ module DaVinciCRDTestKit
         end
       end
 
-      no_error_validation('Some Additional Orders as companions/prerequisites cards are not valid.')
+      no_error_validation('Some companions/prerequisites Additional Order cards are not valid.')
     end
   end
 end

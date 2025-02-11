@@ -11,6 +11,7 @@ require_relative 'server_tests/propose_alternate_request_card_validation_test'
 require_relative 'server_tests/additional_orders_validation_test'
 require_relative 'server_tests/form_completion_response_validation_test'
 require_relative 'server_tests/create_or_update_coverage_info_response_validation_test'
+require_relative 'tags'
 
 module DaVinciCRDTestKit
   class ServerOrderSelectGroup < Inferno::TestGroup
@@ -41,7 +42,7 @@ module DaVinciCRDTestKit
       optional
     )
 
-    config options: { hook_name: 'order-select' }
+    config options: { hook_name: ORDER_SELECT_TAG }
     run_as_group
 
     test from: :crd_service_call_test,
@@ -49,11 +50,11 @@ module DaVinciCRDTestKit
            inputs: {
              service_ids: {
                name: :order_select_service_ids,
-               title: 'Service id for the service that invokes `order-select` hook'
+               title: 'Service id for the service that implements the `order-select` hook'
              },
              service_request_bodies: {
                name: :order_select_request_bodies,
-               title: 'Request bodies collection to use to invoke the `order-select` hook'
+               title: 'Request body or bodies for invoking the `order-select` hook'
              }
            }
          }
