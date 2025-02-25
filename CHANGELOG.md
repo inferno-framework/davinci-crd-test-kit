@@ -1,4 +1,14 @@
 # 0.11.0
+* **Inferno Core Update:** Bumped to version `0.6.2`.
+* **Ruby Version Update:** Upgraded Ruby to `3.3.6`.
+* **TLS Version Update:** Bumped to `0.3.0`.
+* **SMART App Launch Version Update:** Bumped to `0.5.0`.
+* **Gemspec Updates:**
+  * Switched to `git` for specifying files.
+  * Added `presets` to the gem package.
+  * Updated dependencies to include the new Ruby and Inferno Core versions.
+* **Test Kit Metadata:** Implemented test kit metadata.
+* **Environment Updates:** Updated Ruby version in the `Dockerfile` and GitHub Actions workflow.
 * FI-3648: Add Spec for Shared Tests and Implement Features for the Failing Tests by @vanessuniq in https://github.com/inferno-framework/davinci-crd-test-kit/pull/14
 * Fi 3718 hook demonstration test by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/15
 
