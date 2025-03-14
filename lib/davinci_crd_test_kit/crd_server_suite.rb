@@ -94,7 +94,7 @@ module DaVinciCRDTestKit
           title: 'CRD server base URL'
 
     fhir_resource_validator do
-      igs('hl7.fhir.us.davinci-crd', 'hl7.fhir.us.core')
+      igs('hl7.fhir.us.davinci-crd#2.0.1')
 
       exclude_message do |message|
         message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
