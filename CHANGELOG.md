@@ -1,3 +1,6 @@
+# 0.11.1
+* FI-3877: Pin CRD IG version to 2.0.1 by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/18
+
 # 0.11.0
 * **Inferno Core Update:** Bumped to version `0.6.2`.
 * **Ruby Version Update:** Upgraded Ruby to `3.3.6`.
