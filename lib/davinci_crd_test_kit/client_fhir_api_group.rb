@@ -42,6 +42,24 @@ module DaVinciCRDTestKit
         Capabilities tests.
       )
 
+      config(
+        inputs: {
+          smart_auth_info: {
+            name: :smart_auth_info,
+            title: 'EHR Launch Credentials',
+            options: {
+              mode: 'auth',
+              components: [
+                Inferno::DSL::AuthInfo.default_auth_type_component_without_backend_services
+              ]
+            }
+          }
+        },
+        outputs: {
+          smart_auth_info: { name: :smart_auth_info }
+        }
+      )
+
       group from: :smart_discovery do
         required_suite_options CRDOptions::SMART_1_REQUIREMENT
         run_as_group
@@ -107,11 +125,7 @@ module DaVinciCRDTestKit
         optional
         config(
           inputs: {
-            id_token: { name: :ehr_id_token },
-            client_id: { name: :ehr_client_id },
-            requested_scopes: { name: :ehr_requested_scopes },
-            access_token: { name: :ehr_access_token },
-            smart_credentials: { name: :ehr_smart_credentials }
+            id_token: { name: :ehr_id_token }
           }
         )
       end
@@ -121,9 +135,6 @@ module DaVinciCRDTestKit
         optional
         config(
           inputs: {
-            refresh_token: { name: :ehr_refresh_token },
-            client_id: { name: :ehr_client_id },
-            client_secret: { name: :ehr_client_secret },
             received_scopes: { name: :ehr_received_scopes }
           }
         )
@@ -158,14 +169,15 @@ module DaVinciCRDTestKit
           * [VisionPrescription](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html#VisionPrescription1-17)
       )
       input :url
-      input :ehr_smart_credentials,
-            type: :oauth_credentials,
+      input :smart_auth_info,
+            type: :auth_info,
             title: 'OAuth Credentials',
+            options: { mode: 'access' },
             optional: true
 
       fhir_client do
         url :url
-        oauth_credentials :ehr_smart_credentials
+        auth_info :smart_auth_info
       end
 
       group do

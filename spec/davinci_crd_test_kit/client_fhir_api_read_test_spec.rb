@@ -9,10 +9,11 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
       refresh_token: 'REFRESH_TOKEN',
       expires_in: 3600,
       client_id: 'CLIENT_ID',
-      token_retrieval_time: Time.now.iso8601,
+      issue_time: Time.now.iso8601,
       token_url: 'http://example.com/token'
-    }.to_json
+    }
   end
+  let(:smart_auth_info) { Inferno::DSL::AuthInfo.new(client_smart_credentials) }
 
   let(:patient_ids) { 'example' }
 
@@ -51,7 +52,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiReadTest) do
         fhir_client do
           url :server_endpoint
-          oauth_credentials :client_smart_credentials
+          auth_info :smart_auth_info
         end
 
         config(
@@ -59,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         )
 
         input :server_endpoint, :resource_ids
-        input :client_smart_credentials, type: :oauth_credentials
+        input :smart_auth_info, type: :auth_info
       end
     end
 
@@ -70,7 +71,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         )
         .to_return(status: 200, body: crd_patient_first.to_json)
 
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(patient_resource_request_first).to have_been_made
@@ -89,7 +90,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         .to_return(status: 200, body: crd_patient_second.to_json)
 
       patient_ids = 'example, example2'
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(patient_resource_request_first).to have_been_made
@@ -97,7 +98,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
     end
 
     it 'skips if no Patient ids are inputted' do
-      result = run(test, resource_ids: '', server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: '', server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('skip')
     end
@@ -109,7 +110,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         )
         .to_return(status: 400, body: crd_patient_first.to_json)
 
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 200, but received 400')
@@ -124,7 +125,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         .to_return(status: 200, body: crd_patient_first.to_json)
 
       patient_ids = 'wrong-id'
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Expected resource to have id: `wrong-id`, but found `example`')
@@ -138,7 +139,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         )
         .to_return(status: 200, body: crd_patient_no_id.to_json)
 
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Expected resource to have id: `example`, but found ``')
@@ -152,7 +153,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
         )
         .to_return(status: 200, body: crd_practitioner.to_json)
 
-      result = run(test, resource_ids: patient_ids, server_endpoint:, client_smart_credentials:)
+      result = run(test, resource_ids: patient_ids, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected resource type: expected Patient, but received Practitioner')
