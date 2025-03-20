@@ -4,7 +4,7 @@ module DaVinciCRDTestKit
     title 'FHIR Resource Validation'
     description %(
         Verify that the given resources returned from the previous client API interactions are valid resources. Each
-        resource is validated against its corresponding [CRD resorce profile](https://hl7.org/fhir/us/davinci-crd/STU2/artifacts.html).
+        resource is validated against its corresponding [CRD resource profile](https://hl7.org/fhir/us/davinci-crd/STU2/artifacts.html).
       )
 
     def resource_type

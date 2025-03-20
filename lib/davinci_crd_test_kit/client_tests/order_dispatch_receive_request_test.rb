@@ -13,6 +13,13 @@ module DaVinciCRDTestKit
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
       )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@205', 'hl7.fhir.us.davinci-crd_2.0.1@207',
+                          'hl7.fhir.us.davinci-crd_2.0.1@243', 'hl7.fhir.us.davinci-crd_2.0.1@244',
+                          'hl7.fhir.us.davinci-crd_2.0.1@245', 'hl7.fhir.us.davinci-crd_2.0.1@284',
+                          'hl7.fhir.us.davinci-crd_2.0.1@289', 'hl7.fhir.us.davinci-crd_2.0.1@290',
+                          'hl7.fhir.us.davinci-crd_2.0.1@291', 'hl7.fhir.us.davinci-crd_2.0.1@292',
+                          'hl7.fhir.us.davinci-crd_2.0.1@293', 'hl7.fhir.us.davinci-crd_2.0.1@294',
+                          'hl7.fhir.us.davinci-crd_2.0.1@295', 'hl7.fhir.us.davinci-crd_2.0.1@297'
 
     config options: { accepts_multiple_requests: true }
 

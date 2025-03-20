@@ -34,6 +34,7 @@ module DaVinciCRDTestKit
       The client must provide its FHIR server URL and access token in the hook request in order to run
       this test.
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@254'
 
     input :contexts, :client_fhir_server
     input :client_access_token,

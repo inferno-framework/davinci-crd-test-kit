@@ -41,6 +41,8 @@ module DaVinciCRDTestKit
         server with Inferno so that Inferno may access resources on the FHIR server in order to perform the FHIR RESTful
         Capabilities tests.
       )
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
+                            'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89'
 
       group from: :smart_discovery do
         required_suite_options CRDOptions::SMART_1_REQUIREMENT
@@ -206,6 +208,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,
@@ -227,8 +230,8 @@ module DaVinciCRDTestKit
           validate any returned resources against the [CRD Coverage profile](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage.html)
 
           Required Coverage resource FHIR interactions:
-            * SHALL suport search by [`patient`](http://hl7.org/fhir/R4/coverage.html#search)
-            * SHALL suport search by [`status`](http://hl7.org/fhir/R4/coverage.html#search)
+            * SHALL support search by [`patient`](http://hl7.org/fhir/R4/coverage.html#search)
+            * SHALL support search by [`status`](http://hl7.org/fhir/R4/coverage.html#search)
 
           Resource Conformance: SHALL
         )
@@ -305,6 +308,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,
@@ -582,6 +586,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,
@@ -608,6 +613,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,
@@ -666,6 +672,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,
@@ -744,6 +751,7 @@ module DaVinciCRDTestKit
           Resource Conformance: SHOULD
         )
         optional
+        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
         test from: :crd_client_fhir_api_update_test,
              optional: true,

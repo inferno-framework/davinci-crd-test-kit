@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
       ['organization_include', 'practitioner_include', 'location_include']
     end
 
-    def reference_search_paramaters
+    def reference_search_parameters
       ['organization', 'practitioner', 'patient']
     end
 
@@ -209,7 +209,7 @@ module DaVinciCRDTestKit
           if search_type == '_id'
             bundle = perform_fhir_search({ _id: search_id }, [resource_type, 'id_search'])
             id_search_result_check(bundle, search_id)
-          elsif reference_search_paramaters.include?(search_type)
+          elsif reference_search_parameters.include?(search_type)
             search_params = {}
             search_params[search_type] = search_id
             bundle = perform_fhir_search(search_params, [resource_type, "#{search_type}_search"])
