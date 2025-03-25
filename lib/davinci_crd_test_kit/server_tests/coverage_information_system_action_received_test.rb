@@ -17,6 +17,9 @@ module DaVinciCRDTestKit
           ServiceRequest, or VisionPrescription
       - Then, among the target actions, checking if their resource has the [coverage-information extension](http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information).
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@272', 'hl7.fhir.us.davinci-crd_2.0.1@273',
+                          'hl7.fhir.us.davinci-crd_2.0.1@274', 'hl7.fhir.us.davinci-crd_2.0.1@275',
+                          'hl7.fhir.us.davinci-crd_2.0.1@276', 'hl7.fhir.us.davinci-crd_2.0.1@277'
 
     input :valid_system_actions, :invoked_hook
     output :coverage_info

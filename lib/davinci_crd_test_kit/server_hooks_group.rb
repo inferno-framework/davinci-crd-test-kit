@@ -51,6 +51,8 @@ module DaVinciCRDTestKit
       - Each [CRD response type](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#potential-crd-response-types)
         returned is valid - optional for some response types. See the individual test groups for more details.
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@4', 'hl7.fhir.us.davinci-crd_2.0.1@152',
+                          'hl7.fhir.us.davinci-crd_2.0.1@153'
 
     group from: :crd_server_appointment_book,
           optional: true

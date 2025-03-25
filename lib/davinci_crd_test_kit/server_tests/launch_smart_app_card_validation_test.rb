@@ -19,6 +19,7 @@ module DaVinciCRDTestKit
 
       The test will be skipped if no Launch SMART Application cards are found within the returned valid cards.
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@258'
 
     optional
     input :valid_cards_with_links

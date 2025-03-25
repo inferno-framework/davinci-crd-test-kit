@@ -47,6 +47,7 @@ module DaVinciCRDTestKit
       - [Request form completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion) -
       optional
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@217', 'hl7.fhir.us.davinci-crd_2.0.1@226'
 
     config options: { hook_name: ORDER_SIGN_TAG }
     run_as_group
