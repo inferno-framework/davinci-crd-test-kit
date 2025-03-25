@@ -16,7 +16,14 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :crd_jwt_iss
+    input :crd_jwt_iss,
+          title: 'CRD JWT Issuer',
+          description: %(
+            Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
+            header of all requests. Run or re-run the **Client Registration** group to set or
+            change this value.
+          ),
+          locked: true
     input :order_dispatch_selected_response_types,
           title: 'Response types to return from order-dispatch hook requests',
           description: %(
