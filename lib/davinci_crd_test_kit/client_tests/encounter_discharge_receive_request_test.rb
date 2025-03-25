@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :iss
+    input :crd_jwt_iss
     input :encounter_discharge_selected_response_types,
           title: 'Response types to return from encounter-discharge hook requests',
           description: %(

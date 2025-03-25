@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
 
     input :auth_tokens,
           :auth_tokens_jwk_json,
-          :iss
+          :crd_jwt_iss
 
     run do
       auth_tokens_list = JSON.parse(auth_tokens)

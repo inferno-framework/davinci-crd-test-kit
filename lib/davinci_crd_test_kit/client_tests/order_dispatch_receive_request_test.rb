@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :iss
+    input :crd_jwt_iss
     input :order_dispatch_selected_response_types,
           title: 'Response types to return from order-dispatch hook requests',
           description: %(

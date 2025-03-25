@@ -1,5 +1,6 @@
 require_relative 'client_fhir_api_group'
 require_relative 'client_hooks_group'
+require_relative 'client_registration_group'
 require_relative 'routes/cds_services_discovery_handler'
 require_relative 'tags'
 require_relative 'urls'
@@ -141,6 +142,8 @@ module DaVinciCRDTestKit
     resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
       CRDClientSuite.extract_token_from_query_params(request)
     end
+
+    group from: :crd_client_registration
 
     group from: :crd_client_hooks
 

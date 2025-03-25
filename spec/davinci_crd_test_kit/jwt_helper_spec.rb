@@ -1,7 +1,7 @@
 RSpec.describe DaVinciCRDTestKit::JwtHelper do
   let(:encryption_methods) { ['ES384', 'RS384'] }
   let(:aud) { 'AUD' }
-  let(:iss) { 'ISS' }
+  let(:crd_jwt_iss) { 'ISS' }
   let(:jku) { 'JKU' }
   let(:jwks_hash) { JSON.parse(DaVinciCRDTestKit::JWKS.jwks_json) }
 

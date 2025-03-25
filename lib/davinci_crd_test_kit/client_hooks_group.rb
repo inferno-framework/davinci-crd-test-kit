@@ -42,10 +42,16 @@ module DaVinciCRDTestKit
     DESCRIPTION
     id :crd_client_hooks
 
-    input :iss,
-          title: 'JWT Issuer',
-          description: 'The `iss` claim of the JWT in the Authorization header ' \
-                       'will be used to associate incoming requests with this test session'
+    input :crd_jwt_iss,
+          title: 'CRD JWT Issuer',
+          description: %(
+            Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
+            header of all requests. Run or re-run the **Client Registration** group to set or
+            change this value.
+          ),
+          locked: true
+
+    input_order :crd_jwt_iss, :crd_jwk_set
 
     group from: :crd_client_appointment_book,
           optional: true
