@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    attr_reader :aud, :encryption_method, :exp, :iat, :crd_jwt_iss, :jku, :jti, :kid
+    attr_reader :aud, :encryption_method, :exp, :iat, :iss, :jku, :jti, :kid
 
     def initialize(
       aud:,

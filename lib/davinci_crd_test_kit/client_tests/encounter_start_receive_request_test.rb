@@ -69,7 +69,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "encounter-start #{iss}",
+        identifier: "encounter-start #{crd_jwt_iss}",
         message: %(
           **Encounter Start CDS Service Test**:
 
@@ -79,7 +79,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=enounter-start%20#{iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=enounter-start%20#{crd_jwt_iss}) when you have finished submitting requests.
         )
       )
     end

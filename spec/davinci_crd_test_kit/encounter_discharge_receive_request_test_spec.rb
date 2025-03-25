@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    result = run(test, iss: example_client_url, encounter_discharge_selected_response_types:)
+    result = run(test, crd_jwt_iss: example_client_url, encounter_discharge_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -75,7 +75,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    run(test, iss: example_client_url, encounter_discharge_selected_response_types:)
+    run(test, crd_jwt_iss: example_client_url, encounter_discharge_selected_response_types:)
 
     body['prefetch'] = { 'coverage' => crd_coverage, 'encounter' => crd_encounter }
     header('Authorization', "Bearer #{token}")
@@ -121,7 +121,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    run(test, iss: example_client_url, encounter_discharge_selected_response_types:)
+    run(test, crd_jwt_iss: example_client_url, encounter_discharge_selected_response_types:)
 
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
@@ -155,7 +155,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    result = run(test, iss: 'example.com', encounter_discharge_selected_response_types:)
+    result = run(test, crd_jwt_iss: 'example.com', encounter_discharge_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -179,7 +179,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    result = run(test, iss: 'example.com', encounter_discharge_selected_response_types:)
+    result = run(test, crd_jwt_iss: 'example.com', encounter_discharge_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -204,7 +204,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    run(test, iss: example_client_url, encounter_discharge_selected_response_types: [])
+    run(test, crd_jwt_iss: example_client_url, encounter_discharge_selected_response_types: [])
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -235,7 +235,7 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
       encryption_method: 'RS384'
     )
 
-    run(test, iss: example_client_url,
+    run(test, crd_jwt_iss: example_client_url,
               encounter_discharge_selected_response_types: encounter_discharge_selected_response_types +
     ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app'])
 

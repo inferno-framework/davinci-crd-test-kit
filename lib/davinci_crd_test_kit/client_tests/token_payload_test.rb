@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       The `iss`, `aud`, `exp`, `iat`, and `jti` claims are required.
       Additionally:
 
-      - `iss` must match the `issuer` from the `iss` input
+      - `iss` must match the `issuer` from the **CRD JWT Issuer** input
       - `aud` must match the URL of the CDS Service endpoint being invoked
       - `exp` must represent a time in the future
       - `jti` must be a non-blank string that uniquely identifies this authentication JWT
@@ -51,7 +51,7 @@ module DaVinciCRDTestKit
               true,
               algorithms: [jwk[:alg]],
               exp_leeway: 60,
-              iss:,
+              iss: crd_jwt_iss,
               aud: hook_url,
               verify_not_before: false,
               verify_iat: false,

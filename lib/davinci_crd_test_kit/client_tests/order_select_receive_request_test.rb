@@ -77,7 +77,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "order-select #{iss}",
+        identifier: "order-select #{crd_jwt_iss}",
         message: %(
           **Order Select CDS Service Test**:
 
@@ -87,7 +87,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=order-select%20#{iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=order-select%20#{crd_jwt_iss}) when you have finished submitting requests.
         )
       )
     end

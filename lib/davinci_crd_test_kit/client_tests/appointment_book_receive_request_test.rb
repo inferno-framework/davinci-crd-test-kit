@@ -71,7 +71,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "appointment-book #{iss}",
+        identifier: "appointment-book #{crd_jwt_iss}",
         message: %(
           **Appointment Book CDS Service Test**:
 
@@ -81,7 +81,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=appointment-book%20#{iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=appointment-book%20#{crd_jwt_iss}) when you have finished submitting requests.
         )
       )
     end

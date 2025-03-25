@@ -63,7 +63,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
         encryption_method: 'RS384'
       )
 
-      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], iss: example_client_url)
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], crd_jwt_iss: example_client_url)
       expect(result.result).to eq('pass')
     end
 
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
       )
 
       result = run(test, auth_tokens: [token, token], auth_tokens_jwk_json: [jwk.to_json, jwk.to_json],
-                         iss: example_client_url)
+                         crd_jwt_iss: example_client_url)
       expect(result.result).to eq('pass')
     end
 
@@ -100,7 +100,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
       )
 
       result = run(test, auth_tokens: [token, invalid_token], auth_tokens_jwk_json: [jwk.to_json, jwk.to_json],
-                         iss: example_client_url)
+                         crd_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/Request 2: Token validation error: Invalid issuer./)
     end
@@ -115,7 +115,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
         encryption_method: 'RS384'
       )
 
-      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], iss: example_client_url)
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], crd_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/Token validation error: Invalid issuer./)
     end
@@ -130,7 +130,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
         encryption_method: 'RS384'
       )
 
-      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], iss: example_client_url)
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], crd_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(
         'Token validation error: Invalid audience. Expected http://localhost:4567/custom/crd_client/cds-services/appointment-book-service'
@@ -150,7 +150,8 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
       payload, header = jwt_helper.decode_jwt(token, jwks_hash)
       token_invalid_key = JWT.encode payload, OpenSSL::PKey::RSA.new(2048), 'RS384', header
 
-      result = run(test, auth_tokens: [token_invalid_key], auth_tokens_jwk_json: [jwk.to_json], iss: example_client_url)
+      result = run(test, auth_tokens: [token_invalid_key], auth_tokens_jwk_json: [jwk.to_json],
+                         crd_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/Token validation error: Signature verification failed/)
     end
@@ -166,7 +167,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
       result = run(test,
                    auth_tokens: [token_invalid_key],
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
-                   iss: example_client_url)
+                   crd_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/JWT payload missing required claims: `exp`/)
     end
