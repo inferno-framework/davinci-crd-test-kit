@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :crd_jwt_iss,
+    input :cds_jwt_iss,
           title: 'CRD JWT Issuer',
           description: %(
             Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
@@ -69,7 +69,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "encounter-discharge #{crd_jwt_iss}",
+        identifier: "encounter-discharge #{cds_jwt_iss}",
         message: %(
           **Encounter Discharge CDS Service Test**:
 
@@ -79,7 +79,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=encounter-discharge%20#{crd_jwt_iss}) when you have finished submitting
+          [Click here](#{resume_pass_url}?token=encounter-discharge%20#{cds_jwt_iss}) when you have finished submitting
           requests.
         )
       )

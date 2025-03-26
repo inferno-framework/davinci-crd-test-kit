@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
 
     input :auth_tokens,
           :auth_tokens_jwk_json,
-          :crd_jwt_iss
+          :cds_jwt_iss
 
     run do
       auth_tokens_list = JSON.parse(auth_tokens)
@@ -51,7 +51,7 @@ module DaVinciCRDTestKit
               true,
               algorithms: [jwk[:alg]],
               exp_leeway: 60,
-              iss: crd_jwt_iss,
+              iss: cds_jwt_iss,
               aud: hook_url,
               verify_not_before: false,
               verify_iat: false,

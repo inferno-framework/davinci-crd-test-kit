@@ -42,7 +42,7 @@ module DaVinciCRDTestKit
     DESCRIPTION
     id :crd_client_hooks
 
-    input :crd_jwt_iss,
+    input :cds_jwt_iss,
           title: 'CRD JWT Issuer',
           description: %(
             Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
@@ -51,7 +51,7 @@ module DaVinciCRDTestKit
           ),
           locked: true
 
-    input_order :crd_jwt_iss, :crd_jwk_set
+    input_order :cds_jwt_iss, :cds_jwk_set
 
     group from: :crd_client_appointment_book,
           optional: true

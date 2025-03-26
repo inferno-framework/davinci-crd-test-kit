@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :crd_jwt_iss,
+    input :cds_jwt_iss,
           title: 'CRD JWT Issuer',
           description: %(
             Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
@@ -77,7 +77,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "order-select #{crd_jwt_iss}",
+        identifier: "order-select #{cds_jwt_iss}",
         message: %(
           **Order Select CDS Service Test**:
 
@@ -87,7 +87,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=order-select%20#{crd_jwt_iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=order-select%20#{cds_jwt_iss}) when you have finished submitting requests.
         )
       )
     end

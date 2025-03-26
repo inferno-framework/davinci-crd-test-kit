@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
       )
 
     input :auth_token_headers_json
-    input :crd_jwk_set,
+    input :cds_jwk_set,
           title: 'CRD JSON Web Key Set (JWKS)',
           type: 'textarea',
           description: %(
@@ -55,11 +55,11 @@ module DaVinciCRDTestKit
 
           jwks = JSON.parse(response[:body])
         else
-          skip_if crd_jwk_set.blank?,
+          skip_if cds_jwk_set.blank?,
                   %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
                   identified by the jku header field)
 
-          jwks = JSON.parse(crd_jwk_set)
+          jwks = JSON.parse(cds_jwk_set)
         end
 
         keys = jwks['keys']

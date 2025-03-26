@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that the CRD Client registration details
         provided are conformant.
       )
-    input :crd_jwt_iss,
+    input :cds_jwt_iss,
           title: 'CRD JWT Issuer',
           description: %(
             The `iss` claim of the JWT in the Authorization header sent by the CRD client under test on
@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
             session and any requests that use a different `iss` value will not be recognized.
           ),
           type: 'text'
-    input :crd_jwk_set,
+    input :cds_jwk_set,
           title: 'CRD JSON Web Key Set (JWKS)',
           type: 'textarea',
           description: %(
@@ -28,7 +28,7 @@ module DaVinciCRDTestKit
 
     run do
       jwks_warnings = []
-      parsed_jwk_set = jwk_set(crd_jwk_set, jwks_warnings)
+      parsed_jwk_set = jwk_set(cds_jwk_set, jwks_warnings)
       jwks_warnings.each { |warning| add_message('warning', warning) }
 
       assert parsed_jwk_set.length.positive?, 'JWKS content does not include any valid keys.'

@@ -4,13 +4,13 @@
   "test_suite_id": "crd_client",
   "inputs": [
     {
-      "name": "crd_jwt_iss",
+      "name": "cds_jwt_iss",
       "title": "URI of the issuer of the JWT used to authorize CDS Hooks calls",
       "type": "text",
       "value": "<%= Inferno::Application['base_url'] %>/custom/crd_server"
     },
     {
-      "name": "crd_jwk_set",
+      "name": "cds_jwk_set",
       "type": "textarea",
       "value": "<%= Inferno::Application['base_url'] %>/custom/crd_server/jwks.json"
     },
