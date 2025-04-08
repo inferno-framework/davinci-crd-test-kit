@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
     input :invoked_hook
     output :valid_cards, :valid_system_actions
 
-    SYSTEM_ACTIONS_HOOK_NAMES = ['appointment-book', 'order-sign'].freeze
+    SYSTEM_ACTIONS_HOOK_NAMES = ['appointment-book', 'order-sign', 'order-dispatch'].freeze
 
     def valid_cards
       @valid_cards ||= []
