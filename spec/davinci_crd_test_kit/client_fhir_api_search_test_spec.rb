@@ -10,10 +10,11 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
       refresh_token: 'REFRESH_TOKEN',
       expires_in: 3600,
       client_id: 'CLIENT_ID',
-      token_retrieval_time: Time.now.iso8601,
+      issue_time: Time.now.iso8601,
       token_url: 'http://example.com/token'
-    }.to_json
+    }
   end
+  let(:smart_auth_info) { Inferno::DSL::AuthInfo.new(ehr_smart_credentials) }
 
   let(:patient_id) { 'example' }
   let(:encounter_id) { 'example' }
@@ -239,7 +240,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
       ) do
         fhir_client do
           url :url
-          oauth_credentials :ehr_smart_credentials
+          auth_info :smart_auth_info
         end
       end
     end
@@ -251,7 +252,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_active.to_json)
 
-      result = run(test, search_param_values: patient_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(coverage_search_request).to have_been_made
@@ -264,7 +265,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_with_operation_outcome.to_json)
 
-      result = run(test, search_param_values: patient_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(coverage_search_request).to have_been_made
@@ -283,7 +284,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       patient_id_list = "#{patient_id}, example2"
-      result = run(test, search_param_values: patient_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(coverage_search_request).to have_been_made
@@ -303,7 +304,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       patient_id_list = "#{patient_id}, example2"
-      result = run(test, search_param_values: patient_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No resources returned in any of the search result bundles.')
@@ -312,7 +313,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
     end
 
     it 'skips if no Patient ids are inputted' do
-      result = run(test, search_param_values: '', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: '', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No search parameters passed in, skipping test.')
@@ -325,7 +326,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 400, body: crd_coverage_search_bundle_active.to_json)
 
-      result = run(test, search_param_values: patient_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 200, but received 400')
@@ -339,7 +340,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle.to_json)
 
-      result = run(test, search_param_values: patient_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: patient_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected resource type: expected Coverage, but received Encounter')
@@ -353,7 +354,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_active.to_json)
 
-      result = run(test, search_param_values: 'wrong_id', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: 'wrong_id', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
@@ -370,7 +371,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
       ) do
         fhir_client do
           url :url
-          oauth_credentials :ehr_smart_credentials
+          auth_info :smart_auth_info
         end
       end
     end
@@ -398,7 +399,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
           )
           .to_return(status: 200, body: crd_coverage_search_bundle_entered_in_error.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(active_coverage_search_request).to have_been_made
@@ -430,7 +431,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
           )
           .to_return(status: 200, body: crd_coverage_search_bundle_entered_in_error.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(active_coverage_search_request).to have_been_made
@@ -462,7 +463,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
           )
           .to_return(status: 200, body: empty_bundle.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(active_coverage_search_request).to have_been_made
@@ -494,7 +495,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
           )
           .to_return(status: 200, body: empty_bundle.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No resources returned in any of the search result bundles.')
       expect(active_coverage_search_request).to have_been_made
@@ -510,7 +511,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 400, body: crd_coverage_search_bundle_active.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 200, but received 400')
@@ -524,7 +525,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected resource type: expected Coverage, but received Encounter')
@@ -538,7 +539,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_cancelled.to_json)
 
-      result = run(test, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
@@ -555,7 +556,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
       ) do
         fhir_client do
           url :url
-          oauth_credentials :ehr_smart_credentials
+          auth_info :smart_auth_info
         end
       end
     end
@@ -567,7 +568,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -580,7 +581,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_with_operation_outcome.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -599,7 +600,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       encounter_id_list = "#{encounter_id}, example2"
-      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -619,7 +620,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       encounter_id_list = "#{encounter_id}, example2"
-      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No resources returned in any of the search result bundles.')
@@ -628,7 +629,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
     end
 
     it 'skips if no Encounter ids are inputted' do
-      result = run(test, search_param_values: '', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: '', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No search parameters passed in, skipping test.')
@@ -641,7 +642,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 400, body: crd_encounter_search_bundle.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 200, but received 400')
@@ -655,7 +656,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_active.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected resource type: expected Encounter, but received Coverage')
@@ -669,7 +670,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle.to_json)
 
-      result = run(test, search_param_values: 'wrong_id', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: 'wrong_id', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Expected resource to have id: `wrong_id`, but found `example`')
@@ -684,7 +685,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
       ) do
         fhir_client do
           url :url
-          oauth_credentials :ehr_smart_credentials
+          auth_info :smart_auth_info
         end
       end
     end
@@ -696,7 +697,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_with_location.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -709,7 +710,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_with_operation_outcome.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -728,7 +729,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       encounter_id_list = "#{encounter_id}, example2"
-      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('pass')
       expect(encounter_search_request).to have_been_made
@@ -748,7 +749,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         .to_return(status: 200, body: empty_bundle.to_json)
 
       encounter_id_list = "#{encounter_id}, example2"
-      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id_list, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No resources returned in any of the search result bundles.')
@@ -757,7 +758,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
     end
 
     it 'skips if no Encounter ids are inputted' do
-      result = run(test, search_param_values: '', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: '', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq('No search parameters passed in, skipping test.')
@@ -770,7 +771,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 400, body: crd_encounter_search_bundle_with_location.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 200, but received 400')
@@ -784,7 +785,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_location_search_bundle.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
@@ -800,7 +801,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_multiple_entries.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(
@@ -816,7 +817,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_wrong_entries.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match('Unexpected resource type: expected Location, but received Coverage')
@@ -830,7 +831,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_with_location.to_json)
 
-      result = run(test, search_param_values: 'example2', url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: 'example2', url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match('Expected resource to have id: `example2`, but found `example`')
@@ -844,7 +845,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest do
         )
         .to_return(status: 200, body: crd_encounter_search_bundle_with_location_wrong_id.to_json)
 
-      result = run(test, search_param_values: encounter_id, url: server_endpoint, ehr_smart_credentials:)
+      result = run(test, search_param_values: encounter_id, url: server_endpoint, smart_auth_info:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(

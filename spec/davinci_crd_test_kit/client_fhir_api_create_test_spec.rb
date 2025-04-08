@@ -9,10 +9,11 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
       refresh_token: 'REFRESH_TOKEN',
       expires_in: 3600,
       client_id: 'CLIENT_ID',
-      token_retrieval_time: Time.now.iso8601,
+      issue_time: Time.now.iso8601,
       token_url: 'http://example.com/token'
-    }.to_json
+    }
   end
+  let(:smart_auth_info) { Inferno::DSL::AuthInfo.new(client_smart_credentials) }
 
   let(:task) do
     JSON.parse(
@@ -70,7 +71,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiCreateTest) do
         fhir_client do
           url :server_endpoint
-          oauth_credentials :client_smart_credentials
+          auth_info :smart_auth_info
         end
 
         fhir_resource_validator do
@@ -90,7 +91,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         )
 
         input :server_endpoint
-        input :client_smart_credentials, type: :oauth_credentials
+        input :smart_auth_info, type: :auth_info
       end
     end
 
@@ -102,7 +103,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 201, body: task.to_json)
-      result = run(test, create_resources: [task].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made
       expect(task_create_request).to have_been_made
@@ -118,7 +119,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         .to_return(status: 201, body: task.to_json).then
         .to_return(status: 201, body: task_second.to_json)
 
-      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(2)
       expect(task_create_request).to have_been_made.times(2)
@@ -134,7 +135,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         .to_return(status: 201, body: task.to_json).then
         .to_return(status: 400, body: task_second.to_json)
 
-      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 201, but received 400')
       expect(validation_request).to have_been_made.times(2)
@@ -152,14 +153,14 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         )
         .to_return(status: 201, body: task.to_json)
 
-      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task, task_second].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(2)
       expect(task_create_request).to have_been_made
     end
 
     it 'skips if create_resources input is empty' do
-      result = run(test, create_resources: [], server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [], server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
         "Input 'create_resources' is nil, skipping test."
@@ -167,7 +168,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'skips if empty resource json is inputted' do
-      result = run(test, create_resources: [{}].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [{}].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
         'No valid Task resources were provided to send in Create requests, skipping test.'
@@ -175,7 +176,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'skips if inputted resource is the wrong resource type' do
-      result = run(test, create_resources: [patient].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [patient].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
         'No valid Task resources were provided to send in Create requests, skipping test.'
@@ -186,7 +187,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
       validation_request = stub_request(:post, "#{validator_url}/validate")
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
-      result = run(test, create_resources: [task].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
         'No valid Task resources were provided to send in Create requests, skipping test.'
@@ -195,7 +196,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'fails if resource in invalid JSON format is inputted' do
-      result = run(test, create_resources: '[[', server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: '[[', server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Invalid JSON. ')
     end
@@ -209,7 +210,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         )
         .to_return(status: 400)
 
-      result = run(test, create_resources: [task].to_json, server_endpoint:, client_smart_credentials:)
+      result = run(test, create_resources: [task].to_json, server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('fail')
       expect(result.result_message).to eq('Unexpected response status: expected 201, but received 400')
       expect(validation_request).to have_been_made

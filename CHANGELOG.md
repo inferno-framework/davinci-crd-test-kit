@@ -1,3 +1,15 @@
+# 0.12.0
+## Breaking Change
+This release updates the Da Vinci CRD Test Kit to use AuthInfo rather than
+OAuthCredentials for storing auth information. As a result of this change, any
+test kits which rely on this test kit will need to be updated to use AuthInfo
+rather than OAuthCredentials inputs.
+
+* FI-3746: Transition to use authinfo by @vanessuniq in https://github.com/inferno-framework/davinci-crd-test-kit/pull/20
+
+# 0.11.1
+* FI-3877: Pin CRD IG version to 2.0.1 by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/18
+
 # 0.11.0
 * **Inferno Core Update:** Bumped to version `0.6.2`.
 * **Ruby Version Update:** Upgraded Ruby to `3.3.6`.
