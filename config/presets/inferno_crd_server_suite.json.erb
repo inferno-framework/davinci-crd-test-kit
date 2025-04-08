@@ -17,33 +17,15 @@
       "value": "<%= ENV.fetch('INFERNO_REFERENCE_SERVER_URI', 'https://inferno-qa.healthit.gov') %>/reference-server/r4"
     },
     {
-      "name": "ehr_smart_credentials",
+      "name": "smart_auth_info",
       "optional": true,
       "title": "OAuth Credentials",
-      "type": "oauth_credentials",
+      "type": "auth_info",
       "value": {
+        "auth_type": "public",
         "access_token": "SAMPLE_TOKEN",
-        "refresh_token": "",
-        "expires_in": "",
-        "client_id": "",
-        "client_secret": "",
-        "token_url": ""
+        "client_id": "SAMPLE_PUBLIC_CLIENT_ID"
       }
-    },
-    {
-      "name": "ehr_client_id",
-      "description": "Client ID provided during registration of Inferno as an EHR launch application",
-      "title": "EHR Launch Client ID",
-      "type": "text",
-      "value": "SAMPLE_PUBLIC_CLIENT_ID"
-    },
-    {
-      "name": "ehr_requested_scopes",
-      "default": "launch openid fhirUser offline_access user/*.rs",
-      "description": "OAuth 2.0 scope provided by system to enable all required functionality",
-      "title": "EHR Launch Scope",
-      "type": "textarea",
-      "value": "launch openid fhirUser offline_access user/*.rs"
     },
     {
       "name": "patient_ids",
