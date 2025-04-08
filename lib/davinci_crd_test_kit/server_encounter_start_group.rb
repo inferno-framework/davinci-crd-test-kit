@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
       - [Request form completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion) -
       optional
     )
-    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@185'
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@168', 'hl7.fhir.us.davinci-crd_2.0.1@185'
 
     config options: { hook_name: ENCOUNTER_START_TAG }
     run_as_group
