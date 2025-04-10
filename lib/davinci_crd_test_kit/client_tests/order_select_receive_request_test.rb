@@ -11,11 +11,7 @@ module DaVinciCRDTestKit
       hook requests and responds to the client with the response types selected as an input.
       )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@209', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
-                          'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@289',
-                          'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
-                          'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-                          'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295'
+                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245'
 
     config options: { accepts_multiple_requests: true }
 
