@@ -65,7 +65,7 @@ module DaVinciCRDTestKit
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
     test from: :crd_hook_request_valid_context do
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@286'
     end
     test from: :crd_hook_request_valid_prefetch
     test from: :crd_card_display_attest_test
