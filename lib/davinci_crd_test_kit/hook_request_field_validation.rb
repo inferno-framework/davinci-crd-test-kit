@@ -286,6 +286,14 @@ module DaVinciCRDTestKit
     end
 
     def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil)
+      bundle.entry.each do |entry|
+        resource_id = entry.resource.id
+        next unless resource_id.blank?
+
+        error_msg = 'Resource in the FHIR Bundle does not have an id'
+        add_message('error', error_msg)
+      end
+
       target_resources = bundle.entry.map(&:resource).select { |r| resource_types.include?(r.resourceType) }
       if target_resources.blank?
         error_msg = "#{request_number}`#{context_field_name}` bundle must contain at least one of the " \

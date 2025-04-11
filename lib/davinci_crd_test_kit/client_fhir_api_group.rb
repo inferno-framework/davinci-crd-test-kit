@@ -42,7 +42,8 @@ module DaVinciCRDTestKit
         Capabilities tests.
       )
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
-                            'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89'
+                            'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89',
+                            'hl7.fhir.us.davinci-crd_2.0.1@92'
 
       config(
         inputs: {
@@ -170,6 +171,8 @@ module DaVinciCRDTestKit
           * [Task](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html#Task1-16)
           * [VisionPrescription](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html#VisionPrescription1-17)
       )
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
+
       input :url
       input :smart_auth_info,
             type: :auth_info,
