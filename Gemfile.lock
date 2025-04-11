@@ -300,6 +300,8 @@ GEM
       json-jwt (~> 1.15.3)
       jwt (~> 2.6)
       tls_test_kit (~> 0.3.0)
+    sqlite3 (1.7.3)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (1.7.3-aarch64-linux)
     sqlite3 (1.7.3-arm-linux)
     sqlite3 (1.7.3-arm64-darwin)
@@ -339,6 +341,7 @@ PLATFORMS
   aarch64-linux
   arm-linux
   arm64-darwin
+  ruby
   x86-linux
   x86_64-darwin
   x86_64-linux

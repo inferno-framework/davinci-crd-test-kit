@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
 
       # Test Methodology
 
-      This test sequence accesses the CRD server Dicovery endpoint at /cds-services using a GET request.
+      This test sequence accesses the CRD server Discovery endpoint at /cds-services using a GET request.
       It parses the response and verifies that:
       - The Discovery endpoint is TLS secured.
       - The Discovery endpoint is available at `{baseURL}/cds-services`.
@@ -45,6 +45,7 @@ module DaVinciCRDTestKit
 
         This test verifies that the CRD server is using TLS 1.2 or higher.
       DESCRIPTION
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@89'
       id :crd_server_tls_version_stu2
 
       config(

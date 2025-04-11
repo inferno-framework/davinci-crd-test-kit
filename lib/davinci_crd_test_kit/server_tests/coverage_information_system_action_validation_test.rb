@@ -21,6 +21,7 @@ module DaVinciCRDTestKit
       (if present).
     )
     input :coverage_info
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@264', 'hl7.fhir.us.davinci-crd_2.0.1@265'
 
     def find_extension_value(extension, url, *properties)
       found_extension = extension.extension.find { |ext| ext.url == url }

@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         * `fhirAuthorization` - *object*
         * `prefetch` - *object*
 
-      This test checks for the precense of these fields and if they are of the correct type. This test is optional and
+      This test checks for the presence of these fields and if they are of the correct type. This test is optional and
       will not fail if the hook request does not contain an optional field, it only produces an informational message.
       If the client provides its FHIR server URL in the `fhirServer` field, and it's authorization token in the
       `fhirAuthorization` field object, they will be produced as an output from this test to be used in

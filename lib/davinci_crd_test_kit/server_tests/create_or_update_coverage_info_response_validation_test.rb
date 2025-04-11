@@ -28,6 +28,7 @@ module DaVinciCRDTestKit
 
       If no Create or Update Coverage Information cards or system actions are received, the test is skipped.
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@306'
     optional
     input :valid_cards_with_suggestions, :valid_system_actions
 

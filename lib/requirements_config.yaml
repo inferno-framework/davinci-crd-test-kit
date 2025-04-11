@@ -1,0 +1,18 @@
+test_kit_id: davinci_crd_test_kit
+
+suites: 
+  - id: crd_server
+    class_name: DaVinciCRDTestKit::CRDServerSuite
+    suite_actor: Server
+  - id: crd_client
+    class_name: DaVinciCRDTestKit::CRDClientSuite
+    suite_actor: Client
+
+requirement_sets:
+  - id: hl7.fhir.us.davinci-crd_2.0.1
+    folder: Coverage Requirements Discovery (CRD)
+    requirements: All
+    actor_map:
+      - {spec: Client, test_kit: Client}
+      - {spec: Server, test_kit: Server}
+  

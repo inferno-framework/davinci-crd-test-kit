@@ -10,6 +10,9 @@ module DaVinciCRDTestKit
         This test waits for multiple incoming [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
         hook requests and responds to the client with the response types selected as an input.
       )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@197', 'hl7.fhir.us.davinci-crd_2.0.1@243',
+                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
+                          'hl7.fhir.us.davinci-crd_2.0.1@297', 'hl7.fhir.us.davinci-crd_2.0.1@303'
 
     config options: { accepts_multiple_requests: true }
 

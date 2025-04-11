@@ -25,6 +25,7 @@ module DaVinciCRDTestKit
 
       This version of the CRD implementation guide refers to version 1.0 of the hook.
     DESCRIPTION
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@172'
 
     run_as_group
 
