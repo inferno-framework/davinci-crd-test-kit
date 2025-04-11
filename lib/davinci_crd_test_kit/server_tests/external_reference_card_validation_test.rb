@@ -17,6 +17,7 @@ module DaVinciCRDTestKit
       - The presence of a `links` array within each card.
       - That every link in the `links` array of a card is of type `absolute`.
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@258', 'hl7.fhir.us.davinci-crd_2.0.1@259'
 
     input :valid_cards_with_links
     optional

@@ -13,6 +13,9 @@ module DaVinciCRDTestKit
       - External Reference Card
       - Instructions Card
     )
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@247', 'hl7.fhir.us.davinci-crd_2.0.1@248',
+                          'hl7.fhir.us.davinci-crd_2.0.1@249'
+
     id :crd_server_required_card_response_validation
     run_as_group
 

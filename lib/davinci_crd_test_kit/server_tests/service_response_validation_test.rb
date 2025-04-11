@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
     input :invoked_hook
     output :valid_cards, :valid_system_actions
 
-    SYSTEM_ACTIONS_HOOK_NAMES = ['appointment-book', 'order-sign'].freeze
+    SYSTEM_ACTIONS_HOOK_NAMES = ['appointment-book', 'order-sign', 'order-dispatch'].freeze
 
     def valid_cards
       @valid_cards ||= []
@@ -59,8 +59,8 @@ module DaVinciCRDTestKit
       skip_if successful_requests.empty?, 'All service requests were unsuccessful.'
 
       info do
-        unsuncessful_count = (requests - successful_requests).length
-        assert unsuncessful_count.zero?, "#{unsuncessful_count} out of #{requests.length} requests were unsuccessful"
+        unsuccessful_count = (requests - successful_requests).length
+        assert unsuccessful_count.zero?, "#{unsuccessful_count} out of #{requests.length} requests were unsuccessful"
       end
 
       successful_requests.each_with_index do |request, index|

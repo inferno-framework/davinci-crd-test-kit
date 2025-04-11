@@ -99,7 +99,7 @@ module DaVinciCRDTestKit
       return if draft_orders_bundle_entry_refs(contexts).include?(ref)
 
       error_msg = "Resource being updated must be from the `draftOrders` entry. #{ref} is not in the " \
-                  "`context.drafOrders` of the submitted requests. In Action `#{action}`"
+                  "`context.draftOrders` of the submitted requests. In Action `#{action}`"
       add_message('error', error_msg)
     end
 
