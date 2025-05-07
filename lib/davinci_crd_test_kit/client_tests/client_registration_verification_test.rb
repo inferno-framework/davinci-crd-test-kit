@@ -24,16 +24,18 @@ module DaVinciCRDTestKit
           description: %(
             The CRD client's JWK Set containing it's public key. May be either
             a publicly accessible url containing the JWKS, or the raw JWKS.
-          )
+            This input is required for these tests to pass.
+          ),
+          optional: true
 
     run do
+      assert cds_jwk_set.present?, 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.'
+
       jwks_warnings = []
       parsed_jwk_set = jwk_set(cds_jwk_set, jwks_warnings)
       jwks_warnings.each { |warning| add_message('warning', warning) }
 
       assert parsed_jwk_set.length.positive?, 'JWKS content does not include any valid keys.'
-
-      # TODO: add key-specific verification per end of https://build.fhir.org/ig/HL7/smart-app-launch/client-confidential-asymmetric.html#registering-a-client-communicating-public-keys
 
       assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See messages for details'
     end
@@ -59,7 +61,7 @@ module DaVinciCRDTestKit
           begin
             JSON.parse(retrieved.body)
           rescue JSON::ParserError
-            warning_messages << "Failed to fetch valid json from jwks uri #{jwk_set}."
+            warning_messages << "Failed to fetch valid json from jwks uri #{jku}."
             nil
           end
       else

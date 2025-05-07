@@ -34,8 +34,10 @@ module DaVinciCRDTestKit
       ## SMART App Launch
       Use this information when registering Inferno as a SMART App:
 
-      * Launch URI: `#{SMARTAppLaunch::AppLaunchTest.config.options[:launch_uri]}`
-      * Redirect URI: `#{SMARTAppLaunch::AppRedirectTest.config.options[:redirect_uri]}`
+      * Launch URI: `#{SMARTAppLaunch::AppLaunchTest.config.options[:launch_uri] ||
+                       "#{Inferno::Application['base_url']}/custom/smart/launch"}`
+      * Redirect URI: `#{SMARTAppLaunch::AppRedirectTest.config.options[:redirect_uri] ||
+                         "#{Inferno::Application['base_url']}/custom/smart/redirect"}`
 
       If a client receives a SMART App Launch card in a response and would like
       to test their ability to launch Inferno as a SMART App, first run the
@@ -70,6 +72,29 @@ module DaVinciCRDTestKit
       - Systems are not expected to pass the *FHIR RESTful Capabilities* tests
         based on the provided inputs, as the resource might not exist on the
         client's FHIR server.
+
+      ## Running the Tests aginst the Server Suite
+
+      You can also run these tests against the Inferno CRD Server test suite.
+      The server suite will not render cards like a real CRD client would do,
+      but will simulate and verify the interactions between the client and
+      server.
+
+      1. Start a "Da Vinci CRD Client Test Suite" session.
+      1. Choose the "Inferno CRD Server Suite" preset from the drop down in the upper left.
+      1. Run the Client Registration test group. It should pass.
+      1. Run the Hooks > Appointment Book test group leaving the inputs as is. A
+         "User Action Dialog" will appear indicating that Inferno is waiting for the
+         `appointment-book` hook invocation.
+      1. In another tab, start a "Da Vinci CRD Server Test Suite" session.
+      1. Choose the "Inferno CRD Client Suite" preset from the drop down in the upper left.
+      1. Run the Discovery test group. It should pass.
+      1. Run the Demonstrate A Hook Response test. It should pass
+      1. Return to the client suite and click the link to continue the tests.
+      1. When the attestation wait dialog appears, return to the server tests and look in test
+         **2.04** "All service responses contain valid cards and optional systemActions"
+         for the CDS hooks request made and look at the response to verify that the
+         indicate cards are present. Attest accordingly in the client suite to complete the tests.
 
       ## Limitations
       The test suite does not implement any sort of payer business logic, so the

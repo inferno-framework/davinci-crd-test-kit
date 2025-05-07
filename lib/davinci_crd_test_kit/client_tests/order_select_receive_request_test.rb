@@ -87,7 +87,8 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=order-select%20#{cds_jwt_iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=order-select%20#{cds_jwt_iss}) when you have finished submitting
+          requests.
         )
       )
     end

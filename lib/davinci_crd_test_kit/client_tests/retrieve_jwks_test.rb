@@ -22,9 +22,10 @@ module DaVinciCRDTestKit
             The client's registered JWK Set containing it's public key, either
             as a publicly accessible url containing the JWKS, or the raw JWKS.
             Run or re-run the **Client Registration** group to set or
-            change this value.
+            change this value. Used if the `jku` header is not found in the auth token jwt.
           ),
-          locked: true
+          locked: true,
+          optional: true
     output :crd_jwks_json, :crd_jwks_keys_json
 
     run do

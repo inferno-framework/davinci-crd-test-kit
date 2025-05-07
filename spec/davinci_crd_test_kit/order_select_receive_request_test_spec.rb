@@ -220,9 +220,10 @@ RSpec.describe DaVinciCRDTestKit::OrderSelectReceiveRequestTest, :request do
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, order_select_selected_response_types: order_select_selected_response_types +
-    ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app',
-     'propose_alternate_request', 'companions_prerequisites'])
+    run(test, cds_jwt_iss: example_client_url,
+              order_select_selected_response_types: order_select_selected_response_types +
+              ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app',
+               'propose_alternate_request', 'companions_prerequisites'])
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
