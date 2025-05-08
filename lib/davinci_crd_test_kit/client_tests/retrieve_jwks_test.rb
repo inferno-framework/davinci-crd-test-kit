@@ -15,13 +15,16 @@ module DaVinciCRDTestKit
       )
 
     input :auth_token_headers_json
-    input :jwk_set,
-          title: "The Client's JWK Set containing it's public key",
-          description: %(
-            Must supply if you do not make your keys publicly available via a uri in the authorization JWT header `jku`
-            field'
-          ),
+    input :cds_jwk_set,
+          title: 'CRD JSON Web Key Set (JWKS)',
           type: 'textarea',
+          description: %(
+            The client's registered JWK Set containing it's public key, either
+            as a publicly accessible url containing the JWKS, or the raw JWKS.
+            Run or re-run the **Client Registration** group to set or
+            change this value. Used if the `jku` header is not found in the auth token jwt.
+          ),
+          locked: true,
           optional: true
     output :crd_jwks_json, :crd_jwks_keys_json
 
@@ -53,11 +56,11 @@ module DaVinciCRDTestKit
 
           jwks = JSON.parse(response[:body])
         else
-          skip_if jwk_set.blank?,
+          skip_if cds_jwk_set.blank?,
                   %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
                   identified by the jku header field)
 
-          jwks = JSON.parse(jwk_set)
+          jwks = JSON.parse(cds_jwk_set)
         end
 
         keys = jwks['keys']

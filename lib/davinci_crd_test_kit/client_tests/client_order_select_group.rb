@@ -30,6 +30,8 @@ module DaVinciCRDTestKit
 
     run_as_group
 
+    input_order :cds_jwt_iss, :cds_jwk_set
+
     config(
       inputs: {
         auth_token_headers_json: { name: :order_select_auth_token_headers_json },

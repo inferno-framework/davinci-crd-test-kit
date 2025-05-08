@@ -19,7 +19,14 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :iss
+    input :cds_jwt_iss,
+          title: 'CRD JWT Issuer',
+          description: %(
+            Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
+            header of all requests. Run or re-run the **Client Registration** group to set or
+            change this value.
+          ),
+          locked: true
     input :order_sign_selected_response_types,
           title: 'Response types to return from order-sign hook requests',
           description: %(
@@ -76,7 +83,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "order-sign #{iss}",
+        identifier: "order-sign #{cds_jwt_iss}",
         message: %(
           **Order Sign CDS Service Test**:
 
@@ -86,7 +93,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=order-sign%20#{iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=order-sign%20#{cds_jwt_iss}) when you have finished submitting requests.
         )
       )
     end

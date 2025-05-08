@@ -15,7 +15,14 @@ module DaVinciCRDTestKit
 
     config options: { accepts_multiple_requests: true }
 
-    input :iss
+    input :cds_jwt_iss,
+          title: 'CRD JWT Issuer',
+          description: %(
+            Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
+            header of all requests. Run or re-run the **Client Registration** group to set or
+            change this value.
+          ),
+          locked: true
     input :encounter_start_selected_response_types,
           title: 'Response types to return from encounter-start hook requests',
           description: %(
@@ -64,7 +71,7 @@ module DaVinciCRDTestKit
 
     run do
       wait(
-        identifier: "encounter-start #{iss}",
+        identifier: "encounter-start #{cds_jwt_iss}",
         message: %(
           **Encounter Start CDS Service Test**:
 
@@ -74,7 +81,8 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=enounter-start%20#{iss}) when you have finished submitting requests.
+          [Click here](#{resume_pass_url}?token=enounter-start%20#{cds_jwt_iss}) when you have finished submitting
+          requests.
         )
       )
     end
