@@ -1,3 +1,8 @@
+# 0.12.1
+* FI-3838: Add CRD Server verifies_requirements by @elsaperelli in https://github.com/inferno-framework/davinci-crd-test-kit/pull/23
+* FI-3837: Add CRD Client verifies_requirements by @elsaperelli in https://github.com/inferno-framework/davinci-crd-test-kit/pull/21
+* FI-4055: Client Auth by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/25
+
 # 0.12.0
 ## Breaking Change
 This release updates the Da Vinci CRD Test Kit to use AuthInfo rather than
