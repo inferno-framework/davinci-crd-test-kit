@@ -18,30 +18,14 @@ RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
   end
   let(:base_url) { 'http://example.com/' }
 
-  # TODO: replace with inferno core version, but need to get inputs
-  # right in the test invocations below first.
-  def run(runnable, inputs = {})
-    test_run_params = { test_session_id: test_session.id }.merge(runnable.reference_hash)
-    test_run = Inferno::Repositories::TestRuns.new.create(test_run_params)
-    inputs.each do |name, value|
-      session_data_repo.save(
-        test_session_id: test_session.id,
-        name: name == :valid_cards ? :order_dispatch_valid_cards : name,
-        value:,
-        type: runnable.config.input_type(name)
-      )
-    end
-    Inferno::TestRunner.new(test_session:, test_run:).run(runnable)
-  end
-
   it 'passes if an Instructions card is present' do
-    run(runnable_within, valid_cards: cards.to_json, base_url:)
+    run(runnable_within, order_dispatch_valid_cards: cards.to_json, base_url:)
     result = run(runnable_across)
     expect(result.result).to eq('pass')
   end
 
   it 'skips if no instructions card present' do
-    run(runnable_within, valid_cards: [].to_json, base_url:)
+    run(runnable_within, order_dispatch_valid_cards: [].to_json, base_url:)
     result = run(runnable_across)
     expect(result.result).to eq('skip')
     expect(result.result_message).to match(/None of the hooks invoked returned a valid Instructions card/)
