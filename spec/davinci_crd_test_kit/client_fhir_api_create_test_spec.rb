@@ -64,8 +64,6 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   describe 'Task FHIR Create Test' do
     let(:test) do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiCreateTest) do
@@ -75,7 +73,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
         end
 
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL', 'http://hl7_validator_service:3500')
+          url validator_url
 
           cli_context do
             txServer nil

@@ -9,7 +9,6 @@ RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionAcrossHooksVali
     Inferno::Repositories::Tests.new
       .find('crd_server-crd_server_hooks-crd_server_appointment_book-crd_coverage_info_system_action_validation')
   end
-  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))

@@ -64,8 +64,6 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   describe 'Encounter FHIR Update Test' do
     let(:test) do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiUpdateTest) do

@@ -85,8 +85,6 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   def create_fhir_api_requests(url: nil, body: nil, status: 200, search_tag: nil, name: nil)
     headers ||= [
       {
