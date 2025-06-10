@@ -73,7 +73,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
         end
 
         fhir_resource_validator do
-          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', 'http://hl7_validator_service:3500')
+          url validation_url
 
           cli_context do
             txServer nil
@@ -94,7 +94,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'passes if valid Encounter resource is passed in' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       encounter_update_request = stub_request(:put, "#{server_endpoint}/Encounter/#{encounter_id}")
         .with(
@@ -110,7 +110,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'passes if valid Encounter resource is passed in and create interaction returns 201' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       encounter_update_request = stub_request(:put, "#{server_endpoint}/Encounter/#{encounter_id}")
         .with(
@@ -126,7 +126,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'passes if multiple valid Encounter resource are passed in' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       encounter_update_request = stub_request(:put, "#{server_endpoint}/Encounter/#{encounter_id}")
         .with(
@@ -148,7 +148,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'fails if multiple valid Encounter resource are passed in and at least 1 returns a non 200 or 201' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       encounter_update_request = stub_request(:put, "#{server_endpoint}/Encounter/#{encounter_id}")
         .with(
@@ -171,7 +171,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'passes if multiple Encounter resource are passed in and at least 1 is valid' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json).then
         .to_return(status: 200, body: operation_outcome_failure.to_json).then
         .to_return(status: 200, body: operation_outcome_success.to_json).then
@@ -214,7 +214,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'skips if passed in Encounter resource is invalid' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       result = run(test, update_resources: [encounter].to_json, server_endpoint:,
@@ -233,7 +233,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
     end
 
     it 'fails if Encounter update interaction returns non 200 or 201' do
-      validation_request = stub_request(:post, validator_url)
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       encounter_update_request = stub_request(:put, "#{server_endpoint}/Encounter/#{encounter_id}")
         .with(
