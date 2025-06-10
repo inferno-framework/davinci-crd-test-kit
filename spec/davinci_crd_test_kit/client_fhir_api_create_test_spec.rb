@@ -94,7 +94,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'passes if valid Task resource is passed in' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       task_create_request = stub_request(:post, "#{server_endpoint}/Task")
         .with(
@@ -108,7 +108,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'passes if multiple valid Task resources are passed in' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       task_create_request = stub_request(:post, "#{server_endpoint}/Task")
         .with(
@@ -124,7 +124,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'fails if multiple valid Task resources are passed in and at least 1 returns a non 201' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       task_create_request = stub_request(:post, "#{server_endpoint}/Task")
         .with(
@@ -141,7 +141,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'passes if multiple Task resources are passed in and at least 1 is valid' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_success.to_json).then
         .to_return(status: 200, body: operation_outcome_failure.to_json).then
         .to_return(status: 200, body: operation_outcome_success.to_json).then
@@ -182,7 +182,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'skips if passed in Task resource is invalid' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       result = run(test, create_resources: [task].to_json, server_endpoint:, smart_auth_info:)
@@ -200,7 +200,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
     end
 
     it 'fails if Task creation interaction returns non 201' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validator_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       task_create_request = stub_request(:post, "#{server_endpoint}/Task")
         .with(
