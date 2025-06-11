@@ -149,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil
@@ -356,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil
@@ -388,7 +388,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil
@@ -419,7 +419,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil

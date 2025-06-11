@@ -111,7 +111,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiValidationTest) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil

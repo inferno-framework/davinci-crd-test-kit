@@ -73,7 +73,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
         end
 
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil

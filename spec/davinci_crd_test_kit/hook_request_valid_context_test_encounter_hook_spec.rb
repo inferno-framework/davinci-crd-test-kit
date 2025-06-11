@@ -79,7 +79,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     let(:test) do
       Class.new(described_class) do
         fhir_resource_validator do
-          url validation_url
+          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
 
           cli_context do
             txServer nil
