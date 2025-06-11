@@ -4,7 +4,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  
+
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
   let(:appointment_book_url) { "#{base_url}/cds-services/appointment-book-service" }
@@ -149,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -356,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -388,7 +388,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -419,7 +419,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV['FHIR_RESOURCE_VALIDATOR_URL']
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
