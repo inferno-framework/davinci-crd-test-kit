@@ -4,7 +4,6 @@ require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
 RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
   let(:suite_id) { 'crd_client' }
   let(:results_repo) { Inferno::Repositories::Results.new }
-
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
   let(:encounter_start_url) { "#{base_url}/cds-services/encounter-start-service" }
@@ -68,8 +67,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -80,9 +77,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
   describe 'Encounter Start Hook Valid Context' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidContextTest) do
+      Class.new(described_class) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -99,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'passes if hook request `context` contains all required fields and fhir resources are valid' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(
@@ -130,7 +127,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'passes if multiple hook requests have `context` that contains all required fields and valid fhir resources' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(
@@ -159,7 +156,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'fails if one of multiple hook requests are invalid' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
       patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(
@@ -314,7 +311,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
     end
 
     it 'fails if returned fhir resource fails validation' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
       patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
         .with(

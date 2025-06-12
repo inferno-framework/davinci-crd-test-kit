@@ -137,8 +137,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   def entity_result_message(runnable)
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -151,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -168,7 +166,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'passes if prefetch contains valid resources for `user`, `patient`, and `coverage` fields' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test,
@@ -179,7 +177,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'passes if multiple requests have prefetch with valid resources for `user`, `patient`, and `coverage` fields' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test,
@@ -190,7 +188,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'fails if one request of many has an invalid prefetch field' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       invalid_prefetch = { user: crd_practitioner, patient: crd_practitioner, coverage: crd_coverage_bundle }
@@ -237,7 +235,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'fails if prefetch `user` fails validation' do
-      practitioner_validation_request = stub_request(:post, "#{validator_url}/validate")
+      practitioner_validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       appointment_book_prefetch.delete(:patient)
@@ -275,7 +273,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'fails if prefetch `patient` fails validation' do
-      patient_validation_request = stub_request(:post, "#{validator_url}/validate")
+      patient_validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       appointment_book_prefetch.delete(:user)
@@ -316,7 +314,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'fails if prefetch `coverage` fails validation' do
-      coverage_validation_request = stub_request(:post, "#{validator_url}/validate")
+      coverage_validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       appointment_book_prefetch.delete(:user)
@@ -358,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -375,7 +373,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'passes if prefetch contains valid resources for `user`, `patient`, and `encounter` fields' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, contexts: [encounter_start_context].to_json,
@@ -390,7 +388,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -407,7 +405,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'passes if prefetch contains valid resources for `performer`, `patient`, and `order` fields' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, contexts: [order_dispatch_context].to_json, prefetches: [order_dispatch_hook_prefetch].to_json)
@@ -421,7 +419,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -438,7 +436,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
     end
 
     it 'passes if prefetch contains valid resources for `user` and `patient` fields' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       result = run(test, contexts: [order_select_context].to_json, prefetches: [order_select_hook_prefetch].to_json)

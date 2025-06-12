@@ -85,8 +85,6 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     }
   end
 
-  let(:validator_url) { ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL') }
-
   def create_fhir_api_requests(url: nil, body: nil, status: 200, search_tag: nil, name: nil)
     headers ||= [
       {
@@ -113,7 +111,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::ClientFHIRApiValidationTest) do
         fhir_resource_validator do
-          url ENV.fetch('CRD_FHIR_RESOURCE_VALIDATOR_URL', 'http://hl7_validator_service:3500')
+          url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
           cli_context do
             txServer nil
@@ -130,7 +128,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     end
 
     it 'passes if several fhir api requests return all valid resources' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_fhir_api_requests(
@@ -164,7 +162,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     end
 
     it 'fails if any fhir api requests return invalid resources' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_failure.to_json)
 
       create_fhir_api_requests(
@@ -201,7 +199,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
     end
 
     it 'passes if at least one fhir api request returns a 200 even if one returns a non 200' do
-      validation_request = stub_request(:post, "#{validator_url}/validate")
+      validation_request = stub_request(:post, validation_url)
         .to_return(status: 200, body: operation_outcome_success.to_json)
 
       create_fhir_api_requests(
