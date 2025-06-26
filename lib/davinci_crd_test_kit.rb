@@ -1,4 +1,3 @@
-require_relative 'inferno_requirements_tools/ext/inferno_core/runnable'
 require_relative 'davinci_crd_test_kit/metadata'
 require_relative 'davinci_crd_test_kit/crd_server_suite'
 require_relative 'davinci_crd_test_kit/crd_client_suite'
