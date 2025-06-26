@@ -14,7 +14,7 @@ module DaVinciCRDTestKit
         level of detail provided is insufficient to determine coverage.
       )
     config options: { accepts_multiple_requests: true }
-    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@164', 'hl7.fhir.us.davinci-crd_2.0.1@171',
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@171',
                           'hl7.fhir.us.davinci-crd_2.0.1@183', 'hl7.fhir.us.davinci-crd_2.0.1@243',
                           'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245'
 
