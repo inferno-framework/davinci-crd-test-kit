@@ -123,6 +123,14 @@ module DaVinciCRDTestKit
       }
     ]
 
+    requirement_sets(
+      {
+        identifier: 'hl7.fhir.us.davinci-crd_2.0.1',
+        title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.0.1',
+        actor: 'Client'
+      }
+    )
+
     fhir_resource_validator do
       igs('hl7.fhir.us.davinci-crd#2.0.1')
 
