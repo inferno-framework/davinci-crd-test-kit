@@ -10,14 +10,15 @@ module DaVinciCRDTestKit
 
     input :update_resources,
           type: 'textarea',
-          description:
-          'Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]'
+          description: 'Provide a list of resources to update. e.g., [json_resource_1, json_resource_2]',
+          optional: true
 
     def resource_type
       config.options[:resource_type]
     end
 
     run do
+      skip_if update_resources.blank?, 'Provide a list of resources to update to run this test.'
       assert_valid_json(update_resources)
       update_resources_list = JSON.parse(update_resources)
       skip_if(!update_resources_list.is_a?(Array), 'Resources to update not inputted in list format, skipping test.')
