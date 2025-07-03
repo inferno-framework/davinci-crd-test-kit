@@ -1,4 +1,281 @@
 ﻿Req Set,ID,URL,Requirement,Conformance,Actors,Sub-Requirement(s),Conditionality,Not Tested Reason,Not Tested Details
+cds-hooks_2.0,1,https://cds-hooks.hl7.org/2.0/#use-of-json,All data exchanged through production RESTful APIs MUST be sent and received as JSON (JavaScript Object Notation) structures.,SHALL,"Client, Service",,,,
+cds-hooks_2.0,2,https://cds-hooks.hl7.org/2.0/#use-of-json,All data exchanged through production RESTful APIs MUST be ... transmitted over HTTPS,SHALL,"Client, Service",,,,
+cds-hooks_2.0,3,https://cds-hooks.hl7.org/2.0/#use-of-json,"JSON elements SHALL NOT be null … [or] empty, unless otherwise specified (e.g. to indicate no guidance with an empty array of cards in the CDS Hooks response).",SHALL NOT,"Client, Service",,,,
+cds-hooks_2.0,4,https://cds-hooks.hl7.org/2.0/#discovery,A CDS Service provider exposes its discovery endpoint at: {baseURL}/cds-services,SHALL,Service,,,,
+cds-hooks_2.0,5,https://cds-hooks.hl7.org/2.0/#http-request,The Discovery endpoint SHALL always be available at {baseUrl}/cds-services [using HTTP GET],SHALL,Service,,,,
+cds-hooks_2.0,6,https://cds-hooks.hl7.org/2.0/#response,The response to the discovery endpoint SHALL be an object containing a list [json array] of CDS Services.,SHALL,Service,,,,
+cds-hooks_2.0,7,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: hook
+- optionality: REQUIRED
+- type: string
+- description: The hook this service should be invoked on",SHALL,Service,,,,
+cds-hooks_2.0,8,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: title
+- optionality: RECOMMENDED
+- type: string
+- description:",SHOULD,Service,,,,
+cds-hooks_2.0,9,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: description
+- optionality: REQUIRED 
+- type: string 
+- description: The description of this service.",SHALL,Service,,,,
+cds-hooks_2.0,10,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: id
+- optionality: REQUIRED
+- type: string
+- description:  The {id} portion of the URL to this service which is available at
+{baseUrl}/cds-services/{id}",SHALL,Service,,,,
+cds-hooks_2.0,11,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: prefetch
+- optionality: OPTIONAL
+- type: object
+- description: An object containing key/value pairs of FHIR queries that this service is requesting the CDS Client to perform and provide on each service call. The key is a string that describes the type of data being requested and the value is a string representing the FHIR query.",MAY,Service,,,,
+cds-hooks_2.0,12,https://cds-hooks.hl7.org/2.0/#response,"Each CDS Service SHALL be described by the following attributes [including]:
+- field: usageRequirements
+- optionality: OPTIONAL
+- type: string
+- description: Human-friendly description of any preconditions for the use of this CDS Service.",MAY,Service,,,,
+cds-hooks_2.0,13,https://cds-hooks.hl7.org/2.0/#http-status-codes,[Services SHALL return a HTTP] 200 ok [response to indicate] A successful response [to a discovery request],SHALL,Service,,,,
+cds-hooks_2.0,14,https://cds-hooks.hl7.org/2.0/#http-status-codes,"CDS Services MAY return other HTTP statuses, specifically 4xx and 5xx HTTP error codes.",MAY,Service,,,,
+cds-hooks_2.0,15,https://cds-hooks.hl7.org/2.0/#http-request_1,A CDS Client SHALL call a CDS Service by POSTing a JSON document to the service,SHALL,Client,,,,
+cds-hooks_2.0,16,https://cds-hooks.hl7.org/2.0/#http-request_1,The CDS Service endpoint can be constructed from the CDS Service base URL and an individual service id as {baseUrl}/cds-services/{service.id}.,SHALL,Service,,,,
+cds-hooks_2.0,17,https://cds-hooks.hl7.org/2.0/#http-request_1,"CDS Clients may add additional requirements for the triggering of a hook, based upon the user, workflow, CDS Service or other reasons (e.g. if the service is provided by a payer, the patient has active coverage with that payer).",MAY,Client,,,,
+cds-hooks_2.0,18,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: hook
+- optionality: REQUIRED
+- type: string
+- description: The hook that triggered this CDS Service call.",SHALL,Client,,,,
+cds-hooks_2.0,19,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: hookInstance
+- optionality: REQUIRED
+- type: string
+- description: 	A universally unique identifier (UUID) for this particular hook call",SHALL,Client,,,,
+cds-hooks_2.0,20,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: fhirServer
+- optionality: CONDITIONAL
+- type: URL
+- description: The base URL of the CDS Client's FHIR server. If fhirAuthorization is provided, this field is REQUIRED. The scheme MUST be https when production data is exchanged.",SHALL,Client,,true,,
+cds-hooks_2.0,21,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: fhirAuthorization
+- optionality: OPTIONAL
+- type: object
+- description: A structure holding an OAuth 2.0 bearer access token granting the CDS Service access to FHIR resources, along with supplemental information relating to the token.",MAY,Client,,,,
+cds-hooks_2.0,22,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: context
+- optionality: REQUIRED
+- type: object
+- description: Hook-specific contextual data that the CDS service will need. For example, with the patient-view hook this will include the FHIR id of the Patient being viewed",SHALL,Client,,,,
+cds-hooks_2.0,23,https://cds-hooks.hl7.org/2.0/#http-request_1,"The [service invocation] request SHALL include a JSON POST body with the following input fields [including]:
+- field: prefetch
+- optionality: OPTIONAL
+- type: object
+- description: The FHIR data that was prefetched by the CDS Client",MAY,Client,,,,
+cds-hooks_2.0,24,https://cds-hooks.hl7.org/2.0/#hookinstance,"While working in the CDS Client, a user can perform multiple actions in series or in parallel. For example, a clinician might prescribe two drugs in a row; each prescription action would be assigned a unique hookInstance. This allows a CDS Service to uniquely identify each hook invocation.",SHALL,Client,,,,
+cds-hooks_2.0,25,https://cds-hooks.hl7.org/2.0/#hookinstance,the hookInstance is globally unique,SHALL,Client,,,,
+cds-hooks_2.0,26,https://cds-hooks.hl7.org/2.0/#hookinstance,the hookInstance ... should contain enough entropy to be un-guessable.,SHOULD,Client,,,,
+cds-hooks_2.0,27,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,CDS Services SHOULD respond quickly (on the order of 500 ms.),SHOULD,Service,,,,
+cds-hooks_2.0,28,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"FHIR resources MAY be obtained [by the service] by passing ""prefetched"" data from the CDS Client to the CDS Service in the service call.",MAY,Service,,,,
+cds-hooks_2.0,29,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"If data is to be prefetched, the CDS Service registers a set of ""prefetch templates"" with the CDS Client… [communicated] in the CDS Service discovery response.",SHALL,Service,,true,,
+cds-hooks_2.0,30,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"The [prefetched] FHIR resources are passed as key-value pairs, with each key matching a key described in the discovery response, and each value being a FHIR resource. Note that in the case of searches, this resource may be a searchset Bundle.",SHALL,Client,,true,,
+cds-hooks_2.0,31,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"If the CDS Client decides to have the CDS Service fetch its own FHIR resources, the CDS Client obtains and passes directly to the CDS Service a bearer token issued for the CDS Service's use in executing FHIR API calls against the CDS Client's FHIR server to obtain the required resources.",SHALL,Client,,true,,
+cds-hooks_2.0,32,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"Some CDS Clients MAY pass prefetched data, along with a bearer token for the CDS Service to use if additional resources are required.",MAY,Client,,false,,
+cds-hooks_2.0,33,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,"Each CDS Client SHOULD decide which approach [for providing data to the Service], or combination, is preferred, based on performance considerations and assessment of attendant security and safety risks.",DEPRECATED,Client,,false,,
+cds-hooks_2.0,34,https://cds-hooks.hl7.org/2.0/#providing-fhir-resources-to-a-cds-service,CDS Services should be capable of accessing FHIR resources via either prefetch or from the CDS Client's FHIR server.,SHOULD,Service,,true,,
+cds-hooks_2.0,35,https://cds-hooks.hl7.org/2.0/#prefetch-template,"To allow for prefetch templates that are dependent on the workflow context, prefetch templates may include references to context using prefetch tokens.",MAY,"Client, Service",,false,,
+cds-hooks_2.0,36,https://cds-hooks.hl7.org/2.0/#prefetch-template,The prefetch field of a CDS Service discovery response … [SHALL provide a] prefetch key for each … [prefetch template] that is used to identify the prefetch data in the CDS request.,SHALL,Service,,false,,
+cds-hooks_2.0,37,https://cds-hooks.hl7.org/2.0/#prefetch-template,"CDS Client MAY choose to honor zero, some, or all of the desired prefetch templates",SHALL,Client,,false,,
+cds-hooks_2.0,38,https://cds-hooks.hl7.org/2.0/#prefetch-template,A CDS Client MAY ... choose the most appropriate source for … [its prefetch] data,MAY,Client,,false,,
+cds-hooks_2.0,39,https://cds-hooks.hl7.org/2.0/#prefetch-template,"[To avoid a network call,] the CDS Client MAY ... [use] prefetched data already in memory",MAY,Client,,false,,
+cds-hooks_2.0,40,https://cds-hooks.hl7.org/2.0/#prefetch-template,"[To minimize the number of calls,] the CDS Client MAY compute an efficient set of prefetch templates from multiple CDS Services",MAY,Client,,false,,
+cds-hooks_2.0,41,https://cds-hooks.hl7.org/2.0/#prefetch-template,The CDS Client MAY satisfy some of the desired prefetched templates via some internal service or even its own FHIR server.,MAY,Client,,false,,
+cds-hooks_2.0,42,https://cds-hooks.hl7.org/2.0/#prefetch-template,The CDS Client SHALL only provide access to resources that are within the user's authorized scope.,SHALL,Client,,false,,
+cds-hooks_2.0,43,https://cds-hooks.hl7.org/2.0/#prefetch-template,The relative URL [constructed when a CDS client processes prefetch templates] may be appended to the base URL for the CDS Client's FHIR server and directly invoked,MAY,Client,,false,,
+cds-hooks_2.0,44,https://cds-hooks.hl7.org/2.0/#prefetch-template,CDS Clients may use internal infrastructure to satisfy the [prefetch] request in the same way that invoking against the FHIR server would.,MAY,Client,,false,,
+cds-hooks_2.0,45,https://cds-hooks.hl7.org/2.0/#prefetch-template,the prefetched data given to the CDS Service MUST be equivalent to the data the CDS Service would receive if it were making its own call to the CDS Client's FHIR server using the parameterized prefetch template.,SHALL,Client,,false,,
+cds-hooks_2.0,46,https://cds-hooks.hl7.org/2.0/#prefetch-template,Prefetch data for other services registered to the same hook MUST NOT be provided [to a CDS service that has not requested or is not authorized to receive it],SHALL NOT,Client,,false,,
+cds-hooks_2.0,47,https://cds-hooks.hl7.org/2.0/#prefetch-template,[CDS] services SHALL only receive the data they requested in their prefetch.,SHALL,Client,,false,,
+cds-hooks_2.0,48,https://cds-hooks.hl7.org/2.0/#prefetch-template,CDS Client MAY paginate prefetch results,MAY,Client,,false,,
+cds-hooks_2.0,49,https://cds-hooks.hl7.org/2.0/#prefetch-template,The CDS Client MUST NOT send any prefetch template key that it chooses not to satisfy.,SHALL NOT,Client,,false,,
+cds-hooks_2.0,50,https://cds-hooks.hl7.org/2.0/#prefetch-template,"If the CDS Client encounters errors prefetching the requested data, OperationOutcome(s) SHOULD be used to communicate those errors",SHOULD,Client,,true,,
+cds-hooks_2.0,51,https://cds-hooks.hl7.org/2.0/#prefetch-template,CDS Clients MUST omit the prefetch key if relevant details cannot be provided (e.g. intermittent connectivity issues),SHALL,Client,,false,,
+cds-hooks_2.0,52,https://cds-hooks.hl7.org/2.0/#prefetch-template,CDS Services SHOULD check any prefetched data for the existence of OperationOutcomes,SHOULD,Service,,false,,
+cds-hooks_2.0,53,https://cds-hooks.hl7.org/2.0/#prefetch-template,"If the CDS Client has no data to populate a template prefetch key, the prefetch template key MUST have a value of null.",SHALL,Client,,true,,
+cds-hooks_2.0,54,https://cds-hooks.hl7.org/2.0/#prefetch-template,"If the CDS Service is unable to obtain required data because it cannot access the FHIR server and the request did not contain the necessary prefetch keys, the service SHALL respond with an HTTP 412 Precondition Failed status code.",SHALL,Service,,true,,
+cds-hooks_2.0,55,https://cds-hooks.hl7.org/2.0/#prefetch-tokens,Prefetch tokens MUST be delimited by {{ and }},SHALL,Client,,false,,
+cds-hooks_2.0,56,https://cds-hooks.hl7.org/2.0/#prefetch-tokens,"Prefetch tokens ... MUST contain only the qualified path to a hook context field or one of the following user identifiers: userPractitionerId, userPractitionerRoleId, userPatientId, or userRelatedPersonId",SHALL,Client,,true,,
+cds-hooks_2.0,57,https://cds-hooks.hl7.org/2.0/#prefetch-tokens,Only root-level fields with a primitive value within the context object are eligible to be used as prefetch tokens.,SHALL,Client,,true,,
+cds-hooks_2.0,58,https://cds-hooks.hl7.org/2.0/#prefetch-query-restrictions,"To reduce the implementation burden on CDS Clients that support CDS Services, this specification RECOMMENDS that prefetch queries only use a subset of the full functionality available in the FHIR specification … [that includes]:
+- instance level [read](https://www.hl7.org/fhir/http.html#read) interactions (for resources with known ids such as `Patient`, `Practitioner`, or `Encounter`)
+- type level [search](https://www.hl7.org/fhir/http.html#search) interactions; e.g. `patient={{context.patientId}}`
+-  Resource references (e.g. `patient={{context.patientId}}`)
+- token search parameters using equality (e.g. `code=4548-4`) and ... the `:in` modifier (no other modifiers for token parameters)
+- date search parameters on `date`, `dateTime`, `instant`, or `Period` types only, and using only the prefixes `eq`, `lt`, `gt`, `ge`, `le`
+- the `_count` parameter to limit the number of results returned
+- the `_sort` parameter to allow for most recent and first queries",SHOULD,Service,,,,
+cds-hooks_2.0,59,https://cds-hooks.hl7.org/2.0/#example-prefetch-token,"When context fields are used as tokens, their token name MUST be `context.name-of-the-field`",SHALL,Client,,true,,
+cds-hooks_2.0,60,https://cds-hooks.hl7.org/2.0/#fhir-resource-access,"If the CDS Client provides both fhirServer and fhirAuthorization request parameters, the CDS Service MAY use the FHIR server to obtain any FHIR resources for which it's authorized, beyond those provided by the CDS Client as prefetched data",MAY,Service,,true,,
+cds-hooks_2.0,61,https://cds-hooks.hl7.org/2.0/#fhir-resource-access,CDS Hooks requires that CDS Services present a valid access token to the FHIR server with each API call,SHALL,Service,,false,,
+cds-hooks_2.0,62,https://cds-hooks.hl7.org/2.0/#fhir-resource-access,"CDS Hooks workflow MUST accommodate the automated, low-latency delivery of an access token to the CDS service",SHALL,Client,,false,,
+cds-hooks_2.0,63,https://cds-hooks.hl7.org/2.0/#fhir-resource-access,"[When executing a CDS request on behalf of a user,] the data to which the CDS Service is given access by the CDS Client MUST be limited to the same restrictions and authorizations afforded the current user.",SHALL,Client,,true,,
+cds-hooks_2.0,64,https://cds-hooks.hl7.org/2.0/#fhir-resource-access,"[When executing a CDS request on behalf of a user,] the access token SHALL be scoped to: The CDS Service being invoked [and] the current user",SHALL,Client,,true,,
+cds-hooks_2.0,65,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"If the CDS Client chooses not to pass along an access token, the fhirAuthorization parameter [SHALL be] … omitted.",SHALL,Client,,true,,
+cds-hooks_2.0,66,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter, the]  access_token field [SHALL be populated with] the [Oauth 2.0](https://oauth.net/2/) access token [as a] string data type",SHALL,Client,,true,,
+cds-hooks_2.0,67,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter, the]  token_type field [SHALL be populated with the] fixed value: 'Bearer'",SHALL,Client,,true,,
+cds-hooks_2.0,68,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter, the]  expires_in field [SHALL be populated with the] the lifetime in seconds of the access token [as an] integer data type",SHALL,Client,,true,,
+cds-hooks_2.0,69,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter, the]  scope field [SHALL be populated with the] the scopes the access token grants the CDS Service [as a] string data type",SHALL,Client,,true,,
+cds-hooks_2.0,70,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter, the]  subject field [SHALL be populated with] the [Oauth 2.0](https://oauth.net/2/) client identifier of the CDS Service, as registered with the CDS Client's authorization server [as a] string data type",SHALL,Client,,true,,
+cds-hooks_2.0,71,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,"[When sending a fhirAuthorization request parameter and] the access token is restricted to a specific patient, [the]  patient field  SHOULD be populated to identify the FHIR id of that patient [as a] string data type",SHALL,Client,,true,,
+cds-hooks_2.0,72,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,The `expires_in` value is established by the authorization server and SHOULD BE very short lived,SHOULD,Client,,false,,
+cds-hooks_2.0,73,https://cds-hooks.hl7.org/2.0/#passing-the-access-token-to-the-cds-service,CDS Clients SHOULD revoke an issued access token upon the completion of the CDS Hooks request/response to limit the validity period of the token.,SHOULD,Client,,true,,
+cds-hooks_2.0,74,https://cds-hooks.hl7.org/2.0/#cds-service-response,"For successful responses, CDS Services SHALL respond with a 200 HTTP response with an object containing a cards array",SHALL,Service,,true,,
+cds-hooks_2.0,75,https://cds-hooks.hl7.org/2.0/#cds-service-response,"For successful responses, CDS Services [MAY] optionally [respond with an object containing] a systemActions array",SHALL,Service,,true,,
+cds-hooks_2.0,76,https://cds-hooks.hl7.org/2.0/#cds-service-response,"CDS Services MAY return other HTTP statuses, specifically 4xx and 5xx HTTP error codes.",MAY,Service,,true,,
+cds-hooks_2.0,77,https://cds-hooks.hl7.org/2.0/#cds-service-response,"If … [the] CDS Service has no decision support for the user, … [the] service should return a 200 HTTP response with an empty array of cards",SHOULD,Service,,true,,
+cds-hooks_2.0,78,https://cds-hooks.hl7.org/2.0/#cds-service-response,Clients SHOULD remove cards returned by previous invocations of a hook to a service with the same id when a new hook is triggered (see [update stale guidance](https://cds-hooks.hl7.org/2.0/#update-stale-guidance)).,SHOULD,Service,,true,,
+cds-hooks_2.0,79,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the uuid field SHALL be included in any subsequent calls to the CDS service's feedback endpoint.,SHALL,Client,,true,,
+cds-hooks_2.0,80,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the uuid field SHALL [be a] unique identifier of the card [and be sent as] a string data type,SHALL,Service,,true,,
+cds-hooks_2.0,81,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the uuid field is optional,MAY,Service,,true,,
+cds-hooks_2.0,82,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the uuid field MAY be used for auditing and logging cards,MAY,Service,,true,,
+cds-hooks_2.0,83,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the summary field Shall be a < 140 summary message for display to the user as a string data type,SHALL,Service,,true,,
+cds-hooks_2.0,84,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the detail field is optional [and used to send] information to display,MAY,Service,,true,,
+cds-hooks_2.0,85,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object] the detail field, if provided, MUST be represented in [(GitHub Flavored) Markdown](https://github.github.com/gfm/)",SHALL,Service,,true,,
+cds-hooks_2.0,86,https://cds-hooks.hl7.org/2.0/#card-attributes,"For non-urgent cards, the CDS Client MAY hide [the information from the detail field] until the user clicks a link like ""view more details.",MAY,Client,,true,,
+cds-hooks_2.0,87,https://cds-hooks.hl7.org/2.0/#card-attributes,[When sending a card object] the indicator field is a required field [conveying] the urgency / importance of the card [information sent as a] string data type,SHALL,Service,,true,,
+cds-hooks_2.0,88,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object] the indicator field's allowed values, in order of increasing urgency, are: info, warning, critical",SHALL,Service,,true,,
+cds-hooks_2.0,89,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the CDS Client MAY use [the indicator] field to help make UI display decisions such as sort order or coloring.",SHALL,Service,,true,,
+cds-hooks_2.0,90,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the source is a required field [and SHALL be populated with a] [source](https://cds-hooks.hl7.org/2.0/#source) object",SHALL,Service,,true,,
+cds-hooks_2.0,91,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the source field [/ source object] should be the primary source of guidance for the decision support the card represents.",SHOULD,Client,,true,,
+cds-hooks_2.0,92,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the suggestion field  allows a service to suggest a set of changes in the context of the current activity [and is sent as a] array of [suggestion](https://cds-hooks.hl7.org/2.0/#suggestion) [objects]",SHALL,Service,,true,,
+cds-hooks_2.0,93,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  If suggestions are present, selectionBehavior MUST also be provided.",SHALL,Service,,true,,
+cds-hooks_2.0,94,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the suggestion field  is optional",MAY,Service,,true,,
+cds-hooks_2.0,95,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the selectionBehavior field [has] allowed values of at-most-one, indicating that the user may choose none or at most one of the suggestions [and] any, indicating that the end user may choose any number of suggestions including none of them and all of them",SHALL,Service,,true,,
+cds-hooks_2.0,96,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the selectionBehavior field [SHALL be sent as a] string data type [and SHALL be present if the suggestions field in the card is populated]",SHALL,Service,,true,,
+cds-hooks_2.0,97,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,] CDS Clients that do not understand the value [in the selectionBehavior field] MUST treat the card as an error.",SHALL,Client,,true,,
+cds-hooks_2.0,98,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the overrideReason field [SHALL be sent as a] array of [coding](https://cds-hooks.hl7.org/2.0/#coding) [objects]",SHALL,Service,,true,,
+cds-hooks_2.0,99,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the CDS service MAY return a list of override reasons to the CDS client",MAY,Service,,true,,
+cds-hooks_2.0,100,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  if override reasons are present, the CDS Service MUST populate a display value for each reason's [Coding](https://cds-hooks.hl7.org/2.0/#coding)",SHALL,Service,,true,,
+cds-hooks_2.0,101,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  if override reasons are present … the CDS Client SHOULD present these reasons to the clinician when they dismiss a card.",SHOULD,Client,,true,,
+cds-hooks_2.0,102,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  if override reasons are present … a CDS Client MAY augment the override reasons presented to the user with its own reasons.",MAY,Client,,true,,
+cds-hooks_2.0,103,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the link field [SHALL be sent as a] array of [link](https://cds-hooks.hl7.org/2.0/#link) [objects]",SHALL,Service,,true,,
+cds-hooks_2.0,104,https://cds-hooks.hl7.org/2.0/#card-attributes,"[When sending a card object,]  the link field is optional",MAY,Service,,true,,
+cds-hooks_2.0,105,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the label field is required and [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,106,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] if a url is also specified, [the label field] MAY be the text for the hyperlink",MAY,Service,,true,,
+cds-hooks_2.0,107,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the url field [SHALL be a] URL data type [and use a] absolute URL",SHALL,Service,,true,,
+cds-hooks_2.0,108,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the url field is optional",MAY,Service,,true,,
+cds-hooks_2.0,109,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the URL [field] should not be used to supply a context-specific ""drill-down"" view of the information on this card.",SHOULD NOT,Service,,true,,
+cds-hooks_2.0,110,https://cds-hooks.hl7.org/2.0/#source,"To supply a context-specific ""drill-down"" view of the information on a card [object implementers SHOULD] ... use [card.link.url](https://cds-hooks.hl7.org/2.0/#link)",SHOULD,Service,,false,,
+cds-hooks_2.0,111,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the icon field [SHALL be a] URL data type [and use a] absolute URL",SHALL,Service,,true,,
+cds-hooks_2.0,112,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the icon field URL SHOULD be a 100x100 pixel PNG image without any transparent regions.",SHOULD,Service,,true,,
+cds-hooks_2.0,113,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the icon field is optional",MAY,Service,,true,,
+cds-hooks_2.0,114,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the CDS Client may ignore or scale the image during display as appropriate for user experience.",MAY,Client,,true,,
+cds-hooks_2.0,115,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the topic field [SHALL be a] [Coding](https://cds-hooks.hl7.org/2.0/#coding) type object",SHALL,Service,,true,,
+cds-hooks_2.0,116,https://cds-hooks.hl7.org/2.0/#source,"[When sending a Source object,] the topic field is optional",MAY,Service,,true,,
+cds-hooks_2.0,117,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the label field is required and [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,118,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the uuid field is optional",MAY,Service,,true,,
+cds-hooks_2.0,119,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the uuid field [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,120,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the isRecommended field is optional",MAY,Service,,true,,
+cds-hooks_2.0,121,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the isRecommended field [SHALL be a] boolean data type",SHALL,Service,,true,,
+cds-hooks_2.0,122,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] multiple suggestions MAY be recommended [using suggestion.isRecommended], if card.selectionBehavior is any.",MAY,Service,,true,,
+cds-hooks_2.0,123,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the action field is optional",MAY,Service,,true,,
+cds-hooks_2.0,124,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] the action field [SHALL be a] array of [actions](https://cds-hooks.hl7.org/2.0/#action)",SHALL,Service,,true,,
+cds-hooks_2.0,125,https://cds-hooks.hl7.org/2.0/#suggestion,"Within a suggestion, all actions … [SHALL use] AND [logic], such that a user selecting a suggestion selects all of the actions within it.",SHALL,"Client, Service",,true,,
+cds-hooks_2.0,126,https://cds-hooks.hl7.org/2.0/#suggestion,"[When sending a Suggestion object,] When a suggestion contains multiple actions, the actions SHOULD be processed as per FHIR's rules for processing [transactions](https://hl7.org/fhir/http.html#trules) with the CDS Client's fhirServer as the base url for the inferred full URL of the transaction bundle entries. (Specifically, deletes happen first, then creates, then updates).",SHOULD,Client,,true,,
+cds-hooks_2.0,127,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] the type field is required and [SHALL be a] string data type [with] values of create, update, delete.",SHALL,Service,,true,,
+cds-hooks_2.0,128,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] the description field is required and [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,129,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] the description field MAY be presented to the end-user",MAY,Service,,true,,
+cds-hooks_2.0,130,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] the resource field [SHALL be a] FHIR resource",SHALL,Service,,true,,
+cds-hooks_2.0,131,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] when the type attribute [of the Action object] is create, the resource attribute SHALL contain a new FHIR resource to be created.",SHALL,Service,,true,,
+cds-hooks_2.0,132,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] when the type attribute [of the Action object] is update, this holds the updated resource in its entirety and not just the changed fields.",SHALL,Service,,true,,
+cds-hooks_2.0,133,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object and when the type attribute of the Action object is delete], [the resource field SHALL NOT be used] to communicate a string of a FHIR id for delete suggestions",SHALL,Service,,true,,
+cds-hooks_2.0,134,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object and when the type attribute of the Action object is delete], the resourceID field SHOULD be provided",SHALL,Service,,true,,
+cds-hooks_2.0,135,https://cds-hooks.hl7.org/2.0/#action,"[When sending an Action object,] the resourceID field [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,136,https://cds-hooks.hl7.org/2.0/#reasons-for-rejecting-a-card,"[When sending card.overrideReason,] CDS Services MUST provide a human readable text in the display property",SHALL,Service,,true,,
+cds-hooks_2.0,137,https://cds-hooks.hl7.org/2.0/#reasons-for-rejecting-a-card,CDS Clients MAY incorporate [the card.overrideReason.display] into their user interface,MAY,Client,,false,,
+cds-hooks_2.0,138,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the label field is required [and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,139,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the url field is required [and SHALL be a] URL data type",SHALL,Service,,true,,
+cds-hooks_2.0,140,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the url field MAY be a ""deep link"" with context embedded in path segments, query parameters, or a hash.",MAY,Service,,true,,
+cds-hooks_2.0,141,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the type field is required [and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,142,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the type field [SHALL have values]  absolute … or smart. absolute indicates that the URL is absolute and should be treated as-is. smart indicates that the URL is absolute or smart indicates that the URL is a SMART app launch URL",SHALL,Service,,true,,
+cds-hooks_2.0,143,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object and the link.type field is smart,] CDS Client should ensure the SMART app launch URL is populated with the appropriate SMART launch parameters.",SHOULD,Client,,true,,
+cds-hooks_2.0,144,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the appContext field [SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,145,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the appContext field is optional",MAY,Service,,true,,
+cds-hooks_2.0,146,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the appContext field should only be valued if the link type is smart",SHOULD,Service,,true,,
+cds-hooks_2.0,147,https://cds-hooks.hl7.org/2.0/#link,"[When sending a Link object,] the appContext field  is not valid for absolute links [in other words, when link.type is absolute appContext SHALL NOT be populated]",SHALL NOT,Service,,true,,
+cds-hooks_2.0,148,https://cds-hooks.hl7.org/2.0/#feedback,A CDS Service MAY support a feedback endpoint [to gather suggestion analytics from the CDS client],MAY,Service,,false,,
+cds-hooks_2.0,149,https://cds-hooks.hl7.org/2.0/#feedback,a CDS Client SHOULD be capable of sending feedback [to send suggestion analytics to the CDS service],SHOULD,Client,,false,,
+cds-hooks_2.0,150,https://cds-hooks.hl7.org/2.0/#feedback,CDS Clients should report ... end-user interactions as feedback.,SHOULD,Client,,false,,
+cds-hooks_2.0,151,https://cds-hooks.hl7.org/2.0/#feedback,A CDS Client provides feedback by POSTing a JSON document,SHALL,Client,,false,,
+cds-hooks_2.0,152,https://cds-hooks.hl7.org/2.0/#feedback,"The [service's] feedback endpoint can ([SHALL]) be constructed from the CDS Service endpoint and a path segment of ""feedback"" as {baseUrl}/cds-services/{service.id}/feedback",SHALL,Client,,true,,
+cds-hooks_2.0,153,https://cds-hooks.hl7.org/2.0/#feedback,"The feedback endpoint [for submission] can ([SHALL]) be constructed from the CDS Service endpoint and a path segment of ""feedback"" as {baseUrl}/cds-services/{service.id}/feedback",SHALL,Client,,false,,
+cds-hooks_2.0,154,https://cds-hooks.hl7.org/2.0/#feedback,The request to the feedback endpoint SHALL be an object containing an array [of [Feedback](https://cds-hooks.hl7.org/2.0/#feedback) objects],SHALL,Client,,false,,
+cds-hooks_2.0,155,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the card field is required [and SHALL be a] string data type [containing] the card.uuid from the CDS Hooks response",SHALL,Client,,true,,
+cds-hooks_2.0,156,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the outcome field is required [and SHALL be a] string data type [with a value of either] accepted or overridden",SHALL,Client,,true,,
+cds-hooks_2.0,157,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the outcome field is required [and SHALL be a] string data type [with a value of either] accepted or overridden",SHALL,Client,,true,,
+cds-hooks_2.0,158,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the acceptedSuggestions field is an array of json objects and is required [when feedback.outcome is accepted]",SHALL,Client,,true,,
+cds-hooks_2.0,159,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the overrideReason field is a overrideReason object",SHALL,Client,,true,,
+cds-hooks_2.0,160,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the overrideReason field is optional",MAY,Client,,true,,
+cds-hooks_2.0,161,https://cds-hooks.hl7.org/2.0/#feedback,"[When sending a feedback object,] the outcomeTimestamp field is required [and SHALL be a] string data type [using the] [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) representation of the date and time in Coordinated Universal Time (UTC) when action was taken on the card, as profiled in [section 5.6 of RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)",SHALL,Client,,true,,
+cds-hooks_2.0,162,https://cds-hooks.hl7.org/2.0/#suggestion-accepted,"[When sending an AcceptedSuggestion object], the id field is required [and SHALL be a] string data type [containing] card.suggestion.uuid from the CDS Hooks response",SHALL,Client,,true,,
+cds-hooks_2.0,163,https://cds-hooks.hl7.org/2.0/#suggestion-accepted,"If either the card or the suggestion has no uuid, the CDS Client does not send a [feedback] notification",SHALL,Client,,true,,
+cds-hooks_2.0,164,https://cds-hooks.hl7.org/2.0/#card-ignored,If the end-user doesn't interact with the CDS Service's card at all … the CDS Client [SHALL NOT] inform the CDS Service of the rejected guidance,SHALL NOT,Client,,true,,
+cds-hooks_2.0,165,https://cds-hooks.hl7.org/2.0/#overridereason,"[When sending a overrideReason object,] the reason field is required if user selected an override reason from the list of reasons provided in the Card [and SHALL be a] coding object",SHALL,Client,,true,,
+cds-hooks_2.0,166,https://cds-hooks.hl7.org/2.0/#overridereason,"[When sending a overrideReason object,] the userComment field is a string data type",SHALL,Client,,true,,
+cds-hooks_2.0,167,https://cds-hooks.hl7.org/2.0/#overridereason,"[When sending a overrideReason object,] the userComment field is optional",MAY,Client,,true,,
+cds-hooks_2.0,168,https://cds-hooks.hl7.org/2.0/#security-and-safety,"All data exchanged through the RESTful APIs MUST be transmitted over channels secured using the Hypertext Transfer Protocol (HTTP) over Transport Layer Security (TLS), also known as HTTPS and defined in [RFC2818](https://tools.ietf.org/html/rfc2818)",SHALL,"Client, Service",,false,,
+cds-hooks_2.0,169,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,"Each CDS Client vendor/provider SHOULD maintain an ""allow list"" (and/or ""deny list"") of the CDS Services it has vetted",SHOULD,Client,,false,,
+cds-hooks_2.0,170,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,"Each CDS Client vendor/provider SHOULD maintain an ""allow list"" (and/or ""deny list"") of ... the Card links that have been deemed safe to display from within the CDS Client context",SHOULD,Client,,false,,
+cds-hooks_2.0,171,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,The CDS Service can be registered with the CDS Client's authorization server,MAY,Client,,false,,
+cds-hooks_2.0,172,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,Every interaction between a CDS Client and a CDS Service is initiated by the CDS Client sending a service request to a CDS Service endpoint protected using the [Transport Layer Security protocol] (https://tools.ietf.org/html/rfc5246),SHALL,Client,,false,,
+cds-hooks_2.0,173,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,CDS Client SHALL deny access to a requested resource if it is outside the user's authorized scope,SHALL,Client,,false,,
+cds-hooks_2.0,174,https://cds-hooks.hl7.org/2.0/#trusting-cds-services,"If a CDS Client is satisfying prefetch requests from a CDS Service or sends a non-null fhirAuthorization object to a CDS Service so that it can call the FHIR server, the CDS Service MUST be pre-registered with the authorization server protecting access to the FHIR server",SHALL,Client,,true,,
+cds-hooks_2.0,175,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[The CDS service] MAY use mutual TLS, in which both ends of the channel are authenticated.",MAY,Service,,false,,
+cds-hooks_2.0,176,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[If not using mutual TLS,] to enable the CDS Service to authenticate the identity of the CDS Client, CDS Hooks uses digitally signed [JSON web tokens (JWT)](https://jwt.io/) [(rfc7519)](https://tools.ietf.org/html/rfc7519)",SHALL,Service,,true,,
+cds-hooks_2.0,177,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,CDS Services SHOULD require authentication if invoking the service poses any risk of exposing sensitive data to the caller.,SHOULD,Service,,false,,
+cds-hooks_2.0,178,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"Each time a CDS Client transmits a request to a CDS Service which requires authentication, the request MUST include an Authorization header presenting the JWT as a “Bearer” token:
+Authorization:  Bearer {{JWT}}",SHALL,Client,,true,,
+cds-hooks_2.0,179,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,mutual TLS MAY be used alongside JSON web tokens to establish trust of the CDS Client by the CDS Service,MAY,"Client, Service",,false,,
+cds-hooks_2.0,180,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"The CDS Client MUST use its private key to digitally sign the JWT, using the [JSON Web Signatures (rfc7515)](https://tools.ietf.org/html/rfc7515) standard",SHALL,Client,,false,,
+cds-hooks_2.0,181,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the alg field is required [and SHALL be a] string data type [containing] the cryptographic algorithm used to sign this JWT.",SHALL,Client,,true,,
+cds-hooks_2.0,182,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the kid field is required [and SHALL be a] string data type [containing] the identifier of the key-pair used to sign this JWT.",SHALL,Client,,true,,
+cds-hooks_2.0,183,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the kid field MUST be unique within the CDS Client's JWK Set.",SHALL,Client,,true,,
+cds-hooks_2.0,184,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the typ field is required [and SHALL be a] string data type and SHALL be 'JWT'",SHALL,Client,,true,,
+cds-hooks_2.0,185,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the jku field is a url data type [containing] the URL to the JWK Set containing the public key(s)",SHALL,Client,,true,,
+cds-hooks_2.0,186,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT header,] the jku field is optional",MAY,Client,,true,,
+cds-hooks_2.0,187,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the iss field is required [and SHALL be a] string data type [containing] the URI of the issuer of the JWT",SHALL,Client,,true,,
+cds-hooks_2.0,188,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"The JWT MAY be self-issued by the CDS Client, or MAY be issued by a third-party identity provider.",MAY,Client,,true,,
+cds-hooks_2.0,189,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the aud field is required [and SHALL be a] string data type or an array of strings [per [rfc7519](https://tools.ietf.org/html/rfc7519#section-4.1.3) containing] the CDS Service endpoint that is being called by the CDS Client",SHALL,Client,,true,,
+cds-hooks_2.0,190,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the exp field is required [and SHALL be a] number data type [containing the] expiration time integer for this authentication JWT, expressed in seconds since the ""Epoch"" (1970-01-01T00:00:00Z UTC).",SHALL,Client,,true,,
+cds-hooks_2.0,191,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the iat field is required [and SHALL be a] number data type [containing] the time at which this JWT was issued, expressed in seconds since the ""Epoch"" (1970-01-01T00:00:00Z UTC)",SHALL,Client,,true,,
+cds-hooks_2.0,192,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the jti field is required [and SHALL be a] string data type[containing] a nonce string value that uniquely identifies this authentication JWT (used to protect against replay attacks)",SHALL,Client,,true,,
+cds-hooks_2.0,193,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the tenant field  [SHALL be a] string data type [containing] an opaque string identifying the healthcare organization that is invoking the CDS Hooks request",SHALL,Client,,true,,
+cds-hooks_2.0,194,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"[When sending a JWT payload,] the tenant field  is optional",MAY,Client,,true,,
+cds-hooks_2.0,195,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,CDS Services SHOULD limit the CDS Clients they trust by maintaining an allowlist of iss and jku urls.,SHOULD,Service,,false,,
+cds-hooks_2.0,196,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"For CDS Hooks, [the aud] value MUST be the URL of the CDS Service endpoint being invoked",SHALL,Client,,false,,
+cds-hooks_2.0,197,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"The CDS Client MUST make its public key, expressed as a JSON Web Key (JWK), available in a JWK Set, as defined by [rfc7517](https://tools.ietf.org/html/rfc7517)",SHALL,Client,,false,,
+cds-hooks_2.0,198,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"The CDS Client MAY make its JWK Set available via a URL identified by the jku header field, as defined by [rfc7515 4.1.2](https://tools.ietf.org/html/rfc7515#section-4.1.2)",MAY,Client,,false,,
+cds-hooks_2.0,199,https://cds-hooks.hl7.org/2.0/#trusting-cds-clients,"If the jku header field is ommitted, the CDS Client and CDS Service SHALL communicate the JWK Set out-of-band.",SHALL,"Client, Service",,true,,
+cds-hooks_2.0,200,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,[JSON Web Algorithms (rfc7518)](https://tools.ietf.org/html/rfc7518) defines several cryptographic algorithms for use in signing JWTs and should be referenced by CDS Hooks implementers.,SHOULD,"Client, Service",,false,,
+cds-hooks_2.0,201,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,"JWTs SHALL NOT be signed using the none algorithm, referred to in rfc7518 as unsecured JSON Web Signatures, [and Services SHALL NOT accept these JWTs] as the lack of a cryptographic signature does not provide any integrity protection.",SHALL NOT,Service,,false,,
+cds-hooks_2.0,202,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,"JWTs SHALL NOT be signed [by Clients] using the none algorithm, referred to in rfc7518 as unsecured JSON Web Signatures, as the lack of a cryptographic signature does not provide any integrity protection.",SHALL NOT,Client,,false,,
+cds-hooks_2.0,203,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,JWTs SHALL NOT be signed using any symmetric algorithm as these algorithms require the CDS Client and CDS Service to share a private key in order to verify the signature,SHALL NOT,"Client, Service",,false,,
+cds-hooks_2.0,204,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,"When choosing an algorithm to sign their JWTs, CDS Clients SHOULD consider not only the algorithms (and key sizes) that are recommended within the security industry, but also how well those algorithms are supported in the various programming languages and libraries that may be used by CDS Services.",SHOULD,Client,,false,,
+cds-hooks_2.0,205,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,"At publication time of this specification, both ES384 and RS384 are RECOMMENDED for their regard within the larger security industry, strength, and support across popular programming languages and libraries.",SHOULD,"Client, Service",,false,,
+cds-hooks_2.0,206,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,"Stronger and better algorithms [than ES384 and RS384] are continually being introduced due to new threats, weaknesses, and increases in computing power [and] CDS Clients SHOULD continually re-evaluate their choice of an algorithm based upon these ever changing conditions.",SHOULD,"Client, Service",,false,,
+cds-hooks_2.0,207,https://cds-hooks.hl7.org/2.0/#jwt-signing-algorithm,CDS Services SHOULD consider the algorithms they understand and trust based upon their tolerance for risk.,DEPRECATED,Service,,false,,
+cds-hooks_2.0,208,https://cds-hooks.hl7.org/2.0/#cross-origin-resource-sharing,CDS Services and browser-based CDS Clients will require CORS support. [Cross-origin resource sharing (CORS)](https://www.w3.org/TR/cors/) is a [World Wide Web Consortium (W3C)](https://www.w3.org/Consortium/) standard mechanism that uses additional HTTP headers to enable a web browser to gain permission to access resources from an Internet domain different from that which the browser is currently accessing.,SHALL,"Client, Service",,true,,
+cds-hooks_2.0,209,https://cds-hooks.hl7.org/2.0/#update-stale-guidance,"In the case that CDS Hooks cards are persisted, clients should take care to ensure that stale guidance does not negatively impact patient care.",SHOULD,Client,,true,,
+cds-hooks_2.0,210,https://cds-hooks.hl7.org/2.0/#update-stale-guidance,CDS Services can update their previously returned guidance by returning a new set of cards when the service is invoked based on a different hook,MAY,Service,,true,,
+cds-hooks_2.0,211,https://cds-hooks.hl7.org/2.0/#update-stale-guidance,CDS Services indicate [intent to update an existing card] by providing multiple CDS Services with the same id in discovery.,SHALL,Service,,true,,
+cds-hooks_2.0,212,https://cds-hooks.hl7.org/2.0/#update-stale-guidance,[When updating a card] Clients are recommended to remove cards returned by a previous invocation with the new cards.,SHOULD,Service,,true,,
+cds-hooks_2.0,213,https://cds-hooks.hl7.org/2.0/#update-stale-guidance,Note that CDS Services will need to negotiate with CDS Clients to ensure that hooks that are required to ensure patient safety are supported by the CDS Client,SHALL,Service,,true,,
+cds-hooks_2.0,214,https://cds-hooks.hl7.org/2.0/#extensions,The value of an extension element MUST be a pre-coordinated JSON object,SHALL,"Client, Service",,false,,
+cds-hooks_2.0,215,https://cds-hooks.hl7.org/2.0/#extensions,"Extension structures SHOULD use a strategy for naming that ensures global uniqueness, such as reverse-domain-name notation",SHOULD,"Client, Service",,false,,
+cds-hooks_2.0,216,https://cds-hooks.hl7.org/2.0/#coding,"[When sending a coding object,] the code field is required [and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,217,https://cds-hooks.hl7.org/2.0/#coding,"[When sending a coding object,] the system field is required [and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,218,https://cds-hooks.hl7.org/2.0/#coding,"[When sending a coding object,] the code field is required [and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,219,https://cds-hooks.hl7.org/2.0/#coding,"[When sending a coding object,] the display field is human-readable display required [when] [Override Reasons](https://cds-hooks.hl7.org/2.0/#overridereason) provided by CDS Service [are sent in card.overrideReason and SHALL be a] string data type",SHALL,Service,,true,,
+cds-hooks_2.0,220,https://cds-hooks.hl7.org/2.0/#coding,"[When sending a coding object,] the display field is human-readable display [which is] OPTIONAL  [when sending source.topic]",SHALL,Service,,true,,
 hl7.fhir.us.davinci-crd_2.0.1,1,https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#foundational-requirements,"Future versions of this specification will evolve based on implementer feedback. Therefore, CRD servers and CRD clients MAY mutually agree to support additional hooks, additional card patterns, additional resources, additional extensions, etc. not found in this specification.",MAY,"Client, Server",,,,
 hl7.fhir.us.davinci-crd_2.0.1,2,https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#mustsupport,"For CRD clients, If the client maintains the data element and surfaces it to users, then it SHALL be exposed in their FHIR interface when the data exists and privacy constraints permit",SHALL,Client,,,,
 hl7.fhir.us.davinci-crd_2.0.1,3,https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#mustsupport,"For CRD servers, the server SHALL leverage mustSupport elements as available and appropriate to provide decision support.",SHALL,Server,,,,
