@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    davinci_crd_test_kit (0.12.1)
+    davinci_crd_test_kit (0.12.2)
       inferno_core (~> 0.6.15)
       smart_app_launch_test_kit (~> 0.6.4)
       tls_test_kit (~> 0.3.0)
