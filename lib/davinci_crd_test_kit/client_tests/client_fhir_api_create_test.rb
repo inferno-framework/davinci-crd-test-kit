@@ -10,14 +10,15 @@ module DaVinciCRDTestKit
 
     input :create_resources,
           type: 'textarea',
-          description:
-          'Provide a list of resources to create. e.g., [json_resource_1, json_resource_2]'
+          description: 'Provide a list of resources to create. e.g., [json_resource_1, json_resource_2]',
+          optional: true
 
     def resource_type
       config.options[:resource_type]
     end
 
     run do
+      skip_if create_resources.blank?, 'Provide a list of resources to create to run this test.'
       assert_valid_json(create_resources)
       create_resources_list = JSON.parse(create_resources)
       skip_if(!create_resources_list.is_a?(Array), 'Resources to create not inputted in list format, skipping test.')

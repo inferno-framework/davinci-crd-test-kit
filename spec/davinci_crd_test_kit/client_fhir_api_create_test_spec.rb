@@ -161,7 +161,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiCreateTest do
       result = run(test, create_resources: [], server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
-        "Input 'create_resources' is nil, skipping test."
+        'Provide a list of resources to create to run this test.'
       )
     end
 

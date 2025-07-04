@@ -7,7 +7,8 @@ module DaVinciCRDTestKit
         each resource can be found here: https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1
       )
 
-    input :resource_ids
+    input :resource_ids,
+          optional: true
 
     def resource_type
       config.options[:resource_type]

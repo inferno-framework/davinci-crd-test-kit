@@ -3,6 +3,10 @@ module DaVinciCRDTestKit
     include CardsValidation
 
     title 'Custom CDS Service Response is valid'
+    description %(
+      If a custom CDS Service response is provided for Inferno to return when simulating the CRD Server's
+      hook response, this test will check that it is a valid CRD hook response.
+    )
     id :crd_submitted_response_validation
 
     input :custom_response, optional: true
