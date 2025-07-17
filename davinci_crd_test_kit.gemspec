@@ -3,8 +3,7 @@ require_relative 'lib/davinci_crd_test_kit/version'
 Gem::Specification.new do |spec|
   spec.name          = 'davinci_crd_test_kit'
   spec.version       = DaVinciCRDTestKit::VERSION
-  spec.authors       = ['Stephen MacVicar', 'Vanessa Fotso', 'Emily Michaud']
-  spec.email         = ['inferno@groups.mitre.org']
+  spec.authors       = ['Inferno Team']
   spec.summary       = 'DaVinci CRD Test Kit'
   spec.description   = 'DaVinci CRD Test Kit'
   spec.homepage      = 'https://github.com/inferno-framework/davinci-crd-test-kit'
