@@ -3,7 +3,7 @@
   "type": "transaction",
   "entry": [
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Patient/pat014",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Patient/pat014",
       "resource": {
         "resourceType": "Patient",
         "id": "pat014",
@@ -64,7 +64,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Coverage/cov014",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Coverage/cov014",
       "resource": {
         "resourceType": "Coverage",
         "id": "cov014",
@@ -103,7 +103,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014a",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond014a",
       "resource": {
         "resourceType": "Condition",
         "id": "cond014a",
@@ -160,7 +160,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014b",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond014b",
       "resource": {
         "resourceType": "Condition",
         "id": "cond014b",
@@ -217,7 +217,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014c",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond014c",
       "resource": {
         "resourceType": "Condition",
         "id": "cond014c",
@@ -274,7 +274,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond014a-motor-neuron",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond014a-motor-neuron",
       "resource": {
         "resourceType": "Condition",
         "id": "cond014a-motor-neuron",
@@ -331,7 +331,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-cold",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/enc-pat014-cold",
       "resource": {
         "resourceType": "Encounter",
         "id": "enc-pat014-cold",
@@ -439,7 +439,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/enc-pat014",
       "resource": {
         "resourceType": "Encounter",
         "id": "enc-pat014",
@@ -547,7 +547,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-heartfailure-old",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/enc-pat014-heartfailure-old",
       "resource": {
         "resourceType": "Encounter",
         "id": "enc-pat014-heartfailure-old",
@@ -655,7 +655,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014",
@@ -703,7 +703,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014B",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014B",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014B",
@@ -751,7 +751,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014BodyWeight",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014BodyWeight",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014BodyWeight",
@@ -798,7 +798,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014BMI",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014BMI",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014BMI",
@@ -845,7 +845,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-NeckCircumference",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-NeckCircumference",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-NeckCircumference",
@@ -892,7 +892,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat014-pao2",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs-pat014-pao2",
       "resource": {
         "resourceType": "Observation",
         "id": "obs-pat014-pao2",
@@ -968,7 +968,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra1234",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Practitioner/pra1234",
       "resource": {
         "resourceType": "Practitioner",
         "id": "pra1234",
@@ -1028,7 +1028,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-sstrange",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Practitioner/pra-sstrange",
       "resource": {
         "resourceType": "Practitioner",
         "id": "pra-sstrange",
@@ -1062,7 +1062,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org1234",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Organization/org1234",
       "resource": {
         "resourceType": "Organization",
         "id": "org1234",
@@ -1079,7 +1079,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq014",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq014",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq014",
@@ -1137,7 +1137,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq020",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq020",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq020",
@@ -1195,7 +1195,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-cpape0601",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/enc-pat014-cpape0601",
       "resource": {
         "resourceType": "Encounter",
         "id": "enc-pat014-cpape0601",
@@ -1303,7 +1303,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq021",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq021",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq021",
@@ -1364,7 +1364,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq-014-e0250",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq-014-e0250",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq-014-e0250",
@@ -1422,7 +1422,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq01",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/ServiceRequest/servreq01",
       "resource": {
         "resourceType": "ServiceRequest",
         "id": "servreq01",
@@ -1498,7 +1498,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-cashew",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-cashew",
       "resource": {
         "resourceType": "AllergyIntolerance",
         "id": "allergy-pat014-cashew",
@@ -1613,7 +1613,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-penicillin",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/AllergyIntolerance/allergy-pat014-penicillin",
       "resource": {
         "resourceType": "AllergyIntolerance",
         "id": "allergy-pat014-penicillin",
@@ -1682,7 +1682,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/CareTeam/pat014-hhs-careteam",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/CareTeam/pat014-hhs-careteam",
       "resource": {
         "resourceType": "CareTeam",
         "id": "pat014-hhs-careteam",
@@ -1748,7 +1748,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/enc-pat014-hhs",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/enc-pat014-hhs",
       "resource": {
         "resourceType": "Encounter",
         "id": "enc-pat014-hhs",
@@ -1856,7 +1856,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Goal/pat014-hhs-careplan-goal",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Goal/pat014-hhs-careplan-goal",
       "resource": {
         "resourceType": "Goal",
         "id": "pat014-hhs-careplan-goal",
@@ -1903,7 +1903,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/con-pat014-stroke",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/con-pat014-stroke",
       "resource": {
         "resourceType": "Condition",
         "id": "con-pat014-stroke",
@@ -1960,7 +1960,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/CarePlan/careplan-pat014-hhs",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/CarePlan/careplan-pat014-hhs",
       "resource": {
         "resourceType": "CarePlan",
         "id": "careplan-pat014-hhs",
@@ -2102,7 +2102,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ClinicalImpression/clinicalimpression-pat014-hhs",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/ClinicalImpression/clinicalimpression-pat014-hhs",
       "resource": {
         "resourceType": "ClinicalImpression",
         "id": "clinicalimpression-pat014-hhs",
@@ -2179,7 +2179,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/condition014-livertransplant",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/condition014-livertransplant",
       "resource": {
         "resourceType": "Condition",
         "id": "condition014-livertransplant",
@@ -2238,7 +2238,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/pat014-cond-osa",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/pat014-cond-osa",
       "resource": {
         "resourceType": "Condition",
         "id": "pat014-cond-osa",
@@ -2295,7 +2295,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/con-pat014-obesity",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/con-pat014-obesity",
       "resource": {
         "resourceType": "Condition",
         "id": "con-pat014-obesity",
@@ -2350,7 +2350,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/condition-pat014-shoulder-fracture-open",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/condition-pat014-shoulder-fracture-open",
       "resource": {
         "resourceType": "Condition",
         "id": "condition-pat014-shoulder-fracture-open",
@@ -2405,7 +2405,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Consent/pat014-consent",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Consent/pat014-consent",
       "resource": {
         "resourceType": "Consent",
         "id": "pat014-consent",
@@ -2524,7 +2524,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-azathioprine",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-azathioprine",
       "resource": {
         "resourceType": "MedicationRequest",
         "id": "pat014-mr-azathioprine",
@@ -2638,7 +2638,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationDispense/pat014-meddispsense-azathioprine",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationDispense/pat014-meddispsense-azathioprine",
       "resource": {
         "resourceType": "MedicationDispense",
         "id": "pat014-meddispsense-azathioprine",
@@ -2746,7 +2746,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-methotrexate",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationRequest/pat014-mr-methotrexate",
       "resource": {
         "resourceType": "MedicationRequest",
         "id": "pat014-mr-methotrexate",
@@ -2860,7 +2860,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-azathio",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-azathio",
       "resource": {
         "resourceType": "MedicationStatement",
         "id": "medstate-pat014-azathio",
@@ -3037,7 +3037,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-metho",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-metho",
       "resource": {
         "resourceType": "MedicationStatement",
         "id": "medstate-pat014-metho",
@@ -3214,7 +3214,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-tylenol",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/MedicationStatement/medstate-pat014-tylenol",
       "resource": {
         "resourceType": "MedicationStatement",
         "id": "medstate-pat014-tylenol",
@@ -3366,7 +3366,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-ahi",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-ahi",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-ahi",
@@ -3426,7 +3426,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-fev1-fvc-ratio",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-fev1-fvc-ratio",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-fev1-fvc-ratio",
@@ -3486,7 +3486,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-fvc",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-fvc",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-fvc",
@@ -3546,7 +3546,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-hemocrit-test",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-hemocrit-test",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-hemocrit-test",
@@ -3594,7 +3594,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-mip",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-mip",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-mip",
@@ -3654,7 +3654,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-o2sat",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-o2sat",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-o2sat",
@@ -3730,7 +3730,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat014-o2excercise",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs-pat014-o2excercise",
       "resource": {
         "resourceType": "Observation",
         "id": "obs-pat014-o2excercise",
@@ -3806,7 +3806,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-pao2",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-pao2",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-pao2",
@@ -3882,7 +3882,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-pap",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-pap",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-pap",
@@ -3958,7 +3958,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs014-rdi",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs014-rdi",
       "resource": {
         "resourceType": "Observation",
         "id": "obs014-rdi",
@@ -4018,7 +4018,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Procedure/proced014-kidney-transplant",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Procedure/proced014-kidney-transplant",
       "resource": {
         "resourceType": "Procedure",
         "id": "proced014-kidney-transplant",
@@ -4059,7 +4059,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq-pat014-hhs",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/ServiceRequest/servreq-pat014-hhs",
       "resource": {
         "resourceType": "ServiceRequest",
         "id": "servreq-pat014-hhs",
@@ -4130,7 +4130,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/125",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Appointment/125",
       "resource": {
         "resourceType": "Appointment",
         "id": "125",
@@ -4195,7 +4195,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/126",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Appointment/126",
       "resource": {
         "resourceType": "Appointment",
         "id": "126",
@@ -4249,7 +4249,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-hfairchild",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Practitioner/pra-hfairchild",
       "resource": {
         "resourceType": "Practitioner",
         "id": "pra-hfairchild",
@@ -4283,7 +4283,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra1255",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Practitioner/pra1255",
       "resource": {
         "resourceType": "Practitioner",
         "id": "pra1255",
@@ -4341,7 +4341,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Patient/pat015",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Patient/pat015",
       "resource": {
         "resourceType": "Patient",
         "id": "pat015",
@@ -4424,7 +4424,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Coverage/cov015",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Coverage/cov015",
       "resource": {
         "resourceType": "Coverage",
         "id": "cov015",
@@ -4463,7 +4463,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015a",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond015a",
       "resource": {
         "resourceType": "Condition",
         "id": "cond015a",
@@ -4520,7 +4520,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015b",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond015b",
       "resource": {
         "resourceType": "Condition",
         "id": "cond015b",
@@ -4577,7 +4577,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Condition/cond015c",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Condition/cond015c",
       "resource": {
         "resourceType": "Condition",
         "id": "cond015c",
@@ -4634,7 +4634,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015",
@@ -4710,7 +4710,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015B",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015B",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015B",
@@ -4785,7 +4785,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/pat015-rad-encounter",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/pat015-rad-encounter",
       "resource": {
         "resourceType": "Encounter",
         "id": "pat015-rad-encounter",
@@ -4905,7 +4905,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-hco3",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-hco3",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-hco3",
@@ -4984,7 +4984,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-overnight",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-o2sat-overnight",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-o2sat-overnight",
@@ -5042,7 +5042,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-resting",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-o2sat-resting",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-o2sat-resting",
@@ -5105,7 +5105,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-o2sat-treatment",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-o2sat-treatment",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-o2sat-treatment",
@@ -5168,7 +5168,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat015-pao2",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs-pat015-pao2",
       "resource": {
         "resourceType": "Observation",
         "id": "obs-pat015-pao2",
@@ -5244,7 +5244,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs-pat015-o2excercise",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs-pat015-o2excercise",
       "resource": {
         "resourceType": "Observation",
         "id": "obs-pat015-o2excercise",
@@ -5320,7 +5320,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-paco2",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-paco2",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-paco2",
@@ -5399,7 +5399,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Practitioner/pra-dmorgan",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Practitioner/pra-dmorgan",
       "resource": {
         "resourceType": "Practitioner",
         "id": "pra-dmorgan",
@@ -5421,7 +5421,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org-lab",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Organization/org-lab",
       "resource": {
         "resourceType": "Organization",
         "id": "org-lab",
@@ -5456,7 +5456,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/obs015-ph",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/obs015-ph",
       "resource": {
         "resourceType": "Observation",
         "id": "obs015-ph",
@@ -5519,7 +5519,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq-015-e0250",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq-015-e0250",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq-015-e0250",
@@ -5577,7 +5577,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreq015",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreq015",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreq015",
@@ -5648,7 +5648,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/DeviceRequest/devreqe0470",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/DeviceRequest/devreqe0470",
       "resource": {
         "resourceType": "DeviceRequest",
         "id": "devreqe0470",
@@ -5712,7 +5712,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/ServiceRequest/servreq-g0180-1",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/ServiceRequest/servreq-g0180-1",
       "resource": {
         "resourceType": "ServiceRequest",
         "id": "servreq-g0180-1",
@@ -5770,7 +5770,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Observation/pat015-hemocrit",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Observation/pat015-hemocrit",
       "resource": {
         "resourceType": "Observation",
         "id": "pat015-hemocrit",
@@ -5818,7 +5818,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Appointment/124",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Appointment/124",
       "resource": {
         "resourceType": "Appointment",
         "id": "124",
@@ -5940,7 +5940,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Encounter/127",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Encounter/127",
       "resource": {
         "resourceType": "Encounter",
         "id": "127",
@@ -6045,7 +6045,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Location/loc1234",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Location/loc1234",
       "resource": {
         "resourceType": "Location",
         "id": "loc1234",
@@ -6069,7 +6069,7 @@
       }
     },
     {
-      "fullUrl": "https://inferno-qa.healthit.gov/reference-server/r4/Organization/org123",
+      "fullUrl": "https://inferno.healthit.gov/reference-server/r4/Organization/org123",
       "resource": {
         "resourceType": "Organization",
         "id": "org123",

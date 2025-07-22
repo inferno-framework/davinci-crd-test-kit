@@ -1,3 +1,7 @@
+# 0.13.0
+* FI-4182: Remove inferno@groups.mitre.org email from gemspec by @arscan in https://github.com/inferno-framework/davinci-crd-test-kit/pull/32
+* Demo Simplification for CRD Client Tests by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/29
+
 # 0.12.2
 * FI-3815 Update Test Kit with new RSpec features by @Shaumik-Ashraf in https://github.com/inferno-framework/davinci-crd-test-kit/pull/27
 * FI-4142: Requirements Conversion by @tstrass in https://github.com/inferno-framework/davinci-crd-test-kit/pull/28
