@@ -192,7 +192,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiUpdateTest do
       result = run(test, update_resources: [], server_endpoint:, smart_auth_info:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to eq(
-        "Input 'update_resources' is nil, skipping test."
+        'Provide a list of resources to update to run this test.'
       )
     end
 
