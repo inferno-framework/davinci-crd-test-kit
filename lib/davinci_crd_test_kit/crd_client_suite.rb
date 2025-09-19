@@ -81,13 +81,13 @@ module DaVinciCRDTestKit
       server.
 
       1. Start a "Da Vinci CRD Client Test Suite" session.
-      1. Choose the "Inferno CRD Server Suite" preset from the drop down in the upper left.
+      1. Choose the "Run Against the CRD Server Suite" preset from the drop down in the upper left.
       1. Run the Client Registration test group. It should pass.
       1. Run the Hooks > Appointment Book test group leaving the inputs as is. A
          "User Action Dialog" will appear indicating that Inferno is waiting for the
          `appointment-book` hook invocation.
       1. In another tab, start a "Da Vinci CRD Server Test Suite" session.
-      1. Choose the "Inferno CRD Client Suite" preset from the drop down in the upper left.
+      1. Choose the "Run Against the CRD Client Suite" preset from the drop down in the upper left.
       1. Run the Discovery test group. It should pass.
       1. Run the Demonstrate A Hook Response test. It should pass
       1. Return to the client suite and click the link to continue the tests.
