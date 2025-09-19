@@ -31,8 +31,6 @@ module DaVinciCRDTestKit
       wait(
         identifier:,
         message: <<~MESSAGE
-          **Approval Workflow Test**:
-
           I attest that the following CDS response types were returned and that the client system displays
           each of the CDS Service Cards to the user:
 
