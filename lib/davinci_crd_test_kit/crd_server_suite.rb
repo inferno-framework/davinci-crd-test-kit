@@ -63,7 +63,8 @@ module DaVinciCRDTestKit
       Inferno CRD Client test suite. The client suite will generate sample cards to
       return for these tests to evaluate.
 
-      1. Start a "Da Vinci CRD Client Test Suite" session.
+      1. Start a "Da Vinci CRD Client Test Suite" session using the "SMART App Launch 2.0.0"
+         option.
       1. Choose the "Run Against the CRD Server Suite" preset from the drop down in the upper left.
       1. Run the Hook Invocation test group, leaving the inputs as-is. A
          "User Action Dialog" will appear indicating that Inferno is waiting for the
