@@ -164,9 +164,9 @@ module DaVinciCRDTestKit
       if prefetch.present? && prefetch['coverage']
         prefetch_data = FHIR.from_contents(prefetch['coverage'].to_json)
         if prefetch_data.is_a?(FHIR::Bundle)
-         prefetch_data.entry.first&.resource
+          prefetch_data.entry.first&.resource
         else
-         prefetch_data
+          prefetch_data
         end
       else
         fhir_server = request_body['fhirServer']
