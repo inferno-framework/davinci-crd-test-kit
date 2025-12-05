@@ -66,12 +66,18 @@ module DaVinciCRDTestKit
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
     test from: :crd_hook_request_valid_context do
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150',
+                            'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
                             'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
                             'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
                             'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
                             'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-                            'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295'
+                            'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
+                            'cds-hooks-library_1.0.1@57', 'cds-hooks-library_1.0.1@58', 'cds-hooks-library_1.0.1@59',
+                            'cds-hooks-library_1.0.1@61', 'cds-hooks-library_1.0.1@62', 'cds-hooks-library_1.0.1@63',
+                            'cds-hooks-library_1.0.1@65', 'cds-hooks-library_1.0.1@66', 'cds-hooks-library_1.0.1@67',
+                            'cds-hooks-library_1.0.1@69', 'cds-hooks-library_1.0.1@70', 'cds-hooks-library_1.0.1@71',
+                            'cds-hooks-library_1.0.1@72'
     end
     test from: :crd_hook_request_valid_prefetch
     test from: :crd_card_display_attest_test

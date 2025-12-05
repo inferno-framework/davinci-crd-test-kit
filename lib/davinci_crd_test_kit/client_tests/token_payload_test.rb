@@ -18,6 +18,10 @@ module DaVinciCRDTestKit
       - `jti` must be a non-blank string that uniquely identifies this authentication JWT
     )
 
+    verifies_requirements 'cds-hooks_2.0@180', 'cds-hooks_2.0@181', 'cds-hooks_2.0@187', 'cds-hooks_2.0@189',
+                          'cds-hooks_2.0@190', 'cds-hooks_2.0@191', 'cds-hooks_2.0@192', 'cds-hooks_2.0@196',
+                          'cds-hooks_2.0@203'
+
     REQUIRED_CLAIMS = ['iss', 'aud', 'exp', 'iat', 'jti'].freeze
 
     def required_claims
