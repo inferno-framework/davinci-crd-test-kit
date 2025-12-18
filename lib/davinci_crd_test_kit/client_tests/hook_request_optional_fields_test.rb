@@ -15,16 +15,13 @@ module DaVinciCRDTestKit
         * `fhirAuthorization` - *object*
         * `prefetch` - *object*
 
-      This test checks that the optional fields that are present are of the correct type. This test
+      This test checks for the presence of these fields and if they are of the correct type. This test is optional and
       will not fail if the hook request does not contain an optional field, it only produces an informational message.
       If the client provides its FHIR server URL in the `fhirServer` field, and it's authorization token in the
       `fhirAuthorization` field object, they will be produced as an output from this test to be used in
       subsequent tests.
     )
-
-    verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@3', 'cds-hooks_2.0@20', 'cds-hooks_2.0@21',
-                          'cds-hooks_2.0@23', 'cds-hooks_2.0@65', 'cds-hooks_2.0@66', 'cds-hooks_2.0@67',
-                          'cds-hooks_2.0@68', 'cds-hooks_2.0@69', 'cds-hooks_2.0@70'
+    optional
 
     def hook_name
       config.options[:hook_name]

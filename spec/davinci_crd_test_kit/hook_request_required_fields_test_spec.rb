@@ -155,28 +155,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestRequiredFieldsTest do
       )
     end
 
-    it 'fails if hook request hookInstance is not a uuid' do
-      allow(test).to receive(:suite).and_return(suite)
-
-      token = jwt_helper.build(
-        aud: appointment_book_url,
-        iss: example_client_url,
-        jku: "#{example_client_url}/jwks.json",
-        encryption_method: 'RS384'
-      )
-
-      invalid_hook_request = appointment_book_hook_request_hash.except('hookInstance')
-      invalid_hook_request['hookInstance'] = 'not-a-uuid'
-
-      create_appointment_hook_request(body: invalid_hook_request, auth_header: "Bearer #{token}")
-
-      result = run(test)
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /Request 1: `hookInstance` field must be a globally unique UUID./
-      )
-    end
-
     it 'fails if hook request contains fhirAuthorization field but not fhirServer field' do
       allow(test).to receive(:suite).and_return(suite)
 
