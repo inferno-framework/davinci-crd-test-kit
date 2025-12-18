@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
       contained resource against its corresponding CRD resource profile. This test is optional and will be skipped if no
       `prefetch` field is contained in the hook request.
     )
-    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30'
     optional
 
     input :contexts, :prefetches
