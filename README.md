@@ -74,6 +74,8 @@ At a high-level, the tests check:
 
 ## How to Run
 
+TODO: MOVE ME into wiki
+
 Use either of the following methods to run the suites within this test kit. If
 you would like to try out the tests but don’t have a CRD implementation, the
 test home pages include instructions for trying out the tests, including
@@ -88,19 +90,42 @@ test home pages include instructions for trying out the tests, including
 Detailed instructions can be found in the suite descriptions when the tests are
 run.
 
-### ONC Hosted Instance
+## Getting Started
 
-You can run the CRD test kit via the [ONC
-Inferno](https://inferno.healthit.gov/test-kits/davinci-crd/) website by
-choosing the “Da Vinci Coverage Requirements Discovery (CRD) Test Kit”.
+ASTP hosts a [public
+instance](https://inferno.healthit.gov/test-kits/davinci-crd/) of this test
+kit that developers and testers are welcome to use. However, users are
+encouraged to download and run this tool locally to allow testing within private
+networks and to avoid being affected by downtime of this shared resource.
+Please see the [Local Installation
+Instructions](#local-installation-instructions) section below for more
+information.
 
-### Local Inferno Instance
+Detailed step-by-step instructions for running the tests can be found in our walkthrough guides:
+- [Client Testing Walkthrough](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Walkthrough)
+- [Server Testing Walkthrough](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Walkthrough)
 
-- Download the source code from this repository.
+Additional information is provided in the [Da Vinci CRD Test Kit documentation](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/).
+
+## Local Installation Instructions
+
+- [Download an official release](https://github.com/inferno-framework/davinci-crd-test-kit/releases) of this test kit.
 - Open a terminal in the directory containing the downloaded code.
 - In the terminal, run `setup.sh`.
 - In the terminal, run `run.sh`.
 - Use a web browser to navigate to `http://localhost`.
+
+More information on using Inferno Test Kits is available on the [Inferno
+Framework documentation site](https://inferno-framework.github.io/docs).
+
+### Multi-user Installations
+
+The default configuration of this test kit uses SQLite for data persistence and
+is optimized for running on a local machine with a single user. For
+installations on shared servers that may have multiple tests running
+simultaneously, please [configure the installation to use
+PostgreSQL](https://inferno-framework.github.io/inferno-core/deployment/database.html#postgresql)
+to ensure stability in this type of environment.
 
 ## Providing Feedback and Reporting Issues
 
