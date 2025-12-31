@@ -195,7 +195,7 @@ module DaVinciCRDTestKit
       "Server response #{index}"
     end
 
-    def perform_cards_validation(cards, response_index = 0)
+    def perform_cards_validation(cards, response_index = 0, response_has_system_actions)
       unless cards
         add_message('error', "#{response_label(response_index + 1)} did not have the `cards` field.")
         return
@@ -205,7 +205,8 @@ module DaVinciCRDTestKit
         return
       end
       warning do
-        assert cards.present?, "#{response_label(response_index + 1)} has no decision support."
+        assert cards.present? || response_has_system_actions,
+               "#{response_label(response_index + 1)} has no decision support."
       end
       cards_check(cards)
     end
@@ -221,7 +222,7 @@ module DaVinciCRDTestKit
       all_requests.keep_if { |request| request.status == 200 }
       all_requests.each_with_index do |request, index|
         service_response = JSON.parse(request.response_body)
-        perform_cards_validation(service_response['cards'], index)
+        perform_cards_validation(service_response['cards'], index, service_response['systemActions'].present?)
       rescue JSON::ParserError
         add_message('error', "Invalid JSON: #{response_label(response_index + 1).downcase} is not a valid JSON.")
       end
