@@ -6,7 +6,7 @@ require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
 require_relative 'retrieve_jwks_test'
-require_relative 'submitted_response_validation'
+require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
 require_relative 'token_payload_test'
 
@@ -40,7 +40,7 @@ module DaVinciCRDTestKit
         client_access_token: { name: :order_select_client_access_token },
         client_fhir_server: { name: :order_select_client_fhir_server },
         crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json },
-        custom_response: { name: :order_select_custom_response },
+        custom_response_template: { name: :order_select_custom_response_template },
         selected_response_types: { name: :order_select_selected_response_types }
       },
       outputs: {
@@ -59,7 +59,6 @@ module DaVinciCRDTestKit
       }
     )
 
-    test from: :crd_submitted_response_validation
     test from: :crd_order_select_request
     test from: :crd_decode_auth_token
     test from: :crd_retrieve_jwks
@@ -77,6 +76,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.0.1@295'
     end
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end
 end

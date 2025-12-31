@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :encounter_start_custom_response,
+    input :encounter_start_custom_response_template,
           title: 'Custom response for encounter-start hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response

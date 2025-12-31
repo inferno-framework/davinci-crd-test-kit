@@ -6,7 +6,7 @@ require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
 require_relative 'retrieve_jwks_test'
-require_relative 'submitted_response_validation'
+require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
 require_relative 'token_payload_test'
 
@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
         client_access_token: { name: :encounter_discharge_client_access_token },
         client_fhir_server: { name: :encounter_discharge_client_fhir_server },
         crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json },
-        custom_response: { name: :encounter_discharge_custom_response },
+        custom_response_template: { name: :encounter_discharge_custom_response_template },
         selected_response_types: { name: :encounter_discharge_selected_response_types }
       },
       outputs: {
@@ -58,7 +58,6 @@ module DaVinciCRDTestKit
       }
     )
 
-    test from: :crd_submitted_response_validation
     test from: :crd_encounter_discharge_request
     test from: :crd_decode_auth_token
     test from: :crd_retrieve_jwks
@@ -68,6 +67,7 @@ module DaVinciCRDTestKit
     test from: :crd_hook_request_optional_fields
     test from: :crd_hook_request_valid_context
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end
 end

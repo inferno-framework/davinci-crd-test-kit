@@ -6,7 +6,7 @@ require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
 require_relative 'retrieve_jwks_test'
-require_relative 'submitted_response_validation'
+require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
 require_relative 'token_payload_test'
 
@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
         client_access_token: { name: :appointment_book_client_access_token },
         client_fhir_server: { name: :appointment_book_client_fhir_server },
         crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json },
-        custom_response: { name: :appointment_book_custom_response },
+        custom_response_template: { name: :appointment_book_custom_response_template },
         selected_response_types: { name: :appointment_book_selected_response_types }
       },
       outputs: {
@@ -58,7 +58,6 @@ module DaVinciCRDTestKit
       }
     )
 
-    test from: :crd_submitted_response_validation
     test from: :crd_appointment_book_request
     test from: :crd_decode_auth_token
     test from: :crd_retrieve_jwks
@@ -70,6 +69,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@286'
     end
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end
 end

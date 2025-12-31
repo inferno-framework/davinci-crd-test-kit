@@ -1,6 +1,13 @@
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
+    def selected_response_types
+      @selected_response_types ||=
+        JSON.parse(result.input_json)
+          .find { |input| input['name'].include?('selected_response_types') }
+          &.dig('value')
+    end
+
     def current_time
       Time.now.utc
     end
@@ -16,11 +23,6 @@ module DaVinciCRDTestKit
       json['links'].first['url'] = "#{Inferno::Application['base_url']}/custom/smart/launch"
 
       json
-    end
-
-    def request_body
-      @request_body ||=
-        JSON.parse(request.params.to_json)
     end
 
     def context
@@ -72,8 +74,6 @@ module DaVinciCRDTestKit
     end
 
     def create_warning_messages(hook_card_response)
-      return if custom_response.present?
-
       missing_response_types =
         if hook_card_response.nil?
           selected_response_types
@@ -135,17 +135,12 @@ module DaVinciCRDTestKit
       }[hook_name]
     end
 
-    def hook_response
-      hook_card_response =
-        if custom_response.present?
-          JSON.parse(custom_response)
-        else
-          cards_response = create_cards_and_system_actions
-          update_specific_hook_card_info(cards_response)
-        end
-
+    def build_mock_hook_response
+      hook_card_response = create_cards_and_system_actions
+      update_specific_hook_card_info(hook_card_response)
       create_warning_messages(hook_card_response)
-      create_card_response(hook_card_response)
+
+      hook_card_response
     end
 
     def make_resource_request(uri, access_token)
@@ -162,7 +157,8 @@ module DaVinciCRDTestKit
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
-        FHIR.from_contents(prefetch['coverage'].to_json)
+        coverage_or_bundle = FHIR.from_contents(prefetch['coverage'].to_json)
+        coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first.resource : coverage_or_bundle
       else
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
@@ -200,7 +196,6 @@ module DaVinciCRDTestKit
       cards = []
 
       add_basic_cards(cards)
-
       add_order_hook_cards(cards)
 
       system_actions = add_coverage_cards(cards)
@@ -421,7 +416,7 @@ module DaVinciCRDTestKit
         {
           'type' => 'delete',
           'description' => 'Remove current order until health assessment has been done',
-          'resourceId' => ["#{order_resource_type}/#{order_resource_id}"]
+          'resourceId' => "#{order_resource_type}/#{order_resource_id}"
         },
         {
           'type' => 'create',
