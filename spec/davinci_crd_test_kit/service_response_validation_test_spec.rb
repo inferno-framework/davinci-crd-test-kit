@@ -289,23 +289,23 @@ RSpec.describe DaVinciCRDTestKit::ServiceResponseValidationTest do
     it 'fails if a delete action resourceId is not an array' do
       body_dup = body.deep_dup
       body_dup['systemActions'] = [
-        { 'type' => 'delete', 'description' => '123', 'resourceId' => '123' }
-      ]
-      mock_server(body: body_dup)
-      result = run(runnable, invoked_hook: 'order-sign')
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not of type `Array`/)
-    end
-
-    it 'fails if a delete action resourceId item is not a relative reference' do
-      body_dup = body.deep_dup
-      body_dup['systemActions'] = [
         { 'type' => 'delete', 'description' => '123', 'resourceId' => ['123'] }
       ]
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Invalid `Action.resourceId item` format/)
+      expect(entity_result_message.message).to match(/is not of type `String`/)
+    end
+
+    it 'fails if a delete action resourceId item is not a relative reference' do
+      body_dup = body.deep_dup
+      body_dup['systemActions'] = [
+        { 'type' => 'delete', 'description' => '123', 'resourceId' => '123' }
+      ]
+      mock_server(body: body_dup)
+      result = run(runnable, invoked_hook: 'order-sign')
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to match(/Invalid `Action.resourceId` format/)
     end
 
     it 'persists outputs' do
