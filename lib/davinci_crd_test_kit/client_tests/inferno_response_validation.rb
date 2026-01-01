@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
         next unless response_hash['cards'].present? || response_hash['systemActions'].present?
 
         entity_validated = true
-        perform_cards_validation(response_hash['cards'], index, response_hash['systemActions'].present?)
+        perform_cards_validation(response_hash['cards'], response_hash['systemActions'].present?, index)
         validate_system_actions(response_hash['systemActions'])
       rescue JSON::ParserError
         next

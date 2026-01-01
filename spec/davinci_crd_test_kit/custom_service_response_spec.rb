@@ -96,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       } }
   end
 
-  let(:sytem_action_update_coverage_information_default_because_empty) do
+  let(:sytem_action_update_coverage_information_default_empty) do
     { type: 'update', description: 'add coverage-information extension',
       resource: {
         extension: [{
@@ -129,7 +129,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       } }
   end
 
-  let(:sytem_action_update_coverage_information_default_because_missing) do
+  let(:sytem_action_update_coverage_information_default_missing) do
     { type: 'update', description: 'add coverage-information extension',
       resource: {
         extension: [{
@@ -813,8 +813,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       response_template = { cards: [],
                             systemActions: [sytem_action_update_coverage_information_no_defaults,
-                                            sytem_action_update_coverage_information_default_because_empty,
-                                            sytem_action_update_coverage_information_default_because_missing] }
+                                            sytem_action_update_coverage_information_default_empty,
+                                            sytem_action_update_coverage_information_default_missing] }
       run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
@@ -894,11 +894,11 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         jku: "#{example_client_url}/jwks.json",
         encryption_method: 'RS384'
       )
-      sytem_action_update_coverage_information_default_because_missing[:extension][:'com.inferno.resourceSelectionCriteria'] =
+      sytem_action_update_coverage_information_default_missing[:extension][:'com.inferno.resourceSelectionCriteria'] =
         'context.draftOrders.entry.resource'
 
       response_template = { cards: [],
-                            systemActions: [sytem_action_update_coverage_information_default_because_missing] }
+                            systemActions: [sytem_action_update_coverage_information_default_missing] }
       run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
