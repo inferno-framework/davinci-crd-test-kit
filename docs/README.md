@@ -12,16 +12,17 @@ provides information on how to use and contribute to this test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 
 ### Using the CRD Client Test Suite
-*   **[Client Testing Walkthrough](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Walkthrough)**: Step-by-step guide for testing client systems.
+*   **[Client Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)**: Description of the client tests.
+*   **[Client Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)**: Step-by-step guide for testing client systems, including demonstration execustions.
 *   **[Controlling Simulated CRD Service Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses provided Inferno's simulated CRD Service during client testing.
 
 ### Using the CRD Server Test Suite 
-*   **[Server Testing Walkthrough](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Walkthrough)**: Step-by-step guide for testing server systems.
+*   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)**: Description of the server tests.
+*   **[Server Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)**: Step-by-step guide for testing server systems, including demonstration execustions.
 
 ## Contributing to this Test Kit
 
 *   **[Technical Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Server Test Generation Guide](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Test-Generation-Guide)**: Information on how server tests are generated and how to maintain this process.
 *   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Running-Suites-Against-Each-Other)**: Step-by-step guide for using the Client and Server suites to demonstrate the test execution without a separate CRD implementation, which can be useful
 for demonstration as well as debugging.
 

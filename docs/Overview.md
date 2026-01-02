@@ -43,19 +43,17 @@ patients, orders, coverages, and other details. Inferno cannot know
 what entities are available in the system it is interacting with or what kinds
 of requests or responses will elicit specific behavior. It also does not want to
 dictate to the systems being tested the specifics of its data, configuration, or
-business rules. For these reasons, testers will need to provide Inferno with
+business rules. For these reasons, testers need to provide Inferno with
 details the requests to make or responses to use.
 
 For a details on specific specific limitations, detailed requirements, and known
-issues, please consult the following resources: the [Client Testing
-Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#testing-limitations),
-the [Server Testing
-Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details#testing-limitations),
-the relevant requirements including those in the [CRD Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx),
+issues, please consult the following resources: 
+- [Client Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#testing-limitations)
+- [Server Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details#testing-limitations)
+- Relevant requirements including those in the [CRD Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx),
 the [CDS Hooks Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx),
-and the [CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx),
-and the project's [GitHub Issues
-page](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
+and the [CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)
+- [CRD Test Kit GitHub Issues page](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
 
 ## Conformance Criteria & Interpreting Results
 
@@ -68,5 +66,5 @@ A test run is considered successful if all mandatory tests pass:
 Given the known limitations, passing all automated tests does **not** solely constitute full CRD IG conformance. Systems should also meet requirements verified through attestation or other means.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client Walkthrough](Client-Walkthrough.md)
-* [Server Walkthrough](Server-Walkthrough.md)
+* [Client Instructions](Client-Instructions.md)
+* [Server Instructions](Server-Instructions.md)

@@ -7,11 +7,11 @@
 **Client Suite**
 *   [Client Testing Details](Client-Details)
 *   [Simulated CRD Service Responses](Controlling-Simulated-Responses)
-*   [Client Testing Walkthrough](Client-Walkthrough)
+*   [Client Testing Instructions](Client-Instructions)
 
 **Server Suite**
 *   [Server Testing Details](Server-Details)
-*   [Server Testing Walkthrough](Server-Walkthrough)
+*   [Server Testing Instructions](Server-Instructions)
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
