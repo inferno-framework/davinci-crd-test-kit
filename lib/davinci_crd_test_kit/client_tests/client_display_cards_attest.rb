@@ -8,6 +8,12 @@ module DaVinciCRDTestKit
 
     id :crd_card_display_attest_test
     title 'Check that returned decision support details are displayed to the user'
+    description %(
+      Since Inferno has no way to evaluate the client's UI, testers must manually
+      verify that the cards and system actions returned by Inferno are presented
+      to the user in an appopriate way that allows for consideration and action
+      if warranted.
+    )
 
     def hook_name
       config.options[:hook_name]
