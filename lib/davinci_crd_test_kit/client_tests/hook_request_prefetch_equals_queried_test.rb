@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     include PrefetchContentsValidation
 
     id :crd_hook_request_prefetch_equals_queried
-    title 'Prefetched data equivalent to queried data'
+    title 'Prefetched data is equivalent to queried data'
     description %(
       This test verifies that each key present in the incoming hook request's `prefetch` field is equivalent to the
       data returned by a query to the fhir server using the parameterized prefetch template.
