@@ -209,6 +209,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestPrefetchEqualsQueriedTest do
         result = run(test, client_fhir_server:, client_access_token:, override_access_token:)
         expect(result.result).to eq('pass')
         expect(result.result_message).to match(/Prefetched data matches the requested queries./)
+        expect(entity_result_message(test))
+          .to match('Override access token provided. Ensure that it has the same scope as used when prefetching data ' \
+                    'for the hook request.')
         expect(user_resource_request).to have_been_made.once
       end
     end
@@ -343,6 +346,27 @@ RSpec.describe DaVinciCRDTestKit::HookRequestPrefetchEqualsQueriedTest do
         expect(entity_result_message(test)).to match(
           /Prefetched data `coverage` was different than data returned from requested query `Coverage\?patient=#{patient_id}&status=active`/ # rubocop:disable Layout/LineLength
         )
+      end
+
+      it 'fails and detects errors on multiple requests' do
+        appointment_book_hook_request['prefetch'] = { user: crd_practitioner }
+        create_appointment_hook_request(body: appointment_book_hook_request)
+        create_appointment_hook_request(body: appointment_book_hook_request)
+
+        user_resource_request =
+          stub_request(:get,
+                       "#{client_fhir_server}/#{crd_practitioner['resourceType']}/#{crd_practitioner['id']}")
+            .with(
+              headers: { Authorization: "Bearer #{client_access_token}" }
+            )
+            .to_return(status: 400)
+
+        result = run(test, client_fhir_server:, client_access_token:)
+        expect(result.result).to eq('fail')
+        expect(user_resource_request).to have_been_made.twice
+        expect(result.result_message).to match(/Prefetched data does not match the requested queries./)
+        expect(entity_result_message(test)).to match(/Request 1/)
+        expect(entity_result_message(test)).to match(/Request 2/)
       end
     end
   end

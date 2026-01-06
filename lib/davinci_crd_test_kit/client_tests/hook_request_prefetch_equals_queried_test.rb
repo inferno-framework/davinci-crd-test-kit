@@ -74,6 +74,12 @@ module DaVinciCRDTestKit
       skip_if client_fhir_server.blank?,
               'No FHIR server provided in the hook request to use to validate the prefetch data.'
 
+      if override_access_token.present?
+        add_message(:warning,
+                    'Override access token provided. Ensure that it has the same scope as used when ' \
+                    'prefetching data for the hook request.')
+      end
+
       hook_requests.each_with_index do |request, index|
         @request_number = index + 1
         check_prefetch_data_against_query(request, advertised_prefetch_fields)
