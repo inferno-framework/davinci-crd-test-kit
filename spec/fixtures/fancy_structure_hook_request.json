@@ -1,0 +1,45 @@
+{
+    "hookInstance": "d1577c69-dfbe-44ad-ba6d-3e05e953b2ea",
+    "fhirServer": "https://example/r4",
+    "hook": "fancy-structure",
+    "fhirAuthorization": {
+      "access_token": "SAMPLE_TOKEN",
+      "token_type": "Bearer",
+      "expires_in": 300,
+      "scope": "user/Patient.read user/Observation.read",
+      "subject": "cds-service"
+    },
+    "context":{
+      "userId":"Practitioner/example",
+      "patientId":"example",
+      "list": [
+        {
+          "id": "123",
+          "nested_list": [
+            "one",
+            "two",
+            "three"
+          ]
+        },
+        {
+          "id": "456",
+          "nested_list": [
+            "four",
+            "five",
+            "six"
+          ]
+        }
+      ],
+      "non_uniform_list": [
+        {
+          "idA": "123"
+        },
+        {
+          "id": "456"
+        },
+        {
+          "id": { "value": "789" }
+        }
+      ]
+    }
+  }
