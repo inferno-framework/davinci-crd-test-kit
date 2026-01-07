@@ -144,9 +144,11 @@ response to a request. The extension value will either be a FHIRPath expression 
 string `default`. Specifics for each type of value:
 - *No value*: If the extension is not present or has an empty value, then the entity is always
   included in the response.
-- *FHIRPath expression*: If that expression evaluates to a non-empty collection when executed
-  against the hook request, then the entity will be included in the response. Otherwise, the
-  entity is not included in the response.
+- *FHIRPath expression*: If that expression evaluates to a collection that is converted to `true` when
+  converted to a boolean (e.g., collection with one boolean `true` entry or one resource entry) after
+  execution against the hook request, then the entity will be included in the response (see FHIRPath's rules for
+  [conversion of collections to singletons](https://hl7.org/fhirpath/N1/index.html#singleton-evaluation-of-collections)
+  for details on what will constitute ). Otherwise, the entity is not included in the response.
 - *`default`*: The specifics depend of whether the entity is a card or action:
   - **Card**: If no other cards are (yet) included in the response, then this card will be included.
   - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension) and no other actions are (yet) included in the
