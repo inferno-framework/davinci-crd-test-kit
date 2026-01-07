@@ -19,9 +19,10 @@ module DaVinciCRDTestKit
     input :client_access_token,
           optional: true
     input :override_access_token,
-          title: 'Override Bearer Token',
+          title: 'Prefetch Validation Override Bearer Token',
           description: %(
-            Optionally provide a bearer token to use in place of the one provided in the hook request.
+            Optionally provide a bearer token to use in place of the one provided in the hook request
+            when checking that the prefetched data is equivalent to what can be access via FHIR.
             Use only if the bearer token in the request will not be valid even right after the hook
             request is made. If provided it must have the same scope as the bearer token provided
             in the hook request.
