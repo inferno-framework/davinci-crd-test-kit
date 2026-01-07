@@ -17,7 +17,7 @@ mock simple responses so that testers can get started more easily.
 
 Inferno can generate (mostly) static versions of [each of the cards and system actions specified
 by the CRD IG](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html). When no custom response
-template is provided in the test inputs for a hook group, then Inferno will mock an example of each
+template is provided in the test inputs for a hook group, Inferno will mock an example of each
 card type selected in the "Response types to return..." input. In addition to the logic described
 below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
 
@@ -33,13 +33,13 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   as a prefetched resource or found via a query for active coverages for the patient at the time of
   the invocation using the FHIR server access details found in the hook request. If no coverage can
   be found, then this response type will not be included in Inferno's response. If returned, the
-  extension will indicate that the order is "covered" (in [`covered`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#key_Extension.extension:covered)),
-  that no prior auth is necessary ("no-auth" in [`pa-needed`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#key_Extension.extension:pa-needed))
-  with the current [`date`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#key_Extension.extension:date)
-  and a random [`coverage-assertion-id](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#key_Extension.extension:coverage-assertion-id)
+  extension will indicate that the order is "covered" (in [`covered`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:covered)),
+  that no prior auth is necessary ("no-auth" in [`pa-needed`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:pa-needed))
+  with the current [`date`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:date)
+  and a random [`coverage-assertion-id`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:coverage-assertion-id)
   indicated. No other sub-extensions of the [`coverage-information` extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html) will be populated. The target
   order resources for each hook include:
-  - *appointment-book*: each Appoinment in `context.appointments`.
+  - *appointment-book*: each Appointment in `context.appointments`.
   - *encounter-start* and *encounter-discharge*: the Encounter refered to by `context.encounterId` 
     which must either be provided as a prefetched resource or found via a read for the indicated
     Encounter at the time of the invocation using the FHIR server access details found in the hook request.
@@ -60,20 +60,19 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks.
   It provides a suggestion for the system to create a ServiceRequest for a monthly physical assessment
   for the next three months. The ServiceRequest will be updated to reference the hook request's patient
-  (`context.patientId`), the hook requests user (`context.userId`) as the requester, and an `authoredOn`
+  (`context.patientId`), the hook request's user (`context.userId`) as the `requester`, and an `authoredOn`
   date of the current date.
-companions_prerequisites
 - **[Request Form Completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion)**:
   Inferno's [request form completion card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/request_form_completion.json)
   provides suggestions for the system to create a cancer Questionnaire resource and
   an associated Task resource to track its completion. The Task resource in the template will be
-  updated to be [`for`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#key_Task.for)
+  updated to be [`for`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#diff_Task.for)
   the patient referenced in the hook invocation (`context.patientId`) and have the current date
-  for [`authoredOn`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#key_Task.authoredOn).
+  for `authoredOn`.
 - **[Create or Update Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)**:
   Inferno's [create or update card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/create_update_coverage_information.json)
   provides suggestions for the system to either update the existing coverage if one was found (provided via prefetch or retrieved via query) or create one otherwise. If updating the existing coverage, it will
-  change the [`period`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage-definitions.html#key_Coverage.period)
+  change the [`period`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage-definitions.html#diff_Coverage.period)
   to run from the current date to 1 month in the future. If creating a new coverage, it will create
   a draft self-pay coverage for the patient indicated in the hook request (`context.patientId`).
 - **[Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application)**:
@@ -121,7 +120,8 @@ Actions can be found both within the top-level `systemActions` field and nested 
 found on cards. The same field requirements, configuration options, instantiation logic
 apply in both cases.
 
-Testers must populate the `type` and `description` fields of each action and may provide
+Testers must populate the [required](https://cds-hooks.hl7.org/2.0/#action) `type`
+and `description` fields of each action and may provide
 details in the `resource` or `resourceId` field depending on the `type`. Data in the
 `resource` field does not have to be a complete and valid resource as long as the
 [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
@@ -133,7 +133,7 @@ The same configuration options and logic apply in both cases:
   be included to limit the requests for which the action is included in the response. 
 - The [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
   can be included to specify target resources to use when building the action, which may cause
-  multiple copies to be included in a response.
+  multiple copies of the action each based on a different target resource to be included in a response.
 - [Expression tokens](#expression-tokens) can appear in any descendant field or FHIR element to
   make the value dependent on content in the request.
 
@@ -148,10 +148,10 @@ string `default`. Specifics for each type of value:
   against the hook request, then the entity will be included in the response. Otherwise, the
   entity is not included in the response.
 - *`default`*: The specifics depend of whether the entity is a card or action:
-  - **Card**: If no other cards are included in the response, then this card will be included.
+  - **Card**: If no other cards are (yet) included in the response, then this card will be included.
   - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension) and no other actions are (yet) included in the
     response, then this card will be included. If there is a [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension), then the action will be
-    instantiated against any selected resource for which no action in this list has yet been
+    instantiated against any selected resource for which no action has yet been
     instantiated.
 
 This can be used, for example, to only include a card when the hook has been triggered

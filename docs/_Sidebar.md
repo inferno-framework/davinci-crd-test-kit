@@ -6,8 +6,8 @@
 
 **Client Suite**
 *   [Client Testing Details](Client-Details)
-*   [Simulated CRD Service Responses](Controlling-Simulated-Responses)
 *   [Client Testing Instructions](Client-Instructions)
+*   [Simulated CRD Service Responses](Controlling-Simulated-Responses)
 
 **Server Suite**
 *   [Server Testing Details](Server-Details)
@@ -15,7 +15,6 @@
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
-*   [Test Generation Guide](Test-Generation-Guide)
 *   [Running the Suites Against Each Other](Running-Suites-Against-Each-Other)
 
 **Reference Documents & External Links**

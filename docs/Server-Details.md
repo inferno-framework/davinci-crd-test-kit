@@ -64,6 +64,14 @@ conformant and systems will not pass the tests if they are not.
 Much of what the CRD IG specifies is optional, such as which hooks and resource
 types to support. These tests try to provide testers with an opportunity to
 exercise as much of their systems as they wish and validate that the exercised
-behaviors are correct. However, not all areas of the IG are exercised. For example,
-custom hook configuration is not tested, and neither is the ability of servers to
-request additional data from the client using FHIR APIs.
+behaviors are correct. However, not all areas of the IG are exercised.
+
+Specific limitations include:
+- Inferno is unable to determine what requests will result in specific kinds
+  of responses from the server under test (e.g., what will result in
+  Instructions being returned vs. Coverage Information). As a result, the
+  tester must supply the request bodies that will cause the system under test
+  to return the desired response types.
+- The ability of a CRD server to request additional FHIR resources is not
+  tested.
+- Hook configuration is not tested.

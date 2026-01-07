@@ -13,9 +13,9 @@ requirements and may change the test validation logic.
 ## Technical Implementation
 
 In this test suite, Inferno simulates a CRD payer server for the client under test to
-interact with. The client will be expected to initiate requests to the server
-and demonstrate its ability to react to the returned responses and also allow
-Inferno to access. data using FHIR APIs. Over the course of these interactions,
+interact with. The client will be expected to initiate requests to the server,
+allow Inferno to access data using FHIR APIs, and demonstrate its ability to react
+to the returned responses. Over the course of these interactions,
 Inferno will seek to observe conformant handling of CRD requirements.
 
 This suite contains two groups of tests:
@@ -72,13 +72,24 @@ conformant and systems will not pass the tests if they are not.
 
 ### SMART Authentication for FHIR API Access
 
-In order to access the client's FHIR API, Inferno will need to be registered as a client using
-details provided within the suite at time of execution.
+In order to access the client's FHIR API, Inferno will need to be a
+[trusted service](https://cds-hooks.hl7.org/STU2/#trusting-cds-services)
+registered as a client using details provided within the suite at time of execution.
 
 ## Testing Limitations
 
 Much of what the CRD IG specifies is optional, such as which hooks and resource
 types to support. These tests try to provide testers with an opportunity to
 exercise as much of their systems as they wish and validate that the exercised
-behaviors are correct. However, not all areas of the IG are exercised. For example,
-custom hook configuration is not tested.
+behaviors are correct. However, not all areas of the IG are exercised.
+
+Specific limitations include:
+- This suite does not implement any payer business logic, so testers must either
+  use [Inferno's simple hard-coded responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+  or [tell Inferno how to return responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  that are comformant and drive the desired behavior in the tested system.
+- The tests cannot verify that a client is able to consume the received
+  decision support. Testers should consider this requirement to be verified
+  through attestation and should not represent their systems as having passed
+  these tests if this requirement is not met.
+- Hook configuration is not tested.

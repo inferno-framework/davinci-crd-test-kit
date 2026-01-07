@@ -31,8 +31,7 @@ follow these steps:
    value, Inferno will not be able to link the request to the test session and will not
    respond or analyze the request.
 1. Once all requests have been made, click the link in the "User Action Required" dialog
-   and Inferno will analyze the requests made and provide details on whether they were
-   conformant.
+   and Inferno will analyze the requests to determine whether they were conformant.
 1. Assuming that at least one request was successfully made, a second "User Action Required"
    dialog will appear asking for confirmation that the returned cards were displayed to the
    user within the tested system. Respond using the appropriate link to complete the tests.
@@ -73,7 +72,8 @@ Running the tests require 4 types of inputs:
 - **[ResourceType] IDs**: comma-separated lists of FHIR resource ids of the [ResourceType] that
   Inferno will use to perform a `read` interaction.
 
-NOTE: the resources and resource IDs for testing reads and updates are not required
+NOTE: the resources and resource IDs for testing reads and updates are not required, but if
+no details or provided, those tests will be skipped.
 
 To run them, follow these steps:
 1. Choose group "2 FHIR API" and click the "RUN ALL TESTS" button in the upper right.
