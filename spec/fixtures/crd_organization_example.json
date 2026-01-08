@@ -1,0 +1,5 @@
+{
+  "resourceType" : "Organization",
+  "id" : "example",
+  "name": "University Medical Center"
+}
