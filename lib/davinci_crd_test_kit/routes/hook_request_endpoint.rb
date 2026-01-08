@@ -1,8 +1,10 @@
+require_relative '../gather_response_generation_data'
 require_relative '../mock_service_response'
 require_relative '../tags'
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint
     include DaVinciCRDTestKit::MockServiceResponse
+    include DaVinciCRDTestKit::GatherResponseGenerationData
 
     def selected_response_types
       @selected_response_types ||=
@@ -43,6 +45,8 @@ module DaVinciCRDTestKit
     def make_response
       case hook_name
       when 'appointment-book', 'encounter-start', 'encounter-discharge', 'order-select', 'order-sign', 'order-dispatch'
+        send(:"gather_#{hook_name.gsub('-', '_')}_data")
+        request_coverage
         hook_response
       else
         response.status = 400

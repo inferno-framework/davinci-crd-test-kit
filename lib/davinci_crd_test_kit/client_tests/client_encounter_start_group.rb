@@ -5,6 +5,7 @@ require_relative 'hook_request_optional_fields_test'
 require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
+require_relative 'hook_request_fetched_data_test'
 require_relative 'retrieve_jwks_test'
 require_relative 'submitted_response_validation'
 require_relative 'token_header_test'
@@ -68,6 +69,7 @@ module DaVinciCRDTestKit
     test from: :crd_hook_request_optional_fields
     test from: :crd_hook_request_valid_context
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_hook_request_fetched_data
     test from: :crd_card_display_attest_test
   end
 end
