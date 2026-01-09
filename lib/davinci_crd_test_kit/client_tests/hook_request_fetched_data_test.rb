@@ -3,7 +3,7 @@ require_relative '../tags'
 module DaVinciCRDTestKit
   class HookRequestFetchedDataTest < Inferno::Test
     id :crd_hook_request_fetched_data
-    title 'Required data was accessible during the hook request'
+    title 'Minimum resource dataset was accessible during the hook invocation'
     description %(
       Clients must make a set of data related to the request available to the CRD Server via either prefetch
       as a part of the hook invocation or via FHIR API during server processing of the hook call. According
@@ -48,6 +48,10 @@ module DaVinciCRDTestKit
       assert messages.none? { |msg| msg[:type] == 'error' }, message
     end
 
+    def hook_instance_tag(hook_instance)
+      "#{HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
+    end
+
     run do
       hook_requests = load_tagged_requests(*tags_to_load)
 
@@ -56,7 +60,9 @@ module DaVinciCRDTestKit
         hook_instance = request_body['hookInstance']
 
         failed_data_fetches =
-          load_tagged_requests(hook_instance, DATA_FETCH_TAG).reject { |fetch| fetch.status.to_s.starts_with?('2') }
+          load_tagged_requests(hook_instance_tag(hook_instance), DATA_FETCH_TAG).reject do |fetch|
+            fetch.status.to_s.starts_with?('2')
+          end
 
         next unless failed_data_fetches.present?
 

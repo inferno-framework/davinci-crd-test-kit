@@ -22,7 +22,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
   end
   let(:appointment_book_hook_request_hash) { JSON.parse(appointment_book_hook_request) }
 
-  def create_appointment_hook_request(url: appointment_book_url, body: nil, status: 200, headers: nil,
+  def create_appointment_hook_request(hook_instance, url: appointment_book_url, body: nil, status: 200, headers: nil,
                                       auth_header: nil, workflow_tag: nil)
     headers ||= [
       {
@@ -41,11 +41,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
       request_body: body.is_a?(Hash) ? body.to_json : body,
       status:,
       headers:,
-      tags: ['appointment-book', workflow_tag].compact
+      tags: ['appointment-book', hook_instance_tag(hook_instance), workflow_tag].compact
     )
   end
 
-  def create_data_fetch_request(url, hook_instance_tag, body: nil, status: 200, headers: nil,
+  def create_data_fetch_request(url, hook_instance, body: nil, status: 200, headers: nil,
                                 auth_header: nil)
     headers ||= [
       {
@@ -63,8 +63,12 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
       request_body: body.is_a?(Hash) ? body.to_json : body,
       status:,
       headers:,
-      tags: [DaVinciCRDTestKit::DATA_FETCH_TAG, hook_instance_tag]
+      tags: [DaVinciCRDTestKit::DATA_FETCH_TAG, hook_instance_tag(hook_instance)]
     )
+  end
+
+  def hook_instance_tag(hook_instance)
+    "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
   end
 
   def entity_result_message(test, index: 0)
@@ -90,7 +94,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
         encryption_method: 'RS384'
       )
 
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}")
+      create_appointment_hook_request(appointment_book_hook_request_hash['hookInstance'],
+                                      body: appointment_book_hook_request, auth_header: "Bearer #{token}")
 
       result = run(test)
       expect(result.result).to eq('pass')
@@ -104,7 +109,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
         encryption_method: 'RS384'
       )
 
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}")
+      create_appointment_hook_request(appointment_book_hook_request_hash['hookInstance'],
+                                      body: appointment_book_hook_request, auth_header: "Bearer #{token}")
       create_data_fetch_request("#{client_fhir_server_output}/Patient/example",
                                 appointment_book_hook_request_hash['hookInstance'])
       create_data_fetch_request("#{client_fhir_server_output}/Coverage?patient=example&status=active",
@@ -123,7 +129,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
       )
 
       hook_instance = appointment_book_hook_request_hash['hookInstance']
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}")
+      create_appointment_hook_request(hook_instance, body: appointment_book_hook_request,
+                                                     auth_header: "Bearer #{token}")
       create_data_fetch_request("#{client_fhir_server_output}/Patient/example", hook_instance)
       create_data_fetch_request("#{client_fhir_server_output}/Coverage?patient=example&status=active", hook_instance,
                                 status: 401)
@@ -159,9 +166,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
         encryption_method: 'RS384'
       )
 
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}",
-                                      workflow_tag: alpha_workflow)
       hook_instance = appointment_book_hook_request_hash['hookInstance']
+      create_appointment_hook_request(hook_instance,
+                                      body: appointment_book_hook_request, auth_header: "Bearer #{token}",
+                                      workflow_tag: alpha_workflow)
+
       create_data_fetch_request("#{client_fhir_server_output}/Encounter/example", hook_instance, status: 401)
 
       result = run(test)
@@ -179,9 +188,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
         encryption_method: 'RS384'
       )
 
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}",
-                                      workflow_tag: beta_workflow)
       hook_instance = appointment_book_hook_request_hash['hookInstance']
+      create_appointment_hook_request(hook_instance,
+                                      body: appointment_book_hook_request, auth_header: "Bearer #{token}",
+                                      workflow_tag: beta_workflow)
+
       create_data_fetch_request("#{client_fhir_server_output}/Encounter/example", hook_instance, status: 401)
 
       result = run(test)
@@ -196,8 +207,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
         encryption_method: 'RS384'
       )
 
-      create_appointment_hook_request(body: appointment_book_hook_request, auth_header: "Bearer #{token}")
       hook_instance = appointment_book_hook_request_hash['hookInstance']
+      create_appointment_hook_request(hook_instance, body: appointment_book_hook_request,
+                                                     auth_header: "Bearer #{token}")
+
       create_data_fetch_request("#{client_fhir_server_output}/Encounter/example", hook_instance, status: 401)
 
       result = run(test)

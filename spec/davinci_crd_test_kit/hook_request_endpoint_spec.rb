@@ -76,6 +76,58 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable, scratch)
   end
 
+  def hook_instance_tag(hook_instance)
+    "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
+  end
+
+  describe 'When responding' do
+    it 'returns 400 when the hookInstance has already been used' do
+      allow(test).to receive(:suite).and_return(suite)
+      stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 200, body: patient_example.to_json)
+      stub_request(:get, practitioner_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_example.to_json)
+      stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response: instructions_card_template.to_json)
+
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, order_sign_hook_request)
+      post_json(server_endpoint, order_sign_hook_request)
+
+      expect(last_response).to be_client_error
+      expect(last_response.body)
+        .to match(/Hook instance `#{order_sign_hook_request['hookInstance']}` has already been used in this session./)
+    end
+
+    it 'returns 500 when the hook is not supported since cannot find session' do
+      allow(test).to receive(:suite).and_return(suite)
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response: instructions_card_template.to_json)
+
+      order_sign_hook_request['hook'] = 'not_a_hook'
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, order_sign_hook_request)
+
+      expect(last_response).to be_server_error
+      expect(last_response.body)
+        .to match(/Unable to find test run with identifier 'not_a_hook #{example_client_url}'./)
+    end
+  end
+
   describe 'When fetching data during a hook invocation' do
     it 'makes and tags requests for order-sign' do
       allow(test).to receive(:suite).and_return(suite)
@@ -105,7 +157,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(pat_request).to have_been_made.once
       expect(cov_request).to have_been_made.once
       tagged_requests = requests_repo.tagged_requests(test_session.id,
-                                                      [hook_instance, DaVinciCRDTestKit::DATA_FETCH_TAG])
+                                                      [hook_instance_tag(hook_instance),
+                                                       DaVinciCRDTestKit::DATA_FETCH_TAG])
       expect(tagged_requests.length).to eq(3)
       expect(tagged_requests.one? { |request| request.url == patient_example_reference_absolute }).to be(true)
       expect(tagged_requests.one? { |request| request.url == practitioner_example_reference_absolute }).to be(true)

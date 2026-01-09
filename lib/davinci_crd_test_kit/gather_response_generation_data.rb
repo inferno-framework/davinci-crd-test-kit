@@ -44,6 +44,10 @@ module DaVinciCRDTestKit
       ]
     }.freeze
 
+    def hook_instance_tag
+      @hook_instance_tag ||= "#{HOOK_INSTANCE_TAG_PREFIX}#{request_body['hookInstance']}"
+    end
+
     def gather_appointment_book_data
       appointment_book_to_read = []
       patient_id = request_body.dig('context', 'patientId')
@@ -121,7 +125,7 @@ module DaVinciCRDTestKit
       order_dispatch_to_read << order_id if order_id.present?
       order_dispatch_to_read << performer_id if performer_id.present?
 
-      gather_data_for_request(order_dispatch_to_read, [request_body.dig('context', 'task')])
+      gather_data_for_request(order_dispatch_to_read, [request_body.dig('context', 'task')].compact)
     end
 
     def extract_bundle_entries(bundle)
@@ -136,6 +140,8 @@ module DaVinciCRDTestKit
 
     def gather_data_for_request(to_read_list, to_analyze_list)
       to_analyze_list.each do |resource|
+        next unless resource.present?
+
         find_references_to_read(resource, to_read_list)
         analyzed_resources["#{resource['resourceType']}/#{resource['id']}"] = resource
       end
@@ -173,7 +179,7 @@ module DaVinciCRDTestKit
 
     def fetch_reference(reference)
       response = execute_request(reference)
-      persist_query_request(response, [DATA_FETCH_TAG, request_body['hookInstance']])
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
 
       return nil unless response.status.to_s.starts_with?('2')
 
@@ -272,7 +278,7 @@ module DaVinciCRDTestKit
     def query_for_coverages
       query = "Coverage?patient=#{request_body.dig('context', 'patientId')}&status=active"
       response = execute_request(query)
-      persist_query_request(response, [DATA_FETCH_TAG, request_body['hookInstance']])
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
 
       return nil unless response.status.to_s.starts_with?('2')
 
