@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
       [Data Fetching During Hook Invocations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations)
       documentation.
     )
-    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
+    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43', 'hl7.fhir.us.davinci-crd_2.0.1@323'
 
     def hook_name
       config.options[:hook_name]
@@ -58,6 +58,10 @@ module DaVinciCRDTestKit
       hook_requests.each do |hook_request|
         request_body = JSON.parse(hook_request.request_body)
         hook_instance = request_body['hookInstance']
+
+        if request_body.dig('fhirAuthorization', 'access_token').blank?
+          add_message(:error, "Access token not provided for FHIR data access on hook instance `#{hook_instance}`.")
+        end
 
         failed_data_fetches =
           load_tagged_requests(hook_instance_tag(hook_instance), DATA_FETCH_TAG).reject do |fetch|

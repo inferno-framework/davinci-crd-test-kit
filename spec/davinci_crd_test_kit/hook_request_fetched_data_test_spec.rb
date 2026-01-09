@@ -101,6 +101,22 @@ RSpec.describe DaVinciCRDTestKit::HookRequestFetchedDataTest do
       expect(result.result).to eq('pass')
     end
 
+    it 'fails when no access token provided' do
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      appointment_book_hook_request_hash.delete('fhirAuthorization')
+      create_appointment_hook_request(appointment_book_hook_request_hash['hookInstance'],
+                                      body: appointment_book_hook_request, auth_header: "Bearer #{token}")
+
+      result = run(test)
+      expect(result.result).to eq('pass')
+    end
+
     it 'passes when all data fetches successful' do
       token = jwt_helper.build(
         aud: appointment_book_url,
