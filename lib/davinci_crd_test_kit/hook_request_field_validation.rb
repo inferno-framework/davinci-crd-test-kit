@@ -474,16 +474,19 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
-      advertised_prefetch_fields.each do |advertised_prefetch_key, advertised_prefetch_template|
-        next if received_prefetch[advertised_prefetch_key].blank?
-
-        unless received_prefetch[advertised_prefetch_key].is_a?(Hash)
-          add_message('error', "#{request_number}Prefetch field `#{advertised_prefetch_key}` is not of type `Hash`.")
+      received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
+        unless advertised_prefetch_fields.key?(received_prefetch_key)
+          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
           next
         end
 
-        received_prefetch_resource = FHIR.from_contents(received_prefetch[advertised_prefetch_key].to_json)
+        unless received_prefetch_hash.is_a?(Hash)
+          add_message('error', "#{request_number}Prefetch field `#{received_prefetch_key}` is not of type `Hash`.")
+          next
+        end
 
+        received_prefetch_resource = FHIR.from_contents(received_prefetch[received_prefetch_key].to_json)
+        advertised_prefetch_template = advertised_prefetch_fields[received_prefetch_key]
         if advertised_prefetch_template.include?('?')
           advertised_prefetch_fhir_search = advertised_prefetch_template.gsub(/{|}/, '').split('?')
           advertised_prefetch_resource_type = advertised_prefetch_fhir_search.first
@@ -497,7 +500,7 @@ module DaVinciCRDTestKit
 
             advertised_status_param = advertised_coverage_query_params['status']
 
-            validate_prefetch_coverage(received_prefetch_resource, advertised_prefetch_key, received_context_patient_id,
+            validate_prefetch_coverage(received_prefetch_resource, received_prefetch_key, received_context_patient_id,
                                        advertised_status_param)
           end
         else
@@ -512,7 +515,7 @@ module DaVinciCRDTestKit
             received_context_id = received_context[advertised_context_id]
             received_context_resource_type = advertised_prefetch_token.first
           end
-          validate_prefetch_resource(received_prefetch_resource, advertised_prefetch_key,
+          validate_prefetch_resource(received_prefetch_resource, received_prefetch_key,
                                      received_context_resource_type, received_context_id)
         end
       end

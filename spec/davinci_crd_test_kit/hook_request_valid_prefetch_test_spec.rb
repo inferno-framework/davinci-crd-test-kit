@@ -350,6 +350,15 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(/Expected `coverage` field's Coverage resource to have a `status`/)
     end
+
+    it 'fails if prefetch has an additional unrequested field' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      appointment_book_prefetch[:unrequested] = 'should not be here'
+
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to match(/Client sent non-requested Prefetch field `unrequested`/)
+    end
   end
 
   describe 'Encounter Start Hook Valid Prefetch' do
