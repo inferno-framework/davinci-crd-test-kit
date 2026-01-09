@@ -24,6 +24,11 @@ module DaVinciCRDTestKit
 
       This test checks that those requests were successful, demonstrating that the system can provide access
       to this required information.
+
+      For more details on what Inferno's simulated CDS Service fetches during hook invocation and
+      how the client must respond to pass this test, see the
+      [Data Fetching During Hook Invocations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations)
+      documentation.
     )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
 
