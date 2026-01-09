@@ -43,6 +43,13 @@ RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request
     bundle
   end
 
+  before do
+    # disable data fetches for these tests
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint)
+      .to receive_messages(gather_encounter_discharge_data: nil,
+                           request_coverage: nil)
+  end
+
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do
     token = jwt_helper.build(
       aud: encounter_discharge_url,
