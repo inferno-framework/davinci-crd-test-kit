@@ -105,6 +105,25 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_required_fields_check(request_body, hook_name)
+      hook_request_required_fields_check_presence_and_types(request_body)
+
+      if request_body['hook'] != hook_name
+        add_message('error',
+                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
+      end
+
+      if request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
+        add_message('error', %(
+                    #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
+                    #REQUIRED.))
+      end
+
+      return unless request_body['hookInstance'].present? && !guid?(request_body['hookInstance'])
+
+      add_message('error', "#{request_number}`hookInstance` field must be a globally unique UUID.")
+    end
+
+    def hook_request_required_fields_check_presence_and_types(request_body)
       hook_required_fields.each do |field, type|
         if request_body[field].blank?
           add_message('error', "#{request_number}Hook request did not contain required field: `#{field}`")
@@ -116,18 +135,6 @@ module DaVinciCRDTestKit
           next
         end
       end
-
-      if request_body['hook'] != hook_name
-        add_message('error',
-                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
-        return
-      end
-
-      return unless request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
-
-      add_message('error', %(
-                  #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
-                  #REQUIRED.))
     end
 
     def fhir_auth_fields_valid?(fhir_authorization_required_fields, fhir_authorization)
@@ -142,6 +149,14 @@ module DaVinciCRDTestKit
           fhir_auth_valid = false
         end
       end
+
+      fhir_authorization.keys.reject { |field| fhir_authorization_required_fields.key?(field) }.each do |field|
+        if fhir_authorization[field].blank?
+          add_message('error', "#{request_number}`fhirAuthorization` field `#{field}` cannot be defined but blank.")
+          fhir_auth_valid = false
+        end
+      end
+
       fhir_auth_valid
     end
 
@@ -175,19 +190,37 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_optional_fields_check(request_body)
+      hook_request_optional_fields_check_type(request_body)
+
+      defined_fields = hook_required_fields.keys + hook_optional_fields.keys
+      request_body.keys.reject { |field| defined_fields.include?(field) }.each do |field|
+        if request_body[field].blank?
+          add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
+        end
+      end
+
+      hook_request_fhir_auth_check(request_body)
+    end
+
+    def hook_request_optional_fields_check_type(request_body)
       hook_optional_fields.each do |field, type|
-        info "#{request_number}Hook request did not contain optional field: `#{field}`" if request_body[field].blank?
+        if request_body[field].blank?
+          if request_body.key?(field)
+            add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
+          else
+            info "#{request_number}Hook request did not contain optional field: `#{field}`"
+          end
+        end
 
         if request_body[field] && !request_body[field].is_a?(type)
           add_message('error', "#{request_number}Hook request field #{field} is not of type #{type}")
         end
       end
-      hook_request_fhir_auth_check(request_body)
     end
 
-    def validate_presence_and_type(object, field_name, type, description = '')
+    def validate_presence_and_type(object, field_name, type, description = '', required: true)
       value = object[field_name]
-      unless value
+      if required && !value
         error_msg = "#{description} does not contain required field `#{field_name}`: #{description} `#{object}`."
         add_message('error', error_msg)
         return
@@ -197,7 +230,6 @@ module DaVinciCRDTestKit
       unless is_valid_type
         error_msg = type == 'URL' ? 'is not a valid URL' : "is not of type `#{type}`"
         add_message('error', "#{description} field `#{field_name}` #{error_msg}: #{description} `#{object}`.")
-        return
       end
 
       return unless value.blank?
@@ -406,6 +438,11 @@ module DaVinciCRDTestKit
       false
     end
 
+    def guid?(string)
+      uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      uuid_regex.match?(string.to_s)
+    end
+
     def query_and_validate_id_field(resource_type, resource_id)
       fhir_read(resource_type, resource_id)
       status = request.response[:status]
@@ -436,7 +473,9 @@ module DaVinciCRDTestKit
       return if hook_optional_context_fields.blank?
 
       hook_optional_context_fields.each do |field, type|
-        validate_presence_and_type(hook_context, field, type, "#{hook_name} request context") if hook_context[field]
+        if hook_context.key?(field)
+          validate_presence_and_type(hook_context, field, type, "#{hook_name} request context", required: false)
+        end
       end
 
       optional_field_keys = hook_optional_context_fields.keys

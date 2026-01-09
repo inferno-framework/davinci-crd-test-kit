@@ -28,8 +28,8 @@ module DaVinciCRDTestKit
       Each hook group tests the following:
       * If the CRD Client can invoke the specific hook service request
       * If the incoming hook request is properly authorized with a JWT Bearer token according to the [CDS Hooks authorization requirements](https://cds-hooks.hl7.org/2.0/#trusting-cds-clients)
-      * If the incoming hook request contains the required fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
-      * OPTIONAL: If the incoming hook request contains the optional fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
+      * If the incoming hook request contains valid required fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
+      * If the incoming hook request contains valid optional fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
       * If the hook request's `context` field is valid according to the specific `context` requirements defined for
       each hook type
       * OPTIONAL: If the incoming hook contains the optional `prefetch` field with valid resources
