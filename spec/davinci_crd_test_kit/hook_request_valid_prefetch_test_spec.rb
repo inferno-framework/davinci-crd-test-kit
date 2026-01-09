@@ -199,25 +199,32 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       expect(result.result).to eq('fail')
       expect(validation_request).to have_been_made.times(5)
       expect(entity_result_message(test)).to match(
-        /Request 2: Unexpected resource type: Expected `Patient`. Got/
+        /Request 2: `patient` - Prefetched resource has the wrong resource type. Expected `Patient`, got `Practitioner`./ # rubocop:disable Layout/LineLength
       )
     end
 
-    it 'skips if hook request does not contain the `prefetch` field' do
-      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [nil].to_json)
+    it 'passes if hook request does not contain the `prefetch` field' do
+      result = run(test, contexts: [appointment_book_context].to_json, prefetches: [].to_json)
 
-      expect(result.result).to eq('skip')
+      expect(result.result).to eq('pass')
       expect(result.result_message).to match(
-        'No appointment-book requests contained both the `context` and `prefetch` field'
+        'No prefetched data provided.'
       )
     end
 
-    it 'skips if hook request does not contain the `context` field' do
-      result = run(test, contexts: [nil].to_json, prefetches: [appointment_book_prefetch].to_json)
+    it 'fails to verify id and resource type details if hook request does not contain the `context` field' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      result = run(test, contexts: [].to_json, prefetches: [appointment_book_prefetch].to_json)
 
-      expect(result.result).to eq('skip')
-      expect(result.result_message).to match(
-        'No appointment-book requests contained both the `context` and `prefetch` field'
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to match(
+        /`user` - No resource type provided to verify prefetched resource against./
+      )
+      expect(entity_result_message(test)).to match(
+        /`patient` - No resource id provided to verify prefetched resource against./
+      )
+      expect(entity_result_message(test)).to match(
+        /Cannot verify `coverage` patient id because no id provided in the context./
       )
     end
 
@@ -230,7 +237,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Unexpected resource type: Expected `Practitioner`. Got/
+        /`user` - Prefetched resource has the wrong resource type. Expected `Practitioner`, got `Observation`./
       )
     end
 
@@ -256,10 +263,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Expected `user` field's FHIR resource to have an `id` of/)
+      expect(entity_result_message(test))
+        .to match(/`user` - Prefetched resource has the wrong resource id. Expected `example`, got `incorrect_id`./)
     end
 
-    it 'fails if prefetch `patient` is not a Patient resource' do
+    it 'fails if prefetch is not a Patient resource' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
 
       appointment_book_prefetch[:patient]['resourceType'] = 'Practitioner'
@@ -268,7 +276,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Unexpected resource type: Expected `Patient`. Got/
+        /`patient` - Prefetched resource has the wrong resource type. Expected `Patient`, got `Practitioner`./
       )
     end
 
@@ -295,7 +303,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       expect(result.result).to eq('fail')
       expect(entity_result_message(test)).to match(
-        /Expected `patient` field's FHIR resource to have an `id` of/
+        /`patient` - Prefetched resource has the wrong resource id. Expected `example`, got `incorrect_id`./
       )
     end
 
@@ -387,7 +395,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
       result = run(test, contexts: [encounter_start_context].to_json,
                          prefetches: [encounter_start_hook_prefetch].to_json)
-
       expect(result.result).to eq('pass')
       expect(validation_request).to have_been_made.times(4)
     end
