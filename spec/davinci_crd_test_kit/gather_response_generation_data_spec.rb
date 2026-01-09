@@ -64,6 +64,20 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
   let(:service_request_example) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'crd_service_request_example.json')))
   end
+  let(:crd_coverage) do
+    JSON.parse(File.read(File.join(
+                           __dir__, '..', 'fixtures', 'crd_coverage_example.json'
+                         )))
+  end
+  let(:crd_coverage_bundle) do
+    bundle = FHIR::Bundle.new(type: 'searchset')
+    bundle.entry.append(FHIR::Bundle::Entry.new(
+                          fullUrl: 'https://example.com/base/Coverage/coverage_example',
+                          resource: FHIR.from_contents(crd_coverage.to_json)
+                        ))
+    bundle
+  end
+  let(:coverage_search_url) { "#{fhir_server}/Coverage?patient=example&status=active" }
   let(:appointment_book_request) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'appointment_book_hook_request.json')))
   end
@@ -262,6 +276,62 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(module_instance.analyzed_resources[practitioner_role_example_reference_relative]).to be_present
       expect(pr_request).to have_been_made.once
       expect(p_request).to have_been_made.once
+    end
+  end
+
+  describe 'when fetching coverage resources' do
+    it 'queries if no prefetch data present' do
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      coverage = module_instance.request_coverage
+      expect(coverage.is_a?(FHIR::Coverage)).to be(true)
+      expect(coverage.id).to eq('coverage_example')
+      expect(cov_request).to have_been_made.once
+    end
+
+    it 'queries if no prefetch data present but can handle finding nothing' do
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      crd_coverage_bundle.entry.pop
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      coverage = module_instance.request_coverage
+      expect(coverage).to be_nil
+      expect(cov_request).to have_been_made.once
+    end
+
+    it 'does not query if prefetch data present' do
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      crd_coverage_bundle.entry.first.resource.id = 'prefetch_coverage'
+      order_sign_request['prefetch'] = {
+        'coverage' => JSON.parse(crd_coverage_bundle.to_json)
+      }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      coverage = module_instance.request_coverage
+      expect(coverage.is_a?(FHIR::Coverage)).to be(true)
+      expect(coverage.id).to eq('prefetch_coverage')
+      expect(cov_request).to_not have_been_made
+    end
+
+    it 'finds no coverage if the prefetch data is bad' do
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      order_sign_request['prefetch'] = {
+        'coverage' => JSON.parse(crd_coverage.to_json)
+      }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      coverage = module_instance.request_coverage
+      expect(coverage).to be_nil
+      expect(cov_request).to_not have_been_made
     end
   end
 

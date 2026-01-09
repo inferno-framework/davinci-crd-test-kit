@@ -215,17 +215,16 @@ module DaVinciCRDTestKit
     end
 
     def find_coverage_for_request
-      if request_body.dig('prefetch', 'coverage').present?
-        resource = FHIR.fromContents(request_body.dig('prefetch', 'coverage'))
-      else
-        query_for_coverages
-      end
+      resource =
+        if request_body.dig('prefetch', 'coverage').present?
+          FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
+        else
+          query_for_coverages
+        end
 
-      if resource.is_a?(FHIR::Bundle)
-        resource.entry&.first&.resource
-      else
-        resource
-      end
+      return unless resource.is_a?(FHIR::Bundle)
+
+      resource.entry&.first&.resource
     end
 
     def fhir_server_connection
