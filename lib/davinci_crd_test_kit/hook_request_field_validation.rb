@@ -571,8 +571,8 @@ module DaVinciCRDTestKit
 
       if received_context_patient_id.present? && coverage_beneficiary_patient_id != received_context_patient_id
         add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
-                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `beneficiary` " \
-                             "reference id of '#{received_context_patient_id}', " \
+                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a " \
+                             "`beneficiary` reference id of '#{received_context_patient_id}', " \
                              "instead was '#{coverage_beneficiary_patient_id}`")
         return
       end
