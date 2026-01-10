@@ -524,7 +524,7 @@ module DaVinciCRDTestKit
     def validate_prefetch_coverages(received_resource, advertised_prefetch_key,
                                     received_context_patient_id, advertised_status)
       unless received_resource.resourceType == 'Bundle'
-        add_message('error', "#{request_number}Unexpected resource type: Expected `Bundle`. Got" \
+        add_message('error', "#{request_number}Unexpected resource type: Expected `Bundle`. Got " \
                              "`#{received_resource.resourceType}`.")
         return
       end
@@ -571,7 +571,7 @@ module DaVinciCRDTestKit
 
       if received_context_patient_id.present? && coverage_beneficiary_patient_id != received_context_patient_id
         add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
-                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `beneficiary`" \
+                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `beneficiary` " \
                              "reference id of '#{received_context_patient_id}', " \
                              "instead was '#{coverage_beneficiary_patient_id}`")
         return
@@ -581,7 +581,7 @@ module DaVinciCRDTestKit
       return unless coverage_status != advertised_status
 
       add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
-                           "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of" \
+                           "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of " \
                            "'#{advertised_status}', instead was '#{coverage_status}'")
     end
 
