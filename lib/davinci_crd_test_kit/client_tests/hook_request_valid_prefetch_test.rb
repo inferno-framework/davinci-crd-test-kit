@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
     include URLs
 
     id :crd_hook_request_valid_prefetch
-    title 'Hook contains valid prefetched data'
+    title 'Hook request contains valid prefetched data'
     description %(
       As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
       `prefetch` field is an optional field that contains key/value pairs of FHIR queries that the service is requesting
