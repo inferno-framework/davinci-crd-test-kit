@@ -307,11 +307,12 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
       )
     end
 
-    it 'fails if prefetch `coverage` is not a Coverage resource' do
+    it 'fails if prefetch `coverage` Bundle contains a second resource that is not a Coverage' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
 
-      appointment_book_prefetch[:coverage].entry.first.resource =
-        FHIR.from_contents(crd_practitioner.to_json)
+      appointment_book_prefetch[:coverage].entry.append(FHIR::Bundle::Entry.new(
+                                                          resource: FHIR.from_contents(crd_practitioner.to_json)
+                                                        ))
 
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
