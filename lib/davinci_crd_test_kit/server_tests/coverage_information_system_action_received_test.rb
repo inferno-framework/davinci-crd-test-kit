@@ -1,10 +1,12 @@
 require_relative '../test_helper'
 require_relative '../server_hook_helper'
+require_relative '../cards_identification'
 
 module DaVinciCRDTestKit
   class CoverageInformationSystemActionReceivedTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::ServerHookHelper
+    include DaVinciCRDTestKit::CardsIdentification
 
     title 'Coverage Information system action was received'
     id :crd_coverage_info_system_action_received
@@ -49,9 +51,7 @@ module DaVinciCRDTestKit
       end
 
       coverage_info_system_actions = target_actions.select do |action|
-        resource = FHIR.from_contents(action['resource'].to_json)
-        coverage_info_ext_url = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
-        resource.extension.any? { |extension| extension.url == coverage_info_ext_url }
+        coverage_information_response_type?(action)
       end
 
       assert coverage_info_system_actions.present?,

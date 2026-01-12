@@ -63,7 +63,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :appointment_book_custom_response,
+    input :appointment_book_custom_response_template,
           title: 'Custom response for appointment-book hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response

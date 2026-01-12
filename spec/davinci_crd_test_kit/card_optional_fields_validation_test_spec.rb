@@ -257,19 +257,7 @@ RSpec.describe DaVinciCRDTestKit::CardOptionalFieldsValidationTest do
     expect(msg.message).to match(/does not contain required field/)
   end
 
-  it 'fails if a delete action resourceId is not an array' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
-    delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
-    delete_action['resourceId'] = 'example'
-
-    result = run(runnable, valid_cards: valid_cards.to_json)
-    expect(result.result).to eq('fail')
-
-    msg = entity_result_messages.find { |m| m.type == 'error' }
-    expect(msg.message).to match(/is not of type `Array`/)
-  end
-
-  it 'fails if a delete action resourceId item is not a relative reference' do
+  it 'fails if a delete action resourceId is not a string' do
     cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
     delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
     delete_action['resourceId'] = ['example']
@@ -278,7 +266,19 @@ RSpec.describe DaVinciCRDTestKit::CardOptionalFieldsValidationTest do
     expect(result.result).to eq('fail')
 
     msg = entity_result_messages.find { |m| m.type == 'error' }
-    expect(msg.message).to match(/Invalid `Action.resourceId item` format/)
+    expect(msg.message).to match(/is not of type `String`/)
+  end
+
+  it 'fails if a delete action resourceId item is not a relative reference' do
+    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
+    delete_action['resourceId'] = 'example'
+
+    result = run(runnable, valid_cards: valid_cards.to_json)
+    expect(result.result).to eq('fail')
+
+    msg = entity_result_messages.find { |m| m.type == 'error' }
+    expect(msg.message).to match(/Invalid `Action.resourceId` format/)
   end
 
   it 'persists outputs when valid card with suggestions and/or links are present' do

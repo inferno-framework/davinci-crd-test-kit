@@ -1,12 +1,14 @@
 require_relative '../test_helper'
 require_relative '../server_hook_helper'
 require_relative '../suggestion_actions_validation'
+require_relative '../cards_identification'
 
 module DaVinciCRDTestKit
   class AdditionalOrdersValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
     include DaVinciCRDTestKit::ServerHookHelper
+    include DaVinciCRDTestKit::CardsIdentification
 
     title 'Valid Additional Orders as companions/prerequisites cards received'
     id :crd_additional_orders_card_validation
@@ -35,24 +37,11 @@ module DaVinciCRDTestKit
     optional
     input :valid_cards_with_suggestions
 
-    EXPECTED_RESOURCE_TYPES = %w[
-      CommunicationRequest Device DeviceRequest Medication
-      MedicationRequest NutritionOrder ServiceRequest
-      VisionPrescription
-    ].freeze
-
-    def additional_orders_card?(card)
-      card['suggestions'].all? do |suggestion|
-        actions = suggestion['actions']
-        actions&.all? do |action|
-          action['type'] == 'create' && action_resource_type_check(action, EXPECTED_RESOURCE_TYPES)
-        end
-      end
-    end
-
     run do
       parsed_cards = parse_json(valid_cards_with_suggestions)
-      additional_orders_cards = parsed_cards.filter { |card| additional_orders_card?(card) }
+      additional_orders_cards = parsed_cards.filter do |card|
+        additional_orders_response_type?(card)
+      end
       skip_if additional_orders_cards.blank?,
               "#{tested_hook_name} hook response does not include Additional Orders as companion/prerequisite cards."
 

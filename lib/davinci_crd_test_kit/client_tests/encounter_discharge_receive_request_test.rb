@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :encounter_discharge_custom_response,
+    input :encounter_discharge_custom_response_template,
           title: 'Custom response for encounter-discharge hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response
