@@ -2,6 +2,10 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
   let(:module_instance) do
     Class.new do
       include DaVinciCRDTestKit::CardsIdentification
+
+      def scratch
+        @scratch ||= {}
+      end
     end.new
   end
 
@@ -43,7 +47,7 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
     JSON.parse('{
       "type": "update",
       "description": "add coverage-information extension",
-      "resource": { "resourceType": "ServiceReqeuest", "id": "existingSR", "extension": [{ "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information", "valueString": "sub-extensions elided" }], "status": "details elided" }
+      "resource": { "resourceType": "ServiceRequest", "id": "existingSR", "extension": [{ "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information", "valueString": "sub-extensions elided" }], "status": "details elided" }
     }')
   end
   let(:external_reference_template) do
@@ -108,6 +112,24 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
     }')
 
     template
+  end
+
+  let(:all_types_response) do
+    {
+      cards: [additional_orders_template, create_coverage_card_template, update_coverage_card_template,
+              external_reference_template, form_completion_card_template, instructions_card_template,
+              launch_smart_app_template, propose_alternate_delete_create_card_template,
+              propose_alternate_update_card_template],
+      systemActions: [create_coverage_action_template, update_coverage_action_template,
+                      coverage_information_action_template, form_completion_action_template]
+    }
+  end
+
+  def create_inferno_request(request_body, response_body)
+    Inferno::Entities::Request.new(
+      request_body:,
+      response_body:
+    )
   end
 
   describe 'when identifying additional orders cards' do
@@ -326,6 +348,164 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
     it 'returns false for a non-matching cards' do
       expect(module_instance).to_not be_form_completion_action_response_type(create_coverage_action_template)
       expect(module_instance).to_not be_form_completion_action_response_type(update_coverage_action_template)
+    end
+  end
+
+  describe 'when sorting cards by type' do
+    it 'identifies cards and actions of each type' do
+      all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+      sorted_cards = module_instance.sorted_cards_from_requests([all_types_request])
+      expect(sorted_cards).to_not be_nil
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::EXTERNAL_REFERENCE_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['cards'][nil]).to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to be_present
+      expect(sorted_cards['actions'][nil]).to_not be_present
+    end
+
+    it 'handles unknown cards and actions' do
+      external_reference_template['links'][0]['type'] = 'wrong'
+      coverage_information_action_template['resource'].delete('extension')
+
+      unknown_types_response = { cards: [external_reference_template],
+                                 systemActions: [coverage_information_action_template] }
+
+      unknown_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, unknown_types_response.to_json)
+      sorted_cards = module_instance.sorted_cards_from_requests([unknown_types_request])
+      expect(sorted_cards).to_not be_nil
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::EXTERNAL_REFERENCE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][nil]).to be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][nil]).to be_present
+    end
+
+    it 'skips bad responses' do
+      bad_response_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, 'bad')
+      sorted_cards = module_instance.sorted_cards_from_requests([bad_response_request])
+      expect(sorted_cards).to_not be_nil
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::EXTERNAL_REFERENCE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['cards'][nil]).to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE])
+        .to_not be_present
+      expect(sorted_cards['actions'][nil]).to_not be_present
+    end
+
+    describe 'when caching data' do
+      it 'caches data' do
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        sorted_cards = module_instance.sorted_cards_from_requests([all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(module_instance.scratch).to_not be_blank
+        expect(module_instance.scratch['sorted_cards']['hook_instances']).to eq(['dummy'])
+        expect(module_instance.scratch['sorted_cards']['data']).to eq(sorted_cards)
+      end
+
+      it 'does not cache data with bad requests' do
+        bad_request = create_inferno_request('bad', all_types_response.to_json)
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        sorted_cards = module_instance.sorted_cards_from_requests([bad_request, all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(module_instance.scratch).to be_blank
+      end
+
+      it 'handles missing hookInstance values' do
+        bad_request = create_inferno_request({}.to_json, all_types_response.to_json)
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        sorted_cards = module_instance.sorted_cards_from_requests([bad_request, all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(module_instance.scratch['sorted_cards']['hook_instances']).to eq(['dummy'])
+        expect(module_instance.scratch['sorted_cards']['data']).to be_present
+      end
+
+      it 'overwrites cache when new request set used' do
+        dummy_cache_data = { dummy: 'cache' }
+        prior_request = create_inferno_request({ hookInstance: 'old' }.to_json,
+                                               { cards: [], systemActions: [] }.to_json)
+        module_instance.cache_sorted_cards([prior_request], dummy_cache_data)
+
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        sorted_cards = module_instance.sorted_cards_from_requests([all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(sorted_cards).to_not eq(dummy_cache_data)
+      end
+    end
+
+    describe 'when using cached data' do
+      it 'uses cached data if available and matches the requests' do
+        dummy_cache_data = { dummy: 'cache' }
+
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        module_instance.cache_sorted_cards([all_types_request], dummy_cache_data)
+
+        sorted_cards = module_instance.sorted_cards_from_requests([all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(sorted_cards).to eq(dummy_cache_data)
+      end
+
+      it 'handles missing hookInstance values by not returning the cache' do
+        dummy_cache_data = { dummy: 'cache' }
+
+        all_types_request = create_inferno_request({ hookInstance: 'dummy' }.to_json, all_types_response.to_json)
+        missing_hi_request = create_inferno_request({}.to_json, all_types_response.to_json)
+
+        module_instance.cache_sorted_cards([all_types_request, missing_hi_request], dummy_cache_data)
+        sorted_cards = module_instance.sorted_cards_from_requests([missing_hi_request, all_types_request])
+        expect(sorted_cards).to_not be_nil
+        expect(module_instance.scratch['sorted_cards']['hook_instances']).to eq(['dummy'])
+        expect(module_instance.scratch['sorted_cards']['data']).to_not eq(dummy_cache_data)
+      end
     end
   end
 end

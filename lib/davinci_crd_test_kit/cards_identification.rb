@@ -6,6 +6,8 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::SuggestionActionsValidation
     include DaVinciCRDTestKit::ServerHookRequestValidation
 
+    COVERAGE_INFO_EXT_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'.freeze
+
     ADDITIONAL_ORDERS_RESPONSE_TYPE = 'companions_prerequisites'.freeze
     COVERAGE_INFORMATION_RESPONSE_TYPE = 'coverage_information'.freeze
     CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE = 'create_update_coverage_info'.freeze
@@ -60,8 +62,7 @@ module DaVinciCRDTestKit
     end
 
     def coverage_information_response_type?(action)
-      coverage_info_ext_url = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
-      action.dig('resource', 'extension')&.any? { |extension| extension['url'] == coverage_info_ext_url }
+      action.dig('resource', 'extension')&.any? { |extension| extension['url'] == COVERAGE_INFO_EXT_URL }
     end
 
     def create_or_update_coverage_card_response_type?(card)
@@ -127,7 +128,7 @@ module DaVinciCRDTestKit
     end
 
     def list_card_types_in_requests(hooks_requests)
-      sorted_cards = identify_card_types_from_hooks_invocations(hooks_requests)
+      sorted_cards = sorted_cards_from_requests(hooks_requests)
 
       present_card_types = sorted_cards['cards'].select { |key, value| key.present? && value.present? }.keys
       present_action_types = sorted_cards['actions'].select { |key, value| key.present? && value.present? }.keys
@@ -135,7 +136,9 @@ module DaVinciCRDTestKit
       present_card_types.map { |type| "#{type}_card" } + present_action_types.map { |type| "#{type}_action" }
     end
 
-    def identify_card_types_from_hooks_invocations(hooks_requests)
+    def sorted_cards_from_requests(hooks_requests)
+      return sorted_cards_from_cache if sorted_cards_cached?(hooks_requests)
+
       sorted_cards = initialize_sorted_cards_hash
 
       hooks_requests.each do |request|
@@ -144,6 +147,7 @@ module DaVinciCRDTestKit
         next
       end
 
+      cache_sorted_cards(hooks_requests, sorted_cards)
       sorted_cards
     end
 
@@ -177,6 +181,46 @@ module DaVinciCRDTestKit
           nil => [] # unknown type
         }
       }
+    end
+
+    def extract_coverage_information_extensions(sorted_cards)
+      coverage_information_extensions = []
+
+      sorted_cards['actions'][COVERAGE_INFORMATION_RESPONSE_TYPE].each do |coverage_information_action|
+        coverage_information_action['resource']['extension'].each do |extension|
+          coverage_information_extensions << extension if extension['url'] == COVERAGE_INFO_EXT_URL
+        end
+      end
+
+      coverage_information_extensions.map { |ext| FHIR.from_contents(ext.to_json) }
+    end
+
+    def sorted_cards_cached?(requests)
+      return false unless scratch['sorted_cards'].present?
+      return false unless scratch['sorted_cards']['hook_instances'].length == requests.length
+
+      requests.all? do |request|
+        scratch['sorted_cards']['hook_instances'].include?(JSON.parse(request.request_body)&.dig('hookInstance'))
+      rescue JSON::ParserError
+        false
+      end
+    end
+
+    def cache_sorted_cards(requests, sorted_cards)
+      scratch['sorted_cards'] = {
+        'hook_instances' => hook_instances_from_requests(requests),
+        'data' => sorted_cards
+      }
+    rescue JSON::ParserError
+      nil
+    end
+
+    def sorted_cards_from_cache
+      scratch['sorted_cards']['data']
+    end
+
+    def hook_instances_from_requests(requests)
+      requests.map { |request| JSON.parse(request.request_body)&.dig('hookInstance') }.compact
     end
   end
 end
