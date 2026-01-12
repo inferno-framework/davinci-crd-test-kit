@@ -125,5 +125,58 @@ module DaVinciCRDTestKit
           (expected_resource_types.blank? || action_resource_type_check(action, expected_resource_types))
       end
     end
+
+    def list_card_types_in_requests(hooks_requests)
+      sorted_cards = identify_card_types_from_hooks_invocations(hooks_requests)
+
+      present_card_types = sorted_cards['cards'].select { |key, value| key.present? && value.present? }.keys
+      present_action_types = sorted_cards['actions'].select { |key, value| key.present? && value.present? }.keys
+
+      present_card_types.map { |type| "#{type}_card" } + present_action_types.map { |type| "#{type}_action" }
+    end
+
+    def identify_card_types_from_hooks_invocations(hooks_requests)
+      sorted_cards = initialize_sorted_cards_hash
+
+      hooks_requests.each do |request|
+        sort_card_types_from_request(request, sorted_cards)
+      rescue JSON::ParserError
+        next
+      end
+
+      sorted_cards
+    end
+
+    def sort_card_types_from_request(request, sorted_cards)
+      response_body = JSON.parse(request.response_body)
+      response_body['cards']&.each do |card|
+        sorted_cards['cards'][identify_card_type(card)] << card
+      end
+
+      response_body['systemActions']&.each do |action|
+        sorted_cards['actions'][identify_action_type(action)] << action
+      end
+    end
+
+    def initialize_sorted_cards_hash
+      {
+        'cards' => {
+          ADDITIONAL_ORDERS_RESPONSE_TYPE => [],
+          CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE => [],
+          EXTERNAL_REFERENCE_RESPONSE_TYPE => [],
+          FORM_COMPLETION_RESPONSE_TYPE => [],
+          INSTRUCTIONS_RESPONSE_TYPE => [],
+          LAUNCH_SMART_APP_RESPONSE_TYPE => [],
+          PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE => [],
+          nil => [] # unknown type
+        },
+        'actions' => {
+          COVERAGE_INFORMATION_RESPONSE_TYPE => [],
+          CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE => [],
+          FORM_COMPLETION_RESPONSE_TYPE => [],
+          nil => [] # unknown type
+        }
+      }
+    end
   end
 end
