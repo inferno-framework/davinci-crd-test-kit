@@ -38,14 +38,12 @@ module DaVinciCRDTestKit
     end
 
     def add_response_card_types(response_hash, card_types)
-      return unless response_hash['cards'].present? || response_hash['systemActions'].present?
-
-      response_hash['cards'].each do |card|
+      response_hash['cards']&.each do |card|
         card_type = "#{identify_card_type(card)}_card"
         card_types << card_type if need_to_add_type?(card_types, card_type)
       end
 
-      response_hash['systemActions'].each do |action|
+      response_hash['systemActions']&.each do |action|
         action_type = "#{identify_action_type(action)}_action"
         card_types << action_type if need_to_add_type?(card_types, action_type)
       end

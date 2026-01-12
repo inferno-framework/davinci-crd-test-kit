@@ -2,7 +2,7 @@ module DaVinciCRDTestKit
   class InfernoResponseValidationTest < Inferno::Test
     include CardsValidation
 
-    title 'Inferno CDS Service Response is Valid'
+    title 'Inferno CDS Service Response is Conformant'
     description %(
       This test verifies that each service response built by Inferno and returned to the client is conformant.
       These responses must be conformant for the client to demonstrate its ability to accept CDS Service responses.
