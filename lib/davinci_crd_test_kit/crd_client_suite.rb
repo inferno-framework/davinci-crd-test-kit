@@ -1,5 +1,6 @@
 require_relative 'client_fhir_api_group'
 require_relative 'client_hooks_group'
+require_relative 'client_tests/client_card_must_support_group'
 require_relative 'client_registration_group'
 require_relative 'routes/cds_services_discovery_handler'
 require_relative 'tags'
@@ -111,6 +112,7 @@ module DaVinciCRDTestKit
 
       group from: :crd_client_registration
       group from: :crd_client_hooks
+      group from: :crd_client_card_must_support
     end
 
     group from: :crd_client_fhir_api
