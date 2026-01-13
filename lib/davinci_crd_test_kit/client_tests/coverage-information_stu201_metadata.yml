@@ -1,0 +1,27 @@
+---
+:name: coverage_information
+:version: v2.0.1
+:reformatted_version: vv201
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+:profile_name: "Extension: Coverage Information"
+:profile_version: 2.0.1
+:title: Coverage Information
+:must_supports:
+  :extensions:
+  - :id: Extension.extension:coverage
+    :path: extension
+    :url: coverage
+  - :id: Extension.extension:covered
+    :path: extension
+    :url: covered
+  - :id: Extension.extension:doc-needed
+    :path: extension
+    :url: doc-needed
+  - :id: Extension.extension:doc-purpose
+    :path: extension
+    :url: doc-purpose
+  - :id: Extension.extension:info-needed
+    :path: extension
+    :url: info-needed
+  :slices:
+  :elements:

@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :encounter_start_custom_response,
+    input :encounter_start_custom_response_template,
           title: 'Custom response for encounter-start hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response
@@ -81,7 +81,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=enounter-start%20#{cds_jwt_iss}) when you have finished submitting
+          [Click here](#{resume_pass_url}?token=encounter-start%20#{cds_jwt_iss}) when you have finished submitting
           requests.
         )
       )

@@ -68,7 +68,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :order_select_custom_response,
+    input :order_select_custom_response_template,
           title: 'Custom response for order-select hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response

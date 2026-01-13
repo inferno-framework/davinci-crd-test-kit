@@ -1,4 +1,5 @@
 /data/*.db
+/data/igs/*.tgz
 /data/redis/**/*.rdb
 /data/redis/**/*.aof
 /data/redis/**/*.manifest
@@ -12,6 +13,7 @@
 .settings/org.eclipse.wst.jsdt.ui.superType.container
 .settings/org.eclipse.wst.jsdt.ui.superType.name
 .idea
+**/~$*.xlsx
 
 /coverage
 /spec/examples.txt
