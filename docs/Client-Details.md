@@ -31,9 +31,9 @@ This suite contains two groups of tests:
     - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
   - The ability of the client to process and display to the user information returned in CRD card types
     present in the CDS Hooks responses, including:
-    - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
-    - [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
-    - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+    - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) (must be demonstrated)
+    - [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) (must be demonstrated)
+    - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) (must be demonstrated)
     - [Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)
     - [Additional Orders](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)
     - [Form Completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion)
