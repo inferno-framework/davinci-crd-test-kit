@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
       card type. At least one hook invocation performed during this test session must have returned an External Reference card.
 
       If this test fails, adjust the [cards returned by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
-      and the hook requests made by the client such that an External Reference card is returned and support for it is demonstrated.
+      and/or the hook requests made by the client during the Hooks tests such that an External Reference card is returned and support for it is demonstrated.
     DESCRIPTION
 
     ALL_HOOKS = [

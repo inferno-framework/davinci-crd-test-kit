@@ -16,7 +16,11 @@ module DaVinciCRDTestKit
       made by the client as a part of this test session. In the case of the Coverage Information card type,
       all must support elements defined in the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
       must be demonstrated.
+
+      These tests must be run after the tests in the Hooks group are run.
     DESCRIPTION
+
+    run_as_group
 
     test from: :crd_client_card_must_support_coverage_information
     test from: :crd_client_card_must_support_external_reference
