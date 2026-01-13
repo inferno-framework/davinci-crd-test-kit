@@ -192,7 +192,7 @@ module DaVinciCRDTestKit
         end
       end
 
-      coverage_information_extensions.map { |ext| FHIR.from_contents(ext.to_json) }
+      coverage_information_extensions.map { |ext| FHIR::Extension.new(ext) }
     end
 
     def sorted_cards_cached?(requests)
