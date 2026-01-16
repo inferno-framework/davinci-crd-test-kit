@@ -1,5 +1,5 @@
 {
-  "title": "Inferno CRD Server Suite",
+  "title": "Run Against the CRD Server Suite",
   "id": "inferno-crd-server-suite",
   "test_suite_id": "crd_client",
   "inputs": [
@@ -13,6 +13,324 @@
       "name": "cds_jwk_set",
       "type": "textarea",
       "value": "<%= Inferno::Application['base_url'] %>/custom/crd_server/jwks.json"
+    },
+    {
+      "name": "appointment_book_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for appointment-book hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "appointment_book_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          }
+        ]
+      },
+      "title": "Response types to return from appointment-book hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "encounter_start_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for encounter-start hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "encounter_start_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          }
+        ]
+      },
+      "title": "Response types to return from encounter-start hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "encounter_discharge_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for encounter-discharge hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "encounter_discharge_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          }
+        ]
+      },
+      "title": "Response types to return from encounter-discharge hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "order_select_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for order-select hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "order_select_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          },
+          {
+            "label": "Propose Alternate Request",
+            "value": "propose_alternate_request"
+          },
+          {
+            "label": "Additional Orders as Companions/Prerequisites",
+            "value": "companions_prerequisites"
+          }
+        ]
+      },
+      "title": "Response types to return from order-select hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
+    },
+    {
+      "name": "order_dispatch_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for order-dispatch hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "order_dispatch_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          },
+          {
+            "label": "Propose Alternate Request",
+            "value": "propose_alternate_request"
+          },
+          {
+            "label": "Additional Orders as Companions/Prerequisites",
+            "value": "companions_prerequisites"
+          }
+        ]
+      },
+      "title": "Response types to return from order-dispatch hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
+    },
+    {
+      "name": "order_sign_custom_response",
+      "description": "A JSON string may be provided here to replace the normal response from the hook request endpoint",
+      "optional": true,
+      "title": "Custom response for order-sign hook requests",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "name": "order_sign_selected_response_types",
+      "default": [
+        "coverage_information",
+        "external_reference",
+        "instructions"
+      ],
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "optional": true,
+      "options": {
+        "list_options": [
+          {
+            "label": "External Reference",
+            "value": "external_reference"
+          },
+          {
+            "label": "Instructions",
+            "value": "instructions"
+          },
+          {
+            "label": "Coverage Information",
+            "value": "coverage_information"
+          },
+          {
+            "label": "Request Form Completion",
+            "value": "request_form_completion"
+          },
+          {
+            "label": "Create/Update Coverage Information",
+            "value": "create_update_coverage_info"
+          },
+          {
+            "label": "Launch SMART Application",
+            "value": "launch_smart_app"
+          },
+          {
+            "label": "Propose Alternate Request",
+            "value": "propose_alternate_request"
+          },
+          {
+            "label": "Additional Orders as Companions/Prerequisites",
+            "value": "companions_prerequisites"
+          }
+        ]
+      },
+      "title": "Response types to return from order-sign hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
     },
     {
       "name": "url",
