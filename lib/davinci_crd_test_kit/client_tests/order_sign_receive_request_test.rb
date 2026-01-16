@@ -7,12 +7,16 @@ module DaVinciCRDTestKit
     id :crd_order_sign_request
     title 'Request received for order-sign hook'
     description %(
-        This test waits for multiple incoming [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
-        hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
-        hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
-        system action for these hooks, even if the response indicates that further information is needed or that the
-        level of detail provided is insufficient to determine coverage.
-      )
+      This test waits for multiple incoming [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
+      hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
+      hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+      system action for these hooks, even if the response indicates that further information is needed or that the
+      level of detail provided is insufficient to determine coverage.
+
+      For more details on how Inferno's simulated CDS Service behave during hook invocation see the
+      [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+      documentation.
+    )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@218', 'hl7.fhir.us.davinci-crd_2.0.1@225',
                           'hl7.fhir.us.davinci-crd_2.0.1@243', 'hl7.fhir.us.davinci-crd_2.0.1@244',
                           'hl7.fhir.us.davinci-crd_2.0.1@245'
