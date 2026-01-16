@@ -1,5 +1,6 @@
 {
-  "title": "Inferno CRD Server Suite",
+  "title": "Run Against the CRD Server Suite",
+  "title": "Run Against the CRD Server Suite",
   "id": "inferno-crd-server-suite",
   "test_suite_id": "crd_client",
   "inputs": [
@@ -13,6 +14,48 @@
       "name": "cds_jwk_set",
       "type": "textarea",
       "value": "<%= Inferno::Application['base_url'] %>/custom/crd_server/jwks.json"
+    },
+    {
+      "name": "appointment_book_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "title": "Response types to return from appointment-book hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "encounter_start_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "title": "Response types to return from encounter-start hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "encounter_discharge_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "title": "Response types to return from encounter-discharge hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\"]"
+    },
+    {
+      "name": "order_select_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Instructions` card type.",
+      "title": "Response types to return from order-select hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
+    },
+    {
+      "name": "order_dispatch_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "title": "Response types to return from order-dispatch hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
+    },
+    {
+      "name": "order_sign_selected_response_types",
+      "description": "Select the cards/action response types that the Inferno hook request endpoints will return. The default response type that will be returned for this hook is the `Coverage Information` card type.",
+      "title": "Response types to return from order-sign hook requests",
+      "type": "checkbox",
+      "value": "[\"external_reference\",\"instructions\",\"coverage_information\",\"request_form_completion\",\"create_update_coverage_info\",\"launch_smart_app\",\"propose_alternate_request\",\"companions_prerequisites\"]"
     },
     {
       "name": "url",

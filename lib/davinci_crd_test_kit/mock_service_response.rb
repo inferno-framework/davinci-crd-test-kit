@@ -162,7 +162,12 @@ module DaVinciCRDTestKit
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
-        FHIR.from_contents(prefetch['coverage'].to_json)
+        prefetch_data = FHIR.from_contents(prefetch['coverage'].to_json)
+        if prefetch_data.is_a?(FHIR::Bundle)
+          prefetch_data.entry.first&.resource
+        else
+          prefetch_data
+        end
       else
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
@@ -210,7 +215,8 @@ module DaVinciCRDTestKit
       cards_response = { 'cards' => cards }
       cards_response['systemActions'] = system_actions if system_actions.present?
       cards_response
-    rescue StandardError
+    rescue StandardError => e
+      Inferno::Application['logger'].error(e.full_message)
       nil
     end
 

@@ -75,26 +75,35 @@ module DaVinciCRDTestKit
 
       ## Running the Tests aginst the Server Suite
 
-      You can also run these tests against the Inferno CRD Server test suite.
-      The server suite will not render cards like a real CRD client would do,
-      but will simulate and verify the interactions between the client and
-      server.
+      You can also run the Hook Invocation portion of these tests against the
+      Inferno CRD Server test suite. The server suite will not render cards
+      like a real CRD client would do, but will simulate and verify the
+      interactions between the client and server.
 
-      1. Start a "Da Vinci CRD Client Test Suite" session.
-      1. Choose the "Inferno CRD Server Suite" preset from the drop down in the upper left.
-      1. Run the Client Registration test group. It should pass.
-      1. Run the Hooks > Appointment Book test group leaving the inputs as is. A
+      1. Start a "Da Vinci CRD Client Test Suite" session using the "SMART App Launch 2.0.0"
+         option.
+      1. Choose the "Run Against the CRD Server Suite" preset from the drop down in the upper left.
+      1. Run the Hook Invocation test group, leaving the inputs as-is. A
          "User Action Dialog" will appear indicating that Inferno is waiting for the
          `appointment-book` hook invocation.
       1. In another tab, start a "Da Vinci CRD Server Test Suite" session.
-      1. Choose the "Inferno CRD Client Suite" preset from the drop down in the upper left.
+      1. Choose the "Run Against the CRD Client Suite" preset from the drop down in the upper left.
       1. Run the Discovery test group. It should pass.
       1. Run the Demonstrate A Hook Response test. It should pass
-      1. Return to the client suite and click the link to continue the tests.
-      1. When the attestation wait dialog appears, return to the server tests and look in test
-         **2.04** "All service responses contain valid cards and optional systemActions"
-         for the CDS hooks request made and look at the response to verify that the
-         indicate cards are present. Attest accordingly in the client suite to complete the tests.
+      1. Run the 6 individual hook tests by using the following steps:
+         1. In the Client Suite session, check which hook is indicated in the current "User Action
+            Required" dialog.
+         1. Return to the Server Suite session, and run the corresponding Hook Tests test group, leaving
+            the inputs as-is.
+         1. Once the server tests complete, return to the Client Suite session and click the link to
+            indicate all requests have been submitted.
+         1. A new "User Action Required" dialog will appear asking you to verify that all of the
+            returned cards were displayed to the user. The CRD client simulation in the Server Suite
+            does not display the cards, but does check that they were returned correctly. Click the
+            "true" link if the corresponding server tests had no failures or skips, including on
+            optional tests. Otherwise click the "false" link.
+         1. The Client Suite session will continue to the next hook, or complete if they have all been tested.
+      1. Review the results of the tests. Most tests should pass, but some may fail.
 
       ## Limitations
       The test suite does not implement any sort of payer business logic, so the
