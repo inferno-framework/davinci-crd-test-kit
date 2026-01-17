@@ -16,8 +16,8 @@ module DaVinciCRDTestKit
       config.options[:resource_type]
     end
 
-    def search_type
-      config.options[:search_type]
+    def target_search_param
+      config.options[:target_search_param]
     end
 
     def include_searches
@@ -103,7 +103,7 @@ module DaVinciCRDTestKit
     def include_search_result_check(bundle, search_id, included_resource_type) # rubocop:disable Metrics/CyclomaticComplexity
       warning do
         assert bundle.entry.any?,
-               "Search result bundle is empty for #{resource_type} _include #{search_type} search with an id
+               "Search result bundle is empty for #{resource_type} _include #{target_search_param} search with an id
                of `#{search_id}`"
       end
       return if bundle.entry.empty?
@@ -195,7 +195,7 @@ module DaVinciCRDTestKit
     end
 
     run do
-      if search_type == 'status'
+      if target_search_param == 'status'
         coverage_status = ['active', 'cancelled', 'draft', 'entered-in-error']
         coverage_status.each do |status|
           bundle = perform_fhir_search({ status: }, [resource_type, 'status_search'])
@@ -206,22 +206,22 @@ module DaVinciCRDTestKit
 
         search_id_list = search_param_values.split(',').map(&:strip)
         search_id_list.each do |search_id|
-          if search_type == '_id'
+          if target_search_param == '_id'
             bundle = perform_fhir_search({ _id: search_id }, [resource_type, 'id_search'])
             id_search_result_check(bundle, search_id)
-          elsif reference_search_parameters.include?(search_type)
+          elsif reference_search_parameters.include?(target_search_param)
             search_params = {}
-            search_params[search_type] = search_id
-            bundle = perform_fhir_search(search_params, [resource_type, "#{search_type}_search"])
-            reference_search_result_check(bundle, search_id, search_type)
-          elsif include_searches.include?(search_type)
-            include_resource_type = search_type.gsub('_include', '')
+            search_params[target_search_param] = search_id
+            bundle = perform_fhir_search(search_params, [resource_type, "#{target_search_param}_search"])
+            reference_search_result_check(bundle, search_id, target_search_param)
+          elsif include_searches.include?(target_search_param)
+            include_resource_type = target_search_param.gsub('_include', '')
             bundle = perform_fhir_search({ _id: search_id, _include: "#{resource_type}:#{include_resource_type}" },
                                          [resource_type, "include_#{include_resource_type}_search"])
             include_search_result_check(bundle, search_id, include_resource_type)
           else
             raise StandardError,
-                  'Passed in search_type does not match to any of the search types handled by this search test.'
+                  'Passed in target_search_param does not match to any of the search types handled by this search test.'
           end
         end
       end
