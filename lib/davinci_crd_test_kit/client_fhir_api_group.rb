@@ -1,11 +1,9 @@
 require 'tls_test_kit'
 require 'us_core_test_kit'
 require_relative 'crd_options'
-require_relative 'client_tests/client_fhir_api_read_test'
-require_relative 'client_tests/client_fhir_api_search_test'
+require_relative 'client_tests/client_fhir_api_include_search_test'
 require_relative 'client_tests/client_fhir_api_create_test'
 require_relative 'client_tests/client_fhir_api_update_test'
-require_relative 'client_tests/client_fhir_api_validation_test'
 require_relative 'client_tests/client_fhir_api_encounter_location_search_test'
 require_relative 'client_tests/client_fhir_api_practitioner_role_group'
 require 'smart_app_launch/smart_stu1_suite'
@@ -169,12 +167,12 @@ module DaVinciCRDTestKit
       encounter_group.test(from: :crd_client_fhir_api_encounter_location_search)
       encounter_group.reorder(:crd_client_fhir_api_encounter_location_search, 8)
 
-      encounter_group.test from: :crd_client_fhir_api_search_test,
+      encounter_group.test from: :crd_client_fhir_api_include_search_test,
                            id: :crd_client_fhir_api_encounter_location_include_search,
                            title: 'Search by _id and _include location',
                            config: {
-                             options: { resource_type: 'Encounter', target_search_param: 'location_include' },
-                             inputs: { search_param_values: { name: :encounter_id_with_location } }
+                             options: { resource_type: 'Encounter', target_include_element: 'location' },
+                             inputs: { search_ids: { name: :encounter_id_with_location } }
                            }
       encounter_group.reorder(:crd_client_fhir_api_encounter_location_include_search, 9)
     end

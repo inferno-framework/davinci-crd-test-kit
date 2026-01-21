@@ -57,8 +57,8 @@ elements.
 
 ## Profile Validation
 Each resource returned from the first search is expected to conform to
-the [US Core PractitionerRole Profile](http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole). Each element is checked against
-teminology binding and cardinality requirements.
+the [US Core PractitionerRole Profile](http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole).
+Each element is checked against teminology binding and cardinality requirements.
 
 Elements with a required binding are validated against their bound
 ValueSet. If the code/system in the element is not part of the ValueSet,
@@ -87,21 +87,21 @@ read succeeds.
     test from: :crd_client_fhir_api_practitioner_role_specialty_search_test
     test from: :crd_client_fhir_api_practitioner_role_organization_search_test
     test from: :crd_client_fhir_api_practitioner_role_practitioner_search_test
-    test from: :crd_client_fhir_api_search_test,
+    test from: :crd_client_fhir_api_include_search_test,
          id: :crd_client_fhir_api_practitioner_role_organization_include_search,
          title: 'Search by _id and _include organization',
          config: {
            options: { resource_type: 'PractitionerRole',
-                      target_search_param: 'organization_include' },
-           inputs: { search_param_values: { name: :practitioner_role_id_with_organization } }
+                      target_include_element: 'organization' },
+           inputs: { search_ids: { name: :practitioner_role_id_with_organization } }
          }
-    test from: :crd_client_fhir_api_search_test,
+    test from: :crd_client_fhir_api_include_search_test,
          id: :crd_client_fhir_api_practitioner_role_practitioner_include_search,
          title: 'Search by _id and _include practitioner',
          config: {
            options: { resource_type: 'PractitionerRole',
-                      target_search_param: 'practitioner_include' },
-           inputs: { search_param_values: { name: :practitioner_role_id_with_practitioner } }
+                      target_include_element: 'practitioner' },
+           inputs: { search_ids: { name: :practitioner_role_id_with_practitioner } }
          }
     test from: :crd_client_fhir_api_practitioner_role_validation_test
     test from: :crd_client_fhir_api_practitioner_role_must_support_test
