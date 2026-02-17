@@ -1,4 +1,5 @@
 require_relative '../../lib/davinci_crd_test_kit/client_tests/order_sign_receive_request_test'
+require_relative '../../lib/davinci_crd_test_kit/routes/hook_request_endpoint'
 
 RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest, :request do
   let(:suite_id) { 'crd_client' }
@@ -35,6 +36,12 @@ RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest, :request do
                           resource: FHIR.from_contents(crd_coverage.to_json)
                         ))
     bundle
+  end
+
+  before do
+    # disable data fetches for these tests
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive_messages(gather_order_sign_data: nil,
+                                                                                      request_coverage: nil)
   end
 
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do

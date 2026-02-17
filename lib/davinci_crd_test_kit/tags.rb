@@ -7,4 +7,6 @@ module DaVinciCRDTestKit
   ORDER_SIGN_TAG = 'order-sign'.freeze
   DISCOVERY_TAG = 'cds_discovery'.freeze
   ANY_HOOK_TAG = 'any_hook'.freeze
+  DATA_FETCH_TAG = 'data_fetch'.freeze
+  HOOK_INSTANCE_TAG_PREFIX = 'hi_'.freeze
 end

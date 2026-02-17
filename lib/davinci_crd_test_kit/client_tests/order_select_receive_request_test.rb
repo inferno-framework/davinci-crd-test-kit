@@ -9,7 +9,11 @@ module DaVinciCRDTestKit
     description %(
       This test waits for multiple incoming [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
       hook requests and responds to the client with the response types selected as an input.
-      )
+
+      For more details on how Inferno's simulated CDS Service behave during hook invocation see the
+      [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+      documentation.
+    )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@209', 'hl7.fhir.us.davinci-crd_2.0.1@243',
                           'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245'
 
