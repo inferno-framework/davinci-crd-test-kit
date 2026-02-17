@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
       Under the [CDS hooks HTTP Request section](https://cds-hooks.hl7.org/2.0/#http-request_1), the specification
       requires that a CDS service request SHALL include a JSON POST body with the following input fields:
         * `hook` - *string*
-        * `hookInstance` - *string*
+        * `hookInstance` - *string* containing a globally unique UUID
         * `context` - *object*
 
         Additionally, if the optional `fhirAuthorization` field is present, then the `fhirServer` field is required.
@@ -19,6 +19,9 @@ module DaVinciCRDTestKit
         This test also checks that the `hook` field contains the correct CDS service name that the CDS client is sending
         a request for
     )
+
+    verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@18', 'cds-hooks_2.0@19',
+                          'cds-hooks_2.0@20', 'cds-hooks_2.0@22', 'cds-hooks_2.0@25'
 
     def hook_name
       config.options[:hook_name]
