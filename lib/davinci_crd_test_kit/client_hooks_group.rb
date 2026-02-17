@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
       * If the incoming hook request contains valid optional fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
       * If the hook request's `context` field is valid according to the specific `context` requirements defined for
       each hook type
-      * OPTIONAL: If the incoming hook contains the optional `prefetch` field with valid resources
+      * If the incoming hook request contains the optional `prefetch` field with valid resources
       * If the client can properly display the cards returned as a result of the hook request
 
       Note: In order to successfully return a `Coverage Information` system action, a Coverage resource must either be

@@ -513,16 +513,19 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
-      advertised_prefetch_fields.each do |advertised_prefetch_key, advertised_prefetch_template|
-        next if received_prefetch[advertised_prefetch_key].blank?
-
-        unless received_prefetch[advertised_prefetch_key].is_a?(Hash)
-          add_message('error', "#{request_number}Prefetch field `#{advertised_prefetch_key}` is not of type `Hash`.")
+      received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
+        unless advertised_prefetch_fields.key?(received_prefetch_key)
+          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
           next
         end
 
-        received_prefetch_resource = FHIR.from_contents(received_prefetch[advertised_prefetch_key].to_json)
+        unless received_prefetch_hash.is_a?(Hash)
+          add_message('error', "#{request_number}Prefetch field `#{received_prefetch_key}` is not of type `Hash`.")
+          next
+        end
 
+        received_prefetch_resource = FHIR.from_contents(received_prefetch[received_prefetch_key].to_json)
+        advertised_prefetch_template = advertised_prefetch_fields[received_prefetch_key]
         if advertised_prefetch_template.include?('?')
           advertised_prefetch_fhir_search = advertised_prefetch_template.gsub(/{|}/, '').split('?')
           advertised_prefetch_resource_type = advertised_prefetch_fhir_search.first
@@ -536,8 +539,8 @@ module DaVinciCRDTestKit
 
             advertised_status_param = advertised_coverage_query_params['status']
 
-            validate_prefetch_coverage(received_prefetch_resource, advertised_prefetch_key, received_context_patient_id,
-                                       advertised_status_param)
+            validate_prefetch_coverages(received_prefetch_resource, received_prefetch_key, received_context_patient_id,
+                                        advertised_status_param)
           end
         else
           advertised_prefetch_token = advertised_prefetch_template.gsub(/{|}/, '').split('/')
@@ -551,19 +554,17 @@ module DaVinciCRDTestKit
             received_context_id = received_context[advertised_context_id]
             received_context_resource_type = advertised_prefetch_token.first
           end
-          validate_prefetch_resource(received_prefetch_resource, advertised_prefetch_key,
+          validate_prefetch_resource(received_prefetch_resource, received_prefetch_key,
                                      received_context_resource_type, received_context_id)
         end
       end
     end
 
-    def validate_prefetch_coverage(received_resource, advertised_prefetch_key,
-                                   received_context_patient_id, advertised_status)
+    def validate_prefetch_coverages(received_resource, advertised_prefetch_key,
+                                    received_context_patient_id, advertised_status)
       unless received_resource.resourceType == 'Bundle'
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `Bundle`. Got
-          `#{received_resource.resourceType}`.
-        ))
+        add_message('error', "#{request_number}Unexpected resource type: Expected `Bundle`. Got " \
+                             "`#{received_resource.resourceType}`.")
         return
       end
 
@@ -572,12 +573,27 @@ module DaVinciCRDTestKit
         return
       end
 
-      coverage_resource = received_resource.entry.first.resource
+      if received_context_patient_id.blank?
+        add_message('error',
+                    "#{request_number}Cannot verify `coverage` patient id because no id provided in the context.")
+      end
+
+      received_resource.entry.each_with_index do |entry, index|
+        validate_prefetch_coverage(entry&.resource, advertised_prefetch_key,
+                                   received_context_patient_id, advertised_status, index)
+      end
+    end
+
+    def validate_prefetch_coverage(coverage_resource, advertised_prefetch_key,
+                                   received_context_patient_id, advertised_status, entry_index)
+      unless coverage_resource.present?
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} had no resource")
+        return
+      end
+
       unless coverage_resource.resourceType == 'Coverage'
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `Coverage`. Got
-          `#{coverage_resource.resourceType}`.
-        ))
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - Unexpected resource type: " \
+                             "Expected `Coverage`. Got `#{coverage_resource.resourceType}`.")
         return
       end
 
@@ -587,39 +603,32 @@ module DaVinciCRDTestKit
       coverage_beneficiary_reference = coverage_resource.beneficiary
       coverage_beneficiary_patient_id = coverage_beneficiary_reference.reference_id
       if coverage_beneficiary_patient_id.blank?
-        add_message('error', %(
-          #{request_number}Could not get beneficiary reference id from `#{advertised_prefetch_key}` field's Coverage
-          resource
-        ))
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - Could not get beneficiary " \
+                             "reference id from `#{advertised_prefetch_key}` field's Coverage resource")
         return
       end
 
-      if coverage_beneficiary_patient_id != received_context_patient_id
-        add_message('error', %(
-          #{request_number}Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `beneficiary`
-          reference id of '#{received_context_patient_id}', instead was '#{coverage_beneficiary_patient_id}'
-        ))
+      if received_context_patient_id.present? && coverage_beneficiary_patient_id != received_context_patient_id
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
+                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a " \
+                             "`beneficiary` reference id of '#{received_context_patient_id}', " \
+                             "instead was '#{coverage_beneficiary_patient_id}`")
         return
       end
 
       coverage_status = coverage_resource.status
       return unless coverage_status != advertised_status
 
-      add_message('error', %(
-          #{request_number}Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of
-          '#{advertised_status}', instead was '#{coverage_status}'
-        ))
+      add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
+                           "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of " \
+                           "'#{advertised_status}', instead was '#{coverage_status}'")
     end
 
     def validate_prefetch_resource(received_resource, advertised_prefetch_key, context_field_resource_type,
                                    context_field_id)
-      unless received_resource.resourceType == context_field_resource_type
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `#{context_field_resource_type}`. Got
-          `#{received_resource.resourceType}`.
-        ))
-        return
-      end
+
+      return unless prefetch_resource_type_correct?(received_resource, context_field_resource_type,
+                                                    "#{request_number}`#{advertised_prefetch_key}` - ")
 
       if hook_name == 'order-dispatch'
         resource_is_valid?(resource: received_resource)
@@ -628,20 +637,32 @@ module DaVinciCRDTestKit
                            profile_url: structure_definition_map[context_field_resource_type])
       end
 
-      received_prefetch_resource_id = received_resource.id
-      if received_prefetch_resource_id.blank?
-        add_message('error', %(
-          #{request_number}#{advertised_prefetch_key}` field's FHIR resource does not contain the `id` field
-        ))
-        return
+      prefetch_resource_id_correct?(received_resource, context_field_id,
+                                    "#{request_number}`#{advertised_prefetch_key}` - ")
+    end
+
+    def prefetch_resource_type_correct?(resource, expected_type, error_prefix)
+      if expected_type.present?
+        return true if resource.resourceType == expected_type
+
+        add_message(:error, "#{error_prefix}Prefetched resource has the wrong resource type. " \
+                            "Expected `#{expected_type}`, got `#{resource.resourceType}`.")
+      else
+        add_message(:error, "#{error_prefix}No resource type provided to verify prefetched resource against.")
       end
+      false
+    end
 
-      return unless received_prefetch_resource_id != context_field_id
+    def prefetch_resource_id_correct?(resource, expected_id, error_prefix)
+      if expected_id.present?
+        return true if resource.id == expected_id
 
-      add_message('error', %(
-        #{request_number}Expected `#{advertised_prefetch_key}` field's FHIR resource to have an `id` of
-        '#{context_field_id}', instead was '#{received_prefetch_resource_id}'
-      ))
+        add_message(:error, "#{error_prefix}Prefetched resource has the wrong resource id. " \
+                            "Expected `#{expected_id}`, got `#{resource.id}`.")
+      else
+        add_message(:error, "#{error_prefix}No resource id provided to verify prefetched resource against.")
+      end
+      false
     end
   end
 end
