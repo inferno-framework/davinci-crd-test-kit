@@ -57,6 +57,36 @@ module DaVinciCRDTestKit
       Note that the provided inputs for these tests are not complete and systems
       are not expected to pass the tests based on them.
 
+      ## Running the Tests aginst the Client Suite
+
+      You can also run these tests against the
+      Inferno CRD Client test suite. The client suite will generate sample cards to
+      return for these tests to evaluate.
+
+      1. Start a "Da Vinci CRD Client Test Suite" session using the "SMART App Launch 2.0.0"
+         option.
+      1. Choose the "Run Against the CRD Server Suite" preset from the drop down in the upper left.
+      1. Run the Hook Invocation test group, leaving the inputs as-is. A
+         "User Action Dialog" will appear indicating that Inferno is waiting for the
+         `appointment-book` hook invocation.
+      1. In another tab, start a "Da Vinci CRD Server Test Suite" session.
+      1. Choose the "Run Against the CRD Client Suite" preset from the drop down in the upper left.
+      1. Run the Discovery test group. It should pass.
+      1. Run the Demonstrate A Hook Response test. It should pass
+      1. Run the 6 individual hook tests by using the following steps:
+         1. In the Client Suite session, check which hook is indicated in the current "User Action
+            Required" dialog.
+         1. Return to the Server Suite session, and run the corresponding Hook Tests test group, leaving
+            the inputs as-is.
+         1. Once the server tests complete, return to the Client Suite session and click the link to
+            indicate all requests have been submitted.
+         1. A new "User Action Required" dialog will appear asking you to verify that all of the
+            returned cards were displayed to the user. The CRD client simulation in the Server Suite
+            does not display the cards, but does check that they were returned correctly. Click the
+            "true" link if the corresponding server tests had no failures or skips, including on
+            optional tests. Otherwise click the "false" link.
+         1. The Client Suite session will continue to the next hook, or complete if they have all been tested.
+      1. Review the results of the tests. Most tests should pass, but some may fail.
 
       ## Limitations
       Inferno is unable to determine what requests will result in specific kinds
