@@ -1,4 +1,5 @@
 require_relative 'client_tests/client_registration_verification_test'
+require_relative 'client_tests/client_service_registration_attestation_test'
 
 module DaVinciCRDTestKit
   class PASClientRegistrationGroup < Inferno::TestGroup
@@ -22,5 +23,6 @@ module DaVinciCRDTestKit
     run_as_group
 
     test from: :crd_client_registration_verification
+    test from: :crd_client_service_registration_attestation
   end
 end
