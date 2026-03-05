@@ -1,10 +1,12 @@
 require_relative '../test_helper'
 require_relative '../server_hook_helper'
+require_relative '../cards_identification'
 
 module DaVinciCRDTestKit
   class InstructionsCardReceivedTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::ServerHookHelper
+    include DaVinciCRDTestKit::CardsIdentification
 
     title 'Valid Instructions cards received'
     id :crd_valid_instructions_card_received
@@ -19,7 +21,7 @@ module DaVinciCRDTestKit
 
     run do
       parsed_cards = parse_json(valid_cards)
-      instructions_card = parsed_cards.find { |card| card['links'].blank? && card['suggestions'].blank? }
+      instructions_card = parsed_cards.find { |card| instructions_response_type?(card) }
       assert instructions_card, "#{tested_hook_name} hook response did not contain an Instructions card."
     end
   end

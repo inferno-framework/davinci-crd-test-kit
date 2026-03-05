@@ -47,12 +47,8 @@ module DaVinciCRDTestKit
     end
 
     def action_resource_id_field_validation(action)
-      validate_presence_and_type(action, 'resourceId', Array, '`delete` Action')
-      return unless action['resourceId'].is_a?(Array)
-
-      action['resourceId'].each do |ref|
-        resource_reference_check(ref, 'Action.resourceId item')
-      end
+      validate_presence_and_type(action, 'resourceId', String, '`delete` Action')
+      resource_reference_check(action['resourceId'], 'Action.resourceId')
     end
 
     def draft_orders_bundle_entry_refs(contexts)
@@ -63,12 +59,12 @@ module DaVinciCRDTestKit
     end
 
     def action_resource_type_check(action, expected_resource_types)
-      resource_types = if ['create', 'update'].include?(action['type'])
-                         [FHIR.from_contents(action['resource'].to_json).resourceType]
-                       else
-                         action['resourceId'].map { |ref| ref.split('/').first }
-                       end
-      resource_types.all? { |resource_type| expected_resource_types.include?(resource_type) }
+      resource_type = if ['create', 'update'].include?(action['type'])
+                        FHIR.from_contents(action['resource'].to_json).resourceType
+                      else
+                        action['resourceId']&.split('/')&.first
+                      end
+      expected_resource_types.include?(resource_type)
     end
 
     def extract_resource_types_by_action(actions, action_type)
@@ -104,20 +100,19 @@ module DaVinciCRDTestKit
     end
 
     def delete_action_check(action, create_actions_resource_types, contexts)
-      action['resourceId'].each do |ref|
-        unless draft_orders_bundle_entry_refs(contexts).include?(ref)
-          error_msg = '`Action.resourceId` must reference FHIR resource from the `draftOrders` entry. ' \
-                      "#{ref} is not in `draftOrders`. In Action `#{action}`"
-          add_message('error', error_msg)
-          next
-        end
-
-        resource_type = ref.split('/').first
-        next if create_actions_resource_types.include?(resource_type)
-
-        error_msg = "There's no `create` action for the proposed order being deleted: `#{ref}`. In Action `#{action}`"
+      ref = action['resourceId']
+      unless draft_orders_bundle_entry_refs(contexts).include?(ref)
+        error_msg = '`Action.resourceId` must reference FHIR resource from the `draftOrders` entry. ' \
+                    "#{ref} is not in `draftOrders`. In Action `#{action}`"
         add_message('error', error_msg)
+        return
       end
+
+      resource_type = ref.split('/').first
+      return if create_actions_resource_types.include?(resource_type)
+
+      error_msg = "There's no `create` action for the proposed order being deleted: `#{ref}`. In Action `#{action}`"
+      add_message('error', error_msg)
     end
   end
 end

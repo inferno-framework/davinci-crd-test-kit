@@ -1,12 +1,14 @@
 require_relative '../test_helper'
 require_relative '../suggestion_actions_validation'
 require_relative '../server_hook_helper'
+require_relative '../cards_identification'
 
 module DaVinciCRDTestKit
   class FormCompletionResponseValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
     include DaVinciCRDTestKit::ServerHookHelper
+    include DaVinciCRDTestKit::CardsIdentification
 
     title 'Valid Request Form Completion cards or system actions received'
     id :crd_request_form_completion_response_validation
@@ -34,30 +36,12 @@ module DaVinciCRDTestKit
     optional
     input :valid_cards_with_suggestions, :valid_system_actions
 
-    def task_actions(actions)
-      actions&.select { |action| action['type'] == 'create' && action_resource_type_check(action, ['Task']) }
-    end
-
-    def task_questionnaire?(task_action)
-      task = FHIR.from_contents(task_action['resource'].to_json)
-      task.code.coding.any? { |code| code.code == 'complete-questionnaire' } &&
-        task.input.any? { |input| input.type.text == 'questionnaire' && valid_url?(input.valueCanonical) }
-    end
-
-    def request_form_completion_card?(card)
-      card['suggestions'].all? do |suggestion|
-        actions = suggestion['actions']
-        task_actions = task_actions(actions)
-        task_actions.present? && task_actions.all? { |action| task_questionnaire?(action) }
-      end
-    end
-
     run do
       parsed_cards = parse_json(valid_cards_with_suggestions)
       parsed_actions = parse_json(valid_system_actions)
 
-      form_completion_cards = parsed_cards.filter { |card| request_form_completion_card?(card) }
-      form_completion_actions = task_actions(parsed_actions).select { |action| task_questionnaire?(action) }
+      form_completion_cards = parsed_cards.select { |card| form_completion_card_response_type?(card) }
+      form_completion_actions = parsed_actions.select { |action| form_completion_action_response_type?(action) }
 
       skip_if form_completion_cards.blank? && form_completion_actions.blank?,
               "#{tested_hook_name} hook response does not contain any Request Form Completion cards or system actions."
@@ -67,7 +51,7 @@ module DaVinciCRDTestKit
       if form_completion_cards.present?
         form_completion_cards.each do |card|
           card['suggestions'].each do |suggestion|
-            actions_check(task_actions(suggestion['actions']))
+            actions_check(suggestion['actions']&.select { |action| form_completion_action_response_type?(action) })
           end
         end
       end
