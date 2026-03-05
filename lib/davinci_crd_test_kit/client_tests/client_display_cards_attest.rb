@@ -80,7 +80,7 @@ module DaVinciCRDTestKit
       wait(
         identifier:,
         message: <<~MESSAGE
-          **Approval Workflow Test**:
+          **Card Display Attestation**:
 
           I attest that the following CDS response types returned were processed by the
           client system and displayed to the user:
