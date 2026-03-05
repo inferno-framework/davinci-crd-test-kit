@@ -10,6 +10,9 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that the CRD Client registration details
         provided are conformant.
       )
+
+    verifies_requirements 'cds-hooks_2.0@174'
+
     input :cds_jwt_iss,
           title: 'CRD JWT Issuer',
           description: %(
