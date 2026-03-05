@@ -128,6 +128,17 @@ module DaVinciCRDTestKit
         identifier: 'hl7.fhir.us.davinci-crd_2.0.1',
         title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.0.1',
         actor: 'Client'
+      },
+      {
+        identifier: 'cds-hooks_2.0',
+        title: 'CDS Hooks',
+        actor: 'Client'
+      },
+      {
+        identifier: 'cds-hooks-library_1.0.1',
+        title: 'CDS Hooks Library',
+        actor: 'Client',
+        requirements: 'referenced'
       }
     )
 

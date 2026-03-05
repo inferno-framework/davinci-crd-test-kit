@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
       )
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
                             'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89',
-                            'hl7.fhir.us.davinci-crd_2.0.1@92'
+                            'hl7.fhir.us.davinci-crd_2.0.1@92', 'cds-hooks_2.0@174'
 
       config(
         inputs: {

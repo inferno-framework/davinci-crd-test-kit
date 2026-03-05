@@ -66,7 +66,13 @@ module DaVinciCRDTestKit
     test from: :crd_token_payload
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
-    test from: :crd_hook_request_valid_context
+    test from: :crd_hook_request_valid_context do
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@192', 'hl7.fhir.us.davinci-crd_2.0.1@193',
+                            'hl7.fhir.us.davinci-crd_2.0.1@194',
+                            'cds-hooks-library_1.0.1@33', 'cds-hooks-library_1.0.1@34', 'cds-hooks-library_1.0.1@35',
+                            'cds-hooks-library_1.0.1@37', 'cds-hooks-library_1.0.1@38', 'cds-hooks-library_1.0.1@39',
+                            'cds-hooks-library_1.0.1@41', 'cds-hooks-library_1.0.1@42', 'cds-hooks-library_1.0.1@43'
+    end
     test from: :crd_hook_request_valid_prefetch
     test from: :crd_card_display_attest_test
   end
