@@ -1,0 +1,10 @@
+name: Publish Docs Wiki
+on:
+  workflow_dispatch:
+
+jobs:
+  skeleton-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        run: echo "This is a skeleton to enable manual runs. Switch branches in the UI to run the real code."
