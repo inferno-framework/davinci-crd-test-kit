@@ -27,6 +27,16 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
                            __dir__, '..', 'fixtures', 'crd_coverage_example.json'
                          )))
   end
+  let(:crd_practitioner) do
+    JSON.parse(File.read(File.join(
+                           __dir__, '..', 'fixtures', 'crd_practitioner_example.json'
+                         )))
+  end
+  let(:crd_patient) do
+    JSON.parse(File.read(File.join(
+                           __dir__, '..', 'fixtures', 'crd_patient_example.json'
+                         )))
+  end
   let(:crd_coverage_bundle) do
     bundle = FHIR::Bundle.new(type: 'searchset')
     bundle.entry.append(FHIR::Bundle::Entry.new(
@@ -174,6 +184,15 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
   end
 
   describe 'When returning a custom response' do
+    before do
+      stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .to_return(status: 200, body: crd_practitioner.to_json)
+      stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .to_return(status: 200, body: crd_patient.to_json)
+      stub_request(:get, "#{client_fhir_server}/Coverage?patient=example&status=active")
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+    end
+
     it 'returns 400 when bad json specified in the input' do
       allow(test).to receive(:suite).and_return(suite)
 

@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       'order-sign',
       'order-dispatch'
     ].freeze
-    
+
     def request_body
       @request_body ||=
         JSON.parse(request.params.to_json)
@@ -47,7 +47,9 @@ module DaVinciCRDTestKit
 
     def make_response
       if hook_instance_already_used?
-        error_response("Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session.")
+        error_response(
+          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
+        )
       elsif AVAILABLE_HOOKS.include?(hook_name)
         send(:"gather_#{hook_name.gsub('-', '_')}_data")
         request_coverage

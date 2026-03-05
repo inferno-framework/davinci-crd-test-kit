@@ -96,7 +96,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         encryption_method: 'RS384'
       )
 
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response: instructions_card_template.to_json)
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_custom_response_template: instructions_card_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, order_sign_hook_request)
@@ -116,7 +117,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         encryption_method: 'RS384'
       )
 
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response: instructions_card_template.to_json)
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_custom_response_template: instructions_card_template.to_json)
 
       order_sign_hook_request['hook'] = 'not_a_hook'
       header('Authorization', "Bearer #{token}")
@@ -147,7 +149,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
       hook_instance = order_sign_hook_request['hookInstance']
 
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response: instructions_card_template.to_json)
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, order_sign_hook_request)
