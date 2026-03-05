@@ -19,7 +19,8 @@ module DaVinciCRDTestKit
     )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@205',
                           'hl7.fhir.us.davinci-crd_2.0.1@207', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245'
+                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
+                          'cds-hooks_2.0@15'
 
     config options: { accepts_multiple_requests: true }
 
@@ -76,7 +77,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :order_dispatch_custom_response,
+    input :order_dispatch_custom_response_template,
           title: 'Custom response for order-dispatch hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response

@@ -6,7 +6,6 @@ module DaVinciCRDTestKit
         Verify that the CRD client supports the create interaction for the given resource. The capabilities required
         by each resource can be found here: https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1
       )
-    verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@74'
 
     input :create_resources,
           type: 'textarea',

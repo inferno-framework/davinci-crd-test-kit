@@ -6,8 +6,9 @@ require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
 require_relative 'hook_request_fetched_data_test'
+require_relative 'hook_request_prefetch_equals_queried_test'
 require_relative 'retrieve_jwks_test'
-require_relative 'submitted_response_validation'
+require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
 require_relative 'token_payload_test'
 
@@ -37,9 +38,11 @@ module DaVinciCRDTestKit
         auth_tokens: { name: :order_dispatch_auth_tokens },
         auth_tokens_jwk_json: { name: :order_dispatch_auth_tokens_jwk_json },
         client_access_token: { name: :order_dispatch_client_access_token },
+        override_access_token: { name: :order_dispatch_override_access_token,
+                                 title: 'order-dispatch Prefetch Validation Override Bearer Token' },
         client_fhir_server: { name: :order_dispatch_client_fhir_server },
         crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json },
-        custom_response: { name: :order_dispatch_custom_response },
+        custom_response_template: { name: :order_dispatch_custom_response_template },
         selected_response_types: { name: :order_dispatch_selected_response_types }
       },
       outputs: {
@@ -58,7 +61,6 @@ module DaVinciCRDTestKit
       }
     )
 
-    test from: :crd_submitted_response_validation
     test from: :crd_order_dispatch_request
     test from: :crd_decode_auth_token
     test from: :crd_retrieve_jwks
@@ -67,15 +69,23 @@ module DaVinciCRDTestKit
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
     test from: :crd_hook_request_valid_context do
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150',
+                            'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
                             'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
                             'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
                             'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
                             'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-                            'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295'
+                            'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
+                            'cds-hooks-library_1.0.1@57', 'cds-hooks-library_1.0.1@58', 'cds-hooks-library_1.0.1@59',
+                            'cds-hooks-library_1.0.1@61', 'cds-hooks-library_1.0.1@62', 'cds-hooks-library_1.0.1@63',
+                            'cds-hooks-library_1.0.1@65', 'cds-hooks-library_1.0.1@66', 'cds-hooks-library_1.0.1@67',
+                            'cds-hooks-library_1.0.1@69', 'cds-hooks-library_1.0.1@70', 'cds-hooks-library_1.0.1@71',
+                            'cds-hooks-library_1.0.1@72'
     end
     test from: :crd_hook_request_valid_prefetch
     test from: :crd_hook_request_fetched_data
+    test from: :crd_hook_request_prefetch_equals_queried
+    test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end
 end

@@ -278,8 +278,8 @@ module DaVinciCRDTestKit
     def query_for_coverages
       query = "Coverage?patient=#{request_body.dig('context', 'patientId')}&status=active"
       response = execute_request(query)
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
 
+      persist_query_request(response, [DATA_FETCH_TAG, 'coverage', hook_instance_tag]) #TODO: check tags
       return nil unless response.status.to_s.starts_with?('2')
 
       FHIR.from_contents(response.body)
