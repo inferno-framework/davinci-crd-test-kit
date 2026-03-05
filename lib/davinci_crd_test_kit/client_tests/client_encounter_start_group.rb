@@ -7,7 +7,7 @@ require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
 require_relative 'hook_request_prefetch_equals_queried_test'
 require_relative 'retrieve_jwks_test'
-require_relative 'submitted_response_validation'
+require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
 require_relative 'token_payload_test'
 
@@ -42,7 +42,7 @@ module DaVinciCRDTestKit
                                  title: 'encounter-start Prefetch Validation Override Bearer Token' },
         client_fhir_server: { name: :encounter_start_client_fhir_server },
         crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json },
-        custom_response: { name: :encounter_start_custom_response },
+        custom_response_template: { name: :encounter_start_custom_response_template },
         selected_response_types: { name: :encounter_start_selected_response_types }
       },
       outputs: {
@@ -61,7 +61,6 @@ module DaVinciCRDTestKit
       }
     )
 
-    test from: :crd_submitted_response_validation
     test from: :crd_encounter_start_request
     test from: :crd_decode_auth_token
     test from: :crd_retrieve_jwks
@@ -69,9 +68,16 @@ module DaVinciCRDTestKit
     test from: :crd_token_payload
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
-    test from: :crd_hook_request_valid_context
+    test from: :crd_hook_request_valid_context do
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@192', 'hl7.fhir.us.davinci-crd_2.0.1@193',
+                            'hl7.fhir.us.davinci-crd_2.0.1@194',
+                            'cds-hooks-library_1.0.1@33', 'cds-hooks-library_1.0.1@34', 'cds-hooks-library_1.0.1@35',
+                            'cds-hooks-library_1.0.1@37', 'cds-hooks-library_1.0.1@38', 'cds-hooks-library_1.0.1@39',
+                            'cds-hooks-library_1.0.1@41', 'cds-hooks-library_1.0.1@42', 'cds-hooks-library_1.0.1@43'
+    end
     test from: :crd_hook_request_valid_prefetch
     test from: :crd_hook_request_prefetch_equals_queried
+    test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end
 end

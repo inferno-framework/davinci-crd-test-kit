@@ -334,6 +334,34 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
       expect(encounter_resource_request).to have_been_made
     end
 
+    it 'fails if optional `encounterId` field is defined but blank' do
+      validation_request = stub_request(:post, validation_url)
+        .to_return(status: 200, body: operation_outcome_success.to_json)
+      patient_resource_request = stub_request(:get, "#{client_fhir_server}/Patient/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_patient.to_json)
+      practitioner_resource_request = stub_request(:get, "#{client_fhir_server}/Practitioner/example")
+        .with(
+          headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
+        )
+        .to_return(status: 200, body: crd_practitioner.to_json)
+
+      order_sign_context['encounterId'] = ''
+
+      result = run(test,
+                   client_fhir_server:,
+                   client_access_token: client_bearer_token,
+                   contexts: [order_sign_context].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(entity_result_message(test)).to match(/field `encounterId` should not be an empty/)
+      expect(validation_request).to have_been_made.times(4)
+      expect(patient_resource_request).to have_been_made
+      expect(practitioner_resource_request).to have_been_made
+    end
+
     it 'fails if context `draftOrders` is not a bundle' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
       stub_request(:get, "#{client_fhir_server}/Patient/example")

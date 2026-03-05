@@ -15,10 +15,10 @@ services:
     command: bundle exec sidekiq -r ./worker.rb
     depends_on:
       - redis
-  fhir_validator_app:
+  fhirpath:
     extends:
       file: docker-compose.background.yml
-      service: fhir_validator_app
+      service: fhirpath
   nginx:
     extends:
       file: docker-compose.background.yml
