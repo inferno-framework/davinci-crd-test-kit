@@ -28,29 +28,7 @@ module DaVinciCRDTestKit
     end
 
     def responded_card_types
-      card_types = []
-      requests.each do |request|
-        add_response_card_types(JSON.parse(request.response_body), card_types)
-      rescue JSON::ParserError
-        next
-      end
-      card_types
-    end
-
-    def add_response_card_types(response_hash, card_types)
-      response_hash['cards']&.each do |card|
-        card_type = "#{identify_card_type(card)}_card"
-        card_types << card_type if need_to_add_type?(card_types, card_type)
-      end
-
-      response_hash['systemActions']&.each do |action|
-        action_type = "#{identify_action_type(action)}_action"
-        card_types << action_type if need_to_add_type?(card_types, action_type)
-      end
-    end
-
-    def need_to_add_type?(type_list, type)
-      type.present? && !type_list.include?(type)
+      list_card_types_in_requests(requests)
     end
 
     def format_responded_response_types

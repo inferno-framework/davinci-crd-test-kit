@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
 
     def action_resource_type_check(action, expected_resource_types)
       resource_type = if ['create', 'update'].include?(action['type'])
-                        FHIR.from_contents(action['resource'].to_json).resourceType
+                        FHIR.from_contents(action['resource'].to_json)&.resourceType
                       else
                         action['resourceId']&.split('/')&.first
                       end

@@ -63,6 +63,9 @@ module DaVinciCRDTestKit
       else
         error_response("Invalid Request: hook `#{hook_name}` is not supported by this server.")
       end
+    rescue StandardError => e
+      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
+      nil
     end
 
     def hook_response
