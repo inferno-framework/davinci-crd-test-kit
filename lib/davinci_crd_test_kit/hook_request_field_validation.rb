@@ -105,6 +105,25 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_required_fields_check(request_body, hook_name)
+      hook_request_required_fields_check_presence_and_types(request_body)
+
+      if request_body['hook'] != hook_name
+        add_message('error',
+                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
+      end
+
+      if request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
+        add_message('error', %(
+                    #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
+                    #REQUIRED.))
+      end
+
+      return unless request_body['hookInstance'].present? && !guid?(request_body['hookInstance'])
+
+      add_message('error', "#{request_number}`hookInstance` field must be a globally unique UUID.")
+    end
+
+    def hook_request_required_fields_check_presence_and_types(request_body)
       hook_required_fields.each do |field, type|
         if request_body[field].blank?
           add_message('error', "#{request_number}Hook request did not contain required field: `#{field}`")
@@ -116,18 +135,6 @@ module DaVinciCRDTestKit
           next
         end
       end
-
-      if request_body['hook'] != hook_name
-        add_message('error',
-                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
-        return
-      end
-
-      return unless request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
-
-      add_message('error', %(
-                  #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
-                  #REQUIRED.))
     end
 
     def fhir_auth_fields_valid?(fhir_authorization_required_fields, fhir_authorization)
@@ -142,6 +149,14 @@ module DaVinciCRDTestKit
           fhir_auth_valid = false
         end
       end
+
+      fhir_authorization.keys.reject { |field| fhir_authorization_required_fields.key?(field) }.each do |field|
+        if fhir_authorization[field].blank?
+          add_message('error', "#{request_number}`fhirAuthorization` field `#{field}` cannot be defined but blank.")
+          fhir_auth_valid = false
+        end
+      end
+
       fhir_auth_valid
     end
 
@@ -175,19 +190,37 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_optional_fields_check(request_body)
+      hook_request_optional_fields_check_type(request_body)
+
+      defined_fields = hook_required_fields.keys + hook_optional_fields.keys
+      request_body.keys.reject { |field| defined_fields.include?(field) }.each do |field|
+        if request_body[field].blank?
+          add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
+        end
+      end
+
+      hook_request_fhir_auth_check(request_body)
+    end
+
+    def hook_request_optional_fields_check_type(request_body)
       hook_optional_fields.each do |field, type|
-        info "#{request_number}Hook request did not contain optional field: `#{field}`" if request_body[field].blank?
+        if request_body[field].blank?
+          if request_body.key?(field)
+            add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
+          else
+            info "#{request_number}Hook request did not contain optional field: `#{field}`"
+          end
+        end
 
         if request_body[field] && !request_body[field].is_a?(type)
           add_message('error', "#{request_number}Hook request field #{field} is not of type #{type}")
         end
       end
-      hook_request_fhir_auth_check(request_body)
     end
 
-    def validate_presence_and_type(object, field_name, type, description = '')
+    def validate_presence_and_type(object, field_name, type, description = '', required: true)
       value = object[field_name]
-      unless value
+      if required && !value
         error_msg = "#{description} does not contain required field `#{field_name}`: #{description} `#{object}`."
         add_message('error', error_msg)
         return
@@ -197,7 +230,6 @@ module DaVinciCRDTestKit
       unless is_valid_type
         error_msg = type == 'URL' ? 'is not a valid URL' : "is not of type `#{type}`"
         add_message('error', "#{description} field `#{field_name}` #{error_msg}: #{description} `#{object}`.")
-        return
       end
 
       return unless value.blank?
@@ -406,6 +438,11 @@ module DaVinciCRDTestKit
       false
     end
 
+    def guid?(string)
+      uuid_regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      uuid_regex.match?(string.to_s)
+    end
+
     def query_and_validate_id_field(resource_type, resource_id)
       fhir_read(resource_type, resource_id)
       status = request.response[:status]
@@ -436,7 +473,9 @@ module DaVinciCRDTestKit
       return if hook_optional_context_fields.blank?
 
       hook_optional_context_fields.each do |field, type|
-        validate_presence_and_type(hook_context, field, type, "#{hook_name} request context") if hook_context[field]
+        if hook_context.key?(field)
+          validate_presence_and_type(hook_context, field, type, "#{hook_name} request context", required: false)
+        end
       end
 
       optional_field_keys = hook_optional_context_fields.keys
@@ -474,16 +513,19 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
-      advertised_prefetch_fields.each do |advertised_prefetch_key, advertised_prefetch_template|
-        next if received_prefetch[advertised_prefetch_key].blank?
-
-        unless received_prefetch[advertised_prefetch_key].is_a?(Hash)
-          add_message('error', "#{request_number}Prefetch field `#{advertised_prefetch_key}` is not of type `Hash`.")
+      received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
+        unless advertised_prefetch_fields.key?(received_prefetch_key)
+          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
           next
         end
 
-        received_prefetch_resource = FHIR.from_contents(received_prefetch[advertised_prefetch_key].to_json)
+        unless received_prefetch_hash.is_a?(Hash)
+          add_message('error', "#{request_number}Prefetch field `#{received_prefetch_key}` is not of type `Hash`.")
+          next
+        end
 
+        received_prefetch_resource = FHIR.from_contents(received_prefetch[received_prefetch_key].to_json)
+        advertised_prefetch_template = advertised_prefetch_fields[received_prefetch_key]
         if advertised_prefetch_template.include?('?')
           advertised_prefetch_fhir_search = advertised_prefetch_template.gsub(/{|}/, '').split('?')
           advertised_prefetch_resource_type = advertised_prefetch_fhir_search.first
@@ -497,8 +539,8 @@ module DaVinciCRDTestKit
 
             advertised_status_param = advertised_coverage_query_params['status']
 
-            validate_prefetch_coverage(received_prefetch_resource, advertised_prefetch_key, received_context_patient_id,
-                                       advertised_status_param)
+            validate_prefetch_coverages(received_prefetch_resource, received_prefetch_key, received_context_patient_id,
+                                        advertised_status_param)
           end
         else
           advertised_prefetch_token = advertised_prefetch_template.gsub(/{|}/, '').split('/')
@@ -512,19 +554,17 @@ module DaVinciCRDTestKit
             received_context_id = received_context[advertised_context_id]
             received_context_resource_type = advertised_prefetch_token.first
           end
-          validate_prefetch_resource(received_prefetch_resource, advertised_prefetch_key,
+          validate_prefetch_resource(received_prefetch_resource, received_prefetch_key,
                                      received_context_resource_type, received_context_id)
         end
       end
     end
 
-    def validate_prefetch_coverage(received_resource, advertised_prefetch_key,
-                                   received_context_patient_id, advertised_status)
+    def validate_prefetch_coverages(received_resource, advertised_prefetch_key,
+                                    received_context_patient_id, advertised_status)
       unless received_resource.resourceType == 'Bundle'
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `Bundle`. Got
-          `#{received_resource.resourceType}`.
-        ))
+        add_message('error', "#{request_number}Unexpected resource type: Expected `Bundle`. Got " \
+                             "`#{received_resource.resourceType}`.")
         return
       end
 
@@ -533,12 +573,27 @@ module DaVinciCRDTestKit
         return
       end
 
-      coverage_resource = received_resource.entry.first.resource
+      if received_context_patient_id.blank?
+        add_message('error',
+                    "#{request_number}Cannot verify `coverage` patient id because no id provided in the context.")
+      end
+
+      received_resource.entry.each_with_index do |entry, index|
+        validate_prefetch_coverage(entry&.resource, advertised_prefetch_key,
+                                   received_context_patient_id, advertised_status, index)
+      end
+    end
+
+    def validate_prefetch_coverage(coverage_resource, advertised_prefetch_key,
+                                   received_context_patient_id, advertised_status, entry_index)
+      unless coverage_resource.present?
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} had no resource")
+        return
+      end
+
       unless coverage_resource.resourceType == 'Coverage'
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `Coverage`. Got
-          `#{coverage_resource.resourceType}`.
-        ))
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - Unexpected resource type: " \
+                             "Expected `Coverage`. Got `#{coverage_resource.resourceType}`.")
         return
       end
 
@@ -548,39 +603,32 @@ module DaVinciCRDTestKit
       coverage_beneficiary_reference = coverage_resource.beneficiary
       coverage_beneficiary_patient_id = coverage_beneficiary_reference.reference_id
       if coverage_beneficiary_patient_id.blank?
-        add_message('error', %(
-          #{request_number}Could not get beneficiary reference id from `#{advertised_prefetch_key}` field's Coverage
-          resource
-        ))
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - Could not get beneficiary " \
+                             "reference id from `#{advertised_prefetch_key}` field's Coverage resource")
         return
       end
 
-      if coverage_beneficiary_patient_id != received_context_patient_id
-        add_message('error', %(
-          #{request_number}Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `beneficiary`
-          reference id of '#{received_context_patient_id}', instead was '#{coverage_beneficiary_patient_id}'
-        ))
+      if received_context_patient_id.present? && coverage_beneficiary_patient_id != received_context_patient_id
+        add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
+                             "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a " \
+                             "`beneficiary` reference id of '#{received_context_patient_id}', " \
+                             "instead was '#{coverage_beneficiary_patient_id}`")
         return
       end
 
       coverage_status = coverage_resource.status
       return unless coverage_status != advertised_status
 
-      add_message('error', %(
-          #{request_number}Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of
-          '#{advertised_status}', instead was '#{coverage_status}'
-        ))
+      add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} - " \
+                           "Expected `#{advertised_prefetch_key}` field's Coverage resource to have a `status` of " \
+                           "'#{advertised_status}', instead was '#{coverage_status}'")
     end
 
     def validate_prefetch_resource(received_resource, advertised_prefetch_key, context_field_resource_type,
                                    context_field_id)
-      unless received_resource.resourceType == context_field_resource_type
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `#{context_field_resource_type}`. Got
-          `#{received_resource.resourceType}`.
-        ))
-        return
-      end
+
+      return unless prefetch_resource_type_correct?(received_resource, context_field_resource_type,
+                                                    "#{request_number}`#{advertised_prefetch_key}` - ")
 
       if hook_name == 'order-dispatch'
         resource_is_valid?(resource: received_resource)
@@ -589,20 +637,32 @@ module DaVinciCRDTestKit
                            profile_url: structure_definition_map[context_field_resource_type])
       end
 
-      received_prefetch_resource_id = received_resource.id
-      if received_prefetch_resource_id.blank?
-        add_message('error', %(
-          #{request_number}#{advertised_prefetch_key}` field's FHIR resource does not contain the `id` field
-        ))
-        return
+      prefetch_resource_id_correct?(received_resource, context_field_id,
+                                    "#{request_number}`#{advertised_prefetch_key}` - ")
+    end
+
+    def prefetch_resource_type_correct?(resource, expected_type, error_prefix)
+      if expected_type.present?
+        return true if resource.resourceType == expected_type
+
+        add_message(:error, "#{error_prefix}Prefetched resource has the wrong resource type. " \
+                            "Expected `#{expected_type}`, got `#{resource.resourceType}`.")
+      else
+        add_message(:error, "#{error_prefix}No resource type provided to verify prefetched resource against.")
       end
+      false
+    end
 
-      return unless received_prefetch_resource_id != context_field_id
+    def prefetch_resource_id_correct?(resource, expected_id, error_prefix)
+      if expected_id.present?
+        return true if resource.id == expected_id
 
-      add_message('error', %(
-        #{request_number}Expected `#{advertised_prefetch_key}` field's FHIR resource to have an `id` of
-        '#{context_field_id}', instead was '#{received_prefetch_resource_id}'
-      ))
+        add_message(:error, "#{error_prefix}Prefetched resource has the wrong resource id. " \
+                            "Expected `#{expected_id}`, got `#{resource.id}`.")
+      else
+        add_message(:error, "#{error_prefix}No resource id provided to verify prefetched resource against.")
+      end
+      false
     end
   end
 end

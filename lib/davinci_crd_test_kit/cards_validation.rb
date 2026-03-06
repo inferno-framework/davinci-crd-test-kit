@@ -46,7 +46,7 @@ module DaVinciCRDTestKit
       card_optional_fields.each do |field, type|
         next unless card[field]
 
-        validate_presence_and_type(card, field, type, 'Card')
+        validate_presence_and_type(card, field, type, 'Card', required: false)
       end
 
       card_selection_behavior_check(card)

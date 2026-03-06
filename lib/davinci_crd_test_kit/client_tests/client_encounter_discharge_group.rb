@@ -5,6 +5,8 @@ require_relative 'hook_request_optional_fields_test'
 require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
+require_relative 'hook_request_fetched_data_test'
+require_relative 'hook_request_prefetch_equals_queried_test'
 require_relative 'retrieve_jwks_test'
 require_relative 'inferno_response_validation'
 require_relative 'token_header_test'
@@ -37,6 +39,8 @@ module DaVinciCRDTestKit
         auth_tokens: { name: :encounter_discharge_auth_tokens },
         auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json },
         client_access_token: { name: :encounter_discharge_client_access_token },
+        override_access_token: { name: :encounter_discharge_override_access_token,
+                                 title: 'encounter-discharge Prefetch Validation Override Bearer Token' },
         client_fhir_server: { name: :encounter_discharge_client_fhir_server },
         crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json },
         custom_response_template: { name: :encounter_discharge_custom_response_template },
@@ -65,8 +69,16 @@ module DaVinciCRDTestKit
     test from: :crd_token_payload
     test from: :crd_hook_request_required_fields
     test from: :crd_hook_request_optional_fields
-    test from: :crd_hook_request_valid_context
+    test from: :crd_hook_request_valid_context do
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@201', 'hl7.fhir.us.davinci-crd_2.0.1@202',
+                            'hl7.fhir.us.davinci-crd_2.0.1@203',
+                            'cds-hooks-library_1.0.1@45', 'cds-hooks-library_1.0.1@46', 'cds-hooks-library_1.0.1@47',
+                            'cds-hooks-library_1.0.1@49', 'cds-hooks-library_1.0.1@50', 'cds-hooks-library_1.0.1@51',
+                            'cds-hooks-library_1.0.1@53', 'cds-hooks-library_1.0.1@54', 'cds-hooks-library_1.0.1@55'
+    end
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_hook_request_fetched_data
+    test from: :crd_hook_request_prefetch_equals_queried
     test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
   end

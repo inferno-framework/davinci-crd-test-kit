@@ -11,6 +11,8 @@ module DaVinciCRDTestKit
         include an Authorization header presenting the JWT as a "Bearer" token.
       )
 
+    verifies_requirements 'cds-hooks_2.0@178'
+
     output :auth_tokens, :auth_token_payloads_json, :auth_token_headers_json
 
     def hook_name

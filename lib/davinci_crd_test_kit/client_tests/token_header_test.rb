@@ -12,6 +12,8 @@ module DaVinciCRDTestKit
       that the key used to sign the token can be identified in the JWKS.
     )
 
+    verifies_requirements 'cds-hooks_2.0@182', 'cds-hooks_2.0@184', 'cds-hooks_2.0@202'
+
     input :auth_token_headers_json, :crd_jwks_keys_json
     output :auth_tokens_jwk_json
 
