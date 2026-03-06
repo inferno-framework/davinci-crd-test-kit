@@ -12,6 +12,10 @@ module DaVinciCRDTestKit
         hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
+
+        For more details on how Inferno's simulated CDS Service behave during hook invocation see the
+        [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+        documentation.
       )
     config options: { accepts_multiple_requests: true }
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@171',

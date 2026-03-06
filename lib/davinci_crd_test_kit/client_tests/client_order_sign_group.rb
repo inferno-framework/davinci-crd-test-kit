@@ -5,6 +5,7 @@ require_relative 'hook_request_optional_fields_test'
 require_relative 'hook_request_required_fields_test'
 require_relative 'hook_request_valid_context_test'
 require_relative 'hook_request_valid_prefetch_test'
+require_relative 'hook_request_fetched_data_test'
 require_relative 'hook_request_prefetch_equals_queried_test'
 require_relative 'retrieve_jwks_test'
 require_relative 'inferno_response_validation'
@@ -84,6 +85,7 @@ module DaVinciCRDTestKit
                             'cds-hooks-library_1.0.1@13', 'cds-hooks-library_1.0.1@14', 'cds-hooks-library_1.0.1@15'
     end
     test from: :crd_hook_request_valid_prefetch
+    test from: :crd_hook_request_fetched_data
     test from: :crd_hook_request_prefetch_equals_queried
     test from: :crd_inferno_response_validation
     test from: :crd_card_display_attest_test
