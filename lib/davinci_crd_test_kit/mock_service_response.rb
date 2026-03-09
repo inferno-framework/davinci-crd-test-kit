@@ -158,7 +158,7 @@ module DaVinciCRDTestKit
       prefetch = request_body['prefetch']
       if prefetch.present? && prefetch['coverage']
         coverage_or_bundle = FHIR.from_contents(prefetch['coverage'].to_json)
-        coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first.resource : coverage_or_bundle
+        coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
       else
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
@@ -205,7 +205,8 @@ module DaVinciCRDTestKit
       cards_response = { 'cards' => cards }
       cards_response['systemActions'] = system_actions if system_actions.present?
       cards_response
-    rescue StandardError
+    rescue StandardError => e
+      Inferno::Application['logger'].error(e.full_message)
       nil
     end
 

@@ -76,10 +76,15 @@ module DaVinciCRDTestKit
           ),
           type: 'textarea',
           optional: true
+    output :continuation_url
 
     run do
+      identifier = "appointment-book #{cds_jwt_iss}"
+      continuation_url = "#{resume_pass_url}?token=#{identifier.gsub(' ', '%20')}"
+      output(continuation_url:)
+
       wait(
-        identifier: "appointment-book #{cds_jwt_iss}",
+        identifier:,
         message: %(
           **Appointment Book CDS Service Test**:
 
@@ -89,7 +94,7 @@ module DaVinciCRDTestKit
 
           Inferno will process the requests and return CDS cards if successful.
 
-          [Click here](#{resume_pass_url}?token=appointment-book%20#{cds_jwt_iss}) when you have finished
+          [Click here](#{continuation_url}) when you have finished
           submitting requests.
         )
       )
