@@ -448,7 +448,7 @@ module DaVinciCRDTestKit
       status = request.response[:status]
       unless status == 200
         add_message('error',
-                    "#{request_number}Unexpected response status when reading '#{resource_type}/#{resource_id}': " /
+                    "#{request_number}Unexpected response status when reading '#{resource_type}/#{resource_id}': " \
                     "expected 200, but received #{status}")
         return
       end

@@ -50,7 +50,7 @@ RSpec.describe DaVinciCRDTestKit::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: hook)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/did not have `systemActions` field/)
+      expect(entity_result_message.message).to match(/did not have the `systemActions` field/)
     end
 
     it 'fails if system actions is not an array' do
