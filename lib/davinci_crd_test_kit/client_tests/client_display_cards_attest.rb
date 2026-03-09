@@ -49,12 +49,19 @@ module DaVinciCRDTestKit
         .join("\n")
     end
 
+    output :attest_true_url
+    output :attest_false_url
+
     run do
       load_tagged_requests(*tags_to_load)
 
       skip_if request.blank?, 'No reponses sent to the client.'
 
       identifier = SecureRandom.hex(32)
+      attest_true_url = "#{resume_pass_url}?token=#{identifier}"
+      attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+      output(attest_true_url:)
+      output(attest_false_url:)
       wait(
         identifier:,
         message: <<~MESSAGE
@@ -65,9 +72,9 @@ module DaVinciCRDTestKit
 
           #{format_responded_response_types}
 
-          [Click here](#{resume_pass_url}?token=#{identifier}) if the above statement is **true**.
+          [Click here](#{attest_true_url}) if the above statement is **true**.
 
-          [Click here](#{resume_fail_url}?token=#{identifier}) if the above statement is **false**.
+          [Click here](#{attest_false_url}) if the above statement is **false**.
         MESSAGE
       )
     end
