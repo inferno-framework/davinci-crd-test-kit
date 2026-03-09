@@ -88,7 +88,7 @@ module DaVinciCRDTestKit
         Inferno::Repositories::Messages.new.create(
           result_id: result.id,
           type: 'warning',
-          message: %(Unable to return response type: `#{missing_response_type}` for #{hook_name} hook)
+          message: %(Unable to return response type `#{missing_response_type}` for #{hook_name} hook)
         )
       end
     end

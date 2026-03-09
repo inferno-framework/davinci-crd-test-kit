@@ -54,6 +54,18 @@ the corresponding "Response types to return from [hook name] hook requests" inpu
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
+### Card Must Support
+
+After running one or more hook groups, run group "1.3 Card Must Support" to check if the client
+has received and attested to support for all of the required cards ([External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
+and [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions))
+and demonstrated the display of all of the must support elements in the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+when returned on [Converage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) actions.
+
+Re-run these tests to re-evaluate after making additional requests with adjusted responses
+(see [Customizing Responses](#customizing-responses)) so that the requisite support is
+demonstrated.
+
 ### FHIR API Testing
 
 Group "2 FHIR API" focuses on the FHIR API of the tested client outside of the context of a CDS Hook

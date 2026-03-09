@@ -447,20 +447,21 @@ module DaVinciCRDTestKit
       fhir_read(resource_type, resource_id)
       status = request.response[:status]
       unless status == 200
-        add_message('error', "#{request_number}Unexpected response status: expected 200, but received #{status}")
+        add_message('error',
+                    "#{request_number}Unexpected response status when reading '#{resource_type}/#{resource_id}': " \
+                    "expected 200, but received #{status}")
         return
       end
       unless resource.resourceType == resource_type
-        add_message('error', %(
-          #{request_number}Unexpected resource type: Expected `#{resource_type}`. Got
-          `#{resource.resourceType}`.
-        ))
+        add_message('error',
+                    "#{request_number}Unexpected resource type when reading '#{resource_type}/#{resource_id}': " \
+                    "#Expected `#{resource_type}`. Got `#{resource.resourceType}`.")
         return
       end
       unless resource.id == resource_id
-        add_message('error', %(
-          #{request_number}Requested resource with id #{resource_id}, received resource with id #{resource.id}
-          ))
+        add_message('error',
+                    "#{request_number}Unexpected resource id when reading '#{resource_type}/#{resource_id}': " \
+                    "Expected `#{resource_id}`. Got `#{resource.id}`.")
         return
       end
 
