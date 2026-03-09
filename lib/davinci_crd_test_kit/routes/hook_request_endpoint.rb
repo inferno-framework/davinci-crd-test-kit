@@ -1,21 +1,26 @@
+require_relative '../gather_response_generation_data'
 require_relative '../mock_service_response'
+require_relative '../custom_service_response'
 require_relative '../tags'
+
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint
     include DaVinciCRDTestKit::MockServiceResponse
+    include DaVinciCRDTestKit::GatherResponseGenerationData
+    include DaVinciCRDTestKit::CustomServiceResponse
 
-    def selected_response_types
-      @selected_response_types ||=
-        JSON.parse(result.input_json)
-          .find { |input| input['name'].include?('selected_response_types') }
-          &.dig('value')
-    end
+    AVAILABLE_HOOKS = [
+      'appointment-book',
+      'encounter-start',
+      'encounter-discharge',
+      'order-select',
+      'order-sign',
+      'order-dispatch'
+    ].freeze
 
-    def custom_response
-      @custom_response ||=
-        JSON.parse(result.input_json)
-          .find { |input| input['name'].include?('custom_response') }
-          &.dig('value')
+    def request_body
+      @request_body ||=
+        JSON.parse(request.params.to_json)
     end
 
     def test_run_identifier
@@ -41,33 +46,59 @@ module DaVinciCRDTestKit
     end
 
     def make_response
-      case hook_name
-      when 'appointment-book', 'encounter-start', 'encounter-discharge', 'order-select', 'order-sign', 'order-dispatch'
-        hook_response
+      if hook_instance_already_used?
+        error_response(
+          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
+        )
+      elsif AVAILABLE_HOOKS.include?(hook_name)
+        send(:"gather_#{hook_name.gsub('-', '_')}_data")
+        request_coverage
+        response_body = hook_response
+        if response_body.present?
+          response.body = response_body.to_json
+          response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
+          response.status = 200
+          response.format = :json
+        end
       else
-        response.status = 400
-        response.body = 'Invalid Request: Request did not contain a valid hook in the `hook` field.'
+        error_response("Invalid Request: hook `#{hook_name}` is not supported by this server.")
       end
+    rescue StandardError => e
+      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
+      nil
+    end
+
+    def hook_response
+      if custom_response_template.present?
+        build_custom_hook_response
+      else
+        build_mock_hook_response
+      end
+    rescue StandardError => e
+      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
+      nil
+    end
+
+    def hook_instance_already_used?
+      requests_repo.tagged_requests(test_run.test_session_id, [hook_instance_tag]).present?
     end
 
     def tags
-      case hook_name
-      when 'appointment-book'
-        [APPOINTMENT_BOOK_TAG]
-      when 'encounter-start'
-        [ENCOUNTER_START_TAG]
-      when 'encounter-discharge'
-        [ENCOUNTER_DISCHARGE_TAG]
-      when 'order-select'
-        [ORDER_SELECT_TAG]
-      when 'order-sign'
-        [ORDER_SIGN_TAG]
-      when 'order-dispatch'
-        [ORDER_DISPATCH_TAG]
-      else
+      if hook_instance_already_used?
         response.status = 400
-        response.body = 'Invalid Request: Request did not contain a valid hook in the `hook` field.'
+        response.body =
+          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
+        []
+      elsif AVAILABLE_HOOKS.include?(hook_name)
+        [hook_instance_tag, DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")]
+      else
+        error_response('Invalid Request: Request did not contain a valid hook in the `hook` field.')
       end
+    end
+
+    def error_response(error_message, code: 400)
+      response.status = code
+      response.body = error_message
     end
 
     def name

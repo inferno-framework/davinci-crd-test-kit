@@ -37,6 +37,12 @@ RSpec.describe DaVinciCRDTestKit::OrderSelectReceiveRequestTest, :request do
     bundle
   end
 
+  before do
+    # disable data fetches for these tests
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive_messages(gather_order_select_data: nil,
+                                                                                      request_coverage: nil)
+  end
+
   it 'passes and responds 200 if request sent to the provided URL and jwt `iss` claim matches the given`iss`' do
     token = jwt_helper.build(
       aud: order_select_url,

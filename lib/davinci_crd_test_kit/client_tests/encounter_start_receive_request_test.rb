@@ -9,9 +9,14 @@ module DaVinciCRDTestKit
     description %(
       This test waits for multiple incoming [encounter-start](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
       hook requests and responds to the client with the response types selected as an input.
-      )
+
+      For more details on how Inferno's simulated CDS Service behave during hook invocation see the
+      [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+      documentation.
+    )
     verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@186', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245'
+                          'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
+                          'cds-hooks_2.0@15'
 
     config options: { accepts_multiple_requests: true }
 
@@ -60,7 +65,7 @@ module DaVinciCRDTestKit
               }
             ]
           }
-    input :encounter_start_custom_response,
+    input :encounter_start_custom_response_template,
           title: 'Custom response for encounter-start hook requests',
           description: %(
             A JSON string may be provided here to replace the normal response
