@@ -1,12 +1,14 @@
 require_relative '../test_helper'
 require_relative '../suggestion_actions_validation'
 require_relative '../server_hook_helper'
+require_relative '../cards_identification'
 
 module DaVinciCRDTestKit
   class CreateOrUpdateCoverageInfoResponseValidationTest < Inferno::Test
     include DaVinciCRDTestKit::TestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
     include DaVinciCRDTestKit::ServerHookHelper
+    include DaVinciCRDTestKit::CardsIdentification
 
     title 'Valid Create or Update Coverage Information cards or system actions received'
     id :crd_create_or_update_coverage_info_response_validation
@@ -32,25 +34,16 @@ module DaVinciCRDTestKit
     optional
     input :valid_cards_with_suggestions, :valid_system_actions
 
-    def coverage_actions(actions)
-      return [] if actions.nil?
-
-      valid_types = ['create', 'update']
-      actions.filter do |action|
-        valid_types.include?(action['type']) && action_resource_type_check(action, ['Coverage'])
-      end
-    end
-
-    def create_or_update_coverage_info_card?(card)
-      card['suggestions'].one? && coverage_actions(card['suggestions'].first['actions']).one?
-    end
-
     run do
       parsed_cards = parse_json(valid_cards_with_suggestions)
       parsed_actions = parse_json(valid_system_actions)
 
-      create_or_update_coverage_info_cards = parsed_cards.filter { |card| create_or_update_coverage_info_card?(card) }
-      create_or_update_coverage_info_actions = coverage_actions(parsed_actions)
+      create_or_update_coverage_info_cards = parsed_cards.select do |card|
+        create_or_update_coverage_card_response_type?(card)
+      end
+      create_or_update_coverage_info_actions = parsed_actions.select do |action|
+        create_or_update_coverage_action_response_type?(action)
+      end
 
       skip_msg = "#{tested_hook_name} hook response does not contain any Create or Update Coverage Information " \
                  'cards or system actions.'
@@ -60,8 +53,9 @@ module DaVinciCRDTestKit
 
       if create_or_update_coverage_info_cards.present?
         create_or_update_coverage_info_cards.each do |card|
-          actions = card['suggestions'].first['actions']
-          actions_check(coverage_actions(actions))
+          actions_check(card['suggestions'].first['actions'].select do |action|
+                          create_or_update_coverage_action_response_type?(action)
+                        end)
         end
       end
 

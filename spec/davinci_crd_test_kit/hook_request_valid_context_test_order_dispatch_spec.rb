@@ -284,7 +284,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Unexpected response status: expected 200, but received 404/)
+      expect(entity_result_message(test)).to match(/expected 200, but received 404/)
       expect(patient_resource_request).to have_been_made
       expect(service_request_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made

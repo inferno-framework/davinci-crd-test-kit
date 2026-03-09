@@ -94,9 +94,7 @@
           {
             "type": "delete",
             "description": "Remove name-brand prescription",
-            "resourceId": [
-              "MedicationRequest/smart-MedicationRequest-103"
-            ]
+            "resourceId": "MedicationRequest/smart-MedicationRequest-103"
           },
           {
             "type": "create",
