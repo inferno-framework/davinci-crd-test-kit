@@ -93,7 +93,7 @@ read succeeds.
          config: {
            options: { resource_type: 'PractitionerRole',
                       target_include_element: 'organization' },
-           inputs: { search_ids: { name: :practitioner_role_id_with_organization } }
+           inputs: { search_id: { name: :practitioner_role_id_with_organization } }
          }
     test from: :crd_client_fhir_api_include_search_test,
          id: :crd_client_fhir_api_practitioner_role_practitioner_include_search,
@@ -101,7 +101,7 @@ read succeeds.
          config: {
            options: { resource_type: 'PractitionerRole',
                       target_include_element: 'practitioner' },
-           inputs: { search_ids: { name: :practitioner_role_id_with_practitioner } }
+           inputs: { search_id: { name: :practitioner_role_id_with_practitioner } }
          }
     test from: :crd_client_fhir_api_practitioner_role_validation_test
     test from: :crd_client_fhir_api_practitioner_role_must_support_test

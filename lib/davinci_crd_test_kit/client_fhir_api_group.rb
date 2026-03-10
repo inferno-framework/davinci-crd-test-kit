@@ -15,13 +15,13 @@ module DaVinciCRDTestKit
     description <<~DESCRIPTION
       Systems wishing to conform to the [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
       role are responsible for returning data requested by the CRD Server needed to provide decision support. The Da
-      Vinci CRD Client FHIR API Test Group contains tests that test the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
+      Vinci CRD Client FHIR API Test Group contains tests that verify the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
       of the CRD Client and ensures that the CRD Client can respond to CRD Server queriers. These 'server' capabilities
       are based on [US Core](https://hl7.org/fhir/us/core/STU3.1.1/). This test suite confirms support
       for US Core STU 3.1.1 server requirements, plus additional search, create, and update functionality
       specified by CRD.
 
-      This test group contains three main groups of tests:
+      This test group contains three main sub-groups:
       * **SMART App Launch Authorization**: Tests that perform FHIR API authorization using [SMART on FHIR](https://hl7.org/fhir/smart-app-launch/index.html)
       EHR Launch Sequence
       * **US Core FHIR API**: Tests that verify that the client can expose data as a US Core server as required by the US Core STU 3.1.1 IG.
@@ -153,7 +153,7 @@ module DaVinciCRDTestKit
         - PractitionerRole: the `_id`, `organization`, `_include=PractitionerRole:organization`,
           and `_include=PractitionerRole:practition` search parameters.
 
-        Notes: these tests od not look for crd-specific data and so only verify conformance against
+        Notes: these tests do not look for crd-specific data and so only verify conformance against
         US Core profiles. The hook tests take the CRD-specific profiles into account.
       )
       group from: :crd_client_fhir_api_practitioner_role
