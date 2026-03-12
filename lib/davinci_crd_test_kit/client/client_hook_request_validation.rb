@@ -1,4 +1,4 @@
-require_relative 'hook_request_field_validation'
+require_relative '../cross_suite/hook_request_field_validation'
 
 module DaVinciCRDTestKit
   module ClientHookRequestValidation

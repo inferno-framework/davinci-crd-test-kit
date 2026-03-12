@@ -1,4 +1,4 @@
-require_relative 'tags'
+require_relative '../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module ServerHookHelper

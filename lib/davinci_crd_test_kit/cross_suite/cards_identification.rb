@@ -1,10 +1,10 @@
-require_relative 'server_hook_request_validation'
+require_relative 'hook_request_field_validation'
 require_relative 'suggestion_actions_validation'
 
 module DaVinciCRDTestKit
   module CardsIdentification
     include DaVinciCRDTestKit::SuggestionActionsValidation
-    include DaVinciCRDTestKit::ServerHookRequestValidation
+    include DaVinciCRDTestKit::HookRequestFieldValidation
 
     COVERAGE_INFO_EXT_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'.freeze
 

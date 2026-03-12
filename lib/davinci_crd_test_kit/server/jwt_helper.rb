@@ -1,4 +1,4 @@
-require_relative 'jwks'
+require_relative 'endpoints/jwks'
 
 module DaVinciCRDTestKit
   class JwtHelper

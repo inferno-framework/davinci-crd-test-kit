@@ -1,5 +1,5 @@
-require_relative 'fhirpath_on_cds_request'
-require_relative 'replace_tokens'
+require_relative '../../cross_suite/fhirpath_on_cds_request'
+require_relative '../../cross_suite/replace_tokens'
 require_relative 'gather_response_generation_data'
 
 module DaVinciCRDTestKit

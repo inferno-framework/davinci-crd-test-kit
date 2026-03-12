@@ -1,5 +1,5 @@
 module DaVinciCRDTestKit
-  module TestHelper
+  module ServerTestHelper
     def parse_json(input)
       assert_valid_json(input)
       JSON.parse(input)

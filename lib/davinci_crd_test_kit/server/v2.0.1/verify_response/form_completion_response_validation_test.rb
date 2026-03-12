@@ -1,11 +1,11 @@
-require_relative '../test_helper'
-require_relative '../suggestion_actions_validation'
-require_relative '../server_hook_helper'
-require_relative '../cards_identification'
+require_relative '../../server_test_helper'
+require_relative '../../../cross_suite/suggestion_actions_validation'
+require_relative '../../server_hook_helper'
+require_relative '../../../cross_suite/cards_identification'
 
 module DaVinciCRDTestKit
   class FormCompletionResponseValidationTest < Inferno::Test
-    include DaVinciCRDTestKit::TestHelper
+    include DaVinciCRDTestKit::ServerTestHelper
     include DaVinciCRDTestKit::SuggestionActionsValidation
     include DaVinciCRDTestKit::ServerHookHelper
     include DaVinciCRDTestKit::CardsIdentification

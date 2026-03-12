@@ -1,7 +1,7 @@
-require_relative '../gather_response_generation_data'
-require_relative '../mock_service_response'
-require_relative '../custom_service_response'
-require_relative '../tags'
+require_relative 'gather_response_generation_data'
+require_relative 'mock_service_response'
+require_relative 'custom_service_response'
+require_relative '../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint

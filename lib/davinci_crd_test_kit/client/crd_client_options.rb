@@ -1,5 +1,5 @@
 module DaVinciCRDTestKit
-  module CRDOptions
+  module CRDClientOptions
     SMART_1 = 'smart_app_launch_1'.freeze
     SMART_2 = 'smart_app_launch_2'.freeze
 

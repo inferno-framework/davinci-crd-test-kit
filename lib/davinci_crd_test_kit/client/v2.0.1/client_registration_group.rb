@@ -1,11 +1,12 @@
-require_relative 'client_tests/client_registration_verification_test'
-require_relative 'client_tests/client_service_registration_attestation_test'
+require_relative 'auth/client_registration_verification_test'
+require_relative 'auth/client_service_registration_attestation_test'
 
 module DaVinciCRDTestKit
-  class PASClientRegistrationGroup < Inferno::TestGroup
-    id :crd_client_registration
-    title 'Client Registration'
-    description %(
+  module V201
+    class PASClientRegistrationGroup < Inferno::TestGroup
+      id :crd_client_registration
+      title 'Client Registration'
+      description %(
         Register the CRD client under test with Inferno's simulated CRD Server by
         providing required information for Inferno to use in identifying and verify
         hook requests.
@@ -20,9 +21,10 @@ module DaVinciCRDTestKit
         of the client under test with the Inferno service. If the client needs to make a
         change to its registered values during execution, this test will need to be re-run.
       )
-    run_as_group
+      run_as_group
 
-    test from: :crd_client_registration_verification
-    test from: :crd_client_service_registration_attestation
+      test from: :crd_client_registration_verification
+      test from: :crd_client_service_registration_attestation
+    end
   end
 end

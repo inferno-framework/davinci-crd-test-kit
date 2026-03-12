@@ -1,7 +1,8 @@
-require_relative 'server_hook_request_validation'
+require_relative 'hook_request_field_validation'
+
 module DaVinciCRDTestKit
   module SuggestionActionsValidation
-    include DaVinciCRDTestKit::ServerHookRequestValidation
+    include HookRequestFieldValidation
 
     def action_required_fields
       { 'type' => String, 'description' => String }
