@@ -187,7 +187,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiValidationTest do
       result = run(test)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match('2/2 Encounter resources returned from previous')
+      expect(result.result_message).to match('2/2 Encounter resources returned from')
       expect(validation_request).to have_been_made.times(2)
     end
 
