@@ -11,8 +11,8 @@ module DaVinciCRDTestKit
       title 'Hook request optional fields are valid'
       description %(
         Under the [CDS hooks HTTP Request section](https://cds-hooks.hl7.org/2.0/#http-request_1), the specification
-        requires that a CDS service request SHALL include a JSON POST body which MAY contain the following optional input
-        fields:
+        requires that a CDS service request SHALL include a JSON POST body which MAY contain the following
+        optional input fields:
           * `fhirServer` - *URL*
           * `fhirAuthorization` - *object*
           * `prefetch` - *object*

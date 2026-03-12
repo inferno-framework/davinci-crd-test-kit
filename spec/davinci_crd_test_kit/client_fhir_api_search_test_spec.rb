@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_search_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/api/client_fhir_api_search_test'
 
-RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
+RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
   let(:suite_id) { 'crd_client' }
 
   let(:server_endpoint) { 'http://example.com/fhir' }

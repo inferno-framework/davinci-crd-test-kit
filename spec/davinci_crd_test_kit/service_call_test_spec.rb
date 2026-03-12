@@ -1,7 +1,7 @@
-RSpec.describe DaVinciCRDTestKit::ServiceCallTest do
+RSpec.describe DaVinciCRDTestKit::V201::ServiceCallTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable) do
-    Class.new(DaVinciCRDTestKit::ServiceCallTest) do
+    Class.new(DaVinciCRDTestKit::V201::ServiceCallTest) do
       input :inferno_base_url
     end
   end
@@ -99,7 +99,8 @@ RSpec.describe DaVinciCRDTestKit::ServiceCallTest do
   describe 'when testing any hook' do
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:discovery_response) do
-      File.read(File.join(__dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'routes', 'cds-services.json'))
+      File.read(File.join(__dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                          'cds-services.json'))
     end
 
     before do

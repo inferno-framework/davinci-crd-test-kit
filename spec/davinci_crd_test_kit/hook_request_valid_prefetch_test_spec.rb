@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/hook_request_valid_prefetch_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/verify_request/hook_request_valid_prefetch_test'
 
-RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
+RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
@@ -147,7 +147,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
   describe 'Appointment Book Hook Valid Prefetch' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
@@ -372,7 +372,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
   describe 'Encounter Start Hook Valid Prefetch' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
@@ -403,7 +403,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
   describe 'Order Dispatch Hook Valid Prefetch' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 
@@ -434,7 +434,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidPrefetchTest do
 
   describe 'Order Select Hook Valid Prefetch' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidPrefetchTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 

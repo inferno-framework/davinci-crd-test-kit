@@ -1,10 +1,12 @@
 require_relative '../../server_test_helper'
+require_relative '../../server_hook_request_validation'
 require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V201
     class CardOptionalFieldsValidationTest < Inferno::Test
       include DaVinciCRDTestKit::ServerTestHelper
+      include DaVinciCRDTestKit::ServerHookRequestValidation
       include DaVinciCRDTestKit::CardsValidation
 
       title 'Cards contain valid optional fields'

@@ -1,7 +1,7 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/decode_auth_token_test'
-require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/auth/decode_auth_token_test'
+require_relative '../../lib/davinci_crd_test_kit/server/jwt_helper'
 
-RSpec.describe DaVinciCRDTestKit::DecodeAuthTokenTest do
+RSpec.describe DaVinciCRDTestKit::V201::DecodeAuthTokenTest do
   let(:suite_id) { 'crd_client' }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
@@ -49,7 +49,7 @@ RSpec.describe DaVinciCRDTestKit::DecodeAuthTokenTest do
 
   describe 'Appointment Book Decode Auth Token Test' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::DecodeAuthTokenTest) do
+      Class.new(DaVinciCRDTestKit::V201::DecodeAuthTokenTest) do
         config(
           options: { hook_name: 'appointment-book' }
         )

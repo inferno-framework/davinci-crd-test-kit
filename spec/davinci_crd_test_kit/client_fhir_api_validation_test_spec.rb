@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_validation_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/api/client_fhir_api_validation_test'
 
-RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
@@ -109,7 +109,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiValidationTest do
 
   describe 'FHIR Resource Validation' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::ClientFHIRApiValidationTest) do
+      Class.new(DaVinciCRDTestKit::V201::ClientFHIRApiValidationTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 

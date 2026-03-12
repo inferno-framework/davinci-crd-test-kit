@@ -18,8 +18,8 @@ module DaVinciCRDTestKit
 
           Additionally, if the optional `fhirAuthorization` field is present, then the `fhirServer` field is required.
 
-          This test also checks that the `hook` field contains the correct CDS service name that the CDS client is sending
-          a request for
+          This test also checks that the `hook` field contains the correct CDS service name that the CDS client
+          is sending a request for
       )
 
       verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@18', 'cds-hooks_2.0@19',

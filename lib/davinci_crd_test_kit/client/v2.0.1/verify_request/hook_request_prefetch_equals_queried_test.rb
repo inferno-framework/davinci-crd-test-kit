@@ -53,7 +53,7 @@ module DaVinciCRDTestKit
 
       def cds_services_json
         JSON.parse(File.read(File.join(
-                               __dir__, '..', 'routes', 'cds-services.json'
+                               __dir__, '..', '..', 'endpoints', 'cds-services.json'
                              )))['services']
       end
 

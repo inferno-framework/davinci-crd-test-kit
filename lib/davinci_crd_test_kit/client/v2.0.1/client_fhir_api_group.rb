@@ -39,8 +39,8 @@ module DaVinciCRDTestKit
         title 'Authorization'
         description %(
           Perform an EHR [SMART App Launch](https://www.hl7.org/fhir/smart-app-launch/) to Authorize the client FHIR
-          server with Inferno so that Inferno may access resources on the FHIR server in order to perform the FHIR RESTful
-          Capabilities tests.
+          server with Inferno so that Inferno may access resources on the FHIR server in order to perform the
+          FHIR RESTful Capabilities tests.
         )
         verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
                               'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89',
@@ -148,9 +148,10 @@ module DaVinciCRDTestKit
       group do
         title 'FHIR RESTful Capabilities'
         description %(
-          This test group contains groups of tests for each CRD resource profile and ensures the [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
-          supports the appropriate FHIR operations required on each resource. For each resource, Inferno will perform the
-          required FHIR operations, and then it will validate any resources that are returned as a result of
+          This test group contains groups of tests for each CRD resource profile and ensures the
+          [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
+          supports the appropriate FHIR operations required on each resource. For each resource, Inferno will
+          perform the required FHIR operations, and then it will validate any resources that are returned as a result of
           these FHIR operations.
 
           The resources that are a part of the CRD IG configuration include:
@@ -461,7 +462,8 @@ module DaVinciCRDTestKit
                    resource_ids: {
                      name: :practitioner_ids,
                      title: 'Practitioner IDs',
-                     description: 'Comma separated list of Practitioner IDs that in sum contain all MUST SUPPORT elements'
+                     description: 'Comma separated list of Practitioner IDs that in sum contain all MUST SUPPORT ' \
+                                  'elements'
                    }
                  }
                }
@@ -665,7 +667,8 @@ module DaVinciCRDTestKit
                    resource_ids: {
                      name: :organization_ids,
                      title: 'Organization IDs',
-                     description: 'Comma separated list of Organization IDs that in sum contain all MUST SUPPORT elements'
+                     description: 'Comma separated list of Organization IDs that in sum contain all MUST SUPPORT ' \
+                                  'elements'
                    }
                  }
                }

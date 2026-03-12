@@ -11,9 +11,10 @@ module DaVinciCRDTestKit
       title 'Hook request contains valid prefetched data'
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
-        `prefetch` field is an optional field that contains key/value pairs of FHIR queries that the service is requesting
-        the CDS Client to perform and provide on each service call. The key is a string that describes the type of data
-        being requested and the value is a string representing the FHIR query. See [Prefetch Template](https://cds-hooks.hl7.org/2.0#prefetch-template)
+        `prefetch` field is an optional field that contains key/value pairs of FHIR queries that the service is
+        requesting the CDS Client to perform and provide on each service call. The key is a string that describes
+        the type of data being requested and the value is a string representing the FHIR query.
+        See [Prefetch Template](https://cds-hooks.hl7.org/2.0#prefetch-template)
         for more information about how the `prefetch` formatting works.
 
         This test verifies that the incoming hook request's `prefetch` field is in a valid JSON format,
@@ -32,7 +33,7 @@ module DaVinciCRDTestKit
 
       def cds_services_json
         JSON.parse(File.read(File.join(
-                               __dir__, '..', 'routes', 'cds-services.json'
+                               __dir__, '..', '..', 'endpoints', 'cds-services.json'
                              )))['services']
       end
 

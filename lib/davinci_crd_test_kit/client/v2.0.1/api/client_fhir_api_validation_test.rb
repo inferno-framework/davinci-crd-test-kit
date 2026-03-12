@@ -53,8 +53,8 @@ module DaVinciCRDTestKit
         validation_error_count = messages.count { |msg| msg[:type] == 'error' }
         invalid_resource_count = validated_resources.reject { |valid| valid }.count
         assert(validation_error_count.zero?,
-               %(#{invalid_resource_count}/#{validated_resources.length} #{resource_type} resources returned from previous
-             test's FHIR API requests failed validation.))
+               %(#{invalid_resource_count}/#{validated_resources.length} #{resource_type} resources returned from
+             previous test's FHIR API requests failed validation.))
 
         skip_if validated_resources.blank?, 'No FHIR resources were made in previous tests that could be validated.'
       end

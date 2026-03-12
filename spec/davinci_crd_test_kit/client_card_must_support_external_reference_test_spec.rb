@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ClientCardMustSupportExternalReferenceTest do
+RSpec.describe DaVinciCRDTestKit::V201::ClientCardMustSupportExternalReferenceTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
 
@@ -12,7 +12,8 @@ RSpec.describe DaVinciCRDTestKit::ClientCardMustSupportExternalReferenceTest do
       cards: [
         JSON.parse(
           File.read(File.join(
-                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'external_reference.json'
+                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                      'mocked_card_responses', 'external_reference.json'
                     ))
         )
       ],

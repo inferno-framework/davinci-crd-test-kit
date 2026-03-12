@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/encounter_discharge_receive_request_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/invocation/encounter_discharge_receive_request_test'
 
-RSpec.describe DaVinciCRDTestKit::EncounterDischargeReceiveRequestTest, :request do
+RSpec.describe DaVinciCRDTestKit::V201::EncounterDischargeReceiveRequestTest, :request do
   let(:suite_id) { 'crd_client' }
   let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

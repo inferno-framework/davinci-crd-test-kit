@@ -11,9 +11,9 @@ module DaVinciCRDTestKit
       title 'Hook request contains valid context'
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
-        `context` field contains hook-specific contextual data that the CDS service will need. The context is specified
-        in the hook definition to guide developers on the information available at the point in the workflow when the hook
-        is triggered.
+        `context` field contains hook-specific contextual data that the CDS service will need. The context is
+        specified in the hook definition to guide developers on the information available at the point in the
+        workflow when the hook is triggered.
 
         The `context` requirements for each [hook specified in the CRD IG](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html)
         can be found below:

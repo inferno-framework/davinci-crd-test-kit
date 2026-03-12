@@ -8,9 +8,10 @@ module DaVinciCRDTestKit
       id :crd_token_header
       title 'Authorization token header contains required information'
       description %(
-        Verify that the JWT header contains the header fields required by the [CDS hooks spec](https://cds-hooks.hl7.org/2.0#trusting-cds-clients).
-        The `alg`, `kid`, and `typ` fields are required. This test also verifies that the `typ` field is set to `JWT` and
-        that the key used to sign the token can be identified in the JWKS.
+        Verify that the JWT header contains the header fields required by the
+        [CDS hooks spec](https://cds-hooks.hl7.org/2.0#trusting-cds-clients).
+        The `alg`, `kid`, and `typ` fields are required. This test also verifies that the `typ` field is set to
+        `JWT` and that the key used to sign the token can be identified in the JWKS.
       )
 
       verifies_requirements 'cds-hooks_2.0@182', 'cds-hooks_2.0@184', 'cds-hooks_2.0@202'

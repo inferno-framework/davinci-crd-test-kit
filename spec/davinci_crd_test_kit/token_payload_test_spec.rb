@@ -1,7 +1,7 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/token_payload_test'
-require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/auth/token_payload_test'
+require_relative '../../lib/davinci_crd_test_kit/server/jwt_helper'
 
-RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
+RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
   let(:suite_id) { 'crd_client' }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:results_repo) { Inferno::Repositories::Results.new }
@@ -46,7 +46,7 @@ RSpec.describe DaVinciCRDTestKit::TokenPayloadTest do
 
   describe 'CRD Appointment Book Token Payload' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::TokenPayloadTest) do
+      Class.new(DaVinciCRDTestKit::V201::TokenPayloadTest) do
         config(
           options: { hook_path: '/cds-services/appointment-book-service' }
         )

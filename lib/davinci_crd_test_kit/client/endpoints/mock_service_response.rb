@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
     end
 
     def load_json_file(filename)
-      json = JSON.parse(File.read(File.join(__dir__, 'card_responses', filename)))
+      json = JSON.parse(File.read(File.join(__dir__, 'mocked_card_responses', filename)))
       return json unless filename == 'launch_smart_app.json'
 
       json['links'].first['url'] = "#{Inferno::Application['base_url']}/custom/smart/launch"
