@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_read_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/api/client_fhir_api_read_test'
 
-RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
+RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiReadTest do
   let(:suite_id) { 'crd_client' }
   let(:server_endpoint) { 'http://example.com/fhir' }
   let(:client_smart_credentials) do
@@ -49,7 +49,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiReadTest do
 
   describe 'Patient FHIR Read Test' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::ClientFHIRApiReadTest) do
+      Class.new(DaVinciCRDTestKit::V201::ClientFHIRApiReadTest) do
         fhir_client do
           url :server_endpoint
           auth_info :smart_auth_info

@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ProposeAlternateRequestCardValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::ProposeAlternateRequestCardValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ServerDiscoveryGroup do
+RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
   let(:suite_id) { 'crd_server' }
   let(:group) { Inferno::Repositories::TestGroups.new.find('crd_server_discovery_group') }
   let(:base_url) { 'http://example.com' }
