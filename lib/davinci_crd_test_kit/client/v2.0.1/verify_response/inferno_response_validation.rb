@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
         If this test fails when Inferno mocked the response based on selected card types, please
         report this failure to the Inferno team via github issues.
       )
-      id :crd_inferno_response_validation
+      id :crd_v201_inferno_response_validation
 
       input :custom_response_template, optional: true
 

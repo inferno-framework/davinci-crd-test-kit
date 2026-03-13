@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
 
       title 'All service responses contain valid cards and optional systemActions'
-      id :crd_service_response_validation
+      id :crd_v201_service_response_validation
       description %(
         As per the [CDS Hooks spec section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response),
         a successful server's response to a service request must be a JSON object containing a `cards` array.

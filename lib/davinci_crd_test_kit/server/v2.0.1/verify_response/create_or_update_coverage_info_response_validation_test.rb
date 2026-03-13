@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
 
       title 'Valid Create or Update Coverage Information cards or system actions received'
-      id :crd_create_or_update_coverage_info_response_validation
+      id :crd_v201_create_or_update_coverage_info_response_validation
       description %(
         This test validates the Create or Update Coverage Information cards or system actions received from the
         CRD service, as per the specifications outlined in the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information).

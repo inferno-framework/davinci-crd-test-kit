@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'All Coverage Information system actions received are valid'
-      id :crd_coverage_info_system_action_validation
+      id :crd_v201_coverage_info_system_action_validation
       description %(
         This test validates all [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
         system actions received. It verifies the following for each action:

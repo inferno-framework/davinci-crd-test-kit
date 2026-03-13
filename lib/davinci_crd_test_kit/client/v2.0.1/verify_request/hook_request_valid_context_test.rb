@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientURLs
       include ClientHookRequestValidation
 
-      id :crd_hook_request_valid_context
+      id :crd_v201_hook_request_valid_context
       title 'Hook request contains valid context'
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's

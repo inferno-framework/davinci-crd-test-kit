@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class TokenHeaderTest < Inferno::Test
       include ClientHookRequestValidation
 
-      id :crd_token_header
+      id :crd_v201_token_header
       title 'Authorization token header contains required information'
       description %(
         Verify that the JWT header contains the header fields required by the

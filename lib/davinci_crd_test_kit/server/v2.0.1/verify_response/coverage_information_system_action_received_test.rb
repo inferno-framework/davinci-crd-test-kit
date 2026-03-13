@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
 
       title 'Coverage Information system action was received'
-      id :crd_coverage_info_system_action_received
+      id :crd_v201_coverage_info_system_action_received
       description %(
         This test validates that a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
         system action was returned. It does so by:

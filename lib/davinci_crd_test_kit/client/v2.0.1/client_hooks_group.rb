@@ -38,7 +38,7 @@ module DaVinciCRDTestKit
         provided in the service request's `prefetch` field, or must be fetchable from the client's FHIR server for
         the patient provided in the service request.
       DESCRIPTION
-      id :crd_client_hooks
+      id :crd_v201_client_hooks
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@149'
 
       input :cds_jwt_iss,
@@ -52,22 +52,22 @@ module DaVinciCRDTestKit
 
       input_order :cds_jwt_iss, :cds_jwk_set
 
-      group from: :crd_client_appointment_book,
+      group from: :crd_v201_client_appointment_book,
             optional: true
 
-      group from: :crd_client_encounter_start,
+      group from: :crd_v201_client_encounter_start,
             optional: true
 
-      group from: :crd_client_encounter_discharge,
+      group from: :crd_v201_client_encounter_discharge,
             optional: true
 
-      group from: :crd_client_order_select,
+      group from: :crd_v201_client_order_select,
             optional: true
 
-      group from: :crd_client_order_dispatch,
+      group from: :crd_v201_client_order_dispatch,
             optional: true
 
-      group from: :crd_client_order_sign,
+      group from: :crd_v201_client_order_sign,
             optional: true
     end
   end

@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientHookRequestValidation
       include ClientURLs
 
-      id :crd_hook_request_optional_fields
+      id :crd_v201_hook_request_optional_fields
       title 'Hook request optional fields are valid'
       description %(
         Under the [CDS hooks HTTP Request section](https://cds-hooks.hl7.org/2.0/#http-request_1), the specification

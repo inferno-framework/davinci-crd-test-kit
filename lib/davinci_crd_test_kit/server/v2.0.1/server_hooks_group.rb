@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
   module V201
     class ServerHooksGroup < Inferno::TestGroup
       title 'Hook Tests'
-      id :crd_server_hooks
+      id :crd_v201_server_hooks
       description %(
         # Background
 
@@ -55,19 +55,19 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@4', 'hl7.fhir.us.davinci-crd_2.0.1@152',
                             'hl7.fhir.us.davinci-crd_2.0.1@153'
 
-      group from: :crd_server_appointment_book,
+      group from: :crd_v201_server_appointment_book,
             optional: true
-      group from: :crd_server_encounter_start,
+      group from: :crd_v201_server_encounter_start,
             optional: true
-      group from: :crd_server_encounter_discharge,
+      group from: :crd_v201_server_encounter_discharge,
             optional: true
-      group from: :crd_server_order_select,
+      group from: :crd_v201_server_order_select,
             optional: true
-      group from: :crd_server_order_dispatch,
+      group from: :crd_v201_server_order_dispatch,
             optional: true
-      group from: :crd_server_order_sign,
+      group from: :crd_v201_server_order_sign,
             optional: true
-      group from: :crd_server_required_card_response_validation
+      group from: :crd_v201_server_required_card_response_validation
     end
   end
 end

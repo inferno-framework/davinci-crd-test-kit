@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'Valid Instructions cards received across all hooks'
-      id :crd_valid_instructions_card_received_across_hooks
+      id :crd_v201_valid_instructions_card_received_across_hooks
       description %(
         This test validates that a valid [Instructions card](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
         was received across all hooks responses.

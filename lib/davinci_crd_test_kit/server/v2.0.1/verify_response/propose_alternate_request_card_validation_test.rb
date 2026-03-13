@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
 
       title 'Valid Propose Alternate Request cards received'
-      id :crd_propose_alternate_request_card_validation
+      id :crd_v201_propose_alternate_request_card_validation
       description %(
         This test validates that all [Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)
         cards received are valid. It checks for the presence of a card's suggestion

@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
 
       title 'All service requests contain optional fields'
-      id :crd_service_request_optional_fields_validation
+      id :crd_v201_service_request_optional_fields_validation
       description %(
         This optional test reviews the user-submitted CRD service requests for the presence of optional fields:
         `fhirAuthorization` and `prefetch`.

@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'Valid External Reference cards received across all hooks'
-      id :crd_external_reference_card_across_hooks_validation
+      id :crd_v201_external_reference_card_across_hooks_validation
       description %(
         This test verifies the presence of valid External Reference returned by CRD services across all hooks invoked.
         As per the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference),
