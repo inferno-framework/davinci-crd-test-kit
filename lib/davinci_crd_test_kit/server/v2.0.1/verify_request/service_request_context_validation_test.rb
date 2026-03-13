@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
 
       title 'All service requests contain valid context'
-      id :crd_service_request_context_validation
+      id :crd_v201_service_request_context_validation
       description %(
         This test verifies that all service requests `context` field is valid and contains all the
         required fields.

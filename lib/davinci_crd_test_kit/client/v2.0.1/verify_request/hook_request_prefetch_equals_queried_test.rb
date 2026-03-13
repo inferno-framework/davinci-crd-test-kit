@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class HookRequestPrefetchEqualsQueriedTest < Inferno::Test
       include PrefetchContentsValidation
 
-      id :crd_hook_request_prefetch_equals_queried
+      id :crd_v201_hook_request_prefetch_equals_queried
       title 'Prefetched data is equivalent to queried data'
       description %(
         This test verifies that each key present in the incoming hook request's `prefetch` field is equivalent to the

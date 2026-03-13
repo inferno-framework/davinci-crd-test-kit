@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class OrderDispatchReceiveRequestTest < Inferno::Test
       include ClientURLs
 
-      id :crd_order_dispatch_request
+      id :crd_v201_order_dispatch_request
       title 'Request received for order-dispatch hook'
       description %(
         This test waits for multiple incoming [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)

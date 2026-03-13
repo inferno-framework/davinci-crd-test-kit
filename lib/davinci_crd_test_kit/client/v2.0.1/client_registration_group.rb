@@ -4,7 +4,7 @@ require_relative 'auth/client_service_registration_attestation_test'
 module DaVinciCRDTestKit
   module V201
     class PASClientRegistrationGroup < Inferno::TestGroup
-      id :crd_client_registration
+      id :crd_v201_client_registration
       title 'Client Registration'
       description %(
         Register the CRD client under test with Inferno's simulated CRD Server by
@@ -23,8 +23,8 @@ module DaVinciCRDTestKit
       )
       run_as_group
 
-      test from: :crd_client_registration_verification
-      test from: :crd_client_service_registration_attestation
+      test from: :crd_v201_client_registration_verification
+      test from: :crd_v201_client_service_registration_attestation
     end
   end
 end

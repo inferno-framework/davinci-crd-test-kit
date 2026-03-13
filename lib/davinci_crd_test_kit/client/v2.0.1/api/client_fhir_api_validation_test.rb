@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V201
     class ClientFHIRApiValidationTest < Inferno::Test
-      id :crd_client_fhir_api_validation_test
+      id :crd_v201_client_fhir_api_validation_test
       title 'FHIR Resource Validation'
       description %(
         Verify that the given resources returned from the previous client API interactions are valid resources. Each

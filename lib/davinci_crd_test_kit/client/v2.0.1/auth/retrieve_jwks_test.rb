@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class RetrieveJWKSTest < Inferno::Test
       include ClientHookRequestValidation
 
-      id :crd_retrieve_jwks
+      id :crd_v201_retrieve_jwks
       title 'JWKS can be retrieved'
       description %(
         Verify that the JWKS can be retrieved from the JWKS uri if it is present in the `jku` field within the JWT token

@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
   module V201
     class CRDClientSuite < Inferno::TestSuite
       id :crd_client
-      title 'Da Vinci CRD Client Test Suite'
+      title 'Da Vinci CRD Client v2.0.1 Test Suite'
       description <<~DESCRIPTION
         The Da Vinci CRD Client Test Suite tests the conformance of client systems
         to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
@@ -115,19 +115,19 @@ module DaVinciCRDTestKit
       end
 
       group do
-        id :crd_client_hook_invocation
+        id :crd_v201_client_hook_invocation
         title 'Hook Invocation'
         description %(
           This groups checks that the system can register as a CDS Client with
           Inferno's simulated CRD Server and make hook invocations.
         )
 
-        group from: :crd_client_registration
-        group from: :crd_client_hooks
-        group from: :crd_client_card_must_support
+        group from: :crd_v201_client_registration
+        group from: :crd_v201_client_hooks
+        group from: :crd_v201_client_card_must_support
       end
 
-      group from: :crd_client_fhir_api
+      group from: :crd_v201_client_fhir_api
     end
   end
 end

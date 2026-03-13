@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V201
     class ClientFHIRApiUpdateTest < Inferno::Test
-      id :crd_client_fhir_api_update_test
+      id :crd_v201_client_fhir_api_update_test
       title 'Update Interaction'
       description %(
         Verify that the CRD client supports the update interaction for the given resource. The capabilities required by

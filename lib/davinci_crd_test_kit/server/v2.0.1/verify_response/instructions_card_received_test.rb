@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
 
       title 'Valid Instructions cards received'
-      id :crd_valid_instructions_card_received
+      id :crd_v201_valid_instructions_card_received
       description %(
         This test validates that an [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
         card was received. It does so by:

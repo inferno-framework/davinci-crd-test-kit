@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
   module V201
     class ServerDemonstrateHookResponseGroup < Inferno::TestGroup
       title 'Demonstrate A Hook Response'
-      id :crd_server_demonstrate_hook_response
+      id :crd_v201_server_demonstrate_hook_response
       description %(
         This group of tests allows the system to demonstrate its ability to respond to a CRD Hook invocation
         and return a valid response. Inferno will use the provided request body and will either use the provided service
@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
       config options: { hook_name: ANY_HOOK_TAG }
       run_as_group
 
-      test from: :crd_service_call_test,
+      test from: :crd_v201_service_call_test,
            config: {
              inputs: {
                service_ids: {
@@ -45,7 +45,7 @@ module DaVinciCRDTestKit
              }
            }
 
-      test from: :crd_service_request_required_fields_validation,
+      test from: :crd_v201_service_request_required_fields_validation,
            config: {
              outputs: {
                contexts: {
@@ -53,7 +53,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_service_request_context_validation,
+      test from: :crd_v201_service_request_context_validation,
            config: {
              inputs: {
                contexts: {
@@ -64,7 +64,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_service_response_validation,
+      test from: :crd_v201_service_response_validation,
            config: {
              outputs: {
                valid_cards: {

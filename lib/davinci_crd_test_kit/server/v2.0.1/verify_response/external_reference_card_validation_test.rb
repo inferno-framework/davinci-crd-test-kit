@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
 
       title 'Valid External Reference cards received'
-      id :crd_external_reference_card_validation
+      id :crd_v201_external_reference_card_validation
       description %(
         This test verifies the presence of valid External Reference cards within the list of valid cards
         returned by the CRD service.

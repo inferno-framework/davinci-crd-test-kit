@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsValidation
 
       title 'Cards contain valid optional fields'
-      id :crd_card_optional_fields_validation
+      id :crd_v201_card_optional_fields_validation
       description %(
         This test checks for the presence and validity of optional fields in a card,
         but only if the card's required fields are valid. As specified in the

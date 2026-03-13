@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include CardsIdentification
 
       title 'Coverage Information Action Support'
-      id :crd_client_card_must_support_coverage_information
+      id :crd_v201_client_card_must_support_coverage_information
       description <<~DESCRIPTION
         Checks that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
         action type. At least one hook invocation performed during this test session must have returned a Coverage Information action.

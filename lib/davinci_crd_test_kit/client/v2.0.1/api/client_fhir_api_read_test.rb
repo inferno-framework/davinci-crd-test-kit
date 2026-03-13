@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V201
     class ClientFHIRApiReadTest < Inferno::Test
-      id :crd_client_fhir_api_read_test
+      id :crd_v201_client_fhir_api_read_test
       title 'Read Interaction'
       description %(
         Verify that the CRD client supports the read interaction for the given resource. The capabilities required by

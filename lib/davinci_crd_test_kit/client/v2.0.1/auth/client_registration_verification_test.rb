@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class CRDClientRegistrationVerification < Inferno::Test
       include ClientURLs
 
-      id :crd_client_registration_verification
+      id :crd_v201_client_registration_verification
       title 'Verify CRD Client Registration'
       description %(
         During this test, Inferno will verify that the CRD Client registration details

@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class EncounterStartReceiveRequestTest < Inferno::Test
       include ClientURLs
 
-      id :crd_encounter_start_request
+      id :crd_v201_encounter_start_request
       title 'Request received for encounter-start hook'
       description %(
         This test waits for multiple incoming [encounter-start](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)

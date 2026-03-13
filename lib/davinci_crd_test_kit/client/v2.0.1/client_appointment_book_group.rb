@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
   module V201
     class ClientAppointmentBookGroup < Inferno::TestGroup
       title 'appointment-book'
-      id :crd_client_appointment_book
+      id :crd_v201_client_appointment_book
       description <<~DESCRIPTION
         The appointment-book hook is invoked when the user is scheduling one or more future encounters/visits for the
         patient. These tests are based on the following criteria:
@@ -63,14 +63,14 @@ module DaVinciCRDTestKit
         }
       )
 
-      test from: :crd_appointment_book_request
-      test from: :crd_decode_auth_token
-      test from: :crd_retrieve_jwks
-      test from: :crd_token_header
-      test from: :crd_token_payload
-      test from: :crd_hook_request_required_fields
-      test from: :crd_hook_request_optional_fields
-      test from: :crd_hook_request_valid_context do
+      test from: :crd_v201_appointment_book_request
+      test from: :crd_v201_decode_auth_token
+      test from: :crd_v201_retrieve_jwks
+      test from: :crd_v201_token_header
+      test from: :crd_v201_token_payload
+      test from: :crd_v201_hook_request_required_fields
+      test from: :crd_v201_hook_request_optional_fields
+      test from: :crd_v201_hook_request_valid_context do
         verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71',
                               'hl7.fhir.us.davinci-crd_2.0.1@177', 'hl7.fhir.us.davinci-crd_2.0.1@178',
                               'hl7.fhir.us.davinci-crd_2.0.1@179', 'hl7.fhir.us.davinci-crd_2.0.1@180',
@@ -80,11 +80,11 @@ module DaVinciCRDTestKit
                               'cds-hooks-library_1.0.1@25', 'cds-hooks-library_1.0.1@26', 'cds-hooks-library_1.0.1@27',
                               'cds-hooks-library_1.0.1@29', 'cds-hooks-library_1.0.1@30', 'cds-hooks-library_1.0.1@31'
       end
-      test from: :crd_hook_request_valid_prefetch
-      test from: :crd_hook_request_fetched_data
-      test from: :crd_hook_request_prefetch_equals_queried
-      test from: :crd_inferno_response_validation
-      test from: :crd_card_display_attest_test
+      test from: :crd_v201_hook_request_valid_prefetch
+      test from: :crd_v201_hook_request_fetched_data
+      test from: :crd_v201_hook_request_prefetch_equals_queried
+      test from: :crd_v201_inferno_response_validation
+      test from: :crd_v201_card_display_attest_test
     end
   end
 end

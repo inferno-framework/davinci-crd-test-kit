@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include CardsIdentification
 
       title 'External Reference Card Support'
-      id :crd_client_card_must_support_external_reference
+      id :crd_v201_client_card_must_support_external_reference
       description <<~DESCRIPTION
         Checks that the client demonstrated support for the [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
         card type. At least one hook invocation performed during this test session must have returned an External Reference card.

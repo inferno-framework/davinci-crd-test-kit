@@ -4,7 +4,7 @@ module DaVinciCRDTestKit
   module V201
     class DecodeAuthTokenTest < Inferno::Test
       include ClientHookRequestValidation
-      id :crd_decode_auth_token
+      id :crd_v201_decode_auth_token
       title 'Bearer token can be decoded'
       description %(
         Verify that the Bearer token is a properly constructed JWT. As per the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#trusting-cds-clients),

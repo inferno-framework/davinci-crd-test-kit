@@ -3,7 +3,7 @@ module DaVinciCRDTestKit
     class CRDClientServiceRegistrationAttestation < Inferno::Test
       include ClientURLs
 
-      id :crd_client_service_registration_attestation
+      id :crd_v201_client_service_registration_attestation
       title 'Attest to the registration of the Inferno Service by the CRD Client'
       description %(
         During this test, the tester will confirm that Inferno has been registered as a

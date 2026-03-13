@@ -29,7 +29,7 @@ module DaVinciCRDTestKit
         * CRD FHIR RESTful Capabilities: A group of tests that test each CRD resource profile and ensure the CRD client
         supports the appropriate FHIR operations required on each resource
       DESCRIPTION
-      id :crd_client_fhir_api
+      id :crd_v201_client_fhir_api
 
       input :url,
             title: 'FHIR Endpoint',
@@ -82,7 +82,7 @@ module DaVinciCRDTestKit
 
               This test verifies that the FHIR server is using TLS 1.2 or higher.
             DESCRIPTION
-            id :crd_server_tls_version_stu1
+            id :crd_v201_server_tls_version_stu1
 
             config(
               options: { minimum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION }
@@ -112,7 +112,7 @@ module DaVinciCRDTestKit
 
               This test verifies that the FHIR server is using TLS 1.2 or higher.
             DESCRIPTION
-            id :crd_server_tls_version_stu2
+            id :crd_v201_server_tls_version_stu2
 
             config(
               options: { minimum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION }
@@ -200,7 +200,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'Appointment' },
@@ -227,7 +227,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'CommunicationRequest' },
@@ -253,8 +253,8 @@ module DaVinciCRDTestKit
             Resource Conformance: SHALL
           )
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_coverage_patient_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_coverage_patient_search_test,
                title: 'Search by patient',
                config: {
                  options: { resource_type: 'Coverage', search_type: 'patient' },
@@ -265,8 +265,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_coverage_status_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_coverage_status_search_test,
                title: 'Search by status',
                config: {
                  options: { resource_type: 'Coverage', search_type: 'status' },
@@ -275,7 +275,7 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Coverage' }
                }
@@ -294,7 +294,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_read_test,
+          test from: :crd_v201_client_fhir_api_read_test,
                optional: true,
                config: {
                  options: { resource_type: 'Device' },
@@ -307,7 +307,7 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Device' }
                }
@@ -327,7 +327,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'DeviceRequest' },
@@ -355,7 +355,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHALL
           )
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'Encounter' },
@@ -367,8 +367,8 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_encounter_id_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_encounter_id_search_test,
                title: 'Search by _id',
                config: {
                  options: { resource_type: 'Encounter', search_type: '_id' },
@@ -379,8 +379,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_encounter_organization_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_encounter_organization_search_test,
                title: 'Search by organization',
                config: {
                  options: { resource_type: 'Encounter', search_type: 'organization' },
@@ -391,8 +391,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_encounter_location_include_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_encounter_location_include_test,
                title: 'Search by _id and _include location',
                config: {
                  options: { resource_type: 'Encounter', search_type: 'location_include' },
@@ -403,7 +403,7 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Encounter' }
                }
@@ -422,7 +422,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_read_test,
+          test from: :crd_v201_client_fhir_api_read_test,
                optional: true,
                config: {
                  options: { resource_type: 'Patient' },
@@ -435,7 +435,7 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Patient' }
                }
@@ -454,7 +454,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_read_test,
+          test from: :crd_v201_client_fhir_api_read_test,
                optional: true,
                config: {
                  options: { resource_type: 'Practitioner' },
@@ -468,7 +468,7 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Practitioner' }
                }
@@ -490,8 +490,8 @@ module DaVinciCRDTestKit
             Resource Conformance: SHALL
           )
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_practitioner_role_id_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_practitioner_role_id_search_test,
                title: 'Search by _id',
                config: {
                  options: { resource_type: 'PractitionerRole', search_type: '_id' },
@@ -502,8 +502,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_practitioner_role_organization_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_practitioner_role_organization_search_test,
                title: 'Search by organization',
                config: {
                  options: { resource_type: 'PractitionerRole', search_type: 'organization' },
@@ -514,8 +514,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_practitioner_role_practitioner_search_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_practitioner_role_practitioner_search_test,
                title: 'Search by practitioner',
                config: {
                  options: { resource_type: 'PractitionerRole', search_type: 'practitioner' },
@@ -526,8 +526,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_practitioner_role_organization_include_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_practitioner_role_organization_include_test,
                title: 'Search by _id and _include organization',
                config: {
                  options: { resource_type: 'PractitionerRole', search_type: 'organization_include' },
@@ -540,8 +540,8 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_search_test,
-               id: :crd_client_practitioner_role_practitioner_include_test,
+          test from: :crd_v201_client_fhir_api_search_test,
+               id: :crd_v201_client_practitioner_role_practitioner_include_test,
                title: 'Search by _id and _include practitioner',
                config: {
                  options: { resource_type: 'PractitionerRole', search_type: 'practitioner_include' },
@@ -554,7 +554,7 @@ module DaVinciCRDTestKit
                  } }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'PractitionerRole' }
                }
@@ -573,7 +573,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_read_test,
+          test from: :crd_v201_client_fhir_api_read_test,
                optional: true,
                config: {
                  options: { resource_type: 'Location' },
@@ -586,7 +586,7 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Location' }
                }
@@ -606,7 +606,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'MedicationRequest' },
@@ -633,7 +633,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'NutritionOrder' },
@@ -659,7 +659,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_read_test,
+          test from: :crd_v201_client_fhir_api_read_test,
                optional: true,
                config: {
                  options: { resource_type: 'Organization' },
@@ -673,7 +673,7 @@ module DaVinciCRDTestKit
                  }
                }
 
-          test from: :crd_client_fhir_api_validation_test,
+          test from: :crd_v201_client_fhir_api_validation_test,
                config: {
                  options: { resource_type: 'Organization' }
                }
@@ -693,7 +693,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'ServiceRequest' },
@@ -719,7 +719,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_create_test,
+          test from: :crd_v201_client_fhir_api_create_test,
                optional: true,
                config: {
                  options: { resource_type: 'ClaimResponse' },
@@ -745,7 +745,7 @@ module DaVinciCRDTestKit
           )
           optional
 
-          test from: :crd_client_fhir_api_create_test,
+          test from: :crd_v201_client_fhir_api_create_test,
                optional: true,
                config: {
                  options: { resource_type: 'Task' },
@@ -772,7 +772,7 @@ module DaVinciCRDTestKit
           optional
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
-          test from: :crd_client_fhir_api_update_test,
+          test from: :crd_v201_client_fhir_api_update_test,
                optional: true,
                config: {
                  options: { resource_type: 'VisionPrescription' },

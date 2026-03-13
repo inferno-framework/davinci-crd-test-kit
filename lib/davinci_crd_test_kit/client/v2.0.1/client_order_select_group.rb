@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
   module V201
     class ClientOrderSelectGroup < Inferno::TestGroup
       title 'order-select'
-      id :crd_client_order_select
+      id :crd_v201_client_order_select
       description <<~DESCRIPTION
         The order-select hook fires when a clinician selects one or more orders to place for a patient,
         (including orders for medications, procedures, labs and other orders). If supported by the CDS Client, this
@@ -64,14 +64,14 @@ module DaVinciCRDTestKit
         }
       )
 
-      test from: :crd_order_select_request
-      test from: :crd_decode_auth_token
-      test from: :crd_retrieve_jwks
-      test from: :crd_token_header
-      test from: :crd_token_payload
-      test from: :crd_hook_request_required_fields
-      test from: :crd_hook_request_optional_fields
-      test from: :crd_hook_request_valid_context do
+      test from: :crd_v201_order_select_request
+      test from: :crd_v201_decode_auth_token
+      test from: :crd_v201_retrieve_jwks
+      test from: :crd_v201_token_header
+      test from: :crd_v201_token_payload
+      test from: :crd_v201_hook_request_required_fields
+      test from: :crd_v201_hook_request_optional_fields
+      test from: :crd_v201_hook_request_valid_context do
         verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@150',
                               'hl7.fhir.us.davinci-crd_2.0.1@212', 'hl7.fhir.us.davinci-crd_2.0.1@213',
                               'hl7.fhir.us.davinci-crd_2.0.1@214', 'hl7.fhir.us.davinci-crd_2.0.1@215',
@@ -87,11 +87,11 @@ module DaVinciCRDTestKit
                               'cds-hooks-library_1.0.1@86', 'cds-hooks-library_1.0.1@87', 'cds-hooks-library_1.0.1@88',
                               'cds-hooks-library_1.0.1@90', 'cds-hooks-library_1.0.1@91', 'cds-hooks-library_1.0.1@92'
       end
-      test from: :crd_hook_request_valid_prefetch
-      test from: :crd_hook_request_fetched_data
-      test from: :crd_hook_request_prefetch_equals_queried
-      test from: :crd_inferno_response_validation
-      test from: :crd_card_display_attest_test
+      test from: :crd_v201_hook_request_valid_prefetch
+      test from: :crd_v201_hook_request_fetched_data
+      test from: :crd_v201_hook_request_prefetch_equals_queried
+      test from: :crd_v201_inferno_response_validation
+      test from: :crd_v201_card_display_attest_test
     end
   end
 end

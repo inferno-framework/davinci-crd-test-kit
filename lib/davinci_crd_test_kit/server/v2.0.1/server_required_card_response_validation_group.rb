@@ -17,12 +17,12 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@247', 'hl7.fhir.us.davinci-crd_2.0.1@248',
                             'hl7.fhir.us.davinci-crd_2.0.1@249'
 
-      id :crd_server_required_card_response_validation
+      id :crd_v201_server_required_card_response_validation
       run_as_group
 
-      test from: :crd_external_reference_card_across_hooks_validation
-      test from: :crd_valid_instructions_card_received_across_hooks
-      test from: :crd_coverage_info_system_action_across_hooks_validation
+      test from: :crd_v201_external_reference_card_across_hooks_validation
+      test from: :crd_v201_valid_instructions_card_received_across_hooks
+      test from: :crd_v201_coverage_info_system_action_across_hooks_validation
     end
   end
 end

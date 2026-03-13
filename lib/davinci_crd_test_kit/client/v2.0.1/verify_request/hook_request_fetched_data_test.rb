@@ -3,7 +3,7 @@ require_relative '../../../cross_suite/tags'
 module DaVinciCRDTestKit
   module V201
     class HookRequestFetchedDataTest < Inferno::Test
-      id :crd_hook_request_fetched_data
+      id :crd_v201_hook_request_fetched_data
       title 'Minimum resource dataset was accessible during the hook invocation'
       description %(
         Clients must make a set of data related to the request available to the CRD Server via either prefetch

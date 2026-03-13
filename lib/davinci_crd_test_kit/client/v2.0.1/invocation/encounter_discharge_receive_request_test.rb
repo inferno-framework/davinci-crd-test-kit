@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class EncounterDischargeReceiveRequestTest < Inferno::Test
       include ClientURLs
 
-      id :crd_encounter_discharge_request
+      id :crd_v201_encounter_discharge_request
       title 'Request received for encounter-discharge hook'
       description %(
         This test waits for multiple incoming [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)

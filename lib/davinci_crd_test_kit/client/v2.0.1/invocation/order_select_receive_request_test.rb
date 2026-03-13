@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class OrderSelectReceiveRequestTest < Inferno::Test
       include ClientURLs
 
-      id :crd_order_select_request
+      id :crd_v201_order_select_request
       title 'Request received for order-select hook'
       description %(
         This test waits for multiple incoming [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)

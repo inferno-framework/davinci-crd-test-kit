@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V201
     class ClientFHIRApiCreateTest < Inferno::Test
-      id :crd_client_fhir_api_create_test
+      id :crd_v201_client_fhir_api_create_test
       title 'Create Interaction'
       description %(
         Verify that the CRD client supports the create interaction for the given resource. The capabilities required

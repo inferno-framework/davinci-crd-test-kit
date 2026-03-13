@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientHookRequestValidation
       include ClientURLs
 
-      id :crd_hook_request_valid_prefetch
+      id :crd_v201_hook_request_valid_prefetch
       title 'Hook request contains valid prefetched data'
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's

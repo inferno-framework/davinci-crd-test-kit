@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
   module V201
     class ServerDiscoveryGroup < Inferno::TestGroup
       title 'Discovery'
-      id :crd_server_discovery_group
+      id :crd_v201_server_discovery_group
       description %(
         # Background
 
@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
           This test verifies that the CRD server is using TLS 1.2 or higher.
         DESCRIPTION
         verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@89'
-        id :crd_server_tls_version_stu2
+        id :crd_v201_server_tls_version_stu2
 
         config(
           options: { minimum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION },
@@ -55,8 +55,8 @@ module DaVinciCRDTestKit
         )
       end
 
-      test from: :crd_discovery_endpoint_test
-      test from: :crd_discovery_services_validation
+      test from: :crd_v201_discovery_endpoint_test
+      test from: :crd_v201_discovery_services_validation
     end
   end
 end
