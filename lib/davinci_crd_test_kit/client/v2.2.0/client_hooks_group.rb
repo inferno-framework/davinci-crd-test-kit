@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
         the patient provided in the service request.
       DESCRIPTION
       id :crd_v220_client_hooks
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@149'
+      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@149'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',

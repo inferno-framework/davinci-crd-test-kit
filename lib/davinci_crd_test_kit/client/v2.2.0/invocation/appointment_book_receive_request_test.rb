@@ -19,10 +19,10 @@ module DaVinciCRDTestKit
         documentation.
       )
       config options: { accepts_multiple_requests: true }
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@171',
-                            'hl7.fhir.us.davinci-crd_2.0.1@183', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-                            'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
-                            'cds-hooks_2.0@15'
+      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@171',
+      #                       'hl7.fhir.us.davinci-crd_2.0.1@183', 'hl7.fhir.us.davinci-crd_2.0.1@243',
+      #                       'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
+      #                       'cds-hooks_2.0@15'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',

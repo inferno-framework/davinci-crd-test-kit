@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
         The queries will be performed after the hook response has been returned.
       )
-      verifies_requirements 'cds-hooks_2.0@45'
+      # verifies_requirements 'cds-hooks_2.0@45'
 
       input :client_fhir_server,
             optional: true

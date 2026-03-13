@@ -22,8 +22,8 @@ module DaVinciCRDTestKit
           is sending a request for
       )
 
-      verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@18', 'cds-hooks_2.0@19',
-                            'cds-hooks_2.0@20', 'cds-hooks_2.0@22', 'cds-hooks_2.0@25'
+      # verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@18', 'cds-hooks_2.0@19',
+      #                       'cds-hooks_2.0@20', 'cds-hooks_2.0@22', 'cds-hooks_2.0@25'
 
       def hook_name
         config.options[:hook_name]

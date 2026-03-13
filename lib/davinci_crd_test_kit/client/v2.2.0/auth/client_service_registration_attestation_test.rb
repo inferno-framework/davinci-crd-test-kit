@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
         trusted CRD Service that can access the CRD Client's FHIR Server.
       )
 
-      verifies_requirements 'cds-hooks_2.0@174'
+      # verifies_requirements 'cds-hooks_2.0@174'
 
       output :attest_true_url
       output :attest_false_url

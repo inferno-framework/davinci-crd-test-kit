@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
         provided are conformant.
       )
 
-      verifies_requirements 'cds-hooks_2.0@174', 'cds-hooks_2.0@197'
+      # verifies_requirements 'cds-hooks_2.0@174', 'cds-hooks_2.0@197'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
