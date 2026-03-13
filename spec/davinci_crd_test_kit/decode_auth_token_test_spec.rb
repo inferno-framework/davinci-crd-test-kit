@@ -6,7 +6,7 @@ RSpec.describe DaVinciCRDTestKit::V201::DecodeAuthTokenTest do
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_decode_auth_token') }
+  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_v201_decode_auth_token') }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
