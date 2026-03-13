@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
 
         proposed_alternate_cards.each do |card|
           card['suggestions'].each do |suggestion|
-            actions_check(suggestion['actions'], parsed_contexts)
+            actions_check(suggestion['actions'], parsed_contexts, ig_version: 'v220')
           end
         end
 

@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
               add_message('error', "#{request_number}Missing required context field.")
               next
             end
-            hook_request_context_check(context, hook_name)
+            hook_request_context_check(context, hook_name, ig_version: 'v220')
           end
         end
         no_error_validation('Context is not valid.')

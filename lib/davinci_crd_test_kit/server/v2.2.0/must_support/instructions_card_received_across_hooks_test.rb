@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       run do
         verify_at_least_one_test_passes(
           self.class.parent.parent.groups,
-          'crd_220_valid_instructions_card_received',
+          'crd_v220_valid_instructions_card_received',
           'None of the hooks invoked returned a valid Instructions card.',
           'across_hooks'
         )

@@ -33,7 +33,7 @@ module DaVinciCRDTestKit
       def system_actions_check(system_actions)
         system_actions.each do |action|
           current_error_count = messages.count { |msg| msg[:type] == 'error' }
-          action_fields_validation(action)
+          action_fields_validation(action, ig_version: 'v201')
           valid_system_actions << action if current_error_count == messages.count { |msg| msg[:type] == 'error' }
         end
       end
