@@ -7,7 +7,8 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionAcrossHoo
   end
   let(:runnable_within) do
     Inferno::Repositories::Tests.new
-      .find('crd_server-crd_v201_server_hooks-crd_v201_server_appointment_book-crd_v201_coverage_info_system_action_validation')
+      .find('crd_server-crd_v201_server_hooks-crd_v201_server_appointment_book-' \
+            'crd_v201_coverage_info_system_action_validation')
   end
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:valid_response_body) do
