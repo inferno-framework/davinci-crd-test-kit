@@ -48,7 +48,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          fhir_server_info = hook_request_optional_fields_check(request_body)
+          fhir_server_info = hook_request_optional_fields_check(request_body, ig_version: 'v220')
           client_fhir_server ||= fhir_server_info
         end
 

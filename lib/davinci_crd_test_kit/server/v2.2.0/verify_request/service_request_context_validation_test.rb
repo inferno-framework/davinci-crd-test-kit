@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
       run do
         parsed_contexts = parse_json(contexts)
         parsed_contexts.each do |context|
-          hook_request_context_check(context, invoked_hook)
+          hook_request_context_check(context, invoked_hook, ig_version: 'v220')
         end
 
         no_error_validation('Some contexts are not valid.')

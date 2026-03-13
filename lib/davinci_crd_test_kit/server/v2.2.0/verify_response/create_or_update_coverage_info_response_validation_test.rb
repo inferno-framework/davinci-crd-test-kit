@@ -50,13 +50,15 @@ module DaVinciCRDTestKit
                    'cards or system actions.'
         skip_if create_or_update_coverage_info_cards.blank? && create_or_update_coverage_info_actions.blank?, skip_msg
 
-        actions_check(create_or_update_coverage_info_actions) if create_or_update_coverage_info_actions.present?
+        if create_or_update_coverage_info_actions.present?
+          actions_check(create_or_update_coverage_info_actions, ig_version: 'v220')
+        end
 
         if create_or_update_coverage_info_cards.present?
           create_or_update_coverage_info_cards.each do |card|
             actions_check(card['suggestions'].first['actions'].select do |action|
                             create_or_update_coverage_action_response_type?(action)
-                          end)
+                          end, ig_version: 'v220')
           end
         end
 

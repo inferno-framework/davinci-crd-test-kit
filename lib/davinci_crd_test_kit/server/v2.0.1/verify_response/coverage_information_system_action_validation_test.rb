@@ -94,7 +94,7 @@ module DaVinciCRDTestKit
         assert type == 'update', "`type` must be `update`, but was `#{type}`"
 
         resource = FHIR.from_contents(coverage_info_system_action['resource'].to_json)
-        profile_url = structure_definition_map[resource.resourceType]
+        profile_url = structure_definition_map('v201')[resource.resourceType]
         assert_valid_resource(resource:, profile_url:)
 
         grouped_coverage_info = extract_and_group_coverage_info(resource)

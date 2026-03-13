@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          hook_request_optional_fields_check(request_body)
+          hook_request_optional_fields_check(request_body, ig_version: 'v220')
         end
         no_error_validation('Some service requests have invalid optional fields.')
       end

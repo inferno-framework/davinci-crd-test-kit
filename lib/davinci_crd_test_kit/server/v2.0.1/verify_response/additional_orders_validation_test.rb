@@ -48,7 +48,7 @@ module DaVinciCRDTestKit
 
         additional_orders_cards.each do |card|
           card['suggestions'].each do |suggestion|
-            actions_check(suggestion['actions'])
+            actions_check(suggestion['actions'], ig_version: 'v201')
           end
         end
 

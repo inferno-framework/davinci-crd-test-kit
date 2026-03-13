@@ -53,7 +53,7 @@ module DaVinciCRDTestKit
 
           @request_number = index + 1
           context = hook_contexts[index].present? ? hook_contexts[index] : {}
-          hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context)
+          hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context, ig_version: 'v220')
         end
         no_error_validation('Prefetch is not valid.')
       end

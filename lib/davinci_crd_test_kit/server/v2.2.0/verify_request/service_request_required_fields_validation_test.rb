@@ -28,7 +28,7 @@ module DaVinciCRDTestKit
           next if request_body.blank?
 
           contexts << request_body['context'] if request_body['context'].is_a?(Hash)
-          hook_request_required_fields_check(request_body, invoked_hook)
+          hook_request_required_fields_check(request_body, invoked_hook, ig_version: 'v220')
         end
 
         output contexts: contexts.to_json

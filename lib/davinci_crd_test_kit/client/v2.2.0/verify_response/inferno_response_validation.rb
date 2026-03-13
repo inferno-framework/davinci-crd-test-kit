@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
         return if system_actions.nil?
 
         system_actions.each do |action|
-          action_fields_validation(action)
+          action_fields_validation(action, ig_version: 'v220')
         end
       end
 

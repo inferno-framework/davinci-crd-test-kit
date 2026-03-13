@@ -1,18 +1,114 @@
 module DaVinciCRDTestKit
   module HookRequestFieldValidation
+    def json_parse(json)
+      JSON.parse(json)
+    rescue JSON::ParserError
+      add_message('error', "#{request_number}Invalid JSON.")
+      false
+    end
+
+    def hook_request_required_fields_check(request_body, hook_name, ig_version: 'v201') # rubocop:disable Lint/UnusedMethodArgument
+      hook_request_required_fields_check_presence_and_types(request_body)
+
+      if request_body['hook'] != hook_name
+        add_message('error',
+                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
+      end
+
+      if request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
+        add_message('error', %(
+                    #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
+                    #REQUIRED.))
+      end
+
+      return unless request_body['hookInstance'].present? && !guid?(request_body['hookInstance'])
+
+      add_message('error', "#{request_number}`hookInstance` field must be a globally unique UUID.")
+    end
+
+    def hook_request_optional_fields_check(request_body, ig_version: 'v201') # rubocop:disable Lint/UnusedMethodArgument)
+      hook_request_optional_fields_check_type(request_body)
+
+      defined_fields = hook_required_fields.keys + hook_optional_fields.keys
+      request_body.keys.reject { |field| defined_fields.include?(field) }.each do |field|
+        if request_body[field].blank?
+          add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
+        end
+      end
+
+      hook_request_fhir_auth_check(request_body)
+    end
+
+    def hook_request_context_check(context, hook_name, ig_version: 'v201')
+      required_fields = context_required_fields_by_hook[hook_name]
+      required_fields.each do |field, type|
+        validate_presence_and_type(context, field, type,
+                                   "#{request_number}#{hook_name} request context")
+      end
+      context_validate_optional_fields(context, hook_name, ig_version:)
+      hook_specific_context_check(context, hook_name, ig_version:)
+    end
+
+    def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context, ig_version: 'v201')
+      received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
+        unless advertised_prefetch_fields.key?(received_prefetch_key)
+          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
+          next
+        end
+
+        unless received_prefetch_hash.is_a?(Hash)
+          add_message('error', "#{request_number}Prefetch field `#{received_prefetch_key}` is not of type `Hash`.")
+          next
+        end
+
+        received_prefetch_resource = FHIR.from_contents(received_prefetch[received_prefetch_key].to_json)
+        advertised_prefetch_template = advertised_prefetch_fields[received_prefetch_key]
+        if advertised_prefetch_template.include?('?')
+          advertised_prefetch_fhir_search = advertised_prefetch_template.gsub(/{|}/, '').split('?')
+          advertised_prefetch_resource_type = advertised_prefetch_fhir_search.first
+
+          if advertised_prefetch_resource_type == 'Coverage'
+            advertised_coverage_query_params = Rack::Utils.parse_nested_query(advertised_prefetch_fhir_search.last)
+
+            advertised_patient_token = advertised_coverage_query_params['patient']
+            advertised_context_patient_id_key = advertised_patient_token.split('.').last
+            received_context_patient_id = received_context[advertised_context_patient_id_key]
+
+            advertised_status_param = advertised_coverage_query_params['status']
+
+            validate_prefetch_coverages(received_prefetch_resource, received_prefetch_key, received_context_patient_id,
+                                        advertised_status_param, ig_version:)
+          end
+        else
+          advertised_prefetch_token = advertised_prefetch_template.gsub(/{|}/, '').split('/')
+          advertised_context_id = advertised_prefetch_token.last.split('.').last
+
+          if advertised_prefetch_token.length == 1
+            received_context_reference = FHIR::Reference.new(reference: received_context[advertised_context_id])
+            received_context_resource_type = received_context_reference.resource_type
+            received_context_id = received_context_reference.reference_id
+          else
+            received_context_id = received_context[advertised_context_id]
+            received_context_resource_type = advertised_prefetch_token.first
+          end
+          validate_prefetch_resource(received_prefetch_resource, received_prefetch_key,
+                                     received_context_resource_type, received_context_id, ig_version:)
+        end
+      end
+    end
+
+    def no_error_validation(message)
+      assert messages.none? { |msg| msg[:type] == 'error' }, message
+    end
+
+    private
+
     def request_number
       if @request_number.blank?
         ''
       else
         "Request #{@request_number}: "
       end
-    end
-
-    def json_parse(json)
-      JSON.parse(json)
-    rescue JSON::ParserError
-      add_message('error', "#{request_number}Invalid JSON.")
-      false
     end
 
     def hook_required_fields
@@ -82,45 +178,57 @@ module DaVinciCRDTestKit
       }.freeze
     end
 
-    def structure_definition_map
+    def structure_definition_map(ig_version)
+      case ig_version
+      when 'v220'
+        structure_definition_map_v220
+      when 'v201'
+        structure_definition_map_v201
+      end
+    end
+
+    def structure_definition_map_v201
       {
-        'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner',
-        'PractitionerRole' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole',
-        'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient',
-        'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter',
-        'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment',
-        'DeviceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest',
-        'MedicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest',
-        'NutritionOrder' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder',
-        'ServiceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest',
-        'VisionPrescription' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription',
-        'Medication' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication',
-        'Device' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device',
-        'CommunicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-communicationrequest',
-        'Task' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire',
-        'Coverage' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage',
-        'Location' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location',
-        'Organization' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization'
+        'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.0.1',
+        'PractitionerRole' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole|3.1.1',
+        'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient|2.0.1',
+        'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter|2.0.1',
+        'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment|2.0.1',
+        'DeviceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest|2.0.1',
+        'MedicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest|2.0.1',
+        'NutritionOrder' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder|2.0.1',
+        'ServiceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest|2.0.1',
+        'VisionPrescription' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription|2.0.1',
+        'Medication' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication|3.1.1',
+        'Device' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device|2.0.1',
+        'CommunicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-communicationrequest|2.0.1',
+        'Task' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire|2.0.1',
+        'Coverage' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage|2.0.1',
+        'Location' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location|2.0.1',
+        'Organization' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization|2.0.1'
       }.freeze
     end
 
-    def hook_request_required_fields_check(request_body, hook_name)
-      hook_request_required_fields_check_presence_and_types(request_body)
-
-      if request_body['hook'] != hook_name
-        add_message('error',
-                    "#{request_number}The `hook` field should be #{hook_name}, but was #{request_body['hook']}")
-      end
-
-      if request_body['fhirAuthorization'].present? && request_body['fhirServer'].blank?
-        add_message('error', %(
-                    #{request_number}Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is
-                    #REQUIRED.))
-      end
-
-      return unless request_body['hookInstance'].present? && !guid?(request_body['hookInstance'])
-
-      add_message('error', "#{request_number}`hookInstance` field must be a globally unique UUID.")
+    def structure_definition_map_v220
+      {
+        'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.2.0',
+        'PractitionerRole' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole|3.1.1',
+        'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient|2.2.0',
+        'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter|2.2.0',
+        'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order|2.2.0',
+        'DeviceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest|2.2.0',
+        'MedicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest|2.2.0',
+        'NutritionOrder' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder|2.2.0',
+        'ServiceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest|2.2.0',
+        'VisionPrescription' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription|2.2.0',
+        'Medication' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication|3.1.1',
+        'Device' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device|2.2.0',
+        'CommunicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-communicationrequest|2.2.0',
+        'Task' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire|2.2.0',
+        'Coverage' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage|2.2.0',
+        'Location' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location|2.2.0',
+        'Organization' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization|2.2.0'
+      }.freeze
     end
 
     def hook_request_required_fields_check_presence_and_types(request_body)
@@ -189,19 +297,6 @@ module DaVinciCRDTestKit
       { fhir_server_uri: request_body['fhirServer'], fhir_access_token: access_token }
     end
 
-    def hook_request_optional_fields_check(request_body)
-      hook_request_optional_fields_check_type(request_body)
-
-      defined_fields = hook_required_fields.keys + hook_optional_fields.keys
-      request_body.keys.reject { |field| defined_fields.include?(field) }.each do |field|
-        if request_body[field].blank?
-          add_message('error', "#{request_number}Hook request field `#{field}` cannot be defined but blank.")
-        end
-      end
-
-      hook_request_fhir_auth_check(request_body)
-    end
-
     def hook_request_optional_fields_check_type(request_body)
       hook_optional_fields.each do |field, type|
         if request_body[field].blank?
@@ -238,35 +333,25 @@ module DaVinciCRDTestKit
       add_message('error', error_msg)
     end
 
-    def hook_request_context_check(context, hook_name)
-      required_fields = context_required_fields_by_hook[hook_name]
-      required_fields.each do |field, type|
-        validate_presence_and_type(context, field, type,
-                                   "#{request_number}#{hook_name} request context")
-      end
-      context_validate_optional_fields(context, hook_name)
-      hook_specific_context_check(context, hook_name)
-    end
-
-    def hook_specific_context_check(context, hook_name)
+    def hook_specific_context_check(context, hook_name, ig_version: 'v201')
       case hook_name
       when 'appointment-book'
-        appointment_book_context_check(context)
+        appointment_book_context_check(context, ig_version:)
       when 'encounter-start', 'encounter-discharge'
-        encounter_start_or_discharge_context_check(context, hook_name)
+        encounter_start_or_discharge_context_check(context, hook_name, ig_version:)
       when 'order-select', 'order-sign'
-        order_select_or_sign_context_check(context, hook_name)
+        order_select_or_sign_context_check(context, hook_name, ig_version:)
       when 'order-dispatch'
-        order_dispatch_context_check(context)
+        order_dispatch_context_check(context, ig_version:)
       end
     end
 
-    def hook_user_type_check(context, hook_name)
+    def hook_user_type_check(context, hook_name, ig_version: 'v201')
       supported_resource_types = context_user_types_by_hook[hook_name]
-      resource_reference_check(context['userId'], 'userId', supported_resource_types:)
+      resource_reference_check(context['userId'], 'userId', supported_resource_types:, ig_version:)
     end
 
-    def resource_reference_check(reference, field_name, supported_resource_types: nil)
+    def resource_reference_check(reference, field_name, supported_resource_types: nil, ig_version: 'v201')
       return unless reference.is_a?(String) && valid_reference_format?(reference, field_name)
 
       resource_type, resource_id = reference.split('/')
@@ -280,7 +365,9 @@ module DaVinciCRDTestKit
         return
       end
 
-      query_and_validate_id_field(resource_type, resource_id) if client_test? && !field_name.include?('selections')
+      return unless client_test? && !field_name.include?('selections')
+
+      query_and_validate_id_field(resource_type, resource_id, ig_version:)
     end
 
     def valid_reference_format?(reference, field_name)
@@ -294,14 +381,14 @@ module DaVinciCRDTestKit
       false
     end
 
-    def id_only_fields_check(hook_name, context, id_fields)
+    def id_only_fields_check(hook_name, context, id_fields, ig_version: 'v201')
       id_fields.each do |field|
         resource_id = context[field]
         next unless resource_id.is_a?(String) && valid_id_format?(field, hook_name, resource_id)
 
         if client_test?
           resource_type = field.split(/(?=[A-Z])/).first.capitalize
-          query_and_validate_id_field(resource_type, resource_id)
+          query_and_validate_id_field(resource_type, resource_id, ig_version:)
         end
       end
     end
@@ -317,7 +404,7 @@ module DaVinciCRDTestKit
       true
     end
 
-    def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil)
+    def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil, ig_version: 'v201')
       bundle.entry.each do |entry|
         resource_id = entry.resource.id
         next unless resource_id.blank?
@@ -337,7 +424,7 @@ module DaVinciCRDTestKit
       status_check(context, context_field_name, status, target_resources)
 
       target_resources.each do |resource|
-        resource_is_valid?(resource:, profile_url: structure_definition_map[resource.resourceType])
+        resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
       end
     end
 
@@ -366,11 +453,12 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def context_selections_check(context, selections, order_refs, expected_resource_types)
+    def context_selections_check(context, selections, order_refs, expected_resource_types, ig_version: 'v201')
       return unless selections.is_a?(Array)
 
       selections.each do |reference|
-        resource_reference_check(reference, 'selections item', supported_resource_types: expected_resource_types)
+        resource_reference_check(reference, 'selections item', supported_resource_types: expected_resource_types,
+                                                               ig_version:)
         next if order_refs.include?(reference)
 
         error_msg = "#{request_number}`selections` field must reference FHIR resources in `draftOrders`. " \
@@ -379,25 +467,26 @@ module DaVinciCRDTestKit
       end
     end
 
-    def appointment_book_context_check(context)
-      hook_user_type_check(context, 'appointment-book')
-      id_only_fields_check('appointment-book', context, ['patientId'])
+    def appointment_book_context_check(context, ig_version: 'v201')
+      hook_user_type_check(context, 'appointment-book', ig_version:)
+      id_only_fields_check('appointment-book', context, ['patientId'], ig_version:)
 
       appointment_bundle = parse_fhir_bundle_from_context('appointments', context)
       return if appointment_bundle.blank?
 
       expected_resource_types = ['Appointment']
-      bundle_entries_check(context, 'appointments', appointment_bundle, expected_resource_types, 'proposed')
+      bundle_entries_check(context, 'appointments', appointment_bundle, expected_resource_types, 'proposed',
+                           ig_version:)
     end
 
-    def encounter_start_or_discharge_context_check(context, hook_name)
-      hook_user_type_check(context, hook_name)
-      id_only_fields_check(hook_name, context, ['patientId', 'encounterId'])
+    def encounter_start_or_discharge_context_check(context, hook_name, ig_version: 'v201')
+      hook_user_type_check(context, hook_name, ig_version:)
+      id_only_fields_check(hook_name, context, ['patientId', 'encounterId'], ig_version:)
     end
 
-    def order_select_or_sign_context_check(context, hook_name)
-      hook_user_type_check(context, hook_name)
-      id_only_fields_check(hook_name, context, ['patientId'])
+    def order_select_or_sign_context_check(context, hook_name, ig_version: 'v201')
+      hook_user_type_check(context, hook_name, ig_version:)
+      id_only_fields_check(hook_name, context, ['patientId'], ig_version:)
 
       draft_orders_bundle = parse_fhir_bundle_from_context('draftOrders', context)
       return if draft_orders_bundle.blank?
@@ -407,28 +496,25 @@ module DaVinciCRDTestKit
         'ServiceRequest', 'VisionPrescription'
       ]
 
-      bundle_entries_check(context, 'draftOrders', draft_orders_bundle, expected_resource_types)
+      bundle_entries_check(context, 'draftOrders', draft_orders_bundle, expected_resource_types, ig_version:)
 
       return unless hook_name == 'order-select'
 
       order_refs = draft_orders_bundle.entry.map(&:resource).map do |resource|
         "#{resource.resourceType}/#{resource.id}"
       end
-      context_selections_check(context, context['selections'], order_refs, expected_resource_types)
+      context_selections_check(context, context['selections'], order_refs, expected_resource_types, ig_version:)
     end
 
-    def order_dispatch_context_check(context)
-      id_only_fields_check('order-dispatch', context, ['patientId'])
+    def order_dispatch_context_check(context, ig_version: 'v201')
+      id_only_fields_check('order-dispatch', context, ['patientId'], ig_version:)
       order_supported_resource_type = [
         'DeviceRequest', 'MedicationRequest', 'NutritionOrder',
         'ServiceRequest', 'VisionPrescription'
       ]
-      resource_reference_check(context['order'], 'order', supported_resource_types: order_supported_resource_type)
-      resource_reference_check(context['performer'], 'performer')
-    end
-
-    def no_error_validation(message)
-      assert messages.none? { |msg| msg[:type] == 'error' }, message
+      resource_reference_check(context['order'], 'order', supported_resource_types: order_supported_resource_type,
+                                                          ig_version:)
+      resource_reference_check(context['performer'], 'performer', ig_version:)
     end
 
     def valid_url?(url)
@@ -443,7 +529,7 @@ module DaVinciCRDTestKit
       uuid_regex.match?(string.to_s)
     end
 
-    def query_and_validate_id_field(resource_type, resource_id)
+    def query_and_validate_id_field(resource_type, resource_id, ig_version: 'v201')
       fhir_read(resource_type, resource_id)
       status = request.response[:status]
       unless status == 200
@@ -465,11 +551,11 @@ module DaVinciCRDTestKit
         return
       end
 
-      profile_url = hook_name == 'order-dispatch' ? nil : structure_definition_map[resource_type]
+      profile_url = hook_name == 'order-dispatch' ? nil : structure_definition_map(ig_version)[resource_type]
       resource_is_valid?(profile_url:)
     end
 
-    def context_validate_optional_fields(hook_context, hook_name)
+    def context_validate_optional_fields(hook_context, hook_name, ig_version: 'v201')
       hook_optional_context_fields = context_optional_fields_by_hook[hook_name]
       return if hook_optional_context_fields.blank?
 
@@ -481,7 +567,7 @@ module DaVinciCRDTestKit
 
       optional_field_keys = hook_optional_context_fields.keys
       if optional_field_keys.include?('encounterId') && hook_context['encounterId'].present?
-        id_only_fields_check(hook_name, hook_context, ['encounterId'])
+        id_only_fields_check(hook_name, hook_context, ['encounterId'], ig_version:)
       end
 
       validate_hash_fields(hook_context, optional_field_keys)
@@ -513,56 +599,8 @@ module DaVinciCRDTestKit
       end
     end
 
-    def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context)
-      received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
-        unless advertised_prefetch_fields.key?(received_prefetch_key)
-          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
-          next
-        end
-
-        unless received_prefetch_hash.is_a?(Hash)
-          add_message('error', "#{request_number}Prefetch field `#{received_prefetch_key}` is not of type `Hash`.")
-          next
-        end
-
-        received_prefetch_resource = FHIR.from_contents(received_prefetch[received_prefetch_key].to_json)
-        advertised_prefetch_template = advertised_prefetch_fields[received_prefetch_key]
-        if advertised_prefetch_template.include?('?')
-          advertised_prefetch_fhir_search = advertised_prefetch_template.gsub(/{|}/, '').split('?')
-          advertised_prefetch_resource_type = advertised_prefetch_fhir_search.first
-
-          if advertised_prefetch_resource_type == 'Coverage'
-            advertised_coverage_query_params = Rack::Utils.parse_nested_query(advertised_prefetch_fhir_search.last)
-
-            advertised_patient_token = advertised_coverage_query_params['patient']
-            advertised_context_patient_id_key = advertised_patient_token.split('.').last
-            received_context_patient_id = received_context[advertised_context_patient_id_key]
-
-            advertised_status_param = advertised_coverage_query_params['status']
-
-            validate_prefetch_coverages(received_prefetch_resource, received_prefetch_key, received_context_patient_id,
-                                        advertised_status_param)
-          end
-        else
-          advertised_prefetch_token = advertised_prefetch_template.gsub(/{|}/, '').split('/')
-          advertised_context_id = advertised_prefetch_token.last.split('.').last
-
-          if advertised_prefetch_token.length == 1
-            received_context_reference = FHIR::Reference.new(reference: received_context[advertised_context_id])
-            received_context_resource_type = received_context_reference.resource_type
-            received_context_id = received_context_reference.reference_id
-          else
-            received_context_id = received_context[advertised_context_id]
-            received_context_resource_type = advertised_prefetch_token.first
-          end
-          validate_prefetch_resource(received_prefetch_resource, received_prefetch_key,
-                                     received_context_resource_type, received_context_id)
-        end
-      end
-    end
-
     def validate_prefetch_coverages(received_resource, advertised_prefetch_key,
-                                    received_context_patient_id, advertised_status)
+                                    received_context_patient_id, advertised_status, ig_version: 'v201')
       unless received_resource.resourceType == 'Bundle'
         add_message('error', "#{request_number}Unexpected resource type: Expected `Bundle`. Got " \
                              "`#{received_resource.resourceType}`.")
@@ -581,12 +619,12 @@ module DaVinciCRDTestKit
 
       received_resource.entry.each_with_index do |entry, index|
         validate_prefetch_coverage(entry&.resource, advertised_prefetch_key,
-                                   received_context_patient_id, advertised_status, index)
+                                   received_context_patient_id, advertised_status, index, ig_version:)
       end
     end
 
     def validate_prefetch_coverage(coverage_resource, advertised_prefetch_key,
-                                   received_context_patient_id, advertised_status, entry_index)
+                                   received_context_patient_id, advertised_status, entry_index, ig_version: 'v201')
       unless coverage_resource.present?
         add_message('error', "#{request_number}Coverage Bundle entry #{entry_index + 1} had no resource")
         return
@@ -599,7 +637,7 @@ module DaVinciCRDTestKit
       end
 
       resource_is_valid?(resource: coverage_resource,
-                         profile_url: structure_definition_map['Coverage'])
+                         profile_url: structure_definition_map(ig_version)['Coverage'])
 
       coverage_beneficiary_reference = coverage_resource.beneficiary
       coverage_beneficiary_patient_id = coverage_beneficiary_reference.reference_id
@@ -626,7 +664,7 @@ module DaVinciCRDTestKit
     end
 
     def validate_prefetch_resource(received_resource, advertised_prefetch_key, context_field_resource_type,
-                                   context_field_id)
+                                   context_field_id, ig_version: 'v201')
 
       return unless prefetch_resource_type_correct?(received_resource, context_field_resource_type,
                                                     "#{request_number}`#{advertised_prefetch_key}` - ")
@@ -635,7 +673,7 @@ module DaVinciCRDTestKit
         resource_is_valid?(resource: received_resource)
       else
         resource_is_valid?(resource: received_resource,
-                           profile_url: structure_definition_map[context_field_resource_type])
+                           profile_url: structure_definition_map(ig_version)[context_field_resource_type])
       end
 
       prefetch_resource_id_correct?(received_resource, context_field_id,

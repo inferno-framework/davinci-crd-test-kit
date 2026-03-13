@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
 
           contexts << request_body['context'] if request_body['context'].is_a?(Hash)
           prefetches << request_body['prefetch'] if request_body['prefetch'].is_a?(Hash)
-          hook_request_required_fields_check(request_body, hook_name)
+          hook_request_required_fields_check(request_body, hook_name, ig_version: 'v220')
         end
 
         output contexts: contexts.to_json,
