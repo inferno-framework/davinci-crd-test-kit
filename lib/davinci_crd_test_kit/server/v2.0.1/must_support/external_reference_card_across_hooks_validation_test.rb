@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
       run do
         verify_at_least_one_test_passes(
           self.class.parent.parent.groups,
-          'crd_external_reference_card_validation',
+          'crd_v201_external_reference_card_validation',
           'None of the hooks invoked returned an External Reference card.'
         )
       end

@@ -25,7 +25,7 @@ module DaVinciCRDTestKit
       run do
         verify_at_least_one_test_passes(
           self.class.parent.parent.groups,
-          'crd_coverage_info_system_action_validation',
+          'crd_v220_coverage_info_system_action_validation',
           'None of the hooks invoked returned valid Coverage Info system actions.'
         )
       end

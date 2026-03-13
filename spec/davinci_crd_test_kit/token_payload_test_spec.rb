@@ -5,7 +5,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
   let(:suite_id) { 'crd_client' }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_token_payload') }
+  let(:runnable) { Inferno::Repositories::Tests.new.find('crd_v201_token_payload') }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }

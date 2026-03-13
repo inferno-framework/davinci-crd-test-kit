@@ -1,13 +1,13 @@
 RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedAcrossHooksTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
-    id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \
-         '-crd_valid_instructions_card_received_across_hooks'
+    id = 'crd_server-crd_v201_server_hooks-crd_v201_server_required_card_response_validation' \
+         '-crd_v201_valid_instructions_card_received_across_hooks'
     Inferno::Repositories::Tests.new.find(id)
   end
   let(:runnable_within) do
     Inferno::Repositories::Tests.new
-      .find('crd_server-crd_server_hooks-crd_server_order_dispatch-crd_valid_instructions_card_received')
+      .find('crd_server-crd_v201_server_hooks-crd_v201_server_order_dispatch-crd_v201_valid_instructions_card_received')
   end
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))

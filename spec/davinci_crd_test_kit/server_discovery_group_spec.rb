@@ -1,6 +1,6 @@
 RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
   let(:suite_id) { 'crd_server' }
-  let(:group) { Inferno::Repositories::TestGroups.new.find('crd_server_discovery_group') }
+  let(:group) { Inferno::Repositories::TestGroups.new.find('crd_v201_server_discovery_group') }
   let(:base_url) { 'http://example.com' }
   let(:discovery_url) { 'http://example.com/cds-services' }
   let(:cds_services) do
