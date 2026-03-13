@@ -46,7 +46,7 @@ module DaVinciCRDTestKit
 
           This test verifies that the CRD server is using TLS 1.2 or higher.
         DESCRIPTION
-        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@89'
+        # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@89'
         id :crd_v220_server_tls_version_stu2
 
         config(

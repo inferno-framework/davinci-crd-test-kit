@@ -31,7 +31,7 @@ module DaVinciCRDTestKit
         [Data Fetching During Hook Invocations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations)
         documentation.
       )
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43', 'hl7.fhir.us.davinci-crd_2.0.1@323'
+      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43', 'hl7.fhir.us.davinci-crd_2.0.1@323'
 
       def hook_name
         config.options[:hook_name]

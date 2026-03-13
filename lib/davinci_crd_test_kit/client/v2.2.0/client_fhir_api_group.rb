@@ -42,9 +42,9 @@ module DaVinciCRDTestKit
           server with Inferno so that Inferno may access resources on the FHIR server in order to perform the
           FHIR RESTful Capabilities tests.
         )
-        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
-                              'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89',
-                              'hl7.fhir.us.davinci-crd_2.0.1@92', 'cds-hooks_2.0@174'
+        # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@64', 'hl7.fhir.us.davinci-crd_2.0.1@65',
+        #                       'hl7.fhir.us.davinci-crd_2.0.1@66', 'hl7.fhir.us.davinci-crd_2.0.1@89',
+        #                       'hl7.fhir.us.davinci-crd_2.0.1@92', 'cds-hooks_2.0@174'
 
         config(
           inputs: {
@@ -173,7 +173,7 @@ module DaVinciCRDTestKit
             * [Task](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html#Task1-16)
             * [VisionPrescription](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html#VisionPrescription1-17)
         )
-        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
+        # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43'
 
         input :url
         input :smart_auth_info,
@@ -225,7 +225,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
@@ -325,7 +325,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
@@ -604,7 +604,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
@@ -631,7 +631,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
@@ -691,7 +691,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
@@ -770,7 +770,7 @@ module DaVinciCRDTestKit
             Resource Conformance: SHOULD
           )
           optional
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
+          # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@150'
 
           test from: :crd_v220_client_fhir_api_update_test,
                optional: true,
