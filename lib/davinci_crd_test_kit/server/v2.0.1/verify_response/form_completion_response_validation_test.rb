@@ -45,7 +45,8 @@ module DaVinciCRDTestKit
         form_completion_actions = parsed_actions.select { |action| form_completion_action_response_type?(action) }
 
         skip_if form_completion_cards.blank? && form_completion_actions.blank?,
-                "#{tested_hook_name} hook response does not contain any Request Form Completion cards or system actions."
+                "#{tested_hook_name} hook response does not contain any " \
+                'Request Form Completion cards or system actions.'
 
         actions_check(form_completion_actions, ig_version: 'v201') if form_completion_actions.present?
 
