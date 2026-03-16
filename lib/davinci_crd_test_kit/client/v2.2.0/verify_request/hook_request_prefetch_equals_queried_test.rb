@@ -52,9 +52,7 @@ module DaVinciCRDTestKit
       end
 
       def cds_services_json
-        JSON.parse(File.read(File.join(
-                               __dir__, '..', '..', 'endpoints', 'cds-services.json'
-                             )))['services']
+        JSON.parse(File.read(File.join(__dir__, '..', 'cds-services-v220.json')))['services']
       end
 
       def advertised_prefetch_fields

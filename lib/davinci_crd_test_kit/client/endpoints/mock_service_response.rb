@@ -207,6 +207,7 @@ module DaVinciCRDTestKit
       cards_response
     rescue StandardError => e
       Inferno::Application['logger'].error(e.full_message)
+      # TODO: - make sure this gets logged
       nil
     end
 
@@ -375,6 +376,7 @@ module DaVinciCRDTestKit
 
       form_completion_task['for']['reference'] = "Patient/#{context['patientId']}"
       form_completion_task['authoredOn'] = current_time.strftime('%Y-%m-%d')
+      form_completion_task['input'].delete_at(1) if ig_version == 'v220'
       request_form_completion_card
     end
 

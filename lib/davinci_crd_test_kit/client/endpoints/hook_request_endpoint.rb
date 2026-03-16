@@ -18,6 +18,10 @@ module DaVinciCRDTestKit
       'order-dispatch'
     ].freeze
 
+    def ig_version
+      @ig_version ||= request.env['PATH_INFO'].match(/(v\d+)/)&.[](1) || 'v201'
+    end
+
     def request_body
       @request_body ||=
         JSON.parse(request.params.to_json)
