@@ -99,8 +99,8 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceCallTest do
   describe 'when testing any hook' do
     let(:result) { repo_create(:result, test_session_id: test_session.id) }
     let(:discovery_response) do
-      File.read(File.join(__dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
-                          'cds-services.json'))
+      File.read(File.join(__dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'v2.0.1',
+                          'cds-services-v201.json'))
     end
 
     before do
