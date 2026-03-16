@@ -1,0 +1,74 @@
+
+{
+  "services": [
+    {
+      "hook": "appointment-book",
+      "title": "Appointment Booking CDS Service",
+      "description": "An example of a CDS Service that is invoked when user of a CRD Client books a future appointment for a patient",
+      "id": "appointment-book-service",
+      "prefetch": {
+        "user": "{{context.userId}}",
+        "patient": "Patient/{{context.patientId}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    },
+    {
+      "hook": "encounter-start",
+      "title": "Encounter Start CDS Service",
+      "description": "An example of a CDS Service that is invoked when the user is initiating a new encounter.",
+      "id": "encounter-start-service",
+      "prefetch": {
+        "user": "{{context.userId}}",
+        "patient": "Patient/{{context.patientId}}",
+        "encounter": "Encounter/{{context.encounterId}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    },
+    {
+      "hook": "encounter-discharge",
+      "title": "Encounter Disharge CDS Service Example",
+      "description": "An example of a CDS Service that is invoked when the user is performing the discharge process for an encounter - typically an inpatient encounter.",
+      "id": "encounter-discharge-service",
+      "prefetch": {
+        "user": "{{context.userId}}",
+        "patient": "Patient/{{context.patientId}}",
+        "encounter": "Encounter/{{context.encounterId}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    },
+    {
+      "hook": "order-dispatch",
+      "title": "Order Dispatch CDS Service Example",
+      "description": "An example of a CDS Service that fires when a practitioner is selecting a candidate performer for a pre-existing order that was not tied to a specific performer",
+      "id": "order-dispatch-service",
+      "prefetch": {
+        "patient": "Patient/{{context.patientId}}",
+        "performer": "{{context.performer}}",
+        "order": "{{context.order}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    },
+    {
+      "hook": "order-select",
+      "title": "Order Select CDS Service",
+      "description": "An example of a CDS Service that fires when a clinician selects one or more orders to place for a patient",
+      "id": "order-select-service",
+      "prefetch": {
+        "user": "{{context.userId}}",
+        "patient": "Patient/{{context.patientId}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    },
+    {
+      "hook": "order-sign",
+      "title": "Order Sign CDS Service",
+      "description": "An example of a CDS Service that fires when a clinician is ready to sign one or more orders for a patient",
+      "id": "order-sign-service",
+      "prefetch": {
+        "user": "{{context.userId}}",
+        "patient": "Patient/{{context.patientId}}",
+        "coverage": "Coverage?patient={{context.patientId}}&status=active"
+      }
+    }
+  ]
+}
