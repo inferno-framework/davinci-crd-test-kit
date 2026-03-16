@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedTest do
+RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:cards) do

@@ -76,8 +76,7 @@ RSpec/NotToNot:
   EnforcedStyle: to_not
 
 RSpec/SpecFilePathFormat:
-  CustomTransform:
-    DaVinciCRDTestKit: davinci_crd_test_kit
+  Enabled: false
 
 Gemspec/RequireMFA:
   Enabled: false

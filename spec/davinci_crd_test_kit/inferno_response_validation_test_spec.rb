@@ -1,15 +1,15 @@
-require_relative '../../lib/davinci_crd_test_kit/tags'
+require_relative '../../lib/davinci_crd_test_kit/cross_suite/tags'
 
-RSpec.describe DaVinciCRDTestKit::InfernoResponseValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:order_sign_test) do
-    Class.new(DaVinciCRDTestKit::InfernoResponseValidationTest) do
+    Class.new(DaVinciCRDTestKit::V201::InfernoResponseValidationTest) do
       config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG } })
     end
   end
   let(:coverage_tag) { 'coverage' }
   let(:order_sign_coverage_test) do
-    Class.new(DaVinciCRDTestKit::InfernoResponseValidationTest) do
+    Class.new(DaVinciCRDTestKit::V201::InfernoResponseValidationTest) do
       config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG, crd_test_group: 'coverage' } })
     end
   end
@@ -27,6 +27,10 @@ RSpec.describe DaVinciCRDTestKit::InfernoResponseValidationTest do
   let(:mocked_response_creator) do
     Class.new do
       include DaVinciCRDTestKit::MockServiceResponse
+
+      def ig_version
+        'v201'
+      end
 
       def selected_response_types
         @selected_response_types ||= [

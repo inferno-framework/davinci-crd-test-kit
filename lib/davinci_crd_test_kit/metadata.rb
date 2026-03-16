@@ -64,7 +64,7 @@ module DaVinciCRDTestKit
           tested.
         - Hook configuration is not tested.
     DESCRIPTION
-    suite_ids [:crd_client, :crd_server]
+    suite_ids [:crd_client, :crd_client_v220, :crd_server, :crd_server_v220]
     tags ['Da Vinci', 'CRD']
     last_updated LAST_UPDATED
     version VERSION

@@ -1,13 +1,14 @@
-RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionAcrossHooksValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionAcrossHooksValidationTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
-    id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \
-         '-crd_coverage_info_system_action_across_hooks_validation'
+    id = 'crd_server-crd_v201_server_hooks-crd_v201_server_required_card_response_validation' \
+         '-crd_v201_coverage_info_system_action_across_hooks_validation'
     Inferno::Repositories::Tests.new.find(id)
   end
   let(:runnable_within) do
     Inferno::Repositories::Tests.new
-      .find('crd_server-crd_server_hooks-crd_server_appointment_book-crd_coverage_info_system_action_validation')
+      .find('crd_server-crd_v201_server_hooks-crd_v201_server_appointment_book-' \
+            'crd_v201_coverage_info_system_action_validation')
   end
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:valid_response_body) do
