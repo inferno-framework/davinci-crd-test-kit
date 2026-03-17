@@ -3,6 +3,13 @@ require_relative '../endpoints/jwk_set_endpoint_handler'
 require_relative 'server_discovery_group'
 require_relative 'server_demonstrate_hook_response_group'
 require_relative 'server_hooks_group'
+require_relative 'server_urls'
+require_relative '../endpoints/mock_ehr/fhir_read_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_search_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_create_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_update_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_delete_endpoint'
+require_relative 'api/fhir_request_test'
 
 module DaVinciCRDTestKit
   module V220
@@ -71,12 +78,22 @@ module DaVinciCRDTestKit
       end
 
       route :get, '/jwks.json', JWKSetEndpointHandler
+      suite_endpoint :post, FHIR_SEARCH_POST_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
+      suite_endpoint :get, FHIR_RESOURCE_TYPE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
+      suite_endpoint :get, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRReadEndpoint
+      suite_endpoint :post, FHIR_RESOURCE_TYPE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRCreateEndpoint
+      suite_endpoint :put, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRUpdateEndpoint
+      suite_endpoint :delete, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRDeleteEndpoint
 
       group from: :crd_v220_server_discovery_group
 
       group from: :crd_v220_server_demonstrate_hook_response
 
       group from: :crd_v220_server_hooks
+
+      group do
+        test from: :crd_v220_server_fhir_request_test
+      end
     end
   end
 end
