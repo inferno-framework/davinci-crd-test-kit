@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ClientCardMustSupportInstructionsTest do
+RSpec.describe DaVinciCRDTestKit::V201::ClientCardMustSupportInstructionsTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
 
@@ -11,7 +11,8 @@ RSpec.describe DaVinciCRDTestKit::ClientCardMustSupportInstructionsTest do
     {
       cards: [
         JSON.parse(File.read(File.join(
-                               __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'instructions.json'
+                               __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                               'mocked_card_responses', 'instructions.json'
                              )))
       ],
       systemActions: []

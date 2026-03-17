@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ServiceResponseValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

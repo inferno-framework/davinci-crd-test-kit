@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/client_fhir_api_search_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/api/client_fhir_api_search_test'
 
-RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
+RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
   let(:suite_id) { 'crd_client' }
 
   let(:server_endpoint) { 'http://example.com/fhir' }
@@ -217,7 +217,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
   describe 'Coverage search test with reference search parameter `patient`' do
     let(:test) do
       Inferno::Repositories::Tests.new.find(
-        'crd_client-crd_client_fhir_api-Group02-Group03-crd_client_coverage_patient_search_test'
+        'crd_client-crd_v201_client_fhir_api-Group02-Group03-crd_v201_client_coverage_patient_search_test'
       ) do
         fhir_client do
           url :url
@@ -348,7 +348,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
   describe 'Coverage search test with `status` search parameter' do
     let(:test) do
       Inferno::Repositories::Tests.new.find(
-        'crd_client-crd_client_fhir_api-Group02-Group03-crd_client_coverage_status_search_test'
+        'crd_client-crd_v201_client_fhir_api-Group02-Group03-crd_v201_client_coverage_status_search_test'
       ) do
         fhir_client do
           url :url
@@ -533,7 +533,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
   describe 'Encounter search test with `_id` search parameter' do
     let(:test) do
       Inferno::Repositories::Tests.new.find(
-        'crd_client-crd_client_fhir_api-Group02-Group06-crd_client_encounter_id_search_test'
+        'crd_client-crd_v201_client_fhir_api-Group02-Group06-crd_v201_client_encounter_id_search_test'
       ) do
         fhir_client do
           url :url
@@ -662,7 +662,7 @@ RSpec.describe DaVinciCRDTestKit::ClientFHIRApiSearchTest, :runnable do
   describe 'Encounter search test with `_include` search parameter' do
     let(:test) do
       Inferno::Repositories::Tests.new.find(
-        'crd_client-crd_client_fhir_api-Group02-Group06-crd_client_encounter_location_include_test'
+        'crd_client-crd_v201_client_fhir_api-Group02-Group06-crd_v201_client_encounter_location_include_test'
       ) do
         fhir_client do
           url :url

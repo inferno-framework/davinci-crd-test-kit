@@ -1,7 +1,7 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/order_sign_receive_request_test'
-require_relative '../../lib/davinci_crd_test_kit/routes/hook_request_endpoint'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/invocation/order_sign_receive_request_test'
+require_relative '../../lib/davinci_crd_test_kit/client/endpoints/hook_request_endpoint'
 
-RSpec.describe DaVinciCRDTestKit::OrderSignReceiveRequestTest, :request do
+RSpec.describe DaVinciCRDTestKit::V201::OrderSignReceiveRequestTest, :request do
   let(:suite_id) { 'crd_client' }
   let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

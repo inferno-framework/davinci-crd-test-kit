@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ExternalReferenceCardValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::ExternalReferenceCardValidationTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable) { described_class }
   let(:valid_response_body) do
