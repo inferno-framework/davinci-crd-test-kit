@@ -281,7 +281,7 @@ engine. Inferno currently uses the FHIRPath engine built into the official HL7 F
 to evaluate FHIRPath expressions on FHIR resources. For CDS Hook request fields, Inferno implements
 a small subset of FHIRPath to bridge to the point in those requests that contain FHIR resources.
 
-Inferno's FHIRPath evaluation for CDS Hook requests provides the most limitations. Thes
+Inferno's FHIRPath evaluation for CDS Hook requests provides the most limitations. These include
 - The [FHIRPath expression](https://hl7.org/fhirpath/N1/index.html#expressions) must be
   a path with function calls. The use of literals and operators (e.g. the union operator
   `<exp 1> | <exp 2>`) is not currently supported.
@@ -291,7 +291,7 @@ Inferno's FHIRPath evaluation for CDS Hook requests provides the most limitation
 
 Note that once the path reaches a FHIR resource, then other features are supported, such as
 - the `ofType` function, e.g., `context.draftOrders.entry.resource.ofType(ServiceRequest)`
-- more complex where functions, e.g., `context.draftOrders.entry.resource.ofType(ServiceRequest).where(code.coding.code = '12345')`
+- more complex `where` functions, e.g., `context.draftOrders.entry.resource.ofType(ServiceRequest).where(code.coding.code = '12345')`
 
 Inferno's use of the HL7 FHIR Validator's FHIRPath engine comes with some restrictions as well.
 - The engine is not configured to resolve profiles or value sets. It has the base FHIR R4
@@ -299,7 +299,7 @@ Inferno's use of the HL7 FHIR Validator's FHIRPath engine comes with some restri
   cannot be used.
 - The FHIRPath engine may not implement the entire [FHIRPath specication](https://hl7.org/fhirpath/N1/index.html).
 
-The Inferno team is open to adding support for additional FHIRPath functional. Please submit a
+The Inferno team is open to adding support for additional FHIRPath functions. Please submit a
 [github issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues) with details
 of your use case and the additional features that you believe are necessary.
 

@@ -1,10 +1,7 @@
-require_relative 'fhirpath_on_cds_request'
-
 module DaVinciCRDTestKit
   # Replace "prefetch" tokens (fhirpath surrounded by {{}}) in json object representation
+  # requires execute_fhirpath_on_cds_request (from the FhirpathOnCDSRequest module)
   module ReplaceTokens
-    include DaVinciCRDTestKit::FhirpathOnCDSRequest
-
     def replace_tokens(value, request)
       case value
       when Hash
@@ -29,9 +26,13 @@ module DaVinciCRDTestKit
       string.gsub!(/\{\{.*?\}\}/, replacements)
     end
 
+    private
+
     def calculate_expression_value(request, expression)
-      results = execute_fhirpath_on_cds_request(request, expression)
-      results.map { |res| res.is_a?(Array) || res.is_a?(Hash) ? nil : res }.map(&:to_s).join(',')
+      results = expression.split('|').map do |sub_expression|
+        execute_fhirpath_on_cds_request(request, sub_expression)
+      end.flatten
+      results.map { |res| res.is_a?(Array) || res.is_a?(Hash) ? nil : res }.compact.map(&:to_s).join(',')
     end
   end
 end

@@ -1,0 +1,23 @@
+{
+  "resourceType": "Task",
+  "id": "example-schedule-task",
+  "status": "draft",
+  "intent": "order",
+  "code": {
+    "text": "Appointment Request"
+  },
+  "focus": {
+    "reference": "ServiceRequest/example"
+  },
+  "for": {
+    "reference": "Patient/1288992"
+  },
+  "authoredOn": "2016-03-10T22:39:32-04:00",
+  "lastModified": "2016-03-10T22:39:32-04:00",
+  "requester": {
+    "reference": "Practitioner/example"
+  },
+  "owner": {
+    "reference": "Practitioner/example"
+  }
+}

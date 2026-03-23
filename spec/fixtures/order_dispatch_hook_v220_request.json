@@ -1,0 +1,68 @@
+{
+  "hookInstance": "d1577c69-dfbe-44ad-ba6d-3e05e953b2ea",
+  "fhirServer": "https://example/r4",
+  "hook": "order-dispatch",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/Patient.read user/Observation.read",
+    "subject": "cds-service"
+  },
+  "context": {
+    "patientId": "example",
+    "performer": "Practitioner/example",
+    "dispatchedOrders": [
+      "ServiceRequest/example",
+      "MedicationRequest/smart-MedicationRequest-103"
+    ],
+    "fulfillmentTasks": [
+      {
+        "resourceType": "Task",
+        "id": "example-schedule-task",
+        "status": "draft",
+        "intent": "order",
+        "code": {
+          "text": "Appointment Request"
+        },
+        "focus": {
+          "reference": "ServiceRequest/example"
+        },
+        "for": {
+          "reference": "Patient/1288992"
+        },
+        "authoredOn": "2016-03-10T22:39:32-04:00",
+        "lastModified": "2016-03-10T22:39:32-04:00",
+        "requester": {
+          "reference": "Practitioner/example"
+        },
+        "owner": {
+          "reference": "Practitioner/example"
+        }
+      },
+      {
+        "resourceType": "Task",
+        "id": "example-refill-task",
+        "status": "draft",
+        "intent": "order",
+        "code": {
+          "text": "Refill Request"
+        },
+        "focus": {
+          "reference": "MedicationRequest/smart-MedicationRequest-103"
+        },
+        "for": {
+          "reference": "Patient/1288992"
+        },
+        "authoredOn": "2016-03-10T22:39:32-04:00",
+        "lastModified": "2016-03-10T22:39:32-04:00",
+        "requester": {
+          "reference": "Practitioner/example"
+        },
+        "owner": {
+          "reference": "Practitioner/example"
+        }
+      }
+    ]
+  }
+}

@@ -55,8 +55,10 @@ module DaVinciCRDTestKit
           "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
         )
       elsif AVAILABLE_HOOKS.include?(hook_name)
-        send(:"gather_#{hook_name.gsub('-', '_')}_data")
-        request_coverage
+        if ig_version == 'v201'
+          send(:"gather_#{hook_name.gsub('-', '_')}_data")
+          request_coverage
+        end
         response_body = hook_response
         if response_body.present?
           response.body = response_body.to_json

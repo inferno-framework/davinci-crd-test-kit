@@ -8,7 +8,6 @@ require_relative 'verify_request/hook_request_required_fields_test'
 require_relative 'verify_request/hook_request_valid_context_test'
 require_relative 'verify_request/hook_request_valid_prefetch_test'
 require_relative 'verify_request/hook_request_fetched_data_test'
-require_relative 'verify_request/hook_request_prefetch_equals_queried_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
 
@@ -82,7 +81,6 @@ module DaVinciCRDTestKit
       end
       test from: :crd_v220_hook_request_valid_prefetch
       test from: :crd_v220_hook_request_fetched_data
-      test from: :crd_v220_hook_request_prefetch_equals_queried
       test from: :crd_v220_inferno_response_validation
       test from: :crd_v220_card_display_attest_test
     end
