@@ -1,0 +1,1044 @@
+{
+  "hookInstance": "44577c69-dfbe-bbad-ba6d-3e05e953b2e1",
+  "fhirServer": "https://example/r4",
+  "hook": "appointment-book",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/Patient.read user/Observation.read",
+    "subject": "cds-service"
+  },
+  "context": {
+    "userId": "Practitioner/example",
+    "patientId": "forprefetch",
+    "encounterId": "forprefetch",
+    "appointments": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Appointment",
+            "id": "forprefetch-pra",
+            "status": "proposed",
+            "description": "CPAP adjustments",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/forprefetch-pra"
+              },
+              {
+                "reference": "ServiceRequest/forprefetch-rol"
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "DeviceRequest/forprefetch-pra"
+                    }
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "DeviceRequest/forprefetch-rol"
+                    }
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "MedicationRequest/forprefetch-pra"
+                    }
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "MedicationRequest/forprefetch-rol"
+                    }
+                  }
+                ]
+              }
+            ],
+            "participant": [
+              {
+                "actor": {
+                  "reference": "Patient/forprefetch"
+                },
+                "status": "tentative"
+              },
+              {
+                "type": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "PPRF"
+                      }
+                    ]
+                  }
+                ],
+                "actor": {
+                  "reference": "Practitioner/app-par-act"
+                },
+                "status": "accepted"
+              },
+              {
+                "type": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "PPRF"
+                      }
+                    ]
+                  }
+                ],
+                "actor": {
+                  "reference": "PractitionerRole/app-par-act"
+                },
+                "status": "accepted"
+              },
+              {
+                "type": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "PPRF"
+                      }
+                    ]
+                  }
+                ],
+                "actor": {
+                  "reference": "Location/app-par-act"
+                },
+                "status": "accepted"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "prefetch": {
+    "patient": {
+      "resourceType": "Patient",
+      "id": "forprefetch",
+      "identifier": [
+        {
+          "use": "usual",
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                "code": "MR"
+              }
+            ],
+            "text": "Medical Record Number"
+          },
+          "system": "http://hospital.smarthealthit.org",
+          "value": "1032702"
+        }
+      ],
+      "active": true,
+      "name": [
+        {
+          "family": "Shaw",
+          "given": [
+            "Amy",
+            "V."
+          ],
+          "period": {
+            "start": "2016-12-06",
+            "end": "2020-07-22"
+          }
+        }
+      ],
+      "gender": "female",
+      "birthDate": "1987-02-20"
+    },
+    "encounter": {
+      "resourceType": "Encounter",
+      "id": "forprefetch",
+      "status": "in-progress",
+      "class": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "AMB",
+        "display": "ambulatory"
+      },
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "270427003",
+              "display": "Patient-initiated encounter"
+            }
+          ]
+        }
+      ],
+      "subject": {
+        "reference": "Patient/forprefetch"
+      },
+      "participant": [
+        {
+          "individual": {
+            "reference": "Practitioner/enc-par-ind"
+          }
+        },
+        {
+          "individual": {
+            "reference": "PractitionerRole/enc-par-ind"
+          }
+        }
+      ],
+      "location": [
+        {
+          "location": {
+            "reference": "Location/enc-loc-loc",
+            "display": "Location1"
+          }
+        }
+      ],
+      "serviceProvider": {
+        "reference": "Organization/enc-ser"
+      }
+    },
+    "coverage": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Coverage",
+            "id": "forprefetch",
+            "status": "active",
+            "beneficiary": {
+              "reference": "Patient/forprefetch"
+            },
+            "relationship": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+                  "code": "self"
+                }
+              ]
+            },
+            "payor": [
+              {
+                "reference": "http://example.org/fhir/Organization/example-payer",
+                "display": "Payer XYZ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "deviceRequests": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "DeviceRequest",
+            "id": "forprefetch-rol",
+            "status": "draft",
+            "intent": "original-order",
+            "codeReference": {
+              "reference": "Device/dev-codref-rol"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2016-06-10T11:01:10-08:00",
+            "requester": {
+              "reference": "PractitionerRole/dev-req"
+            },
+            "performer": {
+              "reference": "PractitionerRole/dev-per"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "DeviceRequest",
+            "id": "forprefetch-pra",
+            "status": "draft",
+            "intent": "original-order",
+            "codeReference": {
+              "reference": "Device/dev-codref-pra"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2016-06-10T11:01:10-08:00",
+            "requester": {
+              "reference": "Practitioner/dev-req"
+            },
+            "performer": {
+              "reference": "Practitioner/dev-per"
+            }
+          }
+        }
+      ]
+    },
+    "medicationRequests": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "forprefetch-pra",
+            "status": "draft",
+            "intent": "order",
+            "medicationReference": {
+              "reference": "Medication/med-medref",
+              "display": "Amoxicillin 120 MG/ML / clavulanate potassium 8.58 MG/ML Oral Suspension"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2016-06-10T11:01:10-08:00",
+            "requester": {
+              "reference": "Practitioner/med-req"
+            },
+            "performer": {
+              "reference": "Practitioner/med-per"
+            },
+            "dispenseRequest": {
+              "performer": {
+                "reference": "Organization/med-dis-per"
+              }
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "forprefetch-rol",
+            "status": "draft",
+            "intent": "order",
+            "medicationReference": {
+              "reference": "Medication/med-medref",
+              "display": "Amoxicillin 120 MG/ML / clavulanate potassium 8.58 MG/ML Oral Suspension"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2017-06-10T11:01:10-08:00",
+            "requester": {
+              "reference": "PractitionerRole/med-req"
+            },
+            "performer": {
+              "reference": "PractitionerRole/med-per"
+            },
+            "dispenseRequest": {
+              "performer": {
+                "reference": "Organization/med-dis-per"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "serviceRequests": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "id": "forprefetch-pra",
+            "status": "draft",
+            "intent": "order",
+            "code": {
+              "text": "Implant Pacemaker"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2015-03-30",
+            "requester": {
+              "reference": "Practitioner/ser-req"
+            },
+            "performer": [
+              {
+                "reference": "Practitioner/ser-per"
+              }
+            ],
+            "locationReference": [
+              {
+                "reference": "Location/ser-locref"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "id": "forprefetch-rol",
+            "status": "draft",
+            "intent": "order",
+            "code": {
+              "text": "Implant Pacemaker"
+            },
+            "subject": {
+              "reference": "Patient/forprefetch"
+            },
+            "authoredOn": "2015-03-30",
+            "requester": {
+              "reference": "PractitionerRole/ser-req"
+            },
+            "performer": [
+              {
+                "reference": "PractitionerRole/ser-per"
+              },
+              {
+                "reference": "Organization/ser-per"
+              }
+            ],
+            "locationReference": [
+              {
+                "reference": "Location/ser-locref"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "medications": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Medication",
+            "id": "med-medref",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "206765",
+                  "display": "Prinivil 10 MG Oral Tablet"
+                }
+              ],
+              "text": "lisinopril oral 10 mg"
+            }
+          }
+        }
+      ]
+    },
+    "devices": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Device",
+            "id": "dev-codref-pra",
+            "identifier": [
+              {
+                "system": "http://example.org/devices/id",
+                "value": "345675"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Device",
+            "id": "dev-codref-rol",
+            "identifier": [
+              {
+                "system": "http://example.org/devices/id",
+                "value": "345677"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "practitionerRoles": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "app-par-act",
+            "organization": {
+              "reference": "Organization/app-par-act-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/app-par-act-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "enc-par-ind",
+            "organization": {
+              "reference": "Organization/enc-par-ind-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/enc-par-ind-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "dev-req",
+            "organization": {
+              "reference": "Organization/dev-req-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/dev-req-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "dev-per",
+            "organization": {
+              "reference": "Organization/dev-per-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/dev-per-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "med-req",
+            "organization": {
+              "reference": "Organization/med-req-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/med-req-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "med-per",
+            "organization": {
+              "reference": "Organization/med-per-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/med-per-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "ser-req",
+            "organization": {
+              "reference": "Organization/ser-req-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/ser-req-pra"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "ser-per",
+            "organization": {
+              "reference": "Organization/ser-per-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/ser-per-pra"
+            }
+          }
+        }
+      ]
+    },
+    "practitioners": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "app-par-act-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941388811"
+              }
+            ],
+            "name": [
+              {
+                "family": "app-par-act-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "app-par-act",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9988839122"
+              }
+            ],
+            "name": [
+              {
+                "family": "app-par-act"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941339111"
+              }
+            ],
+            "name": [
+              {
+                "family": "Careful",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941339122"
+              }
+            ],
+            "name": [
+              {
+                "family": "Alternate",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "dev-req-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "8805326622"
+              }
+            ],
+            "name": [
+              {
+                "family": "dev-req-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "dev-per-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9955766122"
+              }
+            ],
+            "name": [
+              {
+                "family": "dev-per-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "dev-req",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "8805377622"
+              }
+            ],
+            "name": [
+              {
+                "family": "dev-req"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "dev-per",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9952266122"
+              }
+            ],
+            "name": [
+              {
+                "family": "dev-per"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "med-req",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "8805375522"
+              }
+            ],
+            "name": [
+              {
+                "family": "med-req"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "med-per",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9882266122"
+              }
+            ],
+            "name": [
+              {
+                "family": "med-per"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "med-req-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "8225375522"
+              }
+            ],
+            "name": [
+              {
+                "family": "med-req-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "med-per-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9833266122"
+              }
+            ],
+            "name": [
+              {
+                "family": "med-per-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "ser-req",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "82993751122"
+              }
+            ],
+            "name": [
+              {
+                "family": "ser-req"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "ser-per",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9773266332"
+              }
+            ],
+            "name": [
+              {
+                "family": "ser-per"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "ser-req-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "82993331122"
+              }
+            ],
+            "name": [
+              {
+                "family": "ser-req-pra"
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "ser-per-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9773266311"
+              }
+            ],
+            "name": [
+              {
+                "family": "ser-per-pra"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "organizations": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "app-par-act-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9947779122"
+              }
+            ],
+            "name": "app-par-act-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-par-ind-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941449122"
+              }
+            ],
+            "name": "enc-par-ind-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-ser",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941449111"
+              }
+            ],
+            "name": "University Medical Center"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "dev-req-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9332243311"
+              }
+            ],
+            "name": "dev-req-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "dev-per-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9881449447"
+              }
+            ],
+            "name": "dev-per-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "med-req-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9311243311"
+              }
+            ],
+            "name": "med-req-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "med-per-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9888849447"
+              }
+            ],
+            "name": "med-per-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "med-dis-per",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9888779447"
+              }
+            ],
+            "name": "med-dis-per"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "ser-per",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9317722311"
+              }
+            ],
+            "name": "ser-per"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "ser-req-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9311222311"
+              }
+            ],
+            "name": "ser-req-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "ser-per-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9558849447"
+              }
+            ],
+            "name": "ser-per-org"
+          }
+        }
+      ]
+    },
+    "locations": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Location",
+            "id": "enc-loc-loc",
+            "status": "active",
+            "name": "South Wing, second floor",
+            "managingOrganization": {
+              "reference": "Organization/enc-ser"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Location",
+            "id": "app-par-act",
+            "status": "active",
+            "name": "app-par-act",
+            "managingOrganization": {
+              "reference": "Organization/app-par-act-org"
+            }
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Location",
+            "id": "ser-locref",
+            "status": "active",
+            "name": "ser-locref",
+            "managingOrganization": {
+              "reference": "Organization/ser-per"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

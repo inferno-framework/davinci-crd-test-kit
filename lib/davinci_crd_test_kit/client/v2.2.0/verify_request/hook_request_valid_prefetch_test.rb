@@ -292,11 +292,12 @@ module DaVinciCRDTestKit
         # -------------------------------------------------------------------------
 
         def resolve(reference)
-          reference = reference['reference'] if reference.is_a?(Hash)
+          key = reference.is_a?(Hash) ? reference['reference'] : reference
+          return nil unless key.present?
           # TODO: assuming relative references
-          return prefetched_resources[reference] if prefetched_resources.key?(reference)
+          return prefetched_resources[key] if prefetched_resources.key?(key)
 
-          errors << "#{error_prefix} resource #{reference} needed to instantiate the query " \
+          errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
                     'was not provided in the prefetched values.'
 
           nil
