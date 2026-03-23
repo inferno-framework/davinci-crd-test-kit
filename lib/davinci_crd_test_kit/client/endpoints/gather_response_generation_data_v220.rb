@@ -1,133 +1,147 @@
 require_relative '../../cross_suite/tags'
+require_relative '../../cross_suite/fhirpath_on_cds_request'
+require_relative '../../cross_suite/replace_tokens'
 
 module DaVinciCRDTestKit
   # Make requests to client's FHIR server to use in building responses
-  module GatherResponseGenerationData
-    REFERENCES_TO_READ_BY_RESOURCE_TYPE = {
-      Appointment: [
-        'basedOn',
-        'participant.actor'
-      ],
-      CommunicationRequest: [
-        'requester',
-        'sender',
-        'recipient'
-      ],
-      DeviceRequest: [
-        'requester',
-        'performer'
-      ],
-      MedicationRequest: [
-        'requester',
-        'performer',
-        'medicationReference',
-        'dispenseRequest.performer'
-      ],
-      NutritionOrder: [
-        'orderer'
-      ],
-      ServiceRequest: [
-        'requester',
-        'performer',
-        'locationReference'
-      ],
-      VisionPrescription: [
-        'prescriber'
-      ],
-      Encounter: [
-        'participant.individual',
-        'location.location',
-        'serviceProvider'
-      ],
-      PractitionerRole: [
-        'practitioner',
-        'organization',
-        'location'
-      ]
-    }.freeze
+  module GatherResponseGenerationDataV220
+    def gather_data
+      add_prefetched_data_to_fetched_resources
+      gather_each_prefetch_template
+    end
+
+    # -------------------------------------------------------------------------
+    # fetched resources (from prefetch or additional requests)
+    # -------------------------------------------------------------------------
+    def fetched_resources
+      @fetched_resources ||= {}
+    end
+
+    # Error handling: if no resourceType or id, skip
+    # verification that everything has one will be handled elsewhere
+    def add_prefetched_data_to_fetched_resources
+      request_body['prefetch'].each_value do |prefetch_resource|
+        next unless prefetch_resource['resourceType'].present?
+
+        if prefetch_resouce['resourceType'] == 'Bundle'
+          add_bundle_instances_to_fetched_resource(prefetch_resource)
+        else
+          add_instance_to_fetched_resource(prefetch_resource)
+        end
+      end
+    end
+
+    def add_bundle_instances_to_fetched_resource(bundle)
+      bundle.entry.each do |entry|
+        next unless entry.dig('resource', 'resourceType').present?
+
+        add_instance_to_fetched_resource(entry['resource'])
+      end
+    end
+
+    def add_instance_to_fetched_resource(resource_instance)
+      return unless resource_instance['id'].present?
+
+      key = "#{resource_instance['resourceType']}/#{resource_instance['id']}"
+      return if fetched_resources.key?(key)
+
+      fetched_resources[key] = resource_instance
+    end
+
+    # -------------------------------------------------------------------------
+    # gather data using prefetch templates
+    # -------------------------------------------------------------------------
+    def hook_prefetch_templates
+      @hook_prefetch_templates ||=
+        JSON.parse(File.read(File.join(__dir__, '..', 'v2.2.0', 'cds-services-v220.json'))).find do |service|
+          service['hook'] == request_body['hook']
+        end['prefetch']
+    end
+
+    def gather_each_prefetch_template
+      hook_request_for_gathering = request_body.dup
+      hook_request_for_gathering['prefetch'] = {}
+
+      hook_prefetch_templates.each do |prefetch_key, prefetch_request|
+        instantiated_request = replace_tokens_in_string(prefetch_request, hook_request_for_gathering)
+        request_results = build_request_results(instantiated_request)
+        hook_request_for_gathering['prefetch'][prefetch_key] = request_results
+      end
+    end
+
+    def build_request_results(request_string)
+      if request_string.include?('?')
+        if id_search?(request_string)
+        else
+        end
+      elsif fetched_resources.key?(request_string)
+        fetched_resources(request_string)
+      else
+        fetch_reference(normalize_reference(request_string))
+      end
+    end
+
+    def id_search?(request_string)
+      resource_type = request_string.split('?').first
+      request_string.starts_with?("#{resource_type}?_id=")
+    end
+
+    # turn absolute references into relative if
+    # for the fhir server indicated in the request
+    def normalize_reference(reference)
+      server = "#{request_body['fhirServer']&.chomp('/')}/"
+
+      if request_body['fhirServer'].present? && reference.starts_with?(server)
+        reference[server.length..]
+      else
+        reference
+      end
+    end
+
+    def fetch_reference(reference)
+      response = execute_request(reference)
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
+
+      return nil unless response.status.to_s.starts_with?('2')
+
+      JSON.parse(response.body)
+    end
+
+    # -------------------------------------------------------------------------
+    # fhirpath for prefetch tokens
+    # -------------------------------------------------------------------------
+    include FhirpathOnCDSRequest
+
+    def resolve(reference)
+      reference = reference.reference if reference.is_a?(FHIR::Reference)
+      reference = reference['reference'] if reference.is_a?(Hash)
+      absolute_reference = if reference.starts_with?('http')
+                             if fhir_server.present? && reference.starts_with?(fhir_server)
+                               reference = reference.gsub(fhir_server, '')
+                               false
+                             else
+                               true
+                             end
+                           else
+                             false
+                           end
+
+      if absolute_reference
+        # direct read, save request, add fetched resource to the map
+      else
+        relative_reference = reference.split('/')[1..2].join('/')
+        if fetched_resources.key?(relative_reference)
+          fetched_resources[relative_reference]
+        elsif fhir_server.present?
+          # read against the fhir server with the bearer token, save request, add fetched resource to the map
+        end
+      end
+    end
+
+    # --------------------
 
     def hook_instance_tag
       @hook_instance_tag ||= "#{HOOK_INSTANCE_TAG_PREFIX}#{request_body['hookInstance']}"
-    end
-
-    def gather_appointment_book_data
-      appointment_book_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      encounter_id = request_body.dig('context', 'encounterId')
-      user_id = request_body.dig('context', 'userId')
-      appointment_book_to_read << "Patient/#{patient_id}" if patient_id.present?
-      appointment_book_to_read << "Encounter/#{encounter_id}" if encounter_id.present?
-      appointment_book_to_read << user_id if user_id.present?
-
-      appointment_book_to_analyze = extract_bundle_entries(request_body.dig('context', 'appointments'))
-
-      gather_data_for_request(appointment_book_to_read, appointment_book_to_analyze)
-    end
-
-    def gather_encounter_start_data
-      encounter_start_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      encounter_id = request_body.dig('context', 'encounterId')
-      user_id = request_body.dig('context', 'userId')
-      encounter_start_to_read << "Patient/#{patient_id}" if patient_id.present?
-      encounter_start_to_read << "Encounter/#{encounter_id}" if encounter_id.present?
-      encounter_start_to_read << user_id if user_id.present?
-
-      gather_data_for_request(encounter_start_to_read, [])
-    end
-
-    def gather_encounter_discharge_data
-      encounter_discharge_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      encounter_id = request_body.dig('context', 'encounterId')
-      user_id = request_body.dig('context', 'userId')
-      encounter_discharge_to_read << "Patient/#{patient_id}" if patient_id.present?
-      encounter_discharge_to_read << "Encounter/#{encounter_id}" if encounter_id.present?
-      encounter_discharge_to_read << user_id if user_id.present?
-
-      gather_data_for_request(encounter_discharge_to_read, [])
-    end
-
-    def gather_order_select_data
-      order_sign_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      encounter_id = request_body.dig('context', 'encounterId')
-      user_id = request_body.dig('context', 'userId')
-      order_sign_to_read << "Patient/#{patient_id}" if patient_id.present?
-      order_sign_to_read << "Encounter/#{encounter_id}" if encounter_id.present?
-      order_sign_to_read << user_id if user_id.present?
-
-      order_sign_to_analyze = extract_bundle_entries(request_body.dig('context', 'draftOrders')).select do |resource|
-        request_body.dig('context', 'selections').include?("#{resource['resourceType']}/#{resource['id']}")
-      end
-
-      gather_data_for_request(order_sign_to_read, order_sign_to_analyze)
-    end
-
-    def gather_order_sign_data
-      order_sign_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      encounter_id = request_body.dig('context', 'encounterId')
-      user_id = request_body.dig('context', 'userId')
-      order_sign_to_read << "Patient/#{patient_id}" if patient_id.present?
-      order_sign_to_read << "Encounter/#{encounter_id}" if encounter_id.present?
-      order_sign_to_read << user_id if user_id.present?
-
-      order_sign_to_analyze = extract_bundle_entries(request_body.dig('context', 'draftOrders'))
-
-      gather_data_for_request(order_sign_to_read, order_sign_to_analyze)
-    end
-
-    def gather_order_dispatch_data
-      order_dispatch_to_read = []
-      patient_id = request_body.dig('context', 'patientId')
-      order_id = request_body.dig('context', 'order')
-      performer_id = request_body.dig('context', 'performer')
-      order_dispatch_to_read << "Patient/#{patient_id}" if patient_id.present?
-      order_dispatch_to_read << order_id if order_id.present?
-      order_dispatch_to_read << performer_id if performer_id.present?
-
-      gather_data_for_request(order_dispatch_to_read, [request_body.dig('context', 'task')].compact)
     end
 
     def extract_bundle_entries(bundle)
@@ -165,27 +179,6 @@ module DaVinciCRDTestKit
       return unless resource.present?
 
       find_references_to_read(resource, to_read_list)
-    end
-
-    # turn absolute references into relative if
-    # for the fhir server indicated in the request
-    def normalize_reference(reference)
-      server = "#{request_body['fhirServer']&.chomp('/')}/"
-
-      if request_body['fhirServer'].present? && reference.starts_with?(server)
-        reference[server.length..]
-      else
-        reference
-      end
-    end
-
-    def fetch_reference(reference)
-      response = execute_request(reference)
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
-
-      return nil unless response.status.to_s.starts_with?('2')
-
-      JSON.parse(response.body)
     end
 
     def find_references_to_read(resource, to_read_list)

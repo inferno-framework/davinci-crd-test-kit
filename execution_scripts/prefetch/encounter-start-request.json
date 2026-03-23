@@ -1,0 +1,246 @@
+{
+  "hookInstance": "44577c69-df0e-b0ad-ba6d-3e05e953b2ea",
+  "fhirServer": "https://example/r4",
+  "hook": "encounter-start",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/Patient.read user/Observation.read",
+    "subject": "cds-service"
+  },
+  "context": {
+    "userId": "Practitioner/example",
+    "patientId": "forprefetch",
+    "encounterId": "forprefetch"
+  },
+  "prefetch": {
+    "patient": {
+      "resourceType": "Patient",
+      "id": "forprefetch",
+      "identifier": [
+        {
+          "use": "usual",
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                "code": "MR"
+              }
+            ],
+            "text": "Medical Record Number"
+          },
+          "system": "http://hospital.smarthealthit.org",
+          "value": "1032702"
+        }
+      ],
+      "active": true,
+      "name": [
+        {
+          "family": "Shaw",
+          "given": [
+            "Amy",
+            "V."
+          ],
+          "period": {
+            "start": "2016-12-06",
+            "end": "2020-07-22"
+          }
+        }
+      ],
+      "gender": "female",
+      "birthDate": "1987-02-20"
+    },
+    "encounter": {
+      "resourceType": "Encounter",
+      "id": "forprefetch",
+      "status": "in-progress",
+      "class": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "AMB",
+        "display": "ambulatory"
+      },
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "270427003",
+              "display": "Patient-initiated encounter"
+            }
+          ]
+        }
+      ],
+      "subject": {
+        "reference": "Patient/forprefetch"
+      },
+      "participant": [
+        {
+          "individual": {
+            "reference": "Practitioner/enc-par-ind"
+          }
+        },
+        {
+          "individual": {
+            "reference": "PractitionerRole/enc-par-ind"
+          }
+        }
+      ],
+      "location": [
+        {
+          "location": {
+            "reference": "Location/enc-loc-loc",
+            "display": "Location1"
+          }
+        }
+      ],
+      "serviceProvider": {
+        "reference": "Organization/enc-ser"
+      }
+    },
+    "coverage": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Coverage",
+            "id": "forprefetch",
+            "status": "active",
+            "beneficiary": {
+              "reference": "Patient/forprefetch"
+            },
+            "relationship": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+                  "code": "self"
+                }
+              ]
+            },
+            "payor": [
+              {
+                "reference": "http://example.org/fhir/Organization/example-payer",
+                "display": "Payer XYZ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "practitionerRoles": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "enc-par-ind",
+            "organization": {
+              "reference": "Organization/enc-par-ind-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/enc-par-ind-pra"
+            }
+          }
+        }
+      ]
+    },
+    "practitioners": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941339111"
+              }
+            ],
+            "name": [
+              {
+                "family": "Careful",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941339122"
+              }
+            ],
+            "name": [
+              {
+                "family": "Alternate",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "organizations": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-par-ind-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941449122"
+              }
+            ],
+            "name": "enc-par-ind-org"
+          }
+        },
+        {
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-ser",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "9941449111"
+              }
+            ],
+            "name": "University Medical Center"
+          }
+        }
+      ]
+    },
+    "locations": {
+      "resourceType": "Bundle",
+      "entry": [
+        {
+          "resource": {
+            "resourceType": "Location",
+            "id": "enc-loc-loc",
+            "status": "active",
+            "name": "South Wing, second floor",
+            "managingOrganization": {
+              "reference": "Organization/enc-ser"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

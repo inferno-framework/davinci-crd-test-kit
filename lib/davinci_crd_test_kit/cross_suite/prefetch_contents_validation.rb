@@ -1,8 +1,10 @@
 require_relative 'replace_tokens'
+require_relative 'fhirpath_on_cds_request'
 
 module DaVinciCRDTestKit
   module PrefetchContentsValidation
     include ReplaceTokens
+    include FhirpathOnCDSRequest
 
     def request_number
       if @request_number.blank?
