@@ -106,6 +106,7 @@
             "resourceType": "Coverage",
             "id": "forprefetch",
             "status": "active",
+            "subscriberId": "123",
             "beneficiary": {
               "reference": "Patient/forprefetch"
             },
@@ -139,7 +140,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/enc-par-ind-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         }
       ]
@@ -154,7 +161,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941339111"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -177,7 +184,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941339122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -205,10 +212,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941449122"
+                "value": "1714983354"
               }
             ],
-            "name": "enc-par-ind-org"
+            "name": "enc-par-ind-org",
+            "active": true
           }
         },
         {
@@ -218,10 +226,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941449111"
+                "value": "1714983354"
               }
             ],
-            "name": "University Medical Center"
+            "name": "University Medical Center",
+            "active": true
           }
         }
       ]
@@ -237,7 +246,17 @@
             "name": "South Wing, second floor",
             "managingOrganization": {
               "reference": "Organization/enc-ser"
-            }
+            },
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ]
           }
         }
       ]
