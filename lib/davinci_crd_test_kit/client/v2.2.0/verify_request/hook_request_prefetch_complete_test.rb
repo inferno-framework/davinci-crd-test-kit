@@ -85,6 +85,13 @@ module DaVinciCRDTestKit
             check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
           end
 
+          hook_request['prefetch'].each_key do |prefetch_template|
+            next if hook_prefetch_templates.key?(prefetch_template)
+
+            errors << "#{request_error_prefix} Extra prefetch data " \
+                      "provided in unrequested template '#{prefetch_template}'."
+          end
+
           errors
         end
 
