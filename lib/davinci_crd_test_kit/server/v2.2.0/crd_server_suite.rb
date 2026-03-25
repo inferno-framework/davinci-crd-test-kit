@@ -57,7 +57,7 @@ module DaVinciCRDTestKit
             title: 'CRD server base URL'
 
       fhir_resource_validator do
-        igs 'igs/davinci_crd_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released
+        igs('hl7.fhir.us.davinci-crd#2.2.0')
 
         # exclude_message do |message|
         #   # extension definition issue present in 2.0.1 but corrected in later versions
