@@ -70,7 +70,7 @@ module DaVinciCRDTestKit
       # )
 
       fhir_resource_validator do
-        igs 'igs/davinci_crd_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released
+        igs('hl7.fhir.us.davinci-crd#2.2.0')
 
         exclude_message do |message|
           message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
