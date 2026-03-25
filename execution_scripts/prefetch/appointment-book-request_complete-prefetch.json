@@ -223,6 +223,7 @@
             "resourceType": "Coverage",
             "id": "forprefetch",
             "status": "active",
+            "subscriberId": "123",
             "beneficiary": {
               "reference": "Patient/forprefetch"
             },
@@ -425,8 +426,7 @@
               "coding": [
                 {
                   "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
-                  "code": "206765",
-                  "display": "Prinivil 10 MG Oral Tablet"
+                  "code": "206765"
                 }
               ],
               "text": "lisinopril oral 10 mg"
@@ -444,7 +444,7 @@
             "id": "dev-codref-pra",
             "identifier": [
               {
-                "system": "http://example.org/devices/id",
+                "system": "http://inferno.healthit.gov/devices/id",
                 "value": "345675"
               }
             ]
@@ -456,7 +456,7 @@
             "id": "dev-codref-rol",
             "identifier": [
               {
-                "system": "http://example.org/devices/id",
+                "system": "http://inferno.healthit.gov/devices/id",
                 "value": "345677"
               }
             ]
@@ -476,7 +476,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/app-par-act-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -488,7 +494,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/enc-par-ind-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -500,7 +512,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/dev-req-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -512,7 +530,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/dev-per-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -524,7 +548,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/med-req-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -536,7 +566,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/med-per-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -548,7 +584,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/ser-req-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         },
         {
@@ -560,7 +602,13 @@
             },
             "practitioner": {
               "reference": "Practitioner/ser-per-pra"
-            }
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
           }
         }
       ]
@@ -575,7 +623,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941388811"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -592,7 +640,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9988839122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -609,7 +657,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941339111"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -632,7 +680,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941339122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -655,7 +703,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "8805326622"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -672,7 +720,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9955766122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -689,7 +737,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "8805377622"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -706,7 +754,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9952266122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -723,7 +771,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "8805375522"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -740,7 +788,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9882266122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -757,7 +805,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "8225375522"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -774,7 +822,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9833266122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -791,7 +839,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "82993751122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -808,7 +856,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9773266332"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -825,7 +873,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "82993331122"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -842,7 +890,7 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9773266311"
+                "value": "1714983354"
               }
             ],
             "name": [
@@ -864,10 +912,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9947779122"
+                "value": "1714983354"
               }
             ],
-            "name": "app-par-act-org"
+            "name": "app-par-act-org",
+            "active": true
           }
         },
         {
@@ -877,10 +926,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941449122"
+                "value": "1714983354"
               }
             ],
-            "name": "enc-par-ind-org"
+            "name": "enc-par-ind-org",
+            "active": true
           }
         },
         {
@@ -890,10 +940,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9941449111"
+                "value": "1714983354"
               }
             ],
-            "name": "University Medical Center"
+            "name": "University Medical Center",
+            "active": true
           }
         },
         {
@@ -903,10 +954,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9332243311"
+                "value": "1714983354"
               }
             ],
-            "name": "dev-req-org"
+            "name": "dev-req-org",
+            "active": true
           }
         },
         {
@@ -916,10 +968,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9881449447"
+                "value": "1714983354"
               }
             ],
-            "name": "dev-per-org"
+            "name": "dev-per-org",
+            "active": true
           }
         },
         {
@@ -929,10 +982,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9311243311"
+                "value": "1714983354"
               }
             ],
-            "name": "med-req-org"
+            "name": "med-req-org",
+            "active": true
           }
         },
         {
@@ -942,10 +996,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9888849447"
+                "value": "1714983354"
               }
             ],
-            "name": "med-per-org"
+            "name": "med-per-org",
+            "active": true
           }
         },
         {
@@ -955,10 +1010,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9888779447"
+                "value": "1714983354"
               }
             ],
-            "name": "med-dis-per"
+            "name": "med-dis-per",
+            "active": true
           }
         },
         {
@@ -968,10 +1024,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9317722311"
+                "value": "1714983354"
               }
             ],
-            "name": "ser-per"
+            "name": "ser-per",
+            "active": true
           }
         },
         {
@@ -981,10 +1038,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9311222311"
+                "value": "1714983354"
               }
             ],
-            "name": "ser-req-org"
+            "name": "ser-req-org",
+            "active": true
           }
         },
         {
@@ -994,10 +1052,11 @@
             "identifier": [
               {
                 "system": "http://hl7.org/fhir/sid/us-npi",
-                "value": "9558849447"
+                "value": "1714983354"
               }
             ],
-            "name": "ser-per-org"
+            "name": "ser-per-org",
+            "active": true
           }
         }
       ]
@@ -1013,7 +1072,17 @@
             "name": "South Wing, second floor",
             "managingOrganization": {
               "reference": "Organization/enc-ser"
-            }
+            },
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ]
           }
         },
         {
@@ -1024,7 +1093,17 @@
             "name": "app-par-act",
             "managingOrganization": {
               "reference": "Organization/app-par-act-org"
-            }
+            },
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ]
           }
         },
         {
@@ -1035,7 +1114,17 @@
             "name": "ser-locref",
             "managingOrganization": {
               "reference": "Organization/ser-per"
-            }
+            },
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ]
           }
         }
       ]
