@@ -3,24 +3,24 @@ require_relative '../../../cross_suite/replace_tokens'
 
 module DaVinciCRDTestKit
   module V220
-    class HookRequestValidPrefetchTest < Inferno::Test
-      id :crd_v220_hook_request_valid_prefetch
-      title 'Hook request contains valid prefetched data'
+    class HookRequestPrefetchCompleteTest < Inferno::Test
+      id :crd_v220_hook_request_prefetch_complete
+      title 'Hook request contains complete prefetched data set'
       description %(
-        As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
-        `prefetch` field is an optional field that contains key/value pairs of FHIR queries that the service is
+        As stated in the [CDS hooks specification](https://build.fhir.org/ig/HL7/cds-hooks/en/#http-request-1),
+        a CDS service request's `prefetch` field contains key/value pairs of FHIR queries that the service is
         requesting the CDS Client to perform and provide on each service call. The key is a string that describes
         the type of data being requested and the value is a string representing the FHIR query.
-        See [Prefetch Template](https://cds-hooks.hl7.org/2.0#prefetch-template)
+        See [Prefetch Template](https://build.fhir.org/ig/HL7/cds-hooks/en/#prefetch-template)
         for more information about how the `prefetch` formatting works.
 
-        This test verifies that the incoming hook request's `prefetch` field is in a valid JSON format,
-        validates each contained resource against its corresponding CRD resource profile, and checks
-        that the data matches what is requested in by the
+        [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.0/en/foundation.html#prefetch).
+        This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format,
+        contains exactly what is requested in by the
         [prefetch templates published by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.0/cds-services-v220.json).
-        In CRD 2.2.0, prefetch support is required, and clients must be able to return all data in the standard
-        prefetch templates, which are used by Inferno. Thus, this test checks that exactly the requested
-        data is present.
+        Clients must be able to return all data in the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.0/en/foundation.html#standard-prefetch),
+        which are used by Inferno. Thus, this test checks that exactly the requested
+        data is present based on the request context.
       )
       # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
 
@@ -36,8 +36,9 @@ module DaVinciCRDTestKit
         crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
       end
 
-      def assert_no_error_messages(message = '')
-        assert messages.none? { |msg| msg[:type] == 'error' },
+      # TODO: remove when updated to core with a standard version
+      def assert_no_error_messages(message = '', message_list: messages)
+        assert message_list.none? { |msg| msg[:type] == 'error' },
                message.present? ? message : 'Errors found - see Messages for details.'
       end
 
@@ -72,11 +73,16 @@ module DaVinciCRDTestKit
         end
 
         def check_prefetched_data
+          return ["#{request_error_prefix} No prefetch data provided."] unless hook_request.key?('prefetch')
+
           hook_prefetch_templates.each do |prefetch_key, prefetch_request|
             @current_prefetch_key = prefetch_key
             instantiated_request = replace_tokens_in_string(prefetch_request, hook_request)
-            provided_prefetch = hook_request.dig('prefetch', prefetch_key)
-            check_provided_against_request(provided_prefetch, instantiated_request)
+            unless hook_request['prefetch'].key?(prefetch_key)
+              errors << "#{error_prefix} No prefetch data provided."
+              next
+            end
+            check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
           end
 
           errors
@@ -91,8 +97,12 @@ module DaVinciCRDTestKit
           @errors ||= []
         end
 
+        def request_error_prefix
+          "(Request #{request_index + 1})"
+        end
+
         def error_prefix
-          "(Request #{request_index + 1}) Prefetch Key #{@current_prefetch_key} -"
+          "#{request_error_prefix} Prefetch Template #{@current_prefetch_key} -"
         end
 
         # -----------------------------------------------------------------------
@@ -129,15 +139,21 @@ module DaVinciCRDTestKit
         end
 
         def check_coverage_search(prefetched_value, _instantiated_request)
-          check_is_fhir_resource(prefetched_value)
-          check_is_target_resource_type(prefetched_value, 'Bundle') if prefetched_value.key?('resourceType')
-          unless prefetched_value['entry'].size == 1
-            errors << "#{error_prefix} only one Coverage must be provided."
+          unless prefetched_value.present?
+            errors << "#{error_prefix} requested Coverage not provided."
             return
           end
 
-          prefetched_coverage = prefetched_value.dig('entry', 0, 'resource')
+          check_is_fhir_resource(prefetched_value, target_resource_type: 'Bundle')
+          unless prefetched_value['entry'].size == 1
+            errors << "#{error_prefix} exactly one Coverage must be provided."
+            return
+          end
 
+          check_coverage(prefetched_value.dig('entry', 0, 'resource'))
+        end
+
+        def check_coverage(prefetched_coverage)
           unless prefetched_coverage['resourceType'].present?
             errors << "#{error_prefix} entry in prefetched Coverage Bundle is not a FHIR resource (no resourceType)."
             return
@@ -167,14 +183,20 @@ module DaVinciCRDTestKit
         def check_read(prefetched_value, instantiated_request)
           resource_type, resource_id = instantiated_request.split('/')
 
-          check_is_fhir_resource(prefetched_value)
-          check_is_target_resource_type(prefetched_value, resource_type) if prefetched_value.key?('resourceType')
+          resource_requested = resource_id.present?
+
+          unless prefetched_value.present?
+            errors << "#{error_prefix} requested resource '#{instantiated_request}' not provided." if resource_requested
+            return
+          end
+
+          check_is_fhir_resource(prefetched_value, target_resource_type: resource_type)
           unless prefetched_value.key?('id')
-            errors << "#{error_prefix} prefetched resource is missing an id."
+            errors << "#{error_prefix} prefetched #{resource_type} is missing an id."
             return
           end
           unless prefetched_value['id'] == resource_id
-            errors << "#{error_prefix} prefetched value has unexpected id: " \
+            errors << "#{error_prefix} prefetched #{resource_type} has unexpected id: " \
                       "expected #{resource_id}, got #{prefetched_value['id']}."
           end
 
@@ -182,13 +204,19 @@ module DaVinciCRDTestKit
         end
 
         def check_id_search(prefetched_value, instantiated_request)
-          check_is_fhir_resource(prefetched_value)
-          check_is_target_resource_type(prefetched_value, 'Bundle') if prefetched_value.key?('resourceType')
-
           resource_type, id_list = instantiated_request.split('?_id=')
-          check_bundle_entry_resource_type(prefetched_value, resource_type)
-
           target_ids = id_list.present? ? id_list.split(',').map { |id| "#{resource_type}/#{id}" }.uniq.sort : []
+          resources_requested = target_ids.present?
+
+          unless prefetched_value.present?
+            if resources_requested
+              errors << "#{error_prefix} requested resources not provided: #{target_ids.join(', ')}."
+            end
+            return
+          end
+
+          check_is_fhir_resource(prefetched_value, target_resource_type: 'Bundle')
+          check_bundle_entry_resource_type(prefetched_value, resource_type)
           check_ids(target_ids, actual_ids(prefetched_value))
           nil
         end
@@ -237,14 +265,13 @@ module DaVinciCRDTestKit
           end
         end
 
-        def check_is_fhir_resource(prefetched_value)
-          return if prefetched_value.key?('resourceType')
+        def check_is_fhir_resource(prefetched_value, target_resource_type: nil)
+          unless prefetched_value.key?('resourceType')
+            errors << "#{error_prefix} prefetched value is not a FHIR resource (no resourceType)."
+            return
+          end
 
-          errors << "#{error_prefix} prefetched value is not a FHIR resource (no resourceType)."
-        end
-
-        def check_is_target_resource_type(prefetched_value, target_resource_type)
-          return if prefetched_value['resourceType'] == target_resource_type
+          return if target_resource_type.blank? || prefetched_value['resourceType'] == target_resource_type
 
           errors << "#{error_prefix} prefetched value has unexpected resourceType: " \
                     "expected #{target_resource_type}, got #{prefetched_value['resourceType']}."
@@ -259,7 +286,7 @@ module DaVinciCRDTestKit
 
         def extract_prefetched_resources
           hook_request['prefetch']&.each_value do |prefetch_resource|
-            next unless prefetch_resource['resourceType'].present?
+            next unless prefetch_resource&.dig('resourceType').present?
 
             if prefetch_resource['resourceType'] == 'Bundle'
               extract_resources_from_prefetched_bundle(prefetch_resource)

@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
+RSpec.describe DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
@@ -102,7 +102,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(read_prefetch)
     end
 
@@ -114,6 +114,47 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
       expect(results.result).to eq('pass')
     end
 
+    it 'passes when no resource requested and none provided' do
+      order_sign_request['prefetch'] = { 'patient' => nil }
+      order_sign_request['context'].delete('patientId')
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('pass')
+    end
+
+    it 'fails when no prefetch data provided' do
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) ' \
+               'No prefetch data provided.')
+    end
+
+    it 'fails when the template key is not present in the prefetch' do
+      order_sign_request['prefetch'] = {}
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               'No prefetch data provided.')
+    end
+
+    it 'fails when requested resource not provided' do
+      order_sign_request['prefetch'] = { 'patient' => nil }
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               "requested resource 'Patient/example' not provided.")
+    end
+
     it 'fails when the prefetched value is not a FHIR resource (no resourceType)' do
       crd_patient_example.delete('resourceType')
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
@@ -121,7 +162,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
       results = run(test)
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched value is not a FHIR resource (no resourceType).')
     end
 
@@ -133,7 +174,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched value has unexpected resourceType: expected Patient, got NotPatient.')
     end
 
@@ -145,8 +186,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
-               'prefetched resource is missing an id.')
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               'prefetched Patient is missing an id.')
     end
 
     it 'fails when the prefetched value has the wrong id' do
@@ -157,8 +198,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
-               'prefetched value has unexpected id: expected example, got wrong.')
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               'prefetched Patient has unexpected id: expected example, got wrong.')
     end
 
     it 'if both resourceType and id are wrong, returns both errors' do
@@ -170,10 +211,10 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched value has unexpected resourceType: expected Patient, got NotPatient. ' \
-               '(Request 1) Prefetch Key patient - ' \
-               'prefetched value has unexpected id: expected example, got wrong.')
+               '(Request 1) Prefetch Template patient - ' \
+               'prefetched Patient has unexpected id: expected example, got wrong.')
     end
 
     it 'uses different prefixes when multiple requests' do
@@ -185,8 +226,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 2) Prefetch Key patient - ' \
-               'prefetched value has unexpected id: expected example, got wrong.')
+        .to eq('(Request 2) Prefetch Template patient - ' \
+               'prefetched Patient has unexpected id: expected example, got wrong.')
     end
   end
 
@@ -198,7 +239,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(id_search_prefetch)
     end
 
@@ -218,7 +259,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched value is not a FHIR resource (no resourceType).')
     end
 
@@ -230,7 +271,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched value has unexpected resourceType: expected Bundle, got NotBundle.')
     end
 
@@ -242,11 +283,11 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - prefetched Bundle entry 1 has an unexpected resourceType: ' \
+        .to eq('(Request 1) Prefetch Template patient - prefetched Bundle entry 1 has an unexpected resourceType: ' \
                'expected Patient, got NotPatient. ' \
-               '(Request 1) Prefetch Key patient - prefetched Bundle missing expected entries: ' \
+               '(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: ' \
                'Patient/example. ' \
-               '(Request 1) Prefetch Key patient - prefetched Bundle includes unrequested entries: ' \
+               '(Request 1) Prefetch Template patient - prefetched Bundle includes unrequested entries: ' \
                'NotPatient/example.')
     end
 
@@ -258,7 +299,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched Bundle has multiple entries with the same resource id.')
     end
 
@@ -270,10 +311,50 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
                'prefetched Bundle missing expected entries: Patient/example. ' \
-               '(Request 1) Prefetch Key patient - ' \
+               '(Request 1) Prefetch Template patient - ' \
                'prefetched Bundle includes unrequested entries: Patient/wrong.')
+    end
+
+    it 'fails when no prefetch provided and ids requested' do
+      order_sign_request['prefetch'] = { 'patient' => nil }
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               'requested resources not provided: Patient/example.')
+    end
+
+    it 'fails when an empty Bundle provided and ids requested' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               'prefetched Bundle missing expected entries: Patient/example.')
+    end
+
+    it 'passes when no prefetch provided and no ids requested' do
+      order_sign_request['prefetch'] = { 'patient' => nil }
+      order_sign_request['context'].delete('patientId')
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('pass')
+    end
+
+    it 'passes when an empty Bundle provided and no ids requested' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      order_sign_request['context'].delete('patientId')
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('pass')
     end
   end
 
@@ -285,7 +366,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(coverage_search_prefetch)
     end
 
@@ -305,8 +386,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
-               'only one Coverage must be provided.')
+        .to eq('(Request 1) Prefetch Template coverage - ' \
+               'exactly one Coverage must be provided.')
     end
 
     it 'fails when the prefetched value is not a FHIR resource (no resourceType)' do
@@ -317,7 +398,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
+        .to eq('(Request 1) Prefetch Template coverage - ' \
                'prefetched value is not a FHIR resource (no resourceType).')
     end
 
@@ -328,7 +409,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
       results = run(test)
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
+        .to eq('(Request 1) Prefetch Template coverage - ' \
                'prefetched value has unexpected resourceType: expected Bundle, got NotBundle.')
     end
 
@@ -340,7 +421,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
+        .to eq('(Request 1) Prefetch Template coverage - ' \
                'entry in prefetched Coverage Bundle has an unexpected type: ' \
                'expected Coverage, got NotCoverage.')
     end
@@ -353,7 +434,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
+        .to eq('(Request 1) Prefetch Template coverage - ' \
                'prefetched Coverage has an unexpected beneficiary reference: ' \
                'expected Patient/example, got Patient/wrong.')
     end
@@ -366,9 +447,20 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key coverage - ' \
+        .to eq('(Request 1) Prefetch Template coverage - ' \
                'prefetched Coverage has an unexpected status: ' \
                'expected active, got wrong.')
+    end
+
+    it 'fails when no prefetch provided' do
+      order_sign_request['prefetch'] = { 'coverage' => nil }
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Prefetch Template coverage - ' \
+               'requested Coverage not provided.')
     end
   end
 
@@ -380,11 +472,11 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(bad_search_prefetch)
     end
 
-    it 'fails when a prefetched Coverage has the wrong status' do
+    it 'fails a non-_id search on a resource other than Coverageed' do
       order_sign_request['prefetch'] = { 'unsupported' => crd_coverage_example_bundle }
       store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
       results = run(test)
@@ -403,7 +495,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(resolving_prefetch)
     end
 
@@ -442,8 +534,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
-               'resource Patient/example needed to instantiate the query ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               "resource 'Patient/example' needed to instantiate the query " \
                'was not provided in the prefetched values.')
     end
 
@@ -465,10 +557,10 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
-               'resource Patient/example needed to instantiate the query ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               "resource 'Patient/example' needed to instantiate the query " \
                'was not provided in the prefetched values. ' \
-               '(Request 1) Prefetch Key patient - ' \
+               '(Request 1) Prefetch Template patient - ' \
                'prefetched Bundle entry 1 is not a FHIR resource (no resourceType).')
     end
 
@@ -490,8 +582,8 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
 
       expect(results.result).to eq('fail')
       expect(entity_result_message(test))
-        .to eq('(Request 1) Prefetch Key patient - ' \
-               'resource Patient/example needed to instantiate the query ' \
+        .to eq('(Request 1) Prefetch Template patient - ' \
+               "resource 'Patient/example' needed to instantiate the query " \
                'was not provided in the prefetched values.')
     end
   end
@@ -506,7 +598,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
     end
 
     before do
-      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest::PrefetchChecker)
+      allow_any_instance_of(DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest::PrefetchChecker)
         .to receive(:hook_prefetch_templates).and_return(resolving_prefetch)
     end
 
@@ -529,6 +621,7 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestValidPrefetchTest do
                                          'practitioners' => crd_practitioner_example_bundle }
       store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
       results = run(test)
+
       expect(results.result).to eq('pass')
     end
   end

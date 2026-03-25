@@ -6,8 +6,8 @@ require_relative 'auth/token_payload_test'
 require_relative 'verify_request/hook_request_optional_fields_test'
 require_relative 'verify_request/hook_request_required_fields_test'
 require_relative 'verify_request/hook_request_valid_context_test'
-require_relative 'verify_request/hook_request_valid_prefetch_test'
-require_relative 'verify_request/hook_request_fetched_data_test'
+require_relative 'verify_request/hook_request_prefetch_profiles_test'
+require_relative 'verify_request/hook_request_prefetch_complete_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
 
@@ -74,13 +74,13 @@ module DaVinciCRDTestKit
         #                       'hl7.fhir.us.davinci-crd_2.0.1@177', 'hl7.fhir.us.davinci-crd_2.0.1@178',
         #                       'hl7.fhir.us.davinci-crd_2.0.1@179', 'hl7.fhir.us.davinci-crd_2.0.1@180',
         #                       'hl7.fhir.us.davinci-crd_2.0.1@286',
-        #                       'cds-hooks-library_1.0.1@17', 'cds-hooks-library_1.0.1@18', 'cds-hooks-library_1.0.1@19',
-        #                       'cds-hooks-library_1.0.1@21', 'cds-hooks-library_1.0.1@22', 'cds-hooks-library_1.0.1@23',
-        #                       'cds-hooks-library_1.0.1@25', 'cds-hooks-library_1.0.1@26', 'cds-hooks-library_1.0.1@27',
+        #                      'cds-hooks-library_1.0.1@17', 'cds-hooks-library_1.0.1@18', 'cds-hooks-library_1.0.1@19',
+        #                      'cds-hooks-library_1.0.1@21', 'cds-hooks-library_1.0.1@22', 'cds-hooks-library_1.0.1@23',
+        #                      'cds-hooks-library_1.0.1@25', 'cds-hooks-library_1.0.1@26', 'cds-hooks-library_1.0.1@27',
         #                       'cds-hooks-library_1.0.1@29', 'cds-hooks-library_1.0.1@30', 'cds-hooks-library_1.0.1@31'
       end
-      test from: :crd_v220_hook_request_valid_prefetch
-      test from: :crd_v220_hook_request_fetched_data
+      test from: :crd_v220_hook_request_prefetch_profiles
+      test from: :crd_v220_hook_request_prefetch_complete
       test from: :crd_v220_inferno_response_validation
       test from: :crd_v220_card_display_attest_test
     end
