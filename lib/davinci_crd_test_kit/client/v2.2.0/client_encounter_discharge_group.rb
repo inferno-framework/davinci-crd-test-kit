@@ -6,8 +6,8 @@ require_relative 'auth/token_payload_test'
 require_relative 'verify_request/hook_request_optional_fields_test'
 require_relative 'verify_request/hook_request_required_fields_test'
 require_relative 'verify_request/hook_request_valid_context_test'
-require_relative 'verify_request/hook_request_valid_prefetch_test'
-require_relative 'verify_request/hook_request_fetched_data_test'
+require_relative 'verify_request/hook_request_prefetch_profiles_test'
+require_relative 'verify_request/hook_request_prefetch_complete_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
 
@@ -72,12 +72,12 @@ module DaVinciCRDTestKit
       test from: :crd_v220_hook_request_valid_context do
         # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@201', 'hl7.fhir.us.davinci-crd_2.0.1@202',
         #                       'hl7.fhir.us.davinci-crd_2.0.1@203',
-        #                       'cds-hooks-library_1.0.1@45', 'cds-hooks-library_1.0.1@46', 'cds-hooks-library_1.0.1@47',
-        #                       'cds-hooks-library_1.0.1@49', 'cds-hooks-library_1.0.1@50', 'cds-hooks-library_1.0.1@51',
+        #                      'cds-hooks-library_1.0.1@45', 'cds-hooks-library_1.0.1@46', 'cds-hooks-library_1.0.1@47',
+        #                      'cds-hooks-library_1.0.1@49', 'cds-hooks-library_1.0.1@50', 'cds-hooks-library_1.0.1@51',
         #                       'cds-hooks-library_1.0.1@53', 'cds-hooks-library_1.0.1@54', 'cds-hooks-library_1.0.1@55'
       end
-      test from: :crd_v220_hook_request_valid_prefetch
-      test from: :crd_v220_hook_request_fetched_data
+      test from: :crd_v220_hook_request_prefetch_profiles
+      test from: :crd_v220_hook_request_prefetch_complete
       test from: :crd_v220_inferno_response_validation
       test from: :crd_v220_card_display_attest_test
     end
