@@ -229,6 +229,16 @@ RSpec.describe DaVinciCRDTestKit::V220::HookRequestPrefetchCompleteTest do
         .to eq('(Request 2) Prefetch Template patient - ' \
                'prefetched Patient has unexpected id: expected example, got wrong.')
     end
+
+    it 'fails when an extra prefetch key is provided' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example, 'extra' => crd_patient_example }
+      store_hook_request('order-sign', url: order_sign_url, body: order_sign_request)
+      results = run(test)
+
+      expect(results.result).to eq('fail')
+      expect(entity_result_message(test))
+        .to eq('(Request 1) Extra prefetch data provided in unrequested template \'extra\'.')
+    end
   end
 
   describe 'when validating an _id search prefetch template' do
