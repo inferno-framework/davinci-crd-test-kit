@@ -15,8 +15,10 @@
     "encounterId": "forprefetch",
     "draftOrders": {
       "resourceType": "Bundle",
+      "type": "collection",
       "entry": [
         {
+          "fullUrl": "https://example/r4/CommunicationRequest/forprefetch-ref-prac",
           "resource": {
             "resourceType": "CommunicationRequest",
             "id": "forprefetch-ref-prac",
@@ -63,6 +65,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/CommunicationRequest/forprefetch-ref-role",
           "resource": {
             "resourceType": "CommunicationRequest",
             "id": "forprefetch-ref-role",
@@ -109,6 +112,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/CommunicationRequest/forprefetch-ref-org",
           "resource": {
             "resourceType": "CommunicationRequest",
             "id": "forprefetch-ref-org",
@@ -155,6 +159,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/DeviceRequest/forprefetch-rol",
           "resource": {
             "resourceType": "DeviceRequest",
             "id": "forprefetch-rol",
@@ -176,6 +181,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/DeviceRequest/forprefetch-pra",
           "resource": {
             "resourceType": "DeviceRequest",
             "id": "forprefetch-pra",
@@ -197,6 +203,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/MedicationRequest/forprefetch-pra",
           "resource": {
             "resourceType": "MedicationRequest",
             "id": "forprefetch-pra",
@@ -224,6 +231,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/MedicationRequest/forprefetch-rol",
           "resource": {
             "resourceType": "MedicationRequest",
             "id": "forprefetch-rol",
@@ -251,6 +259,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/NutritionOrder/forprefetch-pra",
           "resource": {
             "resourceType": "NutritionOrder",
             "id": "forprefetch-pra",
@@ -273,6 +282,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/NutritionOrder/forprefetch-rol",
           "resource": {
             "resourceType": "NutritionOrder",
             "id": "forprefetch-rol",
@@ -295,6 +305,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/ServiceRequest/forprefetch-pra",
           "resource": {
             "resourceType": "ServiceRequest",
             "id": "forprefetch-pra",
@@ -323,6 +334,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/ServiceRequest/forprefetch-rol",
           "resource": {
             "resourceType": "ServiceRequest",
             "id": "forprefetch-rol",
@@ -354,6 +366,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/VisionPrescription/forprefetch-pra",
           "resource": {
             "resourceType": "VisionPrescription",
             "id": "forprefetch-pra",
@@ -411,6 +424,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/VisionPrescription/forprefetch-rol",
           "resource": {
             "resourceType": "VisionPrescription",
             "id": "forprefetch-rol",
@@ -556,8 +570,16 @@
     },
     "coverage": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Coverage?patient=Patient/forprefetch&status=active"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Coverage/forprefetch",
           "resource": {
             "resourceType": "Coverage",
             "id": "forprefetch",
@@ -586,8 +608,16 @@
     },
     "medications": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Medication?_id=med-medref"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Medication/med-medref",
           "resource": {
             "resourceType": "Medication",
             "id": "med-medref",
@@ -606,8 +636,16 @@
     },
     "devices": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Device?_id=dev-codref-pra,dev-codref-rol"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Device/dev-codref-pra",
           "resource": {
             "resourceType": "Device",
             "id": "dev-codref-pra",
@@ -620,6 +658,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Device/dev-codref-rol",
           "resource": {
             "resourceType": "Device",
             "id": "dev-codref-rol",
@@ -635,8 +674,16 @@
     },
     "practitionerRoles": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/PractitionerRole?_id=enc-par-ind,com-req,com-rec,com-sen,dev-req,dev-per,med-req,med-per,nut-ord,ser-req,ser-per,vis-pre"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/PractitionerRole/enc-par-ind",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "enc-par-ind",
@@ -655,6 +702,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/com-req",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "com-req",
@@ -673,6 +721,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/com-rec",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "com-rec",
@@ -691,6 +740,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/com-sen",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "com-sen",
@@ -709,6 +759,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/dev-req",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "dev-req",
@@ -727,6 +778,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/dev-per",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "dev-per",
@@ -745,6 +797,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/med-req",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "med-req",
@@ -763,6 +816,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/med-per",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "med-per",
@@ -781,6 +835,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/nut-ord",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "nut-ord",
@@ -799,6 +854,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/ser-req",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "ser-req",
@@ -817,6 +873,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/ser-per",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "ser-per",
@@ -835,6 +892,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/PractitionerRole/vis-pre",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "vis-pre",
@@ -861,8 +919,16 @@
     },
     "practitioners": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Practitioner?_id=enc-par-ind-pra,enc-par-ind,com-req,com-rec,com-sen,com-req-pra,com-rec-pra,com-sen-pra,dev-req-pra,dev-per-pra,dev-req,dev-per,med-req,med-per,med-req-pra,med-per-pra,nut-ord,nut-ord-pra,ser-req,ser-per,ser-req-pra,ser-per-pra,vis-pre,vis-pre-pra"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "enc-par-ind-pra",
@@ -886,6 +952,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind",
           "resource": {
             "resourceType": "Practitioner",
             "id": "enc-par-ind",
@@ -909,6 +976,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-req",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-req",
@@ -926,6 +994,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-rec",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-rec",
@@ -943,6 +1012,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-sen",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-sen",
@@ -960,6 +1030,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-req-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-req-pra",
@@ -977,6 +1048,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-rec-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-rec-pra",
@@ -994,6 +1066,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/com-sen-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "com-sen-pra",
@@ -1011,6 +1084,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/dev-req-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "dev-req-pra",
@@ -1028,6 +1102,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/dev-per-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "dev-per-pra",
@@ -1045,6 +1120,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/dev-req",
           "resource": {
             "resourceType": "Practitioner",
             "id": "dev-req",
@@ -1062,6 +1138,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/dev-per",
           "resource": {
             "resourceType": "Practitioner",
             "id": "dev-per",
@@ -1079,6 +1156,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/med-req",
           "resource": {
             "resourceType": "Practitioner",
             "id": "med-req",
@@ -1096,6 +1174,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/med-per",
           "resource": {
             "resourceType": "Practitioner",
             "id": "med-per",
@@ -1113,6 +1192,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/med-req-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "med-req-pra",
@@ -1130,6 +1210,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/med-per-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "med-per-pra",
@@ -1147,6 +1228,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/nut-ord",
           "resource": {
             "resourceType": "Practitioner",
             "id": "nut-ord",
@@ -1164,6 +1246,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/nut-ord-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "nut-ord-pra",
@@ -1181,6 +1264,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/ser-req",
           "resource": {
             "resourceType": "Practitioner",
             "id": "ser-req",
@@ -1198,6 +1282,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/ser-per",
           "resource": {
             "resourceType": "Practitioner",
             "id": "ser-per",
@@ -1215,6 +1300,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/ser-req-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "ser-req-pra",
@@ -1232,6 +1318,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/ser-per-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "ser-per-pra",
@@ -1249,6 +1336,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/vis-pre",
           "resource": {
             "resourceType": "Practitioner",
             "id": "vis-pre",
@@ -1266,6 +1354,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/vis-pre-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "vis-pre-pra",
@@ -1286,8 +1375,16 @@
     },
     "organizations": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Organization?_id=enc-par-ind-org,enc-ser,com-rec,com-sen,com-req-org,com-rec-org,com-sen-org,dev-req-org,dev-per-org,med-req-org,med-per-org,med-dis-per,nut-ord-org,ser-per,ser-req-org,ser-per-org,vis-pre-org"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Organization/enc-par-ind-org",
           "resource": {
             "resourceType": "Organization",
             "id": "enc-par-ind-org",
@@ -1302,6 +1399,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/enc-ser",
           "resource": {
             "resourceType": "Organization",
             "id": "enc-ser",
@@ -1316,6 +1414,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/com-rec",
           "resource": {
             "resourceType": "Organization",
             "id": "com-rec",
@@ -1330,6 +1429,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/com-sen",
           "resource": {
             "resourceType": "Organization",
             "id": "com-sen",
@@ -1344,6 +1444,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/com-req-org",
           "resource": {
             "resourceType": "Organization",
             "id": "com-req-org",
@@ -1358,6 +1459,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/com-rec-org",
           "resource": {
             "resourceType": "Organization",
             "id": "com-rec-org",
@@ -1372,6 +1474,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/com-sen-org",
           "resource": {
             "resourceType": "Organization",
             "id": "com-sen-org",
@@ -1386,6 +1489,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/dev-req-org",
           "resource": {
             "resourceType": "Organization",
             "id": "dev-req-org",
@@ -1400,6 +1504,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/dev-per-org",
           "resource": {
             "resourceType": "Organization",
             "id": "dev-per-org",
@@ -1414,6 +1519,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/med-req-org",
           "resource": {
             "resourceType": "Organization",
             "id": "med-req-org",
@@ -1428,6 +1534,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/med-per-org",
           "resource": {
             "resourceType": "Organization",
             "id": "med-per-org",
@@ -1442,6 +1549,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/med-dis-per",
           "resource": {
             "resourceType": "Organization",
             "id": "med-dis-per",
@@ -1456,6 +1564,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/nut-ord-org",
           "resource": {
             "resourceType": "Organization",
             "id": "nut-ord-org",
@@ -1470,6 +1579,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/ser-per",
           "resource": {
             "resourceType": "Organization",
             "id": "ser-per",
@@ -1484,6 +1594,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/ser-req-org",
           "resource": {
             "resourceType": "Organization",
             "id": "ser-req-org",
@@ -1498,6 +1609,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/ser-per-org",
           "resource": {
             "resourceType": "Organization",
             "id": "ser-per-org",
@@ -1512,6 +1624,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/vis-pre-org",
           "resource": {
             "resourceType": "Organization",
             "id": "vis-pre-org",
@@ -1529,8 +1642,16 @@
     },
     "locations": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Location?_id=enc-loc-loc,ser-locref,vis-pre-pra"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Location/enc-loc-loc",
           "resource": {
             "resourceType": "Location",
             "id": "enc-loc-loc",
@@ -1552,6 +1673,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Location/ser-locref",
           "resource": {
             "resourceType": "Location",
             "id": "ser-locref",
@@ -1573,6 +1695,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Location/vis-pre-pra",
           "resource": {
             "resourceType": "Location",
             "id": "vis-pre-pra",

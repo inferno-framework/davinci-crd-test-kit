@@ -100,8 +100,16 @@
     },
     "coverage": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Coverage?patient=Patient/forprefetch&status=active"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Coverage/forprefetch",
           "resource": {
             "resourceType": "Coverage",
             "id": "forprefetch",
@@ -130,8 +138,16 @@
     },
     "practitionerRoles": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/PractitionerRole?_id=enc-par-ind"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/PractitionerRole/enc-par-ind",
           "resource": {
             "resourceType": "PractitionerRole",
             "id": "enc-par-ind",
@@ -153,8 +169,16 @@
     },
     "practitioners": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Practitioner?_id=enc-par-ind-pra,enc-par-ind"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind-pra",
           "resource": {
             "resourceType": "Practitioner",
             "id": "enc-par-ind-pra",
@@ -178,6 +202,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind",
           "resource": {
             "resourceType": "Practitioner",
             "id": "enc-par-ind",
@@ -204,8 +229,16 @@
     },
     "organizations": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Organization?_id=enc-par-ind-org,enc-ser"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Organization/enc-par-ind-org",
           "resource": {
             "resourceType": "Organization",
             "id": "enc-par-ind-org",
@@ -220,6 +253,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/Organization/enc-ser",
           "resource": {
             "resourceType": "Organization",
             "id": "enc-ser",
@@ -237,8 +271,16 @@
     },
     "locations": {
       "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Location?_id=enc-loc-loc"
+        }
+      ],
       "entry": [
         {
+          "fullUrl": "https://example/r4/Location/enc-loc-loc",
           "resource": {
             "resourceType": "Location",
             "id": "enc-loc-loc",
