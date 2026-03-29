@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'DaVinci CRD Test Kit'
   spec.homepage      = 'https://github.com/inferno-framework/davinci-crd-test-kit'
   spec.license       = 'Apache-2.0'
-  spec.add_runtime_dependency 'inferno_core', '~> 1.1'
+  spec.add_runtime_dependency 'inferno_core', '~> 1.1.1'
   spec.add_runtime_dependency 'smart_app_launch_test_kit', '~> 1.0'
   spec.add_runtime_dependency 'tls_test_kit', '~> 1.0'
   spec.required_ruby_version = Gem::Requirement.new('>= 3.3.6')

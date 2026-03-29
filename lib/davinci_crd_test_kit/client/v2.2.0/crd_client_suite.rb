@@ -73,7 +73,11 @@ module DaVinciCRDTestKit
         igs('hl7.fhir.us.davinci-crd#2.2.0')
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          [
+            /\A\S+: \S+: URL value '.*' does not resolve/,
+            %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
+            /CDSHooksRequest.extension: Unrecognized property/
+          ].any? { |match_template| message.message.match?(match_template) }
         end
       end
 

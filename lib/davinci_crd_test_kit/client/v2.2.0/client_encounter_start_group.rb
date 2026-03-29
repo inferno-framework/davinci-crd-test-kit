@@ -3,6 +3,7 @@ require_relative 'auth/decode_auth_token_test'
 require_relative 'auth/retrieve_jwks_test'
 require_relative 'auth/token_header_test'
 require_relative 'auth/token_payload_test'
+require_relative 'verify_request/hook_request_conformance_test'
 require_relative 'verify_request/hook_request_optional_fields_test'
 require_relative 'verify_request/hook_request_required_fields_test'
 require_relative 'verify_request/hook_request_valid_context_test'
@@ -67,6 +68,7 @@ module DaVinciCRDTestKit
       test from: :crd_v220_retrieve_jwks
       test from: :crd_v220_token_header
       test from: :crd_v220_token_payload
+      test from: :crd_v220_hook_request_conformance
       test from: :crd_v220_hook_request_required_fields
       test from: :crd_v220_hook_request_optional_fields
       test from: :crd_v220_hook_request_valid_context do
