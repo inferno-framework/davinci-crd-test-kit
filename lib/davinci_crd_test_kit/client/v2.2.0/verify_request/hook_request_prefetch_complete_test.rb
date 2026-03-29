@@ -36,19 +36,16 @@ module DaVinciCRDTestKit
         crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
       end
 
-      # TODO: remove when updated to core with a standard version
-      def assert_no_error_messages(message = '', message_list: messages)
-        assert message_list.none? { |msg| msg[:type] == 'error' },
-               message.present? ? message : 'Errors found - see Messages for details.'
-      end
-
       run do
         hook_requests = load_tagged_requests(*tags_to_load)
 
-        skip_if hook_requests.blank?, 'No Hook Requests to verify.'
+        skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          hook_request = JSON.parse(request.request_body)
+          hook_request = parsed_json_if_valid(request.request_body,
+                                              "#{hook_name} request #{request_index + 1} malformed.")
+          next unless hook_request.present?
+
           PrefetchChecker.new(hook_request, request_index).check_prefetched_data.each do |error|
             add_message('error', error)
           end
