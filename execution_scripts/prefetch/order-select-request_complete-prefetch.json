@@ -13,6 +13,21 @@
     "userId": "Practitioner/example",
     "patientId": "forprefetch",
     "encounterId": "forprefetch",
+    "selections": [
+      "CommunicationRequest/forprefetch-ref-prac",
+      "CommunicationRequest/forprefetch-ref-role",
+      "CommunicationRequest/forprefetch-ref-org",
+      "DeviceRequest/forprefetch-rol",
+      "DeviceRequest/forprefetch-pra",
+      "MedicationRequest/forprefetch-rol",
+      "MedicationRequest/forprefetch-pra",
+      "NutritionOrder/forprefetch-rol",
+      "NutritionOrder/forprefetch-pra",
+      "ServiceRequest/forprefetch-rol",
+      "ServiceRequest/forprefetch-pra",
+      "VisionPrescription/forprefetch-rol",
+      "VisionPrescription/forprefetch-pra"
+    ],
     "draftOrders": {
       "resourceType": "Bundle",
       "type": "collection",
