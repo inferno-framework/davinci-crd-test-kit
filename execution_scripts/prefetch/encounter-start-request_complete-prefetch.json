@@ -1,0 +1,307 @@
+{
+  "hookInstance": "44577c69-df0e-b0ad-ba6d-3e05e953b2ea",
+  "fhirServer": "https://example/r4",
+  "hook": "encounter-start",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/Patient.read user/Observation.read",
+    "subject": "cds-service"
+  },
+  "context": {
+    "userId": "Practitioner/example",
+    "patientId": "forprefetch",
+    "encounterId": "forprefetch"
+  },
+  "prefetch": {
+    "patient": {
+      "resourceType": "Patient",
+      "id": "forprefetch",
+      "identifier": [
+        {
+          "use": "usual",
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                "code": "MR"
+              }
+            ],
+            "text": "Medical Record Number"
+          },
+          "system": "http://hospital.smarthealthit.org",
+          "value": "1032702"
+        }
+      ],
+      "active": true,
+      "name": [
+        {
+          "family": "Shaw",
+          "given": [
+            "Amy",
+            "V."
+          ],
+          "period": {
+            "start": "2016-12-06",
+            "end": "2020-07-22"
+          }
+        }
+      ],
+      "gender": "female",
+      "birthDate": "1987-02-20"
+    },
+    "encounter": {
+      "resourceType": "Encounter",
+      "id": "forprefetch",
+      "status": "in-progress",
+      "class": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "AMB",
+        "display": "ambulatory"
+      },
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "270427003",
+              "display": "Patient-initiated encounter"
+            }
+          ]
+        }
+      ],
+      "subject": {
+        "reference": "Patient/forprefetch"
+      },
+      "participant": [
+        {
+          "individual": {
+            "reference": "Practitioner/enc-par-ind"
+          }
+        },
+        {
+          "individual": {
+            "reference": "PractitionerRole/enc-par-ind"
+          }
+        }
+      ],
+      "location": [
+        {
+          "location": {
+            "reference": "Location/enc-loc-loc",
+            "display": "Location1"
+          }
+        }
+      ],
+      "serviceProvider": {
+        "reference": "Organization/enc-ser"
+      }
+    },
+    "coverage": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Coverage?patient=Patient/forprefetch&status=active"
+        }
+      ],
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/Coverage/forprefetch",
+          "resource": {
+            "resourceType": "Coverage",
+            "id": "forprefetch",
+            "status": "active",
+            "subscriberId": "123",
+            "beneficiary": {
+              "reference": "Patient/forprefetch"
+            },
+            "relationship": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+                  "code": "self"
+                }
+              ]
+            },
+            "payor": [
+              {
+                "reference": "http://example.org/fhir/Organization/example-payer",
+                "display": "Payer XYZ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "practitionerRoles": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/PractitionerRole?_id=enc-par-ind"
+        }
+      ],
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/PractitionerRole/enc-par-ind",
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "enc-par-ind",
+            "organization": {
+              "reference": "Organization/enc-par-ind-org"
+            },
+            "practitioner": {
+              "reference": "Practitioner/enc-par-ind-pra"
+            },
+            "telecom": [
+              {
+                "system": "other",
+                "value": "sneakernet"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "practitioners": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Practitioner?_id=enc-par-ind-pra,enc-par-ind"
+        }
+      ],
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind-pra",
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind-pra",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1714983354"
+              }
+            ],
+            "name": [
+              {
+                "family": "Careful",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "https://example/r4/Practitioner/enc-par-ind",
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "enc-par-ind",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1714983354"
+              }
+            ],
+            "name": [
+              {
+                "family": "Alternate",
+                "given": [
+                  "Adam"
+                ],
+                "prefix": [
+                  "Dr"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "organizations": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Organization?_id=enc-par-ind-org,enc-ser"
+        }
+      ],
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/Organization/enc-par-ind-org",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-par-ind-org",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1714983354"
+              }
+            ],
+            "name": "enc-par-ind-org",
+            "active": true
+          }
+        },
+        {
+          "fullUrl": "https://example/r4/Organization/enc-ser",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "enc-ser",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1714983354"
+              }
+            ],
+            "name": "University Medical Center",
+            "active": true
+          }
+        }
+      ]
+    },
+    "locations": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://example/r4/Location?_id=enc-loc-loc"
+        }
+      ],
+      "entry": [
+        {
+          "fullUrl": "https://example/r4/Location/enc-loc-loc",
+          "resource": {
+            "resourceType": "Location",
+            "id": "enc-loc-loc",
+            "status": "active",
+            "name": "South Wing, second floor",
+            "managingOrganization": {
+              "reference": "Organization/enc-ser"
+            },
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
