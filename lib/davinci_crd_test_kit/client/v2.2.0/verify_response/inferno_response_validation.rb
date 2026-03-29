@@ -19,6 +19,7 @@ module DaVinciCRDTestKit
         report this failure to the Inferno team via github issues.
       )
       id :crd_v220_inferno_response_validation
+      simulation_verification
 
       input :custom_response_template, optional: true
 
