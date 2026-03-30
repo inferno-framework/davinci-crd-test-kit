@@ -70,7 +70,7 @@ module DaVinciCRDTestKit
       # )
 
       fhir_resource_validator do
-        igs('hl7.fhir.us.davinci-crd#2.2.0')
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
 
         exclude_message do |message|
           [
