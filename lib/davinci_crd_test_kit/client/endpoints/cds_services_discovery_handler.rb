@@ -19,7 +19,8 @@ module DaVinciCRDTestKit
       version_no_dots = suite.split('_')[2] # crd_client_<version>
       version_no_dots = 'v201' if version_no_dots.blank?
       version = "#{version_no_dots[0..1]}.#{version_no_dots[2]}.#{version_no_dots[3]}" # v###
-      [200, { 'Content-Type' => 'application/json' }, [self.class.cds_services(version)]]
+      [200, { 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' },
+       [self.class.cds_services(version)]]
     end
   end
 end
