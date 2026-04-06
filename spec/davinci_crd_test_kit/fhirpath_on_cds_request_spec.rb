@@ -1,4 +1,4 @@
-require_relative '../../lib/davinci_crd_test_kit/fhirpath_on_cds_request'
+require_relative '../../lib/davinci_crd_test_kit/cross_suite/fhirpath_on_cds_request'
 
 RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
   let(:module_instance) { Class.new { include DaVinciCRDTestKit::FhirpathOnCDSRequest }.new }

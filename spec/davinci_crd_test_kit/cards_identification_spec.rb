@@ -11,14 +11,14 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
 
   let(:additional_orders_template) do
     JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses',
-                           'companions_prerequisites.json'
+                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                           'mocked_card_responses', 'companions_prerequisites.json'
                          )))
   end
   let(:create_coverage_card_template) do
     template = JSON.parse(File.read(File.join(
-                                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses',
-                                      'create_update_coverage_information.json'
+                                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                                      'mocked_card_responses', 'create_update_coverage_information.json'
                                     )))
     template['suggestions'].first['actions'] = JSON.parse('[{
       "type": "create",
@@ -31,8 +31,8 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
   let(:create_coverage_action_template) { create_coverage_card_template['suggestions'][0]['actions'][0] }
   let(:update_coverage_card_template) do
     template = JSON.parse(File.read(File.join(
-                                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses',
-                                      'create_update_coverage_information.json'
+                                      __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                                      'mocked_card_responses', 'create_update_coverage_information.json'
                                     )))
     template['suggestions'].first['actions'] = JSON.parse('[{
       "type": "update",
@@ -53,32 +53,37 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
   let(:external_reference_template) do
     JSON.parse(File.read(
                  File.join(
-                   __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'external_reference.json'
+                   __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                   'mocked_card_responses', 'external_reference.json'
                  )
                ))
   end
   let(:form_completion_card_template) do
     JSON.parse(File.read(
                  File.join(
-                   __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'request_form_completion.json'
+                   __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                   'mocked_card_responses', 'request_form_completion.json'
                  )
                ))
   end
   let(:form_completion_action_template) { form_completion_card_template['suggestions'][0]['actions'][1] }
   let(:instructions_card_template) do
     JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'instructions.json'
+                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                           'mocked_card_responses', 'instructions.json'
                          )))
   end
   let(:launch_smart_app_template) do
     JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'launch_smart_app.json'
+                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                           'mocked_card_responses', 'launch_smart_app.json'
                          )))
   end
   let(:propose_alternate_delete_create_card_template) do
     template = JSON.parse(
       File.read(File.join(
-                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'propose_alternate_request.json'
+                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                  'mocked_card_responses', 'propose_alternate_request.json'
                 ))
     )
     template['suggestions'].first['actions'] << JSON.parse('{
@@ -97,7 +102,8 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
   let(:propose_alternate_update_card_template) do
     template = JSON.parse(
       File.read(File.join(
-                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'propose_alternate_request.json'
+                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                  'mocked_card_responses', 'propose_alternate_request.json'
                 ))
     )
     template['suggestions'].first['actions'] << JSON.parse('{

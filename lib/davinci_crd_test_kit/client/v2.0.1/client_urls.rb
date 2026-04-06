@@ -1,0 +1,13 @@
+require_relative '../client_base_urls'
+
+module DaVinciCRDTestKit
+  module V201
+    module ClientURLs
+      include ClientBaseURLs
+
+      def suite_id
+        DaVinciCRDTestKit::V201::CRDClientSuite.id
+      end
+    end
+  end
+end

@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/token_header_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/auth/token_header_test'
 
-RSpec.describe DaVinciCRDTestKit::TokenHeaderTest do
+RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
   let(:suite_id) { 'crd_client' }
   let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

@@ -1,7 +1,7 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/hook_request_valid_context_test'
-require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/verify_request/hook_request_valid_context_test'
+require_relative '../../lib/davinci_crd_test_kit/server/jwt_helper'
 
-RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
+RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
   let(:suite_id) { 'crd_client' }
   let(:results_repo) { Inferno::Repositories::Results.new }
 
@@ -83,7 +83,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestValidContextTest do
 
   describe 'Order Select Hook Valid Context' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestValidContextTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestValidContextTest) do
         fhir_resource_validator do
           url ENV.fetch('FHIR_RESOURCE_VALIDATOR_URL', nil)
 

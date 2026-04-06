@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::CoverageInformationSystemActionReceivedTest do
+RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionReceivedTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable) { described_class }
   let(:coverage_info_system_action) do

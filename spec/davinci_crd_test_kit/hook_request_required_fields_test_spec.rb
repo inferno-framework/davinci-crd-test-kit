@@ -1,7 +1,7 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/hook_request_required_fields_test'
-require_relative '../../lib/davinci_crd_test_kit/jwt_helper'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/verify_request/hook_request_required_fields_test'
+require_relative '../../lib/davinci_crd_test_kit/server/jwt_helper'
 
-RSpec.describe DaVinciCRDTestKit::HookRequestRequiredFieldsTest do
+RSpec.describe DaVinciCRDTestKit::V201::HookRequestRequiredFieldsTest do
   let(:suite_id) { 'crd_client' }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { described_class }
@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestRequiredFieldsTest do
 
   describe 'Appointment Book Hook Request Required Fields' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestRequiredFieldsTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestRequiredFieldsTest) do
         config(
           options: { hook_path: '/cds-services/appointment-book-service', hook_name: 'appointment-book' }
         )

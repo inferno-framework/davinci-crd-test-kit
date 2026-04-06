@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::HookRequestPrefetchEqualsQueriedTest do
+RSpec.describe DaVinciCRDTestKit::V201::HookRequestPrefetchEqualsQueriedTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
@@ -170,7 +170,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestPrefetchEqualsQueriedTest do
 
   describe 'Appointment Book Hook Prefetch' do
     let(:test) do
-      Class.new(DaVinciCRDTestKit::HookRequestPrefetchEqualsQueriedTest) do
+      Class.new(DaVinciCRDTestKit::V201::HookRequestPrefetchEqualsQueriedTest) do
         config(
           options: { hook_name: 'appointment-book' }
         )

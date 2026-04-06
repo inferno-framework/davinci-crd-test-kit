@@ -1,4 +1,4 @@
-require_relative '../../lib/davinci_crd_test_kit/gather_response_generation_data'
+require_relative '../../lib/davinci_crd_test_kit/client/endpoints/gather_response_generation_data'
 
 RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
   let(:module_instance) do

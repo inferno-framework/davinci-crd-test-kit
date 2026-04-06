@@ -1,9 +1,9 @@
-require_relative '../../lib/davinci_crd_test_kit/routes/hook_request_endpoint'
-require_relative '../../lib/davinci_crd_test_kit/tags'
+require_relative '../../lib/davinci_crd_test_kit/client/endpoints/hook_request_endpoint'
+require_relative '../../lib/davinci_crd_test_kit/cross_suite/tags'
 
 RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
   let(:suite_id) { 'crd_client' }
-  let(:test) { DaVinciCRDTestKit::OrderSignReceiveRequestTest }
+  let(:test) { DaVinciCRDTestKit::V201::OrderSignReceiveRequestTest }
 
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:requests_repo) { Inferno::Repositories::Requests.new }
@@ -19,7 +19,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
   let(:server_endpoint) { '/custom/crd_client/cds-services/order-sign-service' }
   let(:instructions_card_template) do
     JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'instructions.json'
+                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                           'mocked_card_responses', 'instructions.json'
                          )))
   end
 

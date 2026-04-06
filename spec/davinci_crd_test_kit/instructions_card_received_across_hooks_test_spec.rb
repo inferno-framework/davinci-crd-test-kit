@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::InstructionsCardReceivedAcrossHooksTest do
+RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedAcrossHooksTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable_across) do
     id = 'crd_server-crd_server_hooks-crd_server_required_card_response_validation' \

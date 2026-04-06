@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::ClientCardMustSupportCoverageInformationTest do
+RSpec.describe DaVinciCRDTestKit::V201::ClientCardMustSupportCoverageInformationTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
 

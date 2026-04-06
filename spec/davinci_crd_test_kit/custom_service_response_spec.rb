@@ -1,8 +1,8 @@
-require_relative '../../lib/davinci_crd_test_kit/client_tests/order_sign_receive_request_test'
+require_relative '../../lib/davinci_crd_test_kit/client/v2.0.1/invocation/order_sign_receive_request_test'
 
 RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
   let(:suite_id) { 'crd_client' }
-  let(:test) { DaVinciCRDTestKit::OrderSignReceiveRequestTest }
+  let(:test) { DaVinciCRDTestKit::V201::OrderSignReceiveRequestTest }
 
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
@@ -47,13 +47,15 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
   end
   let(:instructions_card_template) do
     JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'instructions.json'
+                           __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                           'mocked_card_responses', 'instructions.json'
                          )))
   end
   let(:suggestions_card_template) do
     JSON.parse(
       File.read(File.join(
-                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'card_responses', 'propose_alternate_request.json'
+                  __dir__, '..', '..', 'lib', 'davinci_crd_test_kit', 'client', 'endpoints',
+                  'mocked_card_responses', 'propose_alternate_request.json'
                 ))
     )
   end

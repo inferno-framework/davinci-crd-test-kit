@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::LaunchSmartAppCardValidationTest do
+RSpec.describe DaVinciCRDTestKit::V201::LaunchSmartAppCardValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:valid_cards) do
