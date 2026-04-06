@@ -1,0 +1,87 @@
+require_relative 'invocation/encounter_discharge_receive_request_test'
+require_relative 'auth/decode_auth_token_test'
+require_relative 'auth/retrieve_jwks_test'
+require_relative 'auth/token_header_test'
+require_relative 'auth/token_payload_test'
+require_relative 'verify_request/hook_request_optional_fields_test'
+require_relative 'verify_request/hook_request_required_fields_test'
+require_relative 'verify_request/hook_request_valid_context_test'
+require_relative 'verify_request/hook_request_valid_prefetch_test'
+require_relative 'verify_request/hook_request_fetched_data_test'
+require_relative 'verify_request/hook_request_prefetch_equals_queried_test'
+require_relative 'verify_response/inferno_response_validation'
+require_relative 'verify_response/client_display_cards_attest'
+
+module DaVinciCRDTestKit
+  module V220
+    class ClientEncounterDischargeGroup < Inferno::TestGroup
+      title 'encounter-discharge'
+      id :crd_v220_client_encounter_discharge
+      description <<~DESCRIPTION
+        The encounter-discharge hook is invoked when the user is performing the discharge process for an encounter where
+        the notion of 'discharge' is relevant - typically an inpatient encounter. These tests are based on the
+        following criteria:
+          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge),
+          which includes the profiles that are expected to be used for the resources resolved to by `context`
+          FHIR ID fields
+          * Specific [encounter-discharge `context` requirements](https://cds-hooks.hl7.org/hooks/encounter-discharge/2023SepSTU1Ballot/encounter-discharge/)
+          defined in the CDS Hooks specification
+
+        This version of the CRD implementation guide refers to version 1.0 of the hook.
+      DESCRIPTION
+
+      run_as_group
+
+      input_order :cds_jwt_iss, :cds_jwk_set
+
+      config(
+        inputs: {
+          auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json },
+          auth_tokens: { name: :encounter_discharge_auth_tokens },
+          auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json },
+          client_access_token: { name: :encounter_discharge_client_access_token },
+          override_access_token: { name: :encounter_discharge_override_access_token,
+                                   title: 'encounter-discharge Prefetch Validation Override Bearer Token' },
+          client_fhir_server: { name: :encounter_discharge_client_fhir_server },
+          crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json },
+          custom_response_template: { name: :encounter_discharge_custom_response_template },
+          selected_response_types: { name: :encounter_discharge_selected_response_types }
+        },
+        outputs: {
+          auth_token_headers_json: { name: :encounter_discharge_auth_token_headers_json },
+          auth_token_payloads_json: { name: :encounter_discharge_auth_token_payloads_json },
+          auth_tokens: { name: :encounter_discharge_auth_tokens },
+          auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json },
+          client_access_token: { name: :encounter_discharge_client_access_token },
+          client_fhir_server: { name: :encounter_discharge_client_fhir_server },
+          crd_jwks_json: { name: :encounter_discharge_crd_jwks_json },
+          crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json }
+        },
+        options: {
+          hook_name: 'encounter-discharge',
+          hook_path: ENCOUNTER_DISCHARGE_PATH
+        }
+      )
+
+      test from: :crd_v220_encounter_discharge_request
+      test from: :crd_v220_decode_auth_token
+      test from: :crd_v220_retrieve_jwks
+      test from: :crd_v220_token_header
+      test from: :crd_v220_token_payload
+      test from: :crd_v220_hook_request_required_fields
+      test from: :crd_v220_hook_request_optional_fields
+      test from: :crd_v220_hook_request_valid_context do
+        # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@201', 'hl7.fhir.us.davinci-crd_2.0.1@202',
+        #                       'hl7.fhir.us.davinci-crd_2.0.1@203',
+        #                       'cds-hooks-library_1.0.1@45', 'cds-hooks-library_1.0.1@46', 'cds-hooks-library_1.0.1@47',
+        #                       'cds-hooks-library_1.0.1@49', 'cds-hooks-library_1.0.1@50', 'cds-hooks-library_1.0.1@51',
+        #                       'cds-hooks-library_1.0.1@53', 'cds-hooks-library_1.0.1@54', 'cds-hooks-library_1.0.1@55'
+      end
+      test from: :crd_v220_hook_request_valid_prefetch
+      test from: :crd_v220_hook_request_fetched_data
+      test from: :crd_v220_hook_request_prefetch_equals_queried
+      test from: :crd_v220_inferno_response_validation
+      test from: :crd_v220_card_display_attest_test
+    end
+  end
+end

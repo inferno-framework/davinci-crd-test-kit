@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientHookRequestValidation
       include ClientURLs
 
-      id :crd_hook_request_valid_prefetch
+      id :crd_v201_hook_request_valid_prefetch
       title 'Hook request contains valid prefetched data'
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
         This test verifies that the incoming hook request's `prefetch` field is in a valid JSON format,
         validates each contained resource against its corresponding CRD resource profile, and checks
         that the data matches what is requested in by the
-        [prefetch templates published by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/routes/cds-services.json).
+        [prefetch templates published by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.0.1/cds-services-v201.json).
         Since prefetch support is not required, this test will pass if `prefetch` is not present or has no entries.
       )
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
@@ -33,7 +33,7 @@ module DaVinciCRDTestKit
 
       def cds_services_json
         JSON.parse(File.read(File.join(
-                               __dir__, '..', '..', 'endpoints', 'cds-services.json'
+                               __dir__, '..', 'cds-services-v201.json'
                              )))['services']
       end
 
@@ -53,7 +53,7 @@ module DaVinciCRDTestKit
 
           @request_number = index + 1
           context = hook_contexts[index].present? ? hook_contexts[index] : {}
-          hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context)
+          hook_request_prefetch_check(advertised_prefetch_fields, prefetch, context, ig_version: 'v201')
         end
         no_error_validation('Prefetch is not valid.')
       end

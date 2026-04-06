@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientHookRequestValidation
       include ClientURLs
 
-      id :crd_hook_request_required_fields
+      id :crd_v201_hook_request_required_fields
       title 'Hook request contains required fields'
       description %(
         Under the [CDS hooks HTTP Request section](https://cds-hooks.hl7.org/2.0/#http-request_1), the specification
@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
 
           contexts << request_body['context'] if request_body['context'].is_a?(Hash)
           prefetches << request_body['prefetch'] if request_body['prefetch'].is_a?(Hash)
-          hook_request_required_fields_check(request_body, hook_name)
+          hook_request_required_fields_check(request_body, hook_name, ig_version: 'v201')
         end
 
         output contexts: contexts.to_json,

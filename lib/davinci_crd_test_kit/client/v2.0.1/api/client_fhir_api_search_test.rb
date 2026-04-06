@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V201
     class ClientFHIRApiSearchTest < Inferno::Test
-      id :crd_client_fhir_api_search_test
+      id :crd_v201_client_fhir_api_search_test
       title 'Search Interaction'
       description %(
         Verify that the CRD client supports the specified search interaction for the given resource. The capabilities

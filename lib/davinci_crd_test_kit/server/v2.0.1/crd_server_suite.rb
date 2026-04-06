@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
   module V201
     class CRDServerSuite < Inferno::TestSuite
       id :crd_server
-      title 'Da Vinci CRD Server Test Suite'
+      title 'Da Vinci CRD Server v2.0.1 Test Suite'
       description <<~DESCRIPTION
         The Da Vinci CRD Server Test Suite tests the conformance of server systems
         to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
@@ -72,11 +72,11 @@ module DaVinciCRDTestKit
 
       route :get, '/jwks.json', JWKSetEndpointHandler
 
-      group from: :crd_server_discovery_group
+      group from: :crd_v201_server_discovery_group
 
-      group from: :crd_server_demonstrate_hook_response
+      group from: :crd_v201_server_demonstrate_hook_response
 
-      group from: :crd_server_hooks
+      group from: :crd_v201_server_hooks
     end
   end
 end

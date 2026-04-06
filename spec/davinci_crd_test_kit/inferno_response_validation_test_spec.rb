@@ -28,6 +28,10 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
     Class.new do
       include DaVinciCRDTestKit::MockServiceResponse
 
+      def ig_version
+        'v201'
+      end
+
       def selected_response_types
         @selected_response_types ||= [
           'coverage_information',

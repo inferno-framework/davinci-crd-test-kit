@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
   module V201
     class ClientCardMustSupportGroup < Inferno::TestGroup
       title 'Card Must Support'
-      id :crd_client_card_must_support
+      id :crd_v201_client_card_must_support
       description <<~DESCRIPTION
         CRD clients are required to support the following card types
         - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
@@ -23,9 +23,9 @@ module DaVinciCRDTestKit
 
       run_as_group
 
-      test from: :crd_client_card_must_support_coverage_information
-      test from: :crd_client_card_must_support_external_reference
-      test from: :crd_client_card_must_support_instructions
+      test from: :crd_v201_client_card_must_support_coverage_information
+      test from: :crd_v201_client_card_must_support_external_reference
+      test from: :crd_v201_client_card_must_support_instructions
     end
   end
 end

@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientURLs
       include CardsIdentification
 
-      id :crd_card_display_attest_test
+      id :crd_v201_card_display_attest_test
       title 'Check that returned decision support details are displayed to the user'
       description %(
         Since Inferno has no way to evaluate the client's UI, testers must manually

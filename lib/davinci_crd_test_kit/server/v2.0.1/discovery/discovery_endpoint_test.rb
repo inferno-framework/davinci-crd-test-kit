@@ -2,7 +2,7 @@ module DaVinciCRDTestKit
   module V201
     class DiscoveryEndpointTest < Inferno::Test
       title 'Server returns a discovery response'
-      id :crd_discovery_endpoint_test
+      id :crd_v201_discovery_endpoint_test
       description %(
         A CDS Service provider must expose its discovery endpoint at `{baseURL}/cds-services`
         as specified in the [CDS Hooks Specification](https://cds-hooks.hl7.org/2.0/#discovery).

@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'All Coverage Information system actions received are valid'
-      id :crd_coverage_info_system_action_validation
+      id :crd_v201_coverage_info_system_action_validation
       description %(
         This test validates all [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
         system actions received. It verifies the following for each action:
@@ -94,7 +94,7 @@ module DaVinciCRDTestKit
         assert type == 'update', "`type` must be `update`, but was `#{type}`"
 
         resource = FHIR.from_contents(coverage_info_system_action['resource'].to_json)
-        profile_url = structure_definition_map[resource.resourceType]
+        profile_url = structure_definition_map('v201')[resource.resourceType]
         assert_valid_resource(resource:, profile_url:)
 
         grouped_coverage_info = extract_and_group_coverage_info(resource)

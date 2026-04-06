@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
   module V201
     class ServerOrderSelectGroup < Inferno::TestGroup
       title 'order-select'
-      id :crd_server_order_select
+      id :crd_v201_server_order_select
       description %(
         This group of tests invokes the order-select hook and ensures that
         the user-provided requests are valid as per the requirements described
@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
       config options: { hook_name: ORDER_SELECT_TAG }
       run_as_group
 
-      test from: :crd_service_call_test,
+      test from: :crd_v201_service_call_test,
            config: {
              inputs: {
                service_ids: {
@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_service_request_required_fields_validation,
+      test from: :crd_v201_service_request_required_fields_validation,
            config: {
              outputs: {
                contexts: {
@@ -68,7 +68,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_service_request_context_validation,
+      test from: :crd_v201_service_request_context_validation,
            config: {
              inputs: {
                contexts: {
@@ -76,8 +76,8 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_service_request_optional_fields_validation
-      test from: :crd_service_response_validation,
+      test from: :crd_v201_service_request_optional_fields_validation
+      test from: :crd_v201_service_response_validation,
            config: {
              outputs: {
                valid_cards: {
@@ -88,7 +88,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_card_optional_fields_validation,
+      test from: :crd_v201_card_optional_fields_validation,
            config: {
              inputs: {
                valid_cards: {
@@ -104,7 +104,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_external_reference_card_validation,
+      test from: :crd_v201_external_reference_card_validation,
            config: {
              inputs: {
                valid_cards_with_links: {
@@ -112,7 +112,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_launch_smart_app_card_validation,
+      test from: :crd_v201_launch_smart_app_card_validation,
            config: {
              inputs: {
                valid_cards_with_links: {
@@ -120,7 +120,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_valid_instructions_card_received,
+      test from: :crd_v201_valid_instructions_card_received,
            config: {
              inputs: {
                valid_cards: {
@@ -128,7 +128,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_coverage_info_system_action_received,
+      test from: :crd_v201_coverage_info_system_action_received,
            optional: true,
            config: {
              inputs: {
@@ -142,7 +142,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_coverage_info_system_action_validation,
+      test from: :crd_v201_coverage_info_system_action_validation,
            optional: true,
            config: {
              inputs: {
@@ -151,7 +151,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_propose_alternate_request_card_validation,
+      test from: :crd_v201_propose_alternate_request_card_validation,
            config: {
              inputs: {
                valid_cards_with_suggestions: {
@@ -162,7 +162,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_additional_orders_card_validation,
+      test from: :crd_v201_additional_orders_card_validation,
            config: {
              inputs: {
                valid_cards_with_suggestions: {
@@ -170,7 +170,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_request_form_completion_response_validation,
+      test from: :crd_v201_request_form_completion_response_validation,
            config: {
              inputs: {
                valid_system_actions: {
@@ -181,7 +181,7 @@ module DaVinciCRDTestKit
                }
              }
            }
-      test from: :crd_create_or_update_coverage_info_response_validation,
+      test from: :crd_v201_create_or_update_coverage_info_response_validation,
            config: {
              inputs: {
                valid_system_actions: {

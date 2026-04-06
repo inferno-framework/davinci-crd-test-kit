@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ServerHookHelper
 
       title 'Submit user-defined service requests'
-      id :crd_service_call_test
+      id :crd_v201_service_call_test
       description %(
         This test initiates POST request(s) to a specified CDS Service using the JSON body list provided by the user.
         As indicated in the [CDS Hooks specification section on Calling a CDS Service](https://cds-hooks.hl7.org/2.0/#calling-a-cds-service),

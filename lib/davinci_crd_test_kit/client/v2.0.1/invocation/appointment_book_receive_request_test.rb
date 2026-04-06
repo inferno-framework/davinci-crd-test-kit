@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class AppointmentBookReceiveRequestTest < Inferno::Test
       include ClientURLs
 
-      id :crd_appointment_book_request
+      id :crd_v201_appointment_book_request
       title 'Request received for appointment-book hook'
       description %(
         This test waits for multiple incoming [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)

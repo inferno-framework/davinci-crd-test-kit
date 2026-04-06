@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'Discovery response contains valid services'
-      id :crd_discovery_services_validation
+      id :crd_v201_discovery_services_validation
       description %(
         As per the [CDS Hooks Spec](https://cds-hooks.hl7.org/2.0/#response),
         the response to the discovery endpoint SHALL be an object containing

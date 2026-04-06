@@ -4,19 +4,43 @@ module DaVinciCRDTestKit
   module SuggestionActionsValidation
     include HookRequestFieldValidation
 
-    def action_required_fields
-      { 'type' => String, 'description' => String }
-    end
-
-    def action_fields_validation(action)
+    def action_fields_validation(action, ig_version: 'v201')
       action_required_fields.each do |field, type|
         validate_presence_and_type(action, field, type, 'Action')
       end
 
-      action_type_field_validation(action)
+      action_type_field_validation(action, ig_version:)
     end
 
-    def action_type_field_validation(action)
+    def actions_check(actions, contexts = nil, ig_version: 'v201')
+      create_actions_resource_types = extract_resource_types_by_action(actions, 'create')
+
+      actions.each do |action|
+        case action['type']
+        when 'create', 'update'
+          create_or_update_action_check(action, contexts, ig_version:)
+        when 'delete'
+          delete_action_check(action, create_actions_resource_types, contexts)
+        end
+      end
+    end
+
+    def action_resource_type_check(action, expected_resource_types)
+      resource_type = if ['create', 'update'].include?(action['type'])
+                        FHIR.from_contents(action['resource'].to_json)&.resourceType
+                      else
+                        action['resourceId']&.split('/')&.first
+                      end
+      expected_resource_types.include?(resource_type)
+    end
+
+    private
+
+    def action_required_fields
+      { 'type' => String, 'description' => String }
+    end
+
+    def action_type_field_validation(action, ig_version: 'v201')
       return unless action['type']
 
       allowed_types = ['create', 'update', 'delete']
@@ -31,7 +55,7 @@ module DaVinciCRDTestKit
       if ['create', 'update'].include?(type)
         action_resource_field_validation(action, type)
       else
-        action_resource_id_field_validation(action)
+        action_resource_id_field_validation(action, ig_version:)
       end
     end
 
@@ -47,9 +71,9 @@ module DaVinciCRDTestKit
       add_message('error', "`Action.resource` must be a FHIR resource: `#{action}`.")
     end
 
-    def action_resource_id_field_validation(action)
+    def action_resource_id_field_validation(action, ig_version: 'v201')
       validate_presence_and_type(action, 'resourceId', String, '`delete` Action')
-      resource_reference_check(action['resourceId'], 'Action.resourceId')
+      resource_reference_check(action['resourceId'], 'Action.resourceId', ig_version:)
     end
 
     def draft_orders_bundle_entry_refs(contexts)
@@ -59,37 +83,15 @@ module DaVinciCRDTestKit
       end
     end
 
-    def action_resource_type_check(action, expected_resource_types)
-      resource_type = if ['create', 'update'].include?(action['type'])
-                        FHIR.from_contents(action['resource'].to_json)&.resourceType
-                      else
-                        action['resourceId']&.split('/')&.first
-                      end
-      expected_resource_types.include?(resource_type)
-    end
-
     def extract_resource_types_by_action(actions, action_type)
       actions.each_with_object([]) do |act, resource_types|
         resource_types << act['resource']['resourceType'] if act['type'] == action_type
       end
     end
 
-    def actions_check(actions, contexts = nil)
-      create_actions_resource_types = extract_resource_types_by_action(actions, 'create')
-
-      actions.each do |action|
-        case action['type']
-        when 'create', 'update'
-          create_or_update_action_check(action, contexts)
-        when 'delete'
-          delete_action_check(action, create_actions_resource_types, contexts)
-        end
-      end
-    end
-
-    def create_or_update_action_check(action, contexts)
+    def create_or_update_action_check(action, contexts, ig_version: 'v201')
       resource = FHIR.from_contents(action['resource'].to_json)
-      resource_is_valid?(resource:, profile_url: structure_definition_map[resource.resourceType])
+      resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
       return unless action['type'] == 'update' && contexts
 
       ref = "#{resource.resourceType}/#{resource.id}"

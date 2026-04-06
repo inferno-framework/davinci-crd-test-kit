@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include CardsIdentification
 
       title 'Instructions Card Support'
-      id :crd_client_card_must_support_instructions
+      id :crd_v201_client_card_must_support_instructions
       description <<~DESCRIPTION
         Checks that the client demonstrated support for the [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
         card type. At least one hook invocation performed during this test session must have returned an Instructions card.

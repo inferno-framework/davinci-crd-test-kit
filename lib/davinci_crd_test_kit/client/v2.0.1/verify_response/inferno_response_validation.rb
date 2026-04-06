@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
         If this test fails when Inferno mocked the response based on selected card types, please
         report this failure to the Inferno team via github issues.
       )
-      id :crd_inferno_response_validation
+      id :crd_v201_inferno_response_validation
 
       input :custom_response_template, optional: true
 
@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
         return if system_actions.nil?
 
         system_actions.each do |action|
-          action_fields_validation(action)
+          action_fields_validation(action, ig_version: 'v201')
         end
       end
 
