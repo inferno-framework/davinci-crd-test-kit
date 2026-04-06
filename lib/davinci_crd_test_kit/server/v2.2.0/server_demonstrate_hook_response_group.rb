@@ -22,59 +22,72 @@ module DaVinciCRDTestKit
       config options: { hook_name: ANY_HOOK_TAG }
       run_as_group
 
-      test from: :crd_v220_service_call_test,
-           config: {
-             inputs: {
-               service_ids: {
-                 name: :any_hook_service_ids,
-                 title: 'Service id to use for the "Demonstrate a Hook Response" test',
-                 description: %(
-                If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
-                Discovery response for the hook indicated in the provided request body. If it cannot be inferred,
-                the tests will be skipped.
-               )
-               },
-               service_request_bodies: {
-                 name: :any_hook_request_body,
-                 title: 'Request body to use for the "Demonstrate a Hook Response" test',
-                 description: %(
-                Provide a single JSON request body to submit for the hook invocation. The type of hook invoked
-                will be inferred based on the `hook` element in the request.
-              )
-               }
-             }
-           }
+      group do
+        title 'Make Hook Requests'
 
-      test from: :crd_v220_service_request_required_fields_validation,
-           config: {
-             outputs: {
-               contexts: {
-                 name: :any_hook_contexts
+        test from: :crd_v220_service_call_test,
+             config: {
+               inputs: {
+                 service_ids: {
+                   name: :any_hook_service_ids,
+                   title: 'Service id to use for the "Demonstrate a Hook Response" test',
+                   description: %(
+                  If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
+                  Discovery response for the hook indicated in the provided request body. If it cannot be inferred,
+                  the tests will be skipped.
+                )
+                 },
+                 service_request_bodies: {
+                   name: :any_hook_request_body,
+                   title: 'Request body to use for the "Demonstrate a Hook Response" test',
+                   description: %(
+                  Provide a single JSON request body to submit for the hook invocation. The type of hook invoked
+                  will be inferred based on the `hook` element in the request.
+                )
+                 }
                }
              }
-           }
-      test from: :crd_v220_service_request_context_validation,
-           config: {
-             inputs: {
-               contexts: {
-                 name: :any_hook_contexts
-               },
-               request_body: {
-                 name: :any_hook_request_body
+      end
+
+      group do
+        title 'Verify Requests'
+
+        test from: :crd_v220_service_request_required_fields_validation,
+             config: {
+               outputs: {
+                 contexts: {
+                   name: :any_hook_contexts
+                 }
                }
              }
-           }
-      test from: :crd_v220_service_response_validation,
-           config: {
-             outputs: {
-               valid_cards: {
-                 name: :any_hook_valid_cards
-               },
-               valid_system_actions: {
-                 name: :any_hook_valid_system_actions
+        test from: :crd_v220_service_request_context_validation,
+             config: {
+               inputs: {
+                 contexts: {
+                   name: :any_hook_contexts
+                 },
+                 request_body: {
+                   name: :any_hook_request_body
+                 }
                }
              }
-           }
+      end
+
+      group do
+        title 'Verify Responses'
+
+        test from: :crd_v220_service_response_validation,
+             config: {
+               outputs: {
+                 valid_cards: {
+                   name: :any_hook_valid_cards
+                 },
+                 valid_system_actions: {
+                   name: :any_hook_valid_system_actions
+                 }
+               }
+             }
+      end
     end
   end
 end

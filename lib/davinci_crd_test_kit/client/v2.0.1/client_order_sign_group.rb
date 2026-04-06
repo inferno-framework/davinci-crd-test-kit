@@ -63,33 +63,51 @@ module DaVinciCRDTestKit
         }
       )
 
-      test from: :crd_v201_order_sign_request
-      test from: :crd_v201_decode_auth_token
-      test from: :crd_v201_retrieve_jwks
-      test from: :crd_v201_token_header
-      test from: :crd_v201_token_payload
-      test from: :crd_v201_hook_request_required_fields
-      test from: :crd_v201_hook_request_optional_fields
-      test from: :crd_v201_hook_request_valid_context do
-        verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@150',
-                              'hl7.fhir.us.davinci-crd_2.0.1@220', 'hl7.fhir.us.davinci-crd_2.0.1@221',
-                              'hl7.fhir.us.davinci-crd_2.0.1@222', 'hl7.fhir.us.davinci-crd_2.0.1@223',
-                              'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
-                              'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
-                              'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
-                              'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
-                              'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-                              'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
-                              'cds-hooks-library_1.0.1@1', 'cds-hooks-library_1.0.1@2', 'cds-hooks-library_1.0.1@3',
-                              'cds-hooks-library_1.0.1@5', 'cds-hooks-library_1.0.1@6', 'cds-hooks-library_1.0.1@7',
-                              'cds-hooks-library_1.0.1@9', 'cds-hooks-library_1.0.1@10', 'cds-hooks-library_1.0.1@11',
-                              'cds-hooks-library_1.0.1@13', 'cds-hooks-library_1.0.1@14', 'cds-hooks-library_1.0.1@15'
+      group do
+        title 'Make Hook Requests'
+        test from: :crd_v201_order_sign_request
       end
-      test from: :crd_v201_hook_request_valid_prefetch
-      test from: :crd_v201_hook_request_fetched_data
-      test from: :crd_v201_hook_request_prefetch_equals_queried
-      test from: :crd_v201_inferno_response_validation
-      test from: :crd_v201_card_display_attest_test
+
+      group do
+        title 'Verify Authorization'
+        test from: :crd_v201_decode_auth_token
+        test from: :crd_v201_retrieve_jwks
+        test from: :crd_v201_token_header
+        test from: :crd_v201_token_payload
+      end
+
+      group do
+        title 'Verify Requests'
+        test from: :crd_v201_hook_request_required_fields
+        test from: :crd_v201_hook_request_optional_fields
+        test from: :crd_v201_hook_request_valid_context do
+          verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@150',
+                                'hl7.fhir.us.davinci-crd_2.0.1@220', 'hl7.fhir.us.davinci-crd_2.0.1@221',
+                                'hl7.fhir.us.davinci-crd_2.0.1@222', 'hl7.fhir.us.davinci-crd_2.0.1@223',
+                                'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
+                                'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
+                                'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
+                                'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
+                                'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
+                                'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
+                                'cds-hooks-library_1.0.1@1', 'cds-hooks-library_1.0.1@2',
+                                'cds-hooks-library_1.0.1@3', 'cds-hooks-library_1.0.1@5',
+                                'cds-hooks-library_1.0.1@6', 'cds-hooks-library_1.0.1@7',
+                                'cds-hooks-library_1.0.1@9', 'cds-hooks-library_1.0.1@10',
+                                'cds-hooks-library_1.0.1@11', 'cds-hooks-library_1.0.1@13',
+                                'cds-hooks-library_1.0.1@14', 'cds-hooks-library_1.0.1@15'
+        end
+        test from: :crd_v201_hook_request_valid_prefetch
+        test from: :crd_v201_hook_request_fetched_data
+        test from: :crd_v201_hook_request_prefetch_equals_queried
+      end
+
+      group do
+        title 'Verify Response Handling'
+
+        test from: :crd_v201_inferno_response_validation
+        test from: :crd_v201_card_display_attest_test
+      end
     end
   end
 end
