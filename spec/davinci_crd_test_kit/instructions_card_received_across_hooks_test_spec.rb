@@ -7,7 +7,8 @@ RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedAcrossHooksTest 
   end
   let(:runnable_within) do
     Inferno::Repositories::Tests.new
-      .find('crd_server-crd_v201_server_hooks-crd_v201_server_order_dispatch-crd_v201_valid_instructions_card_received')
+      .find('crd_server-crd_v201_server_hooks-crd_v201_server_order_dispatch-Group03-' \
+            'crd_v201_valid_instructions_card_received')
   end
   let(:valid_response_body) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))

@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ExternalReferenceCardAcrossHooksValidati
   end
   let(:runnable_within) do
     Inferno::Repositories::Tests.new
-      .find('crd_server-crd_v201_server_hooks-crd_v201_server_order_dispatch-' \
+      .find('crd_server-crd_v201_server_hooks-crd_v201_server_order_dispatch-Group03-' \
             'crd_v201_external_reference_card_validation')
   end
   let(:results_repo) { Inferno::Repositories::Results.new }

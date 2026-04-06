@@ -10,7 +10,8 @@ module DaVinciCRDTestKit
       ],
       CommunicationRequest: [
         'requester',
-        'sender'
+        'sender',
+        'recipient'
       ],
       DeviceRequest: [
         'requester',
@@ -19,7 +20,8 @@ module DaVinciCRDTestKit
       MedicationRequest: [
         'requester',
         'performer',
-        'medicationReference'
+        'medicationReference',
+        'dispenseRequest.performer'
       ],
       NutritionOrder: [
         'orderer'
@@ -179,8 +181,9 @@ module DaVinciCRDTestKit
 
     def fetch_reference(reference)
       response = execute_request(reference)
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
+      return nil unless response.present?
 
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
       return nil unless response.status.to_s.starts_with?('2')
 
       JSON.parse(response.body)
@@ -249,7 +252,7 @@ module DaVinciCRDTestKit
     end
 
     def execute_request(query)
-      fhir_server_connection.get(query)
+      fhir_server_connection&.get(query)
     rescue Faraday::Error => e
       # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
       #          no clean way to persist that information for the Inferno test to check later. The solution here
@@ -278,6 +281,7 @@ module DaVinciCRDTestKit
     def query_for_coverages
       query = "Coverage?patient=#{request_body.dig('context', 'patientId')}&status=active"
       response = execute_request(query)
+      return nil unless response.present?
 
       persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
       return nil unless response.status.to_s.starts_with?('2')

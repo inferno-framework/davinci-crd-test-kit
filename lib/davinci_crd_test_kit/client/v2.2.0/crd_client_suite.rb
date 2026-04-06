@@ -70,10 +70,14 @@ module DaVinciCRDTestKit
       # )
 
       fhir_resource_validator do
-        igs 'igs/davinci_crd_2.2.0-preview.tgz' # TODO: update to published ig instead of local file when released
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
 
         exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
+          [
+            /\A\S+: \S+: URL value '.*' does not resolve/,
+            %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
+            /CDSHooksRequest.extension: Unrecognized property/
+          ].any? { |match_template| message.message.match?(match_template) }
         end
       end
 
@@ -99,7 +103,7 @@ module DaVinciCRDTestKit
       # route :post, '/cds-services/:cds-service_id', cds_service_handler
 
       allow_cors APPOINTMENT_BOOK_PATH, ENCOUNTER_START_PATH, ENCOUNTER_DISCHARGE_PATH, ORDER_DISPATCH_PATH,
-                 ORDER_SELECT_PATH, ORDER_SIGN_PATH
+                 ORDER_SELECT_PATH, ORDER_SIGN_PATH, '/cds-services'
       suite_endpoint :post, APPOINTMENT_BOOK_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_START_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_DISCHARGE_PATH, HookRequestEndpoint
