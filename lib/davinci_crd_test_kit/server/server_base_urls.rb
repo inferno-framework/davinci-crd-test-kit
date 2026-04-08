@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
     include BaseURLs
 
     def fhir_url
-      base_url + FHIR_ROUTE
+      inferno_base_url + FHIR_ROUTE
     end
 
     # alias for OIDC from SMART client tests
@@ -19,11 +19,11 @@ module DaVinciCRDTestKit
     end
 
     def instance_url
-      base_url + INSTANCE_ROUTE
+      inferno_base_url + INSTANCE_ROUTE
     end
 
     def search_url
-      base_url + RESOURCE_TYPE_ROUTE
+      inferno_base_url + RESOURCE_TYPE_ROUTE
     end
   end
 end

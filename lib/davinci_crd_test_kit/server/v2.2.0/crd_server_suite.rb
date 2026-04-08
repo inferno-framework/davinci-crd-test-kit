@@ -9,11 +9,12 @@ require_relative '../endpoints/mock_ehr/fhir_search_endpoint'
 require_relative '../endpoints/mock_ehr/fhir_create_endpoint'
 require_relative '../endpoints/mock_ehr/fhir_update_endpoint'
 require_relative '../endpoints/mock_ehr/fhir_delete_endpoint'
-require_relative 'api/fhir_request_test'
 
 module DaVinciCRDTestKit
   module V220
     class CRDServerSuite < Inferno::TestSuite
+      include ServerURLs
+
       id :crd_server_v220
       title 'Da Vinci CRD Server v2.2.0 Test Suite'
       description <<~DESCRIPTION
@@ -72,12 +73,13 @@ module DaVinciCRDTestKit
         # end
       end
 
-      def inferno_base_url
-        suite_id = self.class.suite.id
-        @inferno_base_url ||= "#{Inferno::Application['base_url']}/custom/#{suite_id}"
-      end
-
       route :get, '/jwks.json', JWKSetEndpointHandler
+      resume_test_route :get, RESUME_PASS_PATH do |request|
+        request.query_parameters['token']
+      end
+      resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
+        request.query_parameters['token']
+      end
       suite_endpoint :post, FHIR_SEARCH_POST_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
       suite_endpoint :get, FHIR_RESOURCE_TYPE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
       suite_endpoint :get, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRReadEndpoint
@@ -90,10 +92,6 @@ module DaVinciCRDTestKit
       group from: :crd_v220_server_demonstrate_hook_response
 
       group from: :crd_v220_server_hooks
-
-      group do
-        test from: :crd_v220_server_fhir_request_test
-      end
     end
   end
 end

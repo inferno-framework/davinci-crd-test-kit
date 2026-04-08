@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
       end
 
       def hook_url
-        base_url + config.options[:hook_path]
+        inferno_base_url + config.options[:hook_path]
       end
 
       input :auth_tokens,

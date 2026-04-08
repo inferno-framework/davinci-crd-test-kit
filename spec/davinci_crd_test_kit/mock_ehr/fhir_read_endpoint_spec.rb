@@ -1,7 +1,26 @@
-RSpec.describe DaVinciCRDTestKit::V220::FHIRRequestTest, :request do
-  let(:test) { described_class }
-  let(:suite_id) { :crd_server_v220 }
-  let(:token) { '12345' }
+require_relative '../../../lib/davinci_crd_test_kit/server/endpoints/mock_ehr/fhir_request_handler'
+
+RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
+  let(:suite_id) { 'crd_server' }
+  let(:runnable) do
+    Class.new(described_class) do
+      input :inferno_base_url
+    end
+  end
+  let(:test_session_id) { '12345' }
+  let(:token) do
+    DaVinciCRDTestKit::MockEHR::FHIRRequestHandler.session_id_to_token(test_session_id)
+  end
+  let(:base_url) { 'http://example.com' }
+  let(:discovery_url) { 'http://example.com/cds-services' }
+  let(:inferno_base_url) { 'http://inferno.com' }
+  let(:service_ids) { 'appointment-book-service' }
+  let(:service_request_body) do
+    json = File.read(File.join(__dir__, '..', '..', 'fixtures', 'appointment_book_hook_request.json'))
+    JSON.parse(json)
+  end
+  let(:service_request_bodies) { [service_request_body].to_json }
+  let(:encryption_method) { 'ES384' }
   let(:patient) do
     FHIR.from_contents(File.read(File.join(__dir__, '..', '..', 'fixtures', 'crd_patient_example.json')))
   end
@@ -12,9 +31,16 @@ RSpec.describe DaVinciCRDTestKit::V220::FHIRRequestTest, :request do
   end
 
   def wait_and_auth(bundle_input = mock_ehr_bundle)
-    result = run(test, { token:, mock_ehr_bundle: bundle_input })
+    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:, service_request_bodies:,
+                           mock_ehr_bundle: bundle_input)
     expect(result.result).to eq('wait')
     header 'Authorization', "Bearer #{token}"
+  end
+
+  before do
+    allow_any_instance_of(DaVinciCRDTestKit::Jobs::InvokeHook) # hook invocations
+      .to receive(:perform).and_return(nil)
+    allow_any_instance_of(runnable).to receive(:test_session_id).and_return(test_session_id)
   end
 
   describe 'FHIRReadEndpoint - GET /fhir/:resource_type/:resource_id' do

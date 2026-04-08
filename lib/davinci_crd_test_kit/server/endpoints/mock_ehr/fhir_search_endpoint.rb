@@ -7,10 +7,6 @@ module DaVinciCRDTestKit
       include Inferno::DSL::FHIRResourceNavigation
       include FHIRRequestHandler
 
-      def test_run_identifier
-        request.headers['authorization']&.delete_prefix('Bearer ') # TODO
-      end
-
       def make_response
         prepare_response
         return unless mock_ehr_bundle_present?
@@ -189,7 +185,7 @@ module DaVinciCRDTestKit
               # references can also be URLs, so we may need to resolve those URLs
               if ['subject', 'patient'].include? search_param_name.to_s
                 id = search_value.split('Patient/').last
-                possible_values = [id, "Patient/#{id}"] # , "#{url}/Patient/#{id}"] - TODO: needed or require all relative references?
+                possible_values = [id, "Patient/#{id}"] # TODO: "#{url}/Patient/#{id}"] - allow absolute references?
                 values_found.any? do |reference|
                   possible_values.include? reference
                 end

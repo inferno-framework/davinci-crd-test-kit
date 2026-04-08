@@ -8,7 +8,23 @@ module DaVinciCRDTestKit
       # ---------------------------------------------------------------------------
 
       def test_run_identifier
-        request.headers['authorization']&.delete_prefix('Bearer ') # TODO
+        token_to_session_id(request.headers['authorization']&.delete_prefix('Bearer '))
+      end
+
+      def token_to_session_id(token_to_decode)
+        JSON.parse(Base64.urlsafe_decode64(token_to_decode))&.dig('session_id')
+      rescue JSON::ParserError
+        nil
+      end
+
+      def self.session_id_to_token(session_id, exp_min = 5)
+        token_structure = {
+          session_id:,
+          expiration: exp_min.minutes.from_now.to_i,
+          nonce: SecureRandom.hex(8)
+        }.to_json
+
+        Base64.urlsafe_encode64(token_structure, padding: false)
       end
 
       # ---------------------------------------------------------------------------

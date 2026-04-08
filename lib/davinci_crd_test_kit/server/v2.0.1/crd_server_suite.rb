@@ -3,10 +3,18 @@ require_relative '../endpoints/jwk_set_endpoint_handler'
 require_relative 'server_discovery_group'
 require_relative 'server_demonstrate_hook_response_group'
 require_relative 'server_hooks_group'
+require_relative 'server_urls'
+require_relative '../endpoints/mock_ehr/fhir_read_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_search_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_create_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_update_endpoint'
+require_relative '../endpoints/mock_ehr/fhir_delete_endpoint'
 
 module DaVinciCRDTestKit
   module V201
     class CRDServerSuite < Inferno::TestSuite
+      include ServerURLs
+
       id :crd_server
       title 'Da Vinci CRD Server v2.0.1 Test Suite'
       description <<~DESCRIPTION
@@ -65,12 +73,19 @@ module DaVinciCRDTestKit
         end
       end
 
-      def inferno_base_url
-        suite_id = self.class.suite.id
-        @inferno_base_url ||= "#{Inferno::Application['base_url']}/custom/#{suite_id}"
-      end
-
       route :get, '/jwks.json', JWKSetEndpointHandler
+      resume_test_route :get, RESUME_PASS_PATH do |request|
+        request.query_parameters['token']
+      end
+      resume_test_route :get, RESUME_FAIL_PATH, result: 'fail' do |request|
+        request.query_parameters['token']
+      end
+      suite_endpoint :post, FHIR_SEARCH_POST_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
+      suite_endpoint :get, FHIR_RESOURCE_TYPE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRSearchEndpoint
+      suite_endpoint :get, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRReadEndpoint
+      suite_endpoint :post, FHIR_RESOURCE_TYPE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRCreateEndpoint
+      suite_endpoint :put, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRUpdateEndpoint
+      suite_endpoint :delete, FHIR_INSTANCE_ROUTE, DaVinciCRDTestKit::MockEHR::FHIRDeleteEndpoint
 
       group from: :crd_v201_server_discovery_group
 
