@@ -17,6 +17,14 @@ module DaVinciCRDTestKit
       rescue StandardError => e
         return_unhandled_error(e)
       end
+
+      private
+
+      # Hanami::Action strips non-entity headers from 204 responses by default.
+      # Allow CORS header so cross-origin clients can process the empty response.
+      def keep_response_header?(header)
+        super || header == 'Access-Control-Allow-Origin'
+      end
     end
   end
 end

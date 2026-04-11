@@ -215,9 +215,11 @@ module DaVinciCRDTestKit
 
       def mock_ehr_bundle
         @mock_ehr_bundle ||= begin
-          FHIR.from_contents(
-            JSON.parse(result.input_json).find { |input| input['name'] == mock_ehr_bundle_input_name }&.dig('value')
+          bundle_json = Inferno::Repositories::SessionData.new.load(
+            test_session_id: test_run.test_session_id,
+            name: mock_ehr_bundle_input_name
           )
+          FHIR.from_contents(bundle_json)
         rescue StandardError
           nil
         end

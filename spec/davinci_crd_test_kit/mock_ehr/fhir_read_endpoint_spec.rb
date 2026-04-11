@@ -67,12 +67,17 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome.resourceType).to eq('OperationOutcome')
     end
 
-    it 'returns 400 with an OperationOutcome when the bundle is not loaded' do
-      wait_and_auth(FHIR::Patient.new.to_json)
+    it 'sets Access-Control-Allow-Origin to *' do
+      wait_and_auth
       get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
-      expect(last_response.status).to eq(400)
-      outcome = FHIR.from_contents(last_response.body)
-      expect(outcome.resourceType).to eq('OperationOutcome')
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
+
+    it 'returns an error when the Authorization header is missing' do
+      run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                    service_request_bodies:, mock_ehr_bundle:)
+      get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response.status).to be >= 400
     end
   end
 end

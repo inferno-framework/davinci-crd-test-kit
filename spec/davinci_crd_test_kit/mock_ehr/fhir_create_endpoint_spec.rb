@@ -76,14 +76,6 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome.resourceType).to eq('OperationOutcome')
     end
 
-    it 'returns 400 when the bundle is not loaded' do
-      wait_and_auth(not_a_bundle)
-      post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
-      expect(last_response.status).to eq(400)
-      outcome = FHIR.from_contents(last_response.body)
-      expect(outcome.resourceType).to eq('OperationOutcome')
-    end
-
     it 'adds the created resource to the bundle in session data' do
       wait_and_auth
       post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
@@ -94,6 +86,30 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       saved_bundle = FHIR.from_contents(saved_json)
       expect(saved_bundle.entry.length).to eq(1)
       expect(saved_bundle.entry.first.resource.id).to eq(created_id)
+    end
+
+    it 'sets Access-Control-Allow-Origin to *' do
+      wait_and_auth
+      post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
+
+    it 'returns an error when the Authorization header is missing' do
+      run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                    service_request_bodies:, mock_ehr_bundle:)
+      post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
+      expect(last_response.status).to be >= 400
+    end
+
+    it 'created resource can be read back via GET' do
+      wait_and_auth
+      post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
+      expect(last_response.status).to eq(201)
+
+      created_id = FHIR.from_contents(last_response.body).id
+      get "/custom/#{suite_id}/fhir/Patient/#{created_id}"
+      expect(last_response.status).to eq(200)
+      expect(FHIR.from_contents(last_response.body).id).to eq(created_id)
     end
   end
 end

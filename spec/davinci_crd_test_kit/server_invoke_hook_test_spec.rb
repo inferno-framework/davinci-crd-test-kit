@@ -15,6 +15,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
   end
   let(:service_request_bodies) { [service_request_body].to_json }
   let(:encryption_method) { 'ES384' }
+  let(:mock_ehr_bundle) { FHIR::Bundle.new(type: 'collection').to_json }
 
   before do
     allow_any_instance_of(DaVinciCRDTestKit::Jobs::InvokeHook) # hook invocations
@@ -27,19 +28,21 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
     end
 
     it 'waits when provided details are sufficient' do
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:, service_request_bodies:)
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle:)
       expect(result.result).to eq('wait')
     end
 
     it 'skips when the service_ids is not provided' do
       result = run(runnable, base_url:, inferno_base_url:, service_ids: '', encryption_method:,
-                             service_request_bodies:)
+                             service_request_bodies:, mock_ehr_bundle:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(/No service id provided or discovered for the/)
     end
 
     it 'skips when the service_request_bodies is not provided' do
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:)
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             mock_ehr_bundle:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(/Request body not provided/)
     end
@@ -52,9 +55,39 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
         .to_return(status: 200, body: {}.to_json)
 
       result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
-                             service_request_bodies: 'body')
+                             service_request_bodies: 'body', mock_ehr_bundle:)
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(/Invalid JSON/)
+    end
+
+    describe 'mock_ehr_bundle validation' do
+      it 'skips when mock_ehr_bundle is blank' do
+        result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                               service_request_bodies:, mock_ehr_bundle: '')
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+      end
+
+      it 'skips when mock_ehr_bundle is not valid JSON' do
+        result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                               service_request_bodies:, mock_ehr_bundle: 'not-json')
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+      end
+
+      it 'skips when mock_ehr_bundle is valid JSON but not a FHIR Bundle' do
+        result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                               service_request_bodies:,
+                               mock_ehr_bundle: FHIR::Patient.new(id: 'p1').to_json)
+        expect(result.result).to eq('skip')
+        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+      end
+
+      it 'proceeds past bundle validation when mock_ehr_bundle is a valid Bundle' do
+        result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                               service_request_bodies:, mock_ehr_bundle:)
+        expect(result.result).to eq('wait')
+      end
     end
   end
 
@@ -73,7 +106,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
       multiple_bodies = [service_request_body, service_request_body]
 
       result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
-                             service_request_bodies: multiple_bodies.to_json)
+                             service_request_bodies: multiple_bodies.to_json, mock_ehr_bundle:)
       expect(result.result).to eq('skip')
       expect(result.result_message).to match(/supports only one request body/)
     end
@@ -99,7 +132,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
         .and_return(nil)
 
       result = run(runnable, base_url:, inferno_base_url:, service_ids: '', encryption_method:,
-                             service_request_bodies:)
+                             service_request_bodies:, mock_ehr_bundle:)
       expect(result.result).to eq('wait')
     end
   end

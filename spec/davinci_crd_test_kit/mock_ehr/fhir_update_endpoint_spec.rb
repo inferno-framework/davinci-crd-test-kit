@@ -77,15 +77,6 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome.resourceType).to eq('OperationOutcome')
     end
 
-    it 'returns 400 when the bundle is not loaded' do
-      updated = FHIR::Patient.new(id: patient.id)
-      wait_and_auth(not_a_bundle)
-      put "/custom/#{suite_id}/fhir/Patient/#{patient.id}", updated.to_json
-      expect(last_response.status).to eq(400)
-      outcome = FHIR.from_contents(last_response.body)
-      expect(outcome.resourceType).to eq('OperationOutcome')
-    end
-
     it 'updates the resource in the bundle in session data' do
       updated = FHIR::Patient.new(id: patient.id, gender: 'unknown')
       wait_and_auth
@@ -109,6 +100,41 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       saved_bundle = FHIR.from_contents(saved_json)
       expect(saved_bundle.entry.length).to eq(2)
       expect(saved_bundle.entry.map { |e| e.resource.id }).to include('brand-new-id')
+    end
+
+    it 'uses the URL resource_id when body id differs' do
+      mismatched = FHIR::Patient.new(id: 'different-id')
+      wait_and_auth
+      put "/custom/#{suite_id}/fhir/Patient/#{patient.id}", mismatched.to_json
+      expect(last_response.status).to eq(200)
+      resource = FHIR.from_contents(last_response.body)
+      expect(resource.id).to eq(patient.id)
+    end
+
+    it 'sets Access-Control-Allow-Origin to *' do
+      updated = FHIR::Patient.new(id: patient.id)
+      wait_and_auth
+      put "/custom/#{suite_id}/fhir/Patient/#{patient.id}", updated.to_json
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
+
+    it 'returns an error when the Authorization header is missing' do
+      run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                    service_request_bodies:, mock_ehr_bundle:)
+      updated = FHIR::Patient.new(id: patient.id)
+      put "/custom/#{suite_id}/fhir/Patient/#{patient.id}", updated.to_json
+      expect(last_response.status).to be >= 400
+    end
+
+    it 'updated resource can be read back via GET' do
+      updated = FHIR::Patient.new(id: patient.id, gender: 'unknown')
+      wait_and_auth
+      put "/custom/#{suite_id}/fhir/Patient/#{patient.id}", updated.to_json
+      expect(last_response.status).to eq(200)
+
+      get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response.status).to eq(200)
+      expect(FHIR.from_contents(last_response.body).gender).to eq('unknown')
     end
   end
 end

@@ -73,12 +73,26 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(saved_bundle.entry).to be_empty
     end
 
-    it 'returns 400 when the bundle is not loaded' do
-      wait_and_auth(not_a_bundle)
+    it 'sets Access-Control-Allow-Origin to *' do
+      wait_and_auth
       delete "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
+
+    it 'returns an error when the Authorization header is missing' do
+      run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                    service_request_bodies:, mock_ehr_bundle:)
+      delete "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response.status).to be >= 400
+    end
+
+    it 'deleted resource cannot be read back via GET' do
+      wait_and_auth
+      delete "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response.status).to eq(204)
+
+      get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
       expect(last_response.status).to eq(400)
-      outcome = FHIR.from_contents(last_response.body)
-      expect(outcome.resourceType).to eq('OperationOutcome')
     end
   end
 end

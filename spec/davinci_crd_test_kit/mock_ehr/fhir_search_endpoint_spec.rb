@@ -12,7 +12,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   let(:token) do
     DaVinciCRDTestKit::MockEHR::FHIRRequestHandler.session_id_to_token(test_session_id)
   end
-  let(:base_url) { 'http://example.com' }
+  let(:base_url) { 'http://example.org' }
   let(:discovery_url) { 'http://example.com/cds-services' }
   let(:inferno_base_url) { 'http://inferno.com' }
   let(:service_ids) { 'appointment-book-service' }
@@ -91,9 +91,28 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
     header 'Authorization', "Bearer #{token}"
 
     qs = params.map { |k, v| "#{k}=#{URI.encode_www_form_component(v.to_s)}" }.join('&')
+    request_url = qs.present? ? "#{endpoint_path}?#{qs}" : endpoint_path
+    get(request_url)
+
+    response = FHIR.from_contents(last_response.body)
+    expect(response.link.find { |link| link.relation == 'self' }&.url)
+      .to eq(URI.decode_www_form_component("#{base_url}#{request_url}"))
+
+    response
+  end
+
+  # Like search but returns only the self-link URL without asserting it matches
+  # the full request URL — needed when unsupported params should be excluded.
+  def self_link_for_search(endpoint_path, params = {})
+    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                           service_request_bodies:, mock_ehr_bundle: bundle)
+    expect(result.result).to eq('wait')
+    header 'Authorization', "Bearer #{token}"
+
+    qs = params.map { |k, v| "#{k}=#{URI.encode_www_form_component(v.to_s)}" }.join('&')
     get(qs.present? ? "#{endpoint_path}?#{qs}" : endpoint_path)
 
-    FHIR.from_contents(last_response.body)
+    FHIR.from_contents(last_response.body).link.find { |l| l.relation == 'self' }&.url
   end
 
   # -------------------------------------------------------------------------
@@ -596,6 +615,329 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(last_response.status).to eq(200)
       expect(response.resourceType).to eq('Bundle')
       expect(response.entry).to be_empty
+    end
+  end
+
+  # =========================================================================
+  # search.mode values
+  # =========================================================================
+  describe 'search.mode on bundle entries' do
+    it "sets mode='match' on all directly matched resources" do
+      response = search(patient_endpoint, gender: 'female')
+      expect(response.entry).to_not be_empty
+      expect(response.entry.all? { |e| e.search&.mode == 'match' }).to be true
+    end
+
+    it "sets mode='include' on resources returned via _include" do
+      medication = FHIR::Medication.new(id: 'med-1')
+      medication_dispense = FHIR::MedicationDispense.new(
+        id: 'med-dispense-1',
+        status: 'completed',
+        subject: FHIR::Reference.new(reference: 'Patient/patient-search-1'),
+        medicationReference: FHIR::Reference.new(reference: 'Medication/med-1')
+      )
+      med_bundle = FHIR::Bundle.new
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: patient)
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication)
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication_dispense)
+
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle: med_bundle.to_json)
+      expect(result.result).to eq('wait')
+      header 'Authorization', "Bearer #{token}"
+      get "/custom/#{suite_id}/fhir/MedicationDispense?patient=patient-search-1" \
+          '&_include=MedicationDispense%3Amedication'
+
+      response = FHIR.from_contents(last_response.body)
+      include_entry = response.entry.find { |e| e.resource.resourceType == 'Medication' }
+      expect(include_entry).to_not be_nil
+      expect(include_entry.search&.mode).to eq('include')
+    end
+
+    it "sets mode='include' on resources returned via _revinclude" do
+      provenance = FHIR::Provenance.new(
+        id: 'provenance-1',
+        target: [FHIR::Reference.new(reference: 'Patient/patient-search-1')],
+        recorded: '2024-01-10T12:00:00Z'
+      )
+      prov_bundle = FHIR::Bundle.new
+      prov_bundle.entry << FHIR::Bundle::Entry.new(resource: patient)
+      prov_bundle.entry << FHIR::Bundle::Entry.new(resource: encounter)
+      prov_bundle.entry << FHIR::Bundle::Entry.new(resource: provenance)
+
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle: prov_bundle.to_json)
+      expect(result.result).to eq('wait')
+      header 'Authorization', "Bearer #{token}"
+      get "/custom/#{suite_id}/fhir/Patient?gender=female&_revinclude=Provenance%3Atarget"
+
+      response = FHIR.from_contents(last_response.body)
+      revinclude_entry = response.entry.find { |e| e.resource.resourceType == 'Provenance' }
+      expect(revinclude_entry).to_not be_nil
+      expect(revinclude_entry.search&.mode).to eq('include')
+    end
+  end
+
+  # =========================================================================
+  # No search parameters (resource-type-only search)
+  # =========================================================================
+  describe 'search with no search parameters' do
+    it 'returns all resources of the requested type' do
+      response = search(patient_endpoint)
+      expect(last_response.status).to eq(200)
+      expect(response.resourceType).to eq('Bundle')
+      expect(response.entry.size).to eq(1)
+      expect(response.entry.first.resource.resourceType).to eq('Patient')
+      expect(response.entry.first.resource.id).to eq('patient-search-1')
+    end
+
+    it 'does not return resources of a different type' do
+      response = search(patient_endpoint)
+      expect(response.entry.none? { |e| e.resource.resourceType == 'Encounter' }).to be true
+    end
+  end
+
+  # =========================================================================
+  # Self-link construction
+  # =========================================================================
+  describe 'self-link construction' do
+    let(:medication_dispense_endpoint) { "/custom/#{suite_id}/fhir/MedicationDispense" }
+
+    context 'with search parameters' do
+      it 'includes supported search params' do
+        self_link = self_link_for_search(patient_endpoint, gender: 'female')
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
+      end
+
+      it 'excludes unsupported (unknown) params' do
+        self_link = self_link_for_search(patient_endpoint, gender: 'female', unknown_param: 'foo')
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
+      end
+
+      it 'produces no query string when all params are unsupported' do
+        self_link = self_link_for_search(patient_endpoint, unknown_param: 'foo')
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}")
+      end
+    end
+
+    context 'with _include parameter' do
+      it 'includes _include when the value is a supported include param' do
+        self_link = self_link_for_search(medication_dispense_endpoint,
+                                         patient: 'patient-search-1',
+                                         _include: 'MedicationDispense:medication')
+        expect(self_link).to include('patient=patient-search-1')
+        expect(self_link).to include('_include=MedicationDispense:medication')
+      end
+
+      it 'excludes _include when the value is not a supported include param' do
+        self_link = self_link_for_search(patient_endpoint, gender: 'female', _include: 'Patient:not-real')
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
+      end
+    end
+
+    context 'with _revinclude parameter' do
+      it 'includes _revinclude=Provenance:target' do
+        self_link = self_link_for_search(patient_endpoint, gender: 'female', _revinclude: 'Provenance:target')
+        expect(self_link).to include('gender=female')
+        expect(self_link).to include('_revinclude=Provenance:target')
+      end
+
+      it 'excludes _revinclude when the value is not Provenance:target' do
+        self_link = self_link_for_search(patient_endpoint, gender: 'female', _revinclude: 'Observation:subject')
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
+      end
+    end
+  end
+
+  # =========================================================================
+  # _include search (MedicationDispense:medication)
+  # =========================================================================
+  describe '_include search — MedicationDispense:medication' do
+    let(:medication) { FHIR::Medication.new(id: 'med-1') }
+
+    let(:medication_dispense) do
+      FHIR::MedicationDispense.new(
+        id: 'med-dispense-1',
+        status: 'completed',
+        subject: FHIR::Reference.new(reference: 'Patient/patient-search-1'),
+        medicationReference: FHIR::Reference.new(reference: 'Medication/med-1')
+      )
+    end
+
+    let(:bundle) do
+      b = FHIR::Bundle.new
+      b.entry << FHIR::Bundle::Entry.new(resource: patient)
+      b.entry << FHIR::Bundle::Entry.new(resource: medication)
+      b.entry << FHIR::Bundle::Entry.new(resource: medication_dispense)
+      b.to_json
+    end
+
+    let(:medication_dispense_endpoint) { "/custom/#{suite_id}/fhir/MedicationDispense" }
+
+    it 'includes the referenced Medication alongside the matching MedicationDispense' do
+      response = search(medication_dispense_endpoint, patient: 'patient-search-1',
+                                                      _include: 'MedicationDispense:medication')
+      expect(last_response.status).to eq(200)
+      match_entries = response.entry.select { |e| e.search&.mode == 'match' }
+      include_entries = response.entry.select { |e| e.search&.mode == 'include' }
+      expect(match_entries.size).to eq(1)
+      expect(match_entries.first.resource.id).to eq('med-dispense-1')
+      expect(include_entries.size).to eq(1)
+      expect(include_entries.first.resource.resourceType).to eq('Medication')
+      expect(include_entries.first.resource.id).to eq('med-1')
+    end
+
+    it 'does not return included resources when no resources match the base search' do
+      response = search(medication_dispense_endpoint, patient: 'unknown-patient',
+                                                      _include: 'MedicationDispense:medication')
+      expect(last_response.status).to eq(200)
+      expect(response.entry).to be_empty
+    end
+
+    it 'does not include the Medication when no _include param is sent' do
+      response = search(medication_dispense_endpoint, patient: 'patient-search-1')
+      expect(last_response.status).to eq(200)
+      expect(response.entry.size).to eq(1)
+      expect(response.entry.first.resource.resourceType).to eq('MedicationDispense')
+      expect(response.entry.first.search.mode).to eq('match')
+    end
+
+    context 'when multiple matching dispenses reference the same medication' do
+      let(:medication_dispense2) do
+        FHIR::MedicationDispense.new(
+          id: 'med-dispense-2',
+          status: 'in-progress',
+          subject: FHIR::Reference.new(reference: 'Patient/patient-search-1'),
+          medicationReference: FHIR::Reference.new(reference: 'Medication/med-1')
+        )
+      end
+
+      let(:bundle) do
+        b = FHIR::Bundle.new
+        b.entry << FHIR::Bundle::Entry.new(resource: patient)
+        b.entry << FHIR::Bundle::Entry.new(resource: medication)
+        b.entry << FHIR::Bundle::Entry.new(resource: medication_dispense)
+        b.entry << FHIR::Bundle::Entry.new(resource: medication_dispense2)
+        b.to_json
+      end
+
+      it 'includes the shared referenced Medication only once' do
+        response = search(medication_dispense_endpoint, patient: 'patient-search-1',
+                                                        _include: 'MedicationDispense:medication')
+        match_entries = response.entry.select { |e| e.search&.mode == 'match' }
+        include_entries = response.entry.select { |e| e.search&.mode == 'include' }
+        expect(match_entries.size).to eq(2)
+        expect(include_entries.size).to eq(1)
+        expect(include_entries.first.resource.id).to eq('med-1')
+      end
+    end
+  end
+
+  # =========================================================================
+  # _revinclude search (Provenance:target)
+  # =========================================================================
+  describe '_revinclude search — Provenance:target' do
+    let(:provenance) do
+      FHIR::Provenance.new(
+        id: 'provenance-1',
+        target: [FHIR::Reference.new(reference: 'Patient/patient-search-1')],
+        recorded: '2024-01-10T12:00:00Z'
+      )
+    end
+
+    let(:bundle) do
+      b = FHIR::Bundle.new
+      b.entry << FHIR::Bundle::Entry.new(resource: patient)
+      b.entry << FHIR::Bundle::Entry.new(resource: encounter)
+      b.entry << FHIR::Bundle::Entry.new(resource: provenance)
+      b.to_json
+    end
+
+    it 'includes Provenance resources that target a matching resource' do
+      response = search(patient_endpoint, gender: 'female', _revinclude: 'Provenance:target')
+      expect(last_response.status).to eq(200)
+      match_entries = response.entry.select { |e| e.search&.mode == 'match' }
+      include_entries = response.entry.select { |e| e.search&.mode == 'include' }
+      expect(match_entries.size).to eq(1)
+      expect(match_entries.first.resource.id).to eq('patient-search-1')
+      expect(include_entries.size).to eq(1)
+      expect(include_entries.first.resource.resourceType).to eq('Provenance')
+      expect(include_entries.first.resource.id).to eq('provenance-1')
+    end
+
+    it 'does not include Provenance when no resources match the base search' do
+      response = search(patient_endpoint, gender: 'other', _revinclude: 'Provenance:target')
+      expect(last_response.status).to eq(200)
+      expect(response.entry).to be_empty
+    end
+
+    it 'does not revinclude Provenance that targets only non-matched resources' do
+      # Provenance targets Patient but we are searching Encounters — Patient is not in match set
+      response = search(encounter_endpoint, patient: 'patient-search-1', _revinclude: 'Provenance:target')
+      expect(last_response.status).to eq(200)
+      include_entries = response.entry.select { |e| e.search&.mode == 'include' }
+      expect(include_entries).to be_empty
+    end
+
+    it 'does not return Provenance when the _revinclude param is absent' do
+      response = search(patient_endpoint, gender: 'female')
+      expect(last_response.status).to eq(200)
+      expect(response.entry.size).to eq(1)
+      expect(response.entry.first.resource.resourceType).to eq('Patient')
+    end
+
+    context 'when multiple Provenance resources target the same matched resource' do
+      let(:provenance2) do
+        FHIR::Provenance.new(
+          id: 'provenance-2',
+          target: [FHIR::Reference.new(reference: 'Patient/patient-search-1')],
+          recorded: '2024-02-01T09:00:00Z'
+        )
+      end
+
+      let(:bundle) do
+        b = FHIR::Bundle.new
+        b.entry << FHIR::Bundle::Entry.new(resource: patient)
+        b.entry << FHIR::Bundle::Entry.new(resource: encounter)
+        b.entry << FHIR::Bundle::Entry.new(resource: provenance)
+        b.entry << FHIR::Bundle::Entry.new(resource: provenance2)
+        b.to_json
+      end
+
+      it 'includes all Provenance resources that target the matched resource' do
+        response = search(patient_endpoint, gender: 'female', _revinclude: 'Provenance:target')
+        include_entries = response.entry.select { |e| e.search&.mode == 'include' }
+        expect(include_entries.size).to eq(2)
+        expect(include_entries.map { |e| e.resource.id }).to contain_exactly('provenance-1', 'provenance-2')
+      end
+    end
+  end
+
+  # =========================================================================
+  # Response headers
+  # =========================================================================
+  describe 'response headers' do
+    it 'sets Content-Type to application/fhir+json' do
+      search(patient_endpoint, gender: 'female')
+      expect(last_response.headers['Content-Type']).to include('application/fhir+json')
+    end
+
+    it 'sets Access-Control-Allow-Origin to *' do
+      search(patient_endpoint, gender: 'female')
+      expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
+    end
+  end
+
+  # =========================================================================
+  # Authorization
+  # =========================================================================
+  describe 'authorization' do
+    it 'returns an error when the Authorization header is missing' do
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle: bundle)
+      expect(result.result).to eq('wait')
+      get patient_endpoint
+      expect(last_response.status).to be >= 400
     end
   end
 end

@@ -27,12 +27,20 @@ module DaVinciCRDTestKit
       end
 
       def response_bundle
-        bundle = FHIR::Bundle.new({ type: 'searchset' }) # TODO: links
+        bundle = FHIR::Bundle.new({ type: 'searchset' })
+        bundle.link << FHIR::Bundle::Link.new({ relation: 'self', url: self_link })
 
-        if matching_entry_list.present?
-          matching_entry_list.each do |entry|
-            bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource })
-          end
+        matching_entry_list.each do |entry|
+          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
+                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'match' }) })
+        end
+        included_entry_list.each do |entry|
+          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
+                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'include' }) })
+        end
+        revincluded_entry_list.each do |entry|
+          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
+                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'include' }) })
         end
 
         bundle
@@ -67,6 +75,86 @@ module DaVinciCRDTestKit
       end
 
       # ---------------------------------------------------------------------------
+      # Self Link search parameters identification
+      # ---------------------------------------------------------------------------
+
+      def self_link
+        host_and_path = request.url.split('?').first
+        param_list =
+          (supported_search_param_names + supported_include_param_paths.keys).map do |name|
+            "#{name}=#{request_params[name]}"
+          end
+        param_list << '_revinclude=Provenance:target' if revinclude_provenance_target?
+        query_string = param_list.present? ? "?#{param_list.join('&')}" : ''
+
+        "#{host_and_path}#{query_string}"
+      end
+
+      def supported_search_param_names
+        @supported_search_param_names ||=
+          request_params.keys.select { |name| metadata.search_definitions.key?(name.to_sym) }
+      end
+
+      def revinclude_provenance_target?
+        request_params.any? { |key, value| key == '_revinclude' && value == 'Provenance:target' }
+      end
+
+      # map from include name to a list of paths at which to find references to include
+      def supported_include_param_paths
+        @supported_include_param_paths ||= calculate_supported_includes
+      end
+
+      def calculate_supported_includes
+        request_params.keys.each_with_object({}) do |name, includes|
+          next unless name == '_include'
+
+          target = request_params[name]
+          next unless target.present? && metadata.include_params.include?(target)
+
+          paths = paths_to_include(target)
+          next unless paths.present?
+
+          includes[name] = paths
+        end
+      end
+
+      def paths_to_include(target)
+        paths = paths_from_search_definition(target)
+        paths = paths_from_reference_list(target) unless paths.present?
+        paths = paths_from_must_support_element(target) unless paths.present?
+        paths
+      end
+
+      def paths_from_search_definition(target)
+        search_parameter = target.split(':').last
+        definition = metadata.search_definitions[search_parameter.to_sym]
+        return unless definition.present? && definition[:type] == 'Reference'
+
+        definition[:full_paths]
+      end
+
+      def paths_from_reference_list(target)
+        path_with_resource_type = target.gsub(':', '.')
+        return unless metadata.references.any? { |ref| ref[:path] == path_with_resource_type }
+
+        [path_with_resource_type]
+      end
+
+      def paths_from_must_support_element(target)
+        target_element = target.split(':').last
+        return unless metadata.must_supports[:elements].any? do |elt|
+                        element_matches_reference_target?(elt, target_element)
+                      end
+
+        [target.gsub(':', '.')]
+      end
+
+      def element_matches_reference_target?(element, target_element)
+        element[:types]&.include?('Reference') &&
+          [target_element, "#{target_element}[x]"].include?(element[:path])
+      end
+
+      # ---------------------------------------------------------------------------
       # Search Logic
       # ---------------------------------------------------------------------------
 
@@ -78,12 +166,18 @@ module DaVinciCRDTestKit
         end
       end
 
+      def matching_entry_set
+        @matching_entry_set ||= matching_entry_list.each_with_object(Set.new) do |entry, set|
+          set << [entry.resource.resourceType, entry.resource.id]
+        end
+      end
+
       def request_params
         @request_params ||= request.params.to_h.except(:resource_type).stringify_keys
       end
 
       def include_resource_in_search_results?(resource)
-        request_params.keys.reduce(true) do |matches_so_far, name|
+        supported_search_param_names.reduce(true) do |matches_so_far, name|
           return false unless matches_so_far
 
           escaped_search_value = request_params[name]
@@ -318,6 +412,125 @@ module DaVinciCRDTestKit
 
       def date?(value)
         /^\d{4}(-\d{2})?(-\d{2})?$/.match?(value) # YYYY or YYYY-MM or YYYY-MM-DD
+      end
+
+      # ---------------------------------------------------------------------------
+      # _include logic
+      # ---------------------------------------------------------------------------
+
+      def included_entry_list
+        @included_entry_list ||= begin
+          entries = []
+          included_set = Set.new
+          matching_entry_list.each do |entry|
+            resource = entry.resource
+            next unless include_paths_by_resource_type.key?(resource.resourceType)
+
+            include_paths_by_resource_type[resource.resourceType].each do |target_include_path|
+              resolve_path(resource, target_include_path).each do |reference|
+                evaluate_included_reference(reference, entries, included_set)
+              end
+            end
+          end
+          @included_entry_set = included_set
+          entries
+        end
+      end
+
+      def included_entry_set
+        included_entry_list # ensure built, which populates @included_entry_set
+        @included_entry_set ||= Set.new
+      end
+
+      def evaluate_included_reference(reference, included_entries, included_set)
+        return unless local_reference?(reference)
+
+        resource_type, resource_id = reference.reference.split('/')
+        key = [resource_type, resource_id]
+        return if included_set.include?(key) || matching_entry_set.include?(key)
+
+        included_entry = resolve_refrence_to_entry_in_bundle(resource_type, resource_id)
+        return unless included_entry.present?
+
+        included_entries << included_entry
+        included_set << key
+      end
+
+      def include_paths_by_resource_type
+        @include_paths_by_resource_type ||=
+          supported_include_param_paths.values.each_with_object({}) do |include_paths, by_resource_type|
+            include_paths.each do |path_with_resource_type|
+              resource_type, path = path_with_resource_type.split('.', 2)
+              (by_resource_type[resource_type] ||= []) << path
+            end
+          end
+      end
+
+      def local_reference?(reference)
+        reference.is_a?(FHIR::Reference) &&
+          reference.reference.split('/').length == 2 # local reference
+      end
+
+      def bundle_entry_index
+        @bundle_entry_index ||= mock_ehr_bundle.entry.each_with_object({}) do |entry, index|
+          next unless entry.resource.present?
+
+          index[[entry.resource.resourceType, entry.resource.id]] = entry
+        end
+      end
+
+      def resolve_refrence_to_entry_in_bundle(resource_type, resource_id)
+        bundle_entry_index[[resource_type, resource_id]]
+      end
+
+      # ---------------------------------------------------------------------------
+      # _revinclude logic
+      # ---------------------------------------------------------------------------
+      def revincluded_entry_list
+        @revincluded_entry_list ||= revinclude_provenance_target? ? build_revincluded_entry_list : []
+      end
+
+      def revincluded_entry_set
+        revincluded_entry_list # ensure built, which populates @revincluded_entry_set
+        @revincluded_entry_set ||= Set.new
+      end
+
+      def build_revincluded_entry_list
+        entries = []
+        revincluded_set = Set.new
+        mock_ehr_bundle.entry.each do |entry|
+          next unless candidate_provenance_for_revinclude?(entry, revincluded_set)
+
+          resolve_path(entry.resource, 'target').each do |reference|
+            evaluate_revincluded_reference(entry, reference, entries, revincluded_set)
+          end
+        end
+        @revincluded_entry_set = revincluded_set
+        entries
+      end
+
+      def candidate_provenance_for_revinclude?(entry, revincluded_set)
+        return false unless entry.resource.present?
+        return false unless entry.resource.resourceType == 'Provenance'
+
+        key = [entry.resource.resourceType, entry.resource.id]
+        !revincluded_set.include?(key) && !included_entry_set.include?(key) &&
+          !matching_entry_set.include?(key)
+      end
+
+      def evaluate_revincluded_reference(referencing_entry, reference, revincluded_entries, revincluded_set)
+        return unless local_reference?(reference)
+
+        resource_type, resource_id = reference.reference.split('/')
+        return unless matching_entry_set.include?([resource_type, resource_id]) ||
+                      included_entry_set.include?([resource_type, resource_id])
+
+        provenance_key = [referencing_entry.resource.resourceType, referencing_entry.resource.id]
+        return if revincluded_set.include?(provenance_key)
+
+        # referenced instance is matched or included — add the referencing Provenance
+        revincluded_entries << referencing_entry
+        revincluded_set << provenance_key
       end
     end
   end

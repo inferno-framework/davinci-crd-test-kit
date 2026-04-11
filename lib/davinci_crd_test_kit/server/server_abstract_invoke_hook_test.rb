@@ -72,7 +72,8 @@ module DaVinciCRDTestKit
             by its simulated CRD client that will initiate the CDS Hooks requests.
           DESCRIPTION
           type: 'textarea',
-          optional: true
+          optional: true,
+          default: '{"resourceType":"Bundle","type":"collection"}'
     input :manual_continuation,
           title: 'Require acknowledgement of completed hook requests?',
           description: %(
@@ -101,6 +102,15 @@ module DaVinciCRDTestKit
 
     run do
       discovery_url = "#{base_url.chomp('/')}/cds-services"
+
+      begin
+        bundle_resource = FHIR.from_contents(mock_ehr_bundle)
+      rescue StandardError
+        bundle_resource = nil
+      end
+      skip_if !bundle_resource.is_a?(FHIR::Bundle),
+              'mock_ehr_bundle input must be a FHIR Bundle resource; skipping test.'
+
       skip_if service_request_bodies.blank?,
               'Request body not provided, skipping test.'
       assert_valid_json(service_request_bodies)
