@@ -120,7 +120,7 @@ module DaVinciCRDTestKit
         @supported_include_param_paths ||= calculate_supported_includes
       end
 
-      def calculate_supported_includes
+      def calculate_supported_includes # rubocop:disable Metrics/CyclomaticComplexity
         request_params.keys.each_with_object({}) do |name, includes|
           next unless name == '_include'
 
