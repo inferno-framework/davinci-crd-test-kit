@@ -2,7 +2,7 @@
 # Integration tests — exercises the full HTTP endpoint via FHIRRequestTest
 # ---------------------------------------------------------------------------
 RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
-  let(:suite_id) { 'crd_server' }
+  let(:suite_id) { 'crd_server_v220' }
   let(:runnable) do
     Class.new(described_class) do
       input :inferno_base_url

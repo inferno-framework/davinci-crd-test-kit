@@ -227,7 +227,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'passes if valid Patient id is passed in that can be used to search for Coverage resources' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -240,7 +240,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'passes if patient search result includes an OperationOutcome resource' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -253,12 +253,12 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'passes if at least 1 of list of Patient ids returns resources in Coverage search' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 200, body: crd_coverage_search_bundle_active.to_json)
-      coverage_search_request_empty = stub_request(:get, "#{server_endpoint}/Coverage?patient=example2")
+      coverage_search_request_empty = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/example2")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -273,12 +273,12 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'skips if no resources returned in Coverage search' do
-      coverage_search_request_empty = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request_empty = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
         .to_return(status: 200, body: empty_bundle.to_json)
-      coverage_search_request_empty_second = stub_request(:get, "#{server_endpoint}/Coverage?patient=example2")
+      coverage_search_request_empty_second = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/example2")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -301,7 +301,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'fails if patient Coverage search returns non 200' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -315,7 +315,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'fails if patient Coverage search returns bundle with non Coverage resources' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=#{patient_id}")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/#{patient_id}")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
@@ -329,7 +329,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientFHIRApiSearchTest, :runnable do
     end
 
     it 'fails if patient Coverage search returns Coverage resource with incorrect beneficiary id' do
-      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=wrong_id")
+      coverage_search_request = stub_request(:get, "#{server_endpoint}/Coverage?patient=Patient/wrong_id")
         .with(
           headers: { Authorization: 'Bearer SAMPLE_TOKEN' }
         )
