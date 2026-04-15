@@ -1,0 +1,5 @@
+---
+:resource: PractitionerRole
+:profile_url: http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/hrex-practitionerrole
+:profile_name: HRex PractitionerRole Profile 
+:profile_version: 1.2.0

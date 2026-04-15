@@ -12,27 +12,27 @@ module DaVinciCRDTestKit
     include BaseURLs
 
     def appointment_book_url
-      @appointment_book_url ||= base_url + APPOINTMENT_BOOK_PATH
+      @appointment_book_url ||= inferno_base_url + APPOINTMENT_BOOK_PATH
     end
 
     def encounter_start_url
-      @encounter_start_url ||= base_url + ENCOUNTER_START_PATH
+      @encounter_start_url ||= inferno_base_url + ENCOUNTER_START_PATH
     end
 
     def encounter_discharge_url
-      @encounter_discharge_url ||= base_url + ENCOUNTER_DISCHARGE_PATH
+      @encounter_discharge_url ||= inferno_base_url + ENCOUNTER_DISCHARGE_PATH
     end
 
     def order_dispatch_url
-      @order_dispatch_url ||= base_url + ORDER_DISPATCH_PATH
+      @order_dispatch_url ||= inferno_base_url + ORDER_DISPATCH_PATH
     end
 
     def order_select_url
-      @order_select_url ||= base_url + ORDER_SELECT_PATH
+      @order_select_url ||= inferno_base_url + ORDER_SELECT_PATH
     end
 
     def order_sign_url
-      @order_sign_url ||= base_url + ORDER_SIGN_PATH
+      @order_sign_url ||= inferno_base_url + ORDER_SIGN_PATH
     end
   end
 end

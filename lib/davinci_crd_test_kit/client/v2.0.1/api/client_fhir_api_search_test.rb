@@ -212,7 +212,7 @@ module DaVinciCRDTestKit
               id_search_result_check(bundle, search_id)
             elsif reference_search_parameters.include?(search_type)
               search_params = {}
-              search_params[search_type] = search_id
+              search_params[search_type] = "#{search_type.capitalize}/#{search_id}"
               bundle = perform_fhir_search(search_params, [resource_type, "#{search_type}_search"])
               reference_search_result_check(bundle, search_id, search_type)
             elsif include_searches.include?(search_type)

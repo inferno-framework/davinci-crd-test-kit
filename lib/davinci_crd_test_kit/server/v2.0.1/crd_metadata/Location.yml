@@ -1,0 +1,5 @@
+---
+:resource: Location
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location
+:profile_name: CRD Location
+:profile_version: 2.0.1
