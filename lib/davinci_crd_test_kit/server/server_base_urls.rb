@@ -2,6 +2,7 @@ require_relative '../cross_suite/base_urls'
 
 module DaVinciCRDTestKit
   FHIR_ROUTE = '/fhir'.freeze
+  FHIR_METADATA_ROUTE = "#{FHIR_ROUTE}/metadata".freeze
   FHIR_INSTANCE_ROUTE = "#{FHIR_ROUTE}/:resource_type/:resource_id".freeze
   FHIR_RESOURCE_TYPE_ROUTE = "#{FHIR_ROUTE}/:resource_type".freeze
   FHIR_SEARCH_POST_ROUTE = "#{FHIR_ROUTE}/:resource_type/_search".freeze
