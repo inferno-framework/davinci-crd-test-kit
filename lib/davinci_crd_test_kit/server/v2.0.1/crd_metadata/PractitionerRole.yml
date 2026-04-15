@@ -1,0 +1,40 @@
+---
+:resource: PractitionerRole
+:profile_url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole
+:profile_name: US Core PractitionerRole
+:profile_version: 3.1.1
+:search_definitions:
+  :_id:
+    :paths:
+    - id
+    :full_paths:
+    - PractitionerRole.id
+    :type: http://hl7.org/fhirpath/System.String
+  :specialty:
+    :paths:
+    - specialty
+    :full_paths:
+    - PractitionerRole.specialty
+    :type: CodeableConcept
+  :organization:
+    :paths:
+    - organization
+    :full_paths:
+    - PractitionerRole.organization
+    :type: Reference
+  :practitioner:
+    :paths:
+    - practitioner
+    :full_paths:
+    - PractitionerRole.practitioner
+    :type: Reference
+    :chain:
+    - :chain: identifier
+      :expectation: SHALL
+    - :chain: name
+      :expectation: SHALL
+:include_params:
+- PractitionerRole:endpoint
+- PractitionerRole:practitioner
+:revincludes:
+- Provenance:target

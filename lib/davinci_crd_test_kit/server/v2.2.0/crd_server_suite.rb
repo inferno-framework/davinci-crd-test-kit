@@ -10,7 +10,6 @@ module DaVinciCRDTestKit
   module V220
     class CRDServerSuite < Inferno::TestSuite
       include ServerURLs
-      include MockEHREndpoints
 
       id :crd_server_v220
       title 'Da Vinci CRD Server v2.2.0 Test Suite'
@@ -70,6 +69,14 @@ module DaVinciCRDTestKit
         # end
       end
 
+      US_CORE_7_METADATA_PATTERN = File.join(
+        Gem::Specification.find_by_name('us_core_test_kit').gem_dir,
+        'lib', 'us_core_test_kit', 'generated', 'v7.0.0', '*', 'metadata.yml'
+      )
+      CRD_V220_METADATA_PATTERN = File.join(__dir__, 'crd_metadata', '*.yml')
+      include(MockEHREndpoints.with do
+                Dir.glob([US_CORE_7_METADATA_PATTERN, CRD_V220_METADATA_PATTERN])
+              end)
       route :get, '/jwks.json', JWKSetEndpointHandler
       resume_test_route :get, RESUME_PASS_PATH do |request|
         request.query_parameters['token']

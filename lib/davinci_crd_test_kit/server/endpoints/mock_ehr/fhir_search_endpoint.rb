@@ -55,10 +55,11 @@ module DaVinciCRDTestKit
       end
 
       def self.metadata_by_resource_type
-        @metadata_by_resource_type ||= metadata_files&.each_with_object({}) do |path, by_type|
-          metadata = USCoreTestKit::Generator::GroupMetadata.new(YAML.load_file(path, aliases: true))
-          by_type[metadata.resource] ||= metadata
-        end
+        @metadata_by_resource_type ||=
+          metadata_files&.each_with_object(Hash.new { |h, k| h[k] = [] }) do |path, by_type|
+            metadata = USCoreTestKit::Generator::GroupMetadata.new(YAML.load_file(path, aliases: true))
+            by_type[metadata.resource] << metadata
+          end
       end
 
       def metadata_directory
@@ -66,28 +67,37 @@ module DaVinciCRDTestKit
                   'lib', 'us_core_test_kit', 'generated', 'v6.1.0')
       end
 
-      def metadata
-        @metadata ||= load_metadata
+      def metadata_list
+        @metadata_list ||= load_metadata_list
       end
 
-      def load_metadata
-        return self.class.metadata_by_resource_type&.dig(resource_type) if self.class.metadata_files
+      def load_metadata_list
+        return self.class.metadata_by_resource_type&.dig(resource_type) || [] if self.class.metadata_files
 
-        resource_directory = metadata_directory_for_resource_type(resource_type)
-        return unless resource_directory.present?
-
-        USCoreTestKit::Generator::GroupMetadata.new(
-          YAML.load_file(File.join(metadata_directory, resource_directory, 'metadata.yml'), aliases: true)
-        )
+        Dir.glob(File.join(metadata_directory, "#{resource_type.underscore}*", 'metadata.yml')).filter_map do |path|
+          m = USCoreTestKit::Generator::GroupMetadata.new(YAML.load_file(path, aliases: true))
+          m if m.resource == resource_type
+        end
       end
 
-      def metadata_directory_for_resource_type(resource_type)
-        resource_type_directory_prefix = resource_type.underscore
+      def merged_search_definitions
+        @merged_search_definitions ||= metadata_list.each_with_object({}) do |m, defs|
+          m.search_definitions&.each do |name, definition|
+            defs[name] ||= definition
+          end
+        end
+      end
 
-        return resource_type_directory_prefix if Dir.exist?(File.join(metadata_directory,
-                                                                      resource_type_directory_prefix))
+      def all_include_params
+        @all_include_params ||= metadata_list.flat_map { |m| m.include_params || [] }.uniq
+      end
 
-        Dir.glob(File.join(metadata_directory, "#{resource_type_directory_prefix}*", ''))&.first&.split('/')&.last
+      def all_references
+        @all_references ||= metadata_list.flat_map { |m| m.references || [] }.uniq
+      end
+
+      def all_must_support_elements
+        @all_must_support_elements ||= metadata_list.flat_map { |m| m.must_supports&.dig(:elements) || [] }.uniq
       end
 
       # ---------------------------------------------------------------------------
@@ -108,7 +118,7 @@ module DaVinciCRDTestKit
 
       def supported_search_param_names
         @supported_search_param_names ||=
-          request_params.keys.select { |name| metadata&.search_definitions&.key?(name.to_sym) }
+          request_params.keys.select { |name| merged_search_definitions.key?(name.to_sym) }
       end
 
       def revinclude_provenance_target?
@@ -120,12 +130,12 @@ module DaVinciCRDTestKit
         @supported_include_param_paths ||= calculate_supported_includes
       end
 
-      def calculate_supported_includes # rubocop:disable Metrics/CyclomaticComplexity
+      def calculate_supported_includes
         request_params.keys.each_with_object({}) do |name, includes|
           next unless name == '_include'
 
           target = request_params[name]
-          next unless target.present? && metadata&.include_params&.include?(target)
+          next unless target.present? && all_include_params.include?(target)
 
           paths = paths_to_include(target)
           next unless paths.present?
@@ -143,7 +153,7 @@ module DaVinciCRDTestKit
 
       def paths_from_search_definition(target)
         search_parameter = target.split(':').last
-        definition = metadata&.search_definitions&.dig(search_parameter.to_sym)
+        definition = merged_search_definitions[search_parameter.to_sym]
         return unless definition.present? && definition[:type] == 'Reference'
 
         definition[:full_paths]
@@ -151,16 +161,14 @@ module DaVinciCRDTestKit
 
       def paths_from_reference_list(target)
         path_with_resource_type = target.gsub(':', '.')
-        return unless metadata&.references&.any? { |ref| ref[:path] == path_with_resource_type }
+        return unless all_references.any? { |ref| ref[:path] == path_with_resource_type }
 
         [path_with_resource_type]
       end
 
       def paths_from_must_support_element(target)
         target_element = target.split(':').last
-        return unless metadata&.must_supports&.dig(:elements)&.any? do |elt|
-                        element_matches_reference_target?(elt, target_element)
-                      end
+        return unless all_must_support_elements.any? { |elt| element_matches_reference_target?(elt, target_element) }
 
         [target.gsub(':', '.')]
       end
@@ -207,7 +215,7 @@ module DaVinciCRDTestKit
       end
 
       def search_param_paths(name)
-        paths = metadata&.search_definitions&.dig(name.to_sym, :paths)
+        paths = merged_search_definitions.dig(name.to_sym, :paths)
         paths[0] = 'local_class' if paths.first == 'class'
 
         paths
@@ -220,7 +228,7 @@ module DaVinciCRDTestKit
         match_found = false
 
         paths.each do |path|
-          type = metadata&.search_definitions&.dig(search_param_name.to_sym, :type)
+          type = merged_search_definitions.dig(search_param_name.to_sym, :type)
 
           resolve_path(resource, path).each do |value|
             values_found <<

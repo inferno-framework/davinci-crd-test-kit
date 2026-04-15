@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
   #
   # @example Custom file list via block
   #   class MyTestSuite < Inferno::TestSuite
-  #     include MockEHREndpoints.with { Dir.glob('/path/to/my/metadata/**/metadata.yml') }
+  #     include(MockEHREndpoints.with { Dir.glob('/path/to/my/metadata/**/metadata.yml') })
   #   end
   module MockEHREndpoints
     def self.included(base)

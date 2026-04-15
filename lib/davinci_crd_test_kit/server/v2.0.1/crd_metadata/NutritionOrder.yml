@@ -1,0 +1,5 @@
+---
+:resource: NutritionOrder
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder
+:profile_name: CRD NutritionOrder
+:profile_version: 2.0.1

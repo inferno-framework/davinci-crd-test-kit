@@ -1,0 +1,5 @@
+---
+:resource: DeviceRequest
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest
+:profile_name: CRD DeviceRequest
+:profile_version: 2.0.1
