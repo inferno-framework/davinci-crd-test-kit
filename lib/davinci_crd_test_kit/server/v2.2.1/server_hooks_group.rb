@@ -4,7 +4,6 @@ require_relative 'server_encounter_discharge_group'
 require_relative 'server_order_select_group'
 require_relative 'server_order_dispatch_group'
 require_relative 'server_order_sign_group'
-require_relative 'server_required_card_response_validation_group'
 
 module DaVinciCRDTestKit
   module V221
@@ -36,9 +35,7 @@ module DaVinciCRDTestKit
         In these tests, Inferno acts as a [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
         that initiates CDS Hooks calls. This test sequence is broken up into groups,
         each group corresponding to a supported hook and defining a set of tests verifying
-        the ability of the server to respond to the given hook invocation. Additionally, an additional
-        group checks the required [response types](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#potential-crd-response-types)
-        across all hooks invoked.
+        the ability of the server to respond to the given hook invocation.
 
         Each hook group test verifies that:
         - The hook can be invoked.
@@ -67,7 +64,6 @@ module DaVinciCRDTestKit
             optional: true
       group from: :crd_v221_server_order_sign,
             optional: true
-      group from: :crd_v221_server_required_card_response_validation
     end
   end
 end
