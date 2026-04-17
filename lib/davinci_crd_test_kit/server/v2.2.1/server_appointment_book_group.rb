@@ -13,6 +13,7 @@ require_relative 'verify_response/instructions_card_received_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/launch_smart_app_card_validation_test'
 require_relative 'verify_response/create_or_update_coverage_info_response_validation_test'
+require_relative 'verify_response/all_responses_include_coverage_information_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -164,6 +165,7 @@ module DaVinciCRDTestKit
                  }
                }
              }
+        test from: :crd_v221_all_responses_include_coverage_information
         test from: :crd_v221_request_form_completion_response_validation,
              config: {
                inputs: {
