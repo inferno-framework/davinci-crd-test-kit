@@ -7,6 +7,8 @@ module DaVinciCRDTestKit
         CRD defines logical models representing requirements for the request for each hook.
       )
 
+      output :url, :smart_auth_info
+
       # verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@3', 'cds-hooks_2.0@20', 'cds-hooks_2.0@21',
       #                       'cds-hooks_2.0@23', 'cds-hooks_2.0@65', 'cds-hooks_2.0@66', 'cds-hooks_2.0@67',
       #                       'cds-hooks_2.0@68', 'cds-hooks_2.0@69', 'cds-hooks_2.0@70'
@@ -44,6 +46,11 @@ module DaVinciCRDTestKit
 
           conforms_to_logical_model?(request_body, 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksRequest|2.2.0',
                                      message_prefix: request_number)
+
+          output url: request_body['fhirServer'] if request_body['fhirServer'].present?
+          if request_body.dig('fhirAuthorization', 'access_token').present?
+            output smart_auth_info: { access_token: request_body['fhirAuthorization']['access_token'] }.to_json
+          end
         end
 
         assert_no_error_messages('Non-conformant hook requests detected. See Messages for details.')

@@ -81,16 +81,20 @@ module DaVinciCRDTestKit
         end
       end
 
-      suite_option :smart_app_launch_version,
-                   title: 'SMART App Launch Version',
+      suite_option :us_core_version,
+                   title: 'US Core Version',
                    list_options: [
                      {
-                       label: 'SMART App Launch 1.0.0',
-                       value: CRDClientOptions::SMART_1
+                       label: 'US Core 3.1.1 / USCDI v1',
+                       value: CRDClientOptions::US_CORE_3
                      },
                      {
-                       label: 'SMART App Launch 2.0.0',
-                       value: CRDClientOptions::SMART_2
+                       label: 'US Core 6.1.0 / USCDI v3',
+                       value: CRDClientOptions::US_CORE_6
+                     },
+                     {
+                       label: 'US Core 7.0.0 / USCDI v4',
+                       value: CRDClientOptions::US_CORE_7
                      }
                    ]
 
