@@ -1,9 +1,11 @@
 require_relative '../../../cross_suite/cards_validation'
+require_relative '../../../cross_suite/cards_logical_model_validation'
 
 module DaVinciCRDTestKit
   module V220
     class InfernoResponseValidationTest < Inferno::Test
       include CardsValidation
+      include CardsLogicalModelValidation
 
       title 'Inferno CDS Service Response is Conformant'
       description %(
@@ -66,6 +68,7 @@ module DaVinciCRDTestKit
           entity_validated = true
           perform_cards_validation(response_hash['cards'], response_hash['systemActions'].present?, index)
           validate_system_actions(response_hash['systemActions'])
+          perform_cards_logical_model_validation(response_hash['cards'], response_hash['systemActions'], index)
         rescue JSON::ParserError
           next
         end
