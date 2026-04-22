@@ -341,6 +341,35 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
     end
   end
 
+  describe 'when identifying create questionnaire actions' do
+    it 'returns true for a matching action' do
+      action =
+        {
+          'type' => 'create',
+          'description' => 'Create form',
+          'resource' => {
+            'resourceType' => 'Questionnaire',
+            'url' => 'http://example.org/Questionnaire/XYZ'
+          }
+        }
+      expect(module_instance.create_questionnaire_action_response_type?(action)).to be(true)
+    end
+
+    it 'returns false for a non-matching cards' do
+      action =
+        {
+          'type' => 'update',
+          'description' => 'Update form',
+          'resource' => {
+            'resourceType' => 'Questionnaire',
+            'url' => 'http://example.org/Questionnaire/XYZ'
+          }
+        }
+
+      expect(module_instance.create_questionnaire_action_response_type?(action)).to be(false)
+    end
+  end
+
   describe 'when identifying form completion actions' do
     it 'correctly identifies the type' do
       expect(module_instance.identify_action_type(form_completion_action_template))
