@@ -92,6 +92,7 @@ module DaVinciCRDTestKit
     def create_or_update_action_check(action, contexts, ig_version: 'v201')
       resource = FHIR.from_contents(action['resource'].to_json)
       resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
+
       return unless action['type'] == 'update' && contexts
 
       ref = "#{resource.resourceType}/#{resource.id}"
@@ -100,6 +101,24 @@ module DaVinciCRDTestKit
       error_msg = "Resource being updated must be from the `draftOrders` entry. #{ref} is not in the " \
                   "`context.draftOrders` of the submitted requests. In Action `#{action}`"
       add_message('error', error_msg)
+    end
+
+    def questionnaire_creation_check(action)
+      return unless action.dig('resource', 'resourceType') == 'Questionnaire'
+
+      extension_value = action.dig('extension', 'davinci-crd.if-none-exist')
+
+      return if extension_value.is_a?(Array) && extension_value.all? { |value| value.is_a? String }
+
+      if extension_value.nil?
+        add_message('error', '`davinci-crd.if-none-exist` extension is not present.')
+      elsif !extension_value.is_a? Array
+        add_message('error', '`davinci-crd.if-none-exist` extension is not an Array.')
+      elsif extension_value.blank?
+        add_message('error', '`davinci-crd.if-none-exist` extension is empty.')
+      elsif extension_value.any? { |value| !value.is_a? String }
+        add_message('error', '`davinci-crd.if-none-exist` extension contains non-String values.')
+      end
     end
 
     def delete_action_check(action, create_actions_resource_types, contexts)

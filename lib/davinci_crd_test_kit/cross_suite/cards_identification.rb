@@ -145,6 +145,10 @@ module DaVinciCRDTestKit
       ['create', 'update'].include?(action['type']) && action_resource_type_check(action, ['Coverage'])
     end
 
+    def create_questionnaire_action_response_type?(action)
+      action['type'] == 'create' && action_resource_type_check(action, ['Questionnaire'])
+    end
+
     def external_reference_response_type?(card)
       card['links']&.all? { |link| link['type'] == 'absolute' }
     end
