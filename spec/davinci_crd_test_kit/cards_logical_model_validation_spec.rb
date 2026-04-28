@@ -98,7 +98,16 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-formCompletion')
     end
 
-    it 'records a warning and skips validation for uncategorized cards' do
+    it 'records an error and skips validation when a card is not a JSON object' do
+      module_instance.validate_card_against_logical_model('not a card', 0, 0)
+
+      expect(module_instance.conforms_calls).to be_empty
+      expect(module_instance.messages).to include(
+        hash_including(type: 'error', message: a_string_including('is not a JSON object'))
+      )
+    end
+
+    it 'records a warning and validates uncategorized cards against the base logical model' do
       unknown_card = {
         'summary' => 'unknown', 'indicator' => 'info', 'source' => { 'label' => 'x' },
         'links' => [{ 'type' => 'smart' }, { 'type' => 'absolute' }]
@@ -106,7 +115,9 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       module_instance.validate_card_against_logical_model(unknown_card, 0, 0)
 
-      expect(module_instance.conforms_calls).to be_empty
+      expect(module_instance.conforms_calls.length).to eq(1)
+      expect(module_instance.conforms_calls.first[:url])
+        .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
       expect(module_instance.messages).to include(
         hash_including(type: 'warning', message: a_string_including('could not be categorized'))
       )
@@ -126,13 +137,24 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       expect(call[:message_prefix]).to include('coverage_information')
     end
 
-    it 'records a warning and skips validation for uncategorized actions' do
+    it 'records an error and skips validation when a system action is not a JSON object' do
+      module_instance.validate_system_action_against_logical_model('not an action', 0, 0)
+
+      expect(module_instance.conforms_calls).to be_empty
+      expect(module_instance.messages).to include(
+        hash_including(type: 'error', message: a_string_including('is not a JSON object'))
+      )
+    end
+
+    it 'records a warning and validates uncategorized actions against the base logical model' do
       unknown_action = { 'type' => 'update', 'description' => 'x',
                          'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
 
       module_instance.validate_system_action_against_logical_model(unknown_action, 0, 0)
 
-      expect(module_instance.conforms_calls).to be_empty
+      expect(module_instance.conforms_calls.length).to eq(1)
+      expect(module_instance.conforms_calls.first[:url])
+        .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
       expect(module_instance.messages).to include(
         hash_including(type: 'warning', message: a_string_including('could not be categorized'))
       )

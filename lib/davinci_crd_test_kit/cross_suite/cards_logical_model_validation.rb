@@ -5,6 +5,7 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::CardsIdentification
 
     CRD_LOGICAL_MODEL_BASE = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition'.freeze
+    CRD_RESPONSE_BASE_LOGICAL_MODEL = 'CRDHooksResponseBase'.freeze
 
     CARD_TYPE_TO_LOGICAL_MODEL = {
       DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE =>
@@ -37,49 +38,57 @@ module DaVinciCRDTestKit
     end
 
     def perform_cards_logical_model_validation(cards, system_actions, response_index = 0)
-      Array(cards).each_with_index do |card, card_index|
-        validate_card_against_logical_model(card, response_index, card_index)
+      if cards.is_a?(Array)
+        cards.each_with_index do |card, card_index|
+          validate_card_against_logical_model(card, response_index, card_index)
+        end
       end
 
-      Array(system_actions).each_with_index do |action, action_index|
+      return unless system_actions.is_a?(Array)
+
+      system_actions.each_with_index do |action, action_index|
         validate_system_action_against_logical_model(action, response_index, action_index)
       end
     end
 
     def validate_card_against_logical_model(card, response_index, card_index)
-      return unless card.is_a?(Hash)
+      label = logical_model_entity_label(response_index, card_index, 'card')
+      unless card.is_a?(Hash)
+        add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
+        return
+      end
 
       card_type = identify_card_type(card)
-      label = logical_model_entity_label(response_index, card_index, 'card')
-
       profile_name = CARD_TYPE_TO_LOGICAL_MODEL[card_type]
       unless profile_name
         add_message('warning',
                     "#{label} could not be categorized as a known CRD response type; " \
-                    'skipping logical model validation.')
-        return
+                    'validating against the base CRD response logical model.')
+        profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
       end
 
       conforms_to_logical_model?({ 'cards' => [card] }, logical_model_url(profile_name),
-                                 message_prefix: "#{label} (#{card_type}): ")
+                                 message_prefix: "#{label} (#{card_type || 'uncategorized'}): ")
     end
 
     def validate_system_action_against_logical_model(action, response_index, action_index)
-      return unless action.is_a?(Hash)
+      label = logical_model_entity_label(response_index, action_index, 'systemAction')
+      unless action.is_a?(Hash)
+        add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
+        return
+      end
 
       action_type = identify_action_type(action)
-      label = logical_model_entity_label(response_index, action_index, 'systemAction')
-
       profile_name = ACTION_TYPE_TO_LOGICAL_MODEL[action_type]
       unless profile_name
         add_message('warning',
                     "#{label} could not be categorized as a known CRD response type; " \
-                    'skipping logical model validation.')
-        return
+                    'validating against the base CRD response logical model.')
+        profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
       end
 
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
-                                 message_prefix: "#{label} (#{action_type}): ")
+                                 message_prefix: "#{label} (#{action_type || 'uncategorized'}): ")
     end
 
     def logical_model_entity_label(response_index, entity_index, kind)

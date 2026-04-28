@@ -24,7 +24,7 @@
             "id": "XYZ",
             "url": "http://example.org/Questionnaire/XYZ",
             "title": "Cancer Quality Forum Questionnaire XYZ",
-            "version": 2,
+            "version": "2",
             "status": "active",
             "subjectType": [
               "Patient"

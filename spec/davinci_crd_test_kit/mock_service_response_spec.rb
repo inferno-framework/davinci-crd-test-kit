@@ -83,5 +83,13 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(task['resourceType']).to eq('Task')
       expect(task['input'].size).to eq(1)
     end
+
+    it 'form completion questionnaire version is a string' do
+      response = mocked_response_creator_v220.build_mock_hook_response
+      questionnaire = response.dig('cards', 0, 'suggestions', 0, 'actions', 0, 'resource')
+
+      expect(questionnaire['resourceType']).to eq('Questionnaire')
+      expect(questionnaire['version']).to eq('2')
+    end
   end
 end
