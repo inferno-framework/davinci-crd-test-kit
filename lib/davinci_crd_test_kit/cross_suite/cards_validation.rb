@@ -166,7 +166,7 @@ module DaVinciCRDTestKit
     def card_summary_check(card)
       return if !card['summary'].is_a?(String) || card['summary'].length < 140
 
-      add_message('error', "`summary` is over the 140-character limit: `#{card}`")
+      add_message('error', "`summary` is over the 140-character limit: `#{card['summary']}`")
     end
 
     def card_indicator_check(card)
