@@ -24,6 +24,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     },
@@ -45,6 +54,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     },
@@ -66,6 +84,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     },
@@ -95,6 +122,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     },
@@ -118,6 +154,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     },
@@ -141,6 +186,15 @@
         "davinci-crd.version" : [
           "2.2",
           "2.0"
+        ],
+        "davinci-crd.configuration-options" : [
+          {
+            "code" : "coverage-info",
+            "type" : "boolean",
+            "name" : "Coverage Information",
+            "description" : "Information related to the patient's coverage, including whether a service is covered, requires prior authorization, is approved without seeking prior authorization, and/or requires additional documentation or data collection",
+            "default" : true
+          }
         ]
       }
     }

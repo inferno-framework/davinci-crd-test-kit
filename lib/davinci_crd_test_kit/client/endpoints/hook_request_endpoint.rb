@@ -1,6 +1,7 @@
 require_relative 'gather_response_generation_data'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
+require_relative '../../cross_suite/cards_identification'
 require_relative '../../cross_suite/tags'
 
 module DaVinciCRDTestKit
@@ -8,6 +9,7 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::MockServiceResponse
     include DaVinciCRDTestKit::GatherResponseGenerationData
     include DaVinciCRDTestKit::CustomServiceResponse
+    include DaVinciCRDTestKit::CardsIdentification
 
     AVAILABLE_HOOKS = [
       'appointment-book',
@@ -68,7 +70,7 @@ module DaVinciCRDTestKit
           send(:"gather_#{hook_name.gsub('-', '_')}_data")
           request_coverage
         end
-        response_body = hook_response
+        response_body = apply_hook_configuration(hook_response)
         if response_body.present?
           response.body = response_body.to_json
           response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
@@ -92,6 +94,24 @@ module DaVinciCRDTestKit
     rescue StandardError => e
       error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
       nil
+    end
+
+    def apply_hook_configuration(response_body)
+      return response_body unless response_body.present? && coverage_info_disabled?
+
+      cards = response_body['cards']
+      response_body['cards'] = cards.reject { |card| coverage_info_card_type?(card) } if cards.is_a?(Array)
+
+      system_actions = response_body['systemActions']
+      if system_actions.is_a?(Array)
+        response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
+      end
+
+      response_body
+    end
+
+    def coverage_info_disabled?
+      request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
     end
 
     def hook_instance_already_used?
