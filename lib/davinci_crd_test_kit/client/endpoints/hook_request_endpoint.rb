@@ -19,12 +19,21 @@ module DaVinciCRDTestKit
     ].freeze
 
     def ig_version
-      @ig_version ||= request.env['PATH_INFO'].match(/(v\d+)/)&.[](1) || 'v201'
+      @ig_version ||= requested_version || request.env['PATH_INFO'].match(/(v\d+)/)&.[](1) || 'v201'
     end
 
     def request_body
       @request_body ||=
         JSON.parse(request.params.to_json)
+    end
+
+    def requested_version
+      requested = request_body.dig('extension', 'davinci-crd.requestedVersion').to_s
+      if requested == '2.2'
+        'v220'
+      elsif requested == '2.0'
+        'v201'
+      end
     end
 
     def test_run_identifier

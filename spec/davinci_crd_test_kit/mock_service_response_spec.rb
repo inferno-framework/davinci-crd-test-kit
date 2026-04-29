@@ -41,6 +41,12 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(task['resourceType']).to eq('Task')
       expect(task['input'].size).to eq(2)
     end
+
+    it 'card source topic uses temp code system' do
+      response = mocked_response_creator_v201.build_mock_hook_response
+      source_system = response.dig('cards', 0, 'source', 'topic', 'system')
+      expect(source_system).to eq('http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp')
+    end
   end
 
   describe 'v220' do
@@ -90,6 +96,12 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
 
       expect(questionnaire['resourceType']).to eq('Questionnaire')
       expect(questionnaire['version']).to eq('2')
+    end
+
+    it 'card source topic uses cdshooks code system instead of temp' do
+      response = mocked_response_creator_v220.build_mock_hook_response
+      source_system = response.dig('cards', 0, 'source', 'topic', 'system')
+      expect(source_system).to eq('http://terminology.hl7.org/CodeSystem/cdshooks-card-type')
     end
   end
 end

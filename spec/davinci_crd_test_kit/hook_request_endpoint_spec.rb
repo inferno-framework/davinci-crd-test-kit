@@ -169,4 +169,103 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(tagged_requests.one? { |request| request.url == coverage_search_url }).to be(true)
     end
   end
+
+  describe 'ig_version inference' do
+    describe 'when posting to the v220 endpoint path' do
+      let(:suite_id) { 'crd_client_v220' }
+      let(:test) { DaVinciCRDTestKit::V220::OrderSignReceiveRequestTest }
+      let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v220" }
+      let(:server_endpoint) { '/custom/crd_client_v220/cds-services/order-sign-service' }
+
+      it 'does not make FHIR data-fetch requests when version inferred from path' do
+        allow(test).to receive(:suite).and_return(suite)
+        pat_request = stub_request(:get, patient_example_reference_absolute)
+          .to_return(status: 200, body: patient_example.to_json)
+        p_request = stub_request(:get, practitioner_example_reference_absolute)
+          .to_return(status: 200, body: practitioner_example.to_json)
+        cov_request = stub_request(:get, coverage_search_url)
+          .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+        expect(pat_request).to_not have_been_made
+        expect(p_request).to_not have_been_made
+        expect(cov_request).to_not have_been_made
+      end
+
+      it 'makes FHIR data-fetch requests when requestedVersion extension overrides path to v201' do
+        allow(test).to receive(:suite).and_return(suite)
+        pat_request = stub_request(:get, patient_example_reference_absolute)
+          .to_return(status: 200, body: patient_example.to_json)
+        p_request = stub_request(:get, practitioner_example_reference_absolute)
+          .to_return(status: 200, body: practitioner_example.to_json)
+        cov_request = stub_request(:get, coverage_search_url)
+          .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        request_with_v201_extension = order_sign_hook_request.merge(
+          'extension' => { 'davinci-crd.requestedVersion' => '2.0' }
+        )
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, request_with_v201_extension)
+
+        expect(last_response).to be_ok
+        expect(pat_request).to have_been_made.once
+        expect(p_request).to have_been_made.once
+        expect(cov_request).to have_been_made.once
+      end
+    end
+
+    it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do
+      allow(test).to receive(:suite).and_return(suite)
+      pat_request = stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 200, body: patient_example.to_json)
+      p_request = stub_request(:get, practitioner_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_example.to_json)
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+      request_with_v220_extension = order_sign_hook_request.merge(
+        'extension' => { 'davinci-crd.requestedVersion' => '2.2' }
+      )
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, request_with_v220_extension)
+
+      expect(last_response).to be_ok
+      expect(pat_request).to_not have_been_made
+      expect(p_request).to_not have_been_made
+      expect(cov_request).to_not have_been_made
+    end
+  end
 end
