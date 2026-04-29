@@ -131,6 +131,60 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
     end
   end
 
+  describe '#apply_hook_configuration' do
+    let(:endpoint) { described_class.allocate }
+    let(:coverage_info_card) { { 'summary' => 'Coverage', 'source' => { 'type' => 'coverage-info' } } }
+    let(:coverage_info_topic_card) do
+      { 'summary' => 'Coverage topic', 'source' => { 'topic' => { 'code' => 'coverage-info' } } }
+    end
+    let(:guideline_card) { { 'summary' => 'Guideline', 'source' => { 'topic' => { 'code' => 'guideline' } } } }
+    let(:coverage_info_action) do
+      {
+        'type' => 'update',
+        'resource' => {
+          'resourceType' => 'ServiceRequest',
+          'extension' => [{ 'url' => DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_EXT_URL }]
+        }
+      }
+    end
+    let(:form_completion_action) do
+      {
+        'type' => 'create',
+        'resource' => {
+          'resourceType' => 'Task',
+          'code' => { 'coding' => [{ 'code' => 'complete-questionnaire' }] },
+          'input' => [
+            {
+              'type' => { 'text' => 'questionnaire' },
+              'valueCanonical' => 'http://example.com/Questionnaire/example'
+            }
+          ]
+        }
+      }
+    end
+    let(:other_action) { { 'type' => 'delete', 'resource' => { 'resourceType' => 'ServiceRequest' } } }
+
+    it 'filters coverage-info cards and actions when the coverage-info configuration option is false' do
+      allow(endpoint).to receive(:request_body).and_return(
+        'extension' => {
+          'davinci-crd.configuration' => {
+            'coverage-info' => false
+          }
+        }
+      )
+
+      response_body = {
+        'cards' => [coverage_info_card, coverage_info_topic_card, guideline_card],
+        'systemActions' => [coverage_info_action, form_completion_action, other_action]
+      }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response['cards']).to eq([guideline_card])
+      expect(filtered_response['systemActions']).to eq([other_action])
+    end
+  end
+
   describe 'When fetching data during a hook invocation' do
     it 'makes and tags requests for order-sign' do
       allow(test).to receive(:suite).and_return(suite)

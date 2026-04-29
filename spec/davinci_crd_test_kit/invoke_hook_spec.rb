@@ -16,6 +16,18 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
   let(:service_endpoint) { "#{discovery_url}/#{service_ids}" }
   let(:encryption_method) { 'ES384' }
   let(:invoked_hook) { 'appointment-book' }
+  let(:coverage_info_response) do
+    {
+      cards: [
+        {
+          summary: 'Coverage information',
+          indicator: 'info',
+          source: { type: DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_CONFIGURATION_CODE }
+        }
+      ]
+    }
+  end
+  let(:filtered_response) { { cards: [] } }
   let(:continuation_url) do
     "#{inferno_base_url}/custom/#{suite_id}/resume_pass?token=#{test_session_id}"
   end
@@ -53,11 +65,79 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, encryption_method, invoked_hook, continuation_url, failure_url, false
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to have_been_made.once
       expect(continuation_request).to have_been_made.once
+    end
+
+    it 'updates hook request details before invoking the service' do
+      original_hook_instance = service_request_body['hookInstance']
+      hook_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          request_body = JSON.parse(request.body)
+          token = request_body.dig('fhirAuthorization', 'access_token')
+          token_body = JSON.parse(Base64.urlsafe_decode64(token))
+
+          request_body['hookInstance'] != original_hook_instance &&
+            request_body['fhirServer'] == "#{inferno_base_url}/fhir" &&
+            token_body['session_id'] == test_session_id
+        end
+        .to_return(status: 200)
+      stub_request(:get, continuation_url).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, false
+      )
+
+      expect(hook_request).to have_been_made.once
+    end
+
+    it 'sends one follow-up request with coverage-info disabled when coverage-info content is returned' do
+      original_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil?
+        end
+        .to_return(status: 200, body: coverage_info_response.to_json)
+      coverage_info_disabled_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
+        end
+        .to_return(status: 200, body: filtered_response.to_json)
+      stub_request(:get, continuation_url).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, true
+      )
+
+      expect(original_request).to have_been_made.once
+      expect(coverage_info_disabled_request).to have_been_made.once
+    end
+
+    it 'sends only one coverage-info disabled follow-up request per job' do
+      request_bodies = [service_request_body, service_request_body.deep_dup]
+      original_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil?
+        end
+        .to_return(status: 200, body: coverage_info_response.to_json)
+      coverage_info_disabled_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
+        end
+        .to_return(status: 200, body: filtered_response.to_json)
+      stub_request(:get, continuation_url).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, request_bodies, service_endpoint, inferno_base_url,
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, true
+      )
+
+      expect(original_request).to have_been_made.twice
+      expect(coverage_info_disabled_request).to have_been_made.once
     end
 
     it 'does not invoke the continuation url after successful hook invocations if acknowledgement required' do
@@ -69,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, encryption_method, invoked_hook, continuation_url, failure_url, true
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, true, false
       )
 
       expect(hook_request).to have_been_made.once
@@ -85,7 +165,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, encryption_method, invoked_hook, continuation_url, failure_url, false
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, false
       )
       expect(failure_request).to have_been_made.once
     end
@@ -110,7 +190,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, encryption_method, invoked_hook, continuation_url, failure_url, false
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to have_been_made.once
@@ -130,7 +210,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, encryption_method, invoked_hook, continuation_url, failure_url, false
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to_not have_been_made

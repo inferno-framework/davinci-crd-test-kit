@@ -128,7 +128,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
       expect_any_instance_of(DaVinciCRDTestKit::Jobs::InvokeHook) # rubocop:disable RSpec/StubbedMock
         .to receive(:perform)
         .with(anything, anything, "#{discovery_url}/#{service_ids}", anything, anything, anything,
-              DaVinciCRDTestKit::ANY_HOOK_TAG, anything, anything, anything)
+              DaVinciCRDTestKit::ANY_HOOK_TAG, anything, anything, anything, false)
         .and_return(nil)
 
       result = run(runnable, base_url:, inferno_base_url:, service_ids: '', encryption_method:,

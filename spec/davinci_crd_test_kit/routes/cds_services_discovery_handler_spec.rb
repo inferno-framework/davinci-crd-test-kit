@@ -39,6 +39,14 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
 
       services.all? do |service|
         expect(service).to include('hook', 'description', 'id')
+        expect(service.dig('extension', 'davinci-crd.configuration-options')).to include(
+          a_hash_including(
+            'code' => 'coverage-info',
+            'type' => 'boolean',
+            'name' => 'Coverage Information',
+            'default' => true
+          )
+        )
       end
     end
   end

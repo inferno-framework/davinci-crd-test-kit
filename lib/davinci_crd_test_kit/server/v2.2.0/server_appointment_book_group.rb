@@ -8,6 +8,7 @@ require_relative 'verify_response/card_optional_fields_validation_test'
 require_relative 'verify_response/external_reference_card_validation_test'
 require_relative 'verify_response/coverage_information_system_action_received_test'
 require_relative 'verify_response/coverage_information_system_action_validation_test'
+require_relative 'verify_response/coverage_info_configuration_test'
 require_relative 'verify_response/instructions_card_received_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/launch_smart_app_card_validation_test'
@@ -185,6 +186,7 @@ module DaVinciCRDTestKit
                  }
                }
              }
+        test from: :crd_v220_coverage_info_configuration
       end
     end
   end

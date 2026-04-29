@@ -10,6 +10,7 @@ require_relative 'verify_response/launch_smart_app_card_validation_test'
 require_relative 'verify_response/instructions_card_received_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/create_or_update_coverage_info_response_validation_test'
+require_relative 'verify_response/coverage_info_configuration_test'
 
 module DaVinciCRDTestKit
   module V220
@@ -180,6 +181,7 @@ module DaVinciCRDTestKit
                  }
                }
              }
+        test from: :crd_v220_coverage_info_configuration
       end
     end
   end
