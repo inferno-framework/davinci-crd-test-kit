@@ -14,7 +14,7 @@ RSpec.describe DaVinciCRDTestKit::ReplaceTokens do
   end
 
   let(:order_dispatch_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_dispatch_hook_v220_request.json')))
+    JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_dispatch_hook_v221_request.json')))
   end
 
   describe 'when replacing in a string' do

@@ -1,0 +1,5 @@
+---
+:resource: ServiceRequest
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest
+:profile_name: CRD Service Request
+:profile_version: 2.2.1

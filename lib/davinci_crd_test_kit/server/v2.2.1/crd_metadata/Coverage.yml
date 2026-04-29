@@ -1,0 +1,5 @@
+---
+:resource: Coverage
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage
+:profile_name: CRD Coverage
+:profile_version: 2.2.1

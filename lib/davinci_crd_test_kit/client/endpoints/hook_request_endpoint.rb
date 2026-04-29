@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
     def requested_version
       requested = request_body.dig('extension', 'davinci-crd.requestedVersion').to_s
       if requested == '2.2'
-        'v220'
+        'v221'
       elsif requested == '2.0'
         'v201'
       end

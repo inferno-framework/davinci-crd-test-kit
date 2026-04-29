@@ -1,5 +1,0 @@
----
-:resource: VisionPrescription
-:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription
-:profile_name: CRD Vision Prescription
-:profile_version: 2.2.0

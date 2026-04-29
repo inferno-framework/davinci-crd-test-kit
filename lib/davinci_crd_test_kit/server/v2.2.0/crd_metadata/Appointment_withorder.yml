@@ -1,5 +1,0 @@
----
-:resource: Appointment
-:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-with-order
-:profile_name: CRD Appointment with Order
-:profile_version: 2.2.0

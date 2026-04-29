@@ -180,8 +180,8 @@ module DaVinciCRDTestKit
 
     def structure_definition_map(ig_version)
       case ig_version
-      when 'v220'
-        structure_definition_map_v220
+      when 'v221'
+        structure_definition_map_v221
       when 'v201'
         structure_definition_map_v201
       end
@@ -209,25 +209,25 @@ module DaVinciCRDTestKit
       }.freeze
     end
 
-    def structure_definition_map_v220
+    def structure_definition_map_v221
       {
-        'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.2.0',
+        'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.2.1',
         'PractitionerRole' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole|3.1.1',
-        'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient|2.2.0',
-        'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter|2.2.0',
-        'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order|2.2.0',
-        'DeviceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest|2.2.0',
-        'MedicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest|2.2.0',
-        'NutritionOrder' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder|2.2.0',
-        'ServiceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest|2.2.0',
-        'VisionPrescription' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription|2.2.0',
+        'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient|2.2.1',
+        'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter|2.2.1',
+        'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order|2.2.1',
+        'DeviceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-devicerequest|2.2.1',
+        'MedicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest|2.2.1',
+        'NutritionOrder' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-nutritionorder|2.2.1',
+        'ServiceRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest|2.2.1',
+        'VisionPrescription' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-visionprescription|2.2.1',
         'Medication' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication|3.1.1',
-        'Device' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device|2.2.0',
-        'CommunicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-communicationrequest|2.2.0',
-        'Task' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire|2.2.0',
-        'Coverage' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage|2.2.0',
-        'Location' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location|2.2.0',
-        'Organization' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization|2.2.0'
+        'Device' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device|2.2.1',
+        'CommunicationRequest' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-communicationrequest|2.2.1',
+        'Task' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire|2.2.1',
+        'Coverage' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage|2.2.1',
+        'Location' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location|2.2.1',
+        'Organization' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization|2.2.1'
       }.freeze
     end
 

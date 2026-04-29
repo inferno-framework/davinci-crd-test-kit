@@ -1,0 +1,5 @@
+---
+:resource: MedicationRequest
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest
+:profile_name: CRD Medication Request
+:profile_version: 2.2.1

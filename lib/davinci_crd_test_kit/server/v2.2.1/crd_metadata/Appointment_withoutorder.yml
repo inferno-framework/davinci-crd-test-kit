@@ -1,0 +1,5 @@
+---
+:resource: Appointment
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order
+:profile_name: CRD Appointment without Order
+:profile_version: 2.2.1

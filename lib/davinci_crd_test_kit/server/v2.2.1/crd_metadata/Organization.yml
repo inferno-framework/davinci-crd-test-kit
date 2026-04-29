@@ -1,0 +1,5 @@
+---
+:resource: Organization
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization
+:profile_name: CRD Organization
+:profile_version: 2.2.1

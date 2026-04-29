@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
 
     def load_json_file(filename)
       json = JSON.parse(File.read(File.join(__dir__, 'mocked_card_responses', filename)))
-      if ig_version == 'v220'
+      if ig_version == 'v221'
         json['source']['topic']['system'] = 'http://terminology.hl7.org/CodeSystem/cdshooks-card-type'
       end
       return json unless filename == 'launch_smart_app.json'
@@ -379,7 +379,7 @@ module DaVinciCRDTestKit
 
       form_completion_task['for']['reference'] = "Patient/#{context['patientId']}"
       form_completion_task['authoredOn'] = current_time.strftime('%Y-%m-%d')
-      form_completion_task['input'].delete_at(1) if ig_version == 'v220'
+      form_completion_task['input'].delete_at(1) if ig_version == 'v221'
       request_form_completion_card
     end
 

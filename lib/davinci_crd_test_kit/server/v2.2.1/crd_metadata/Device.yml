@@ -1,0 +1,5 @@
+---
+:resource: Device
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device
+:profile_name: CRD Device
+:profile_version: 2.2.1

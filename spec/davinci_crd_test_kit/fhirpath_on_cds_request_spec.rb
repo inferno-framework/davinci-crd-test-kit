@@ -7,8 +7,8 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
   let(:order_sign_request) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_sign_hook_request.json')))
   end
-  let(:order_dispatch_v220_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_dispatch_hook_v220_request.json')))
+  let(:order_dispatch_v221_request) do
+    JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_dispatch_hook_v221_request.json')))
   end
   let(:crd_practitioner_example) do
     FHIR.from_contents(File.read(File.join(__dir__, '..', 'fixtures', 'crd_practitioner_example.json')))
@@ -57,7 +57,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     end
 
     it 'returns the value for a list field' do
-      results = module_instance.execute_fhirpath_on_cds_request(order_dispatch_v220_request, 'context.dispatchedOrders')
+      results = module_instance.execute_fhirpath_on_cds_request(order_dispatch_v221_request, 'context.dispatchedOrders')
 
       expect(results).to be_an_instance_of(Array)
       expect(results.length).to eq(2)
@@ -67,7 +67,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
 
     #   it 'resolves lists of references in the cds request' do
     #     results = module_instance.execute_fhirpath_on_cds_request(
-    #       order_dispatch_v220_request,
+    #       order_dispatch_v221_request,
     #       'context.dispatchedOrders.resolve()',
     #       fetched_resources:
     #         { 'ServiceRequest/example' => JSON.parse(crd_service_request_example.to_json),
@@ -128,7 +128,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
         .to_return(status: 200, body: fhirpath_result_two.to_json)
 
       results = module_instance.execute_fhirpath_on_cds_request(
-        order_dispatch_v220_request,
+        order_dispatch_v221_request,
         'context.fulfillmentTasks.focus'
       )
 
@@ -151,7 +151,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     #     .to_return(status: 200, body: fhirpath_result_three.to_json)
 
     #   results = module_instance.execute_fhirpath_on_cds_request(
-    #     order_dispatch_v220_request,
+    #     order_dispatch_v221_request,
     #     'context.dispatchedOrders.resolve().orderer.resolve().id',
     #     fetched_resources:
     #       { 'ServiceRequest/example' => JSON.parse(crd_service_request_example.to_json),

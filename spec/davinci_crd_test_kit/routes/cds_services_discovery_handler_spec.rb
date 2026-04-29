@@ -23,8 +23,8 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
       end
     end
 
-    it 'returns JSON with required fields for v220' do
-      get '/custom/crd_client_v220/cds-services'
+    it 'returns JSON with required fields for v221' do
+      get '/custom/crd_client_v221/cds-services'
 
       expect(last_response).to be_ok
       expect(last_response.headers['Content-Type']).to eq('application/json')

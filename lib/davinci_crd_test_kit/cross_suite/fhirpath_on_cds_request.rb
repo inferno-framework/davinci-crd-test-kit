@@ -2,7 +2,7 @@ module DaVinciCRDTestKit
   # Methods for executing simple fhirpath queries on cds request objects, e.g., to resolve
   # prefetch tokens.
   #
-  # If resolve() calls are in scope (CRD 2.2.0 and beyond), then an implementation of the
+  # If resolve() calls are in scope (CRD 2.2.1 and beyond), then an implementation of the
   # `resolve(target)` method must be provided, where `target` is
   module FhirpathOnCDSRequest
     # fhirpath services doesn't handle the following, which are handled manually

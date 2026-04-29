@@ -49,13 +49,13 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     end
   end
 
-  describe 'v220' do
-    let(:mocked_response_creator_v220) do
+  describe 'v221' do
+    let(:mocked_response_creator_v221) do
       Class.new do
         include DaVinciCRDTestKit::MockServiceResponse
 
         def ig_version
-          'v220'
+          'v221'
         end
 
         def selected_response_types
@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     end
 
     it 'form completion task has two inputs' do
-      response = mocked_response_creator_v220.build_mock_hook_response
+      response = mocked_response_creator_v221.build_mock_hook_response
       expect(response['cards'].size).to eq(1)
       task = response.dig('cards', 0, 'suggestions', 0, 'actions', 1, 'resource')
       expect(task).to be_present
@@ -91,7 +91,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     end
 
     it 'form completion questionnaire version is a string' do
-      response = mocked_response_creator_v220.build_mock_hook_response
+      response = mocked_response_creator_v221.build_mock_hook_response
       questionnaire = response.dig('cards', 0, 'suggestions', 0, 'actions', 0, 'resource')
 
       expect(questionnaire['resourceType']).to eq('Questionnaire')
@@ -99,7 +99,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     end
 
     it 'card source topic uses cdshooks code system instead of temp' do
-      response = mocked_response_creator_v220.build_mock_hook_response
+      response = mocked_response_creator_v221.build_mock_hook_response
       source_system = response.dig('cards', 0, 'source', 'topic', 'system')
       expect(source_system).to eq('http://terminology.hl7.org/CodeSystem/cdshooks-card-type')
     end

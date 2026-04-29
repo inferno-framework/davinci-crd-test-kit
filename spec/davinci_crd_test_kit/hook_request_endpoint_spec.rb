@@ -225,11 +225,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
   end
 
   describe 'ig_version inference' do
-    describe 'when posting to the v220 endpoint path' do
-      let(:suite_id) { 'crd_client_v220' }
-      let(:test) { DaVinciCRDTestKit::V220::OrderSignReceiveRequestTest }
-      let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v220" }
-      let(:server_endpoint) { '/custom/crd_client_v220/cds-services/order-sign-service' }
+    describe 'when posting to the v221 endpoint path' do
+      let(:suite_id) { 'crd_client_v221' }
+      let(:test) { DaVinciCRDTestKit::V221::OrderSignReceiveRequestTest }
+      let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
+      let(:server_endpoint) { '/custom/crd_client_v221/cds-services/order-sign-service' }
 
       it 'does not make FHIR data-fetch requests when version inferred from path' do
         allow(test).to receive(:suite).and_return(suite)
@@ -310,11 +310,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       run(test, cds_jwt_iss: example_client_url,
                 order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
-      request_with_v220_extension = order_sign_hook_request.merge(
+      request_with_v221_extension = order_sign_hook_request.merge(
         'extension' => { 'davinci-crd.requestedVersion' => '2.2' }
       )
       header('Authorization', "Bearer #{token}")
-      post_json(server_endpoint, request_with_v220_extension)
+      post_json(server_endpoint, request_with_v221_extension)
 
       expect(last_response).to be_ok
       expect(pat_request).to_not have_been_made

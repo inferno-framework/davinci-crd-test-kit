@@ -1,0 +1,5 @@
+---
+:resource: Encounter
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter
+:profile_name: CRD Encounter
+:profile_version: 2.2.1
