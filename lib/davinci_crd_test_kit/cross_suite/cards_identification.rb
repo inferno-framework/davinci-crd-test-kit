@@ -65,6 +65,46 @@ module DaVinciCRDTestKit
       [COVERAGE_INFORMATION_RESPONSE_TYPE, FORM_COMPLETION_RESPONSE_TYPE].include?(identify_action_type(action))
     end
 
+    def coverage_info_content(response_body)
+      return [[], []] unless response_body.is_a?(Hash)
+
+      cards =
+        if response_body['cards'].is_a?(Array)
+          response_body['cards'].select { |card| coverage_info_card_type?(card) }
+        else
+          []
+        end
+      actions =
+        if response_body['systemActions'].is_a?(Array)
+          response_body['systemActions'].select { |action| coverage_info_system_action_type?(action) }
+        else
+          []
+        end
+
+      [cards, actions]
+    end
+
+    def coverage_info_response?(response_body)
+      cards, actions = coverage_info_content(response_body)
+
+      cards.present? || actions.present?
+    end
+
+    def coverage_info_configuration_disabled?(request_body)
+      request_body.is_a?(Hash) &&
+        request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
+    end
+
+    def disable_coverage_info_configuration!(request_body)
+      request_body['extension'] = {} unless request_body['extension'].is_a?(Hash)
+      unless request_body['extension']['davinci-crd.configuration'].is_a?(Hash)
+        request_body['extension']['davinci-crd.configuration'] = {}
+      end
+      request_body['extension']['davinci-crd.configuration'][COVERAGE_INFO_CONFIGURATION_CODE] = false
+
+      request_body
+    end
+
     def additional_orders_response_type?(card, expected_resource_types: ADDITIONAL_ORDERS_EXPECTED_RESOURCE_TYPES)
       card['suggestions']&.all? do |suggestion|
         actions = suggestion['actions']

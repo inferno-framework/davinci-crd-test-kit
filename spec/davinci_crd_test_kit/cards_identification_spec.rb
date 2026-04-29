@@ -369,6 +369,25 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
       expect(module_instance.coverage_info_system_action_type?(form_completion_action_template)).to be(true)
       expect(module_instance.coverage_info_system_action_type?(create_coverage_action_template)).to be(false)
     end
+
+    it 'extracts coverage-info cards and actions from response bodies' do
+      cards, actions = module_instance.coverage_info_content(
+        'cards' => [instructions_card_template, external_reference_template],
+        'systemActions' => [coverage_information_action_template, create_coverage_action_template]
+      )
+
+      expect(cards).to eq([instructions_card_template])
+      expect(actions).to eq([coverage_information_action_template])
+      expect(module_instance.coverage_info_response?('cards' => cards, 'systemActions' => actions)).to be(true)
+    end
+
+    it 'sets and detects the coverage-info disabled configuration option' do
+      request_body = {}
+
+      module_instance.disable_coverage_info_configuration!(request_body)
+
+      expect(module_instance.coverage_info_configuration_disabled?(request_body)).to be(true)
+    end
   end
 
   describe 'when sorting cards by type' do

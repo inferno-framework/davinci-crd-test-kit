@@ -1,7 +1,6 @@
 require_relative 'server_hook_helper'
 require_relative '../cross_suite/tags'
 require_relative 'jobs/invoke_hook'
-require_relative 'endpoints/mock_ehr/fhir_request_handler'
 
 module DaVinciCRDTestKit
   class ServerAbstractInvokeHookTest < Inferno::Test
@@ -130,12 +129,10 @@ module DaVinciCRDTestKit
       failure_url = "#{resume_fail_url}?token=#{test_session_id}"
 
       acknowledge_before_continuing = manual_continuation == 'yes'
-      payloads.each do |parsed_request|
-        update_hook_request(parsed_request)
-      end
       Inferno::Jobs.perform(DaVinciCRDTestKit::Jobs::InvokeHook, test_session_id,
                             payloads, service_endpoint, inferno_base_url, jwks_kid, encryption_method,
-                            tested_hook_name, continuation_url, failure_url, acknowledge_before_continuing)
+                            tested_hook_name, continuation_url, failure_url, acknowledge_before_continuing,
+                            coverage_info_configuration_supported?)
 
       wait(
         identifier: test_session_id,
@@ -160,21 +157,8 @@ module DaVinciCRDTestKit
         'to continue the tests.'
     end
 
-    # point FHIR server and token details towards the CRD Server
-    # Test Suite's simulated FHIR server
-    def update_hook_request(parsed_request)
-      parsed_request['hookInstance'] = SecureRandom.uuid
-      parsed_request['fhirServer'] = fhir_url
-      update_simulated_server_token(parsed_request)
-    end
-
-    def update_simulated_server_token(parsed_request)
-      parsed_request['fhirAuthorization'] = {} if parsed_request['fhirAuthorization'].nil?
-      fhir_authorization = parsed_request['fhirAuthorization']
-
-      fhir_authorization['expires_in'] = 300 unless fhir_authorization['expires_in'].present?
-      fhir_authorization['access_token'] =
-        MockEHR::FHIRRequestHandler.session_id_to_token(test_session_id, fhir_authorization['expires_in'].to_i / 60)
+    def coverage_info_configuration_supported?
+      false
     end
   end
 end

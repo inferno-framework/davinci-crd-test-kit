@@ -6,6 +6,10 @@ module DaVinciCRDTestKit
     class ServerInvokeHookTest < ServerAbstractInvokeHookTest
       include ServerURLs
       id :crd_v220_server_invoke_hook_test
+
+      def coverage_info_configuration_supported?
+        true
+      end
     end
   end
 end

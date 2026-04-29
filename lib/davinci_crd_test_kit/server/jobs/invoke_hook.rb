@@ -2,16 +2,21 @@
 
 require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/base_urls'
+require_relative '../../cross_suite/cards_identification'
+require_relative '../endpoints/mock_ehr/fhir_request_handler'
+require_relative '../server_base_urls'
 
 module DaVinciCRDTestKit
   module Jobs
     class InvokeHook
       include Sidekiq::Job
+      include DaVinciCRDTestKit::CardsIdentification
 
       sidekiq_options retry: false
 
       def perform(test_session_id, request_bodies, service_endpoint, inferno_base_url, jwks_kid,
-                  encryption_method, request_tag, continuation_url, failure_url, acknowledge_before_continuing)
+                  encryption_method, request_tag, continuation_url, failure_url, acknowledge_before_continuing,
+                  coverage_info_configuration_supported)
         @test_session_id = test_session_id
         @service_endpoint = service_endpoint
         @inferno_base_url = inferno_base_url
@@ -21,6 +26,7 @@ module DaVinciCRDTestKit
         @continuation_url = continuation_url
         @failure_url = failure_url
         @acknowledge_before_continuing = acknowledge_before_continuing
+        @coverage_info_configuration_supported = coverage_info_configuration_supported
 
         perform_hook_invocations(request_bodies)
       end
@@ -31,7 +37,9 @@ module DaVinciCRDTestKit
         request_bodies.each do |request|
           break unless test_waiting?
 
-          send_hook_invocation(request.to_json)
+          request_body = prepare_hook_request(request)
+          response = send_hook_invocation(request_body.to_json)
+          send_coverage_info_configuration_invocation(request_body, response)
         end
         return unless test_waiting?
 
@@ -61,6 +69,10 @@ module DaVinciCRDTestKit
         @service_connection ||= Faraday.new(url: @service_endpoint, request: { open_timeout: 30 })
       end
 
+      def fhir_url
+        @inferno_base_url + FHIR_ROUTE
+      end
+
       def test_done?
         test_runs_repo.status_for_test_run(test_run_id) == 'done'
       end
@@ -75,6 +87,22 @@ module DaVinciCRDTestKit
         results_repo.find_waiting_result(test_run_id:).present?
       end
 
+      def prepare_hook_request(parsed_request)
+        parsed_request['hookInstance'] = SecureRandom.uuid
+        parsed_request['fhirServer'] = fhir_url
+        update_simulated_server_token(parsed_request)
+        parsed_request
+      end
+
+      def update_simulated_server_token(parsed_request)
+        parsed_request['fhirAuthorization'] = {} if parsed_request['fhirAuthorization'].nil?
+        fhir_authorization = parsed_request['fhirAuthorization']
+
+        fhir_authorization['expires_in'] = 300 unless fhir_authorization['expires_in'].present?
+        fhir_authorization['access_token'] =
+          MockEHR::FHIRRequestHandler.session_id_to_token(@test_session_id, fhir_authorization['expires_in'].to_i / 60)
+      end
+
       def send_hook_invocation(request_body)
         token = JwtHelper.build(
           aud: @service_endpoint,
@@ -87,6 +115,24 @@ module DaVinciCRDTestKit
         response = invoke_hook(request_body, headers)
         persist_hook_request(response, [@request_tag], headers)
         response
+      end
+
+      def send_coverage_info_configuration_invocation(request_body, response)
+        return unless @coverage_info_configuration_supported
+        return unless response.status == 200
+        return unless coverage_info_response?(parsed_response_body(response))
+        return unless test_waiting?
+
+        configured_request_body = JSON.parse(request_body.to_json)
+        prepare_hook_request(configured_request_body)
+        disable_coverage_info_configuration!(configured_request_body)
+        send_hook_invocation(configured_request_body.to_json)
+      end
+
+      def parsed_response_body(response)
+        JSON.parse(response.env.response_body.to_s)
+      rescue JSON::ParserError, TypeError
+        nil
       end
 
       def invoke_hook(request_body, headers)

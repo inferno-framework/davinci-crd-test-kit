@@ -68,45 +68,67 @@ RSpec.describe DaVinciCRDTestKit::V220::CoverageInfoConfigurationTest do
     )
   end
 
-  def mock_previous_request(request)
-    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
-    allow_any_instance_of(runnable).to receive(:requests).and_return([request])
+  def coverage_info_disabled_request_body
+    hook_request.deep_dup.tap do |request_body|
+      request_body['hookInstance'] = SecureRandom.uuid
+      request_body['extension'] = {
+        'davinci-crd.configuration' => {
+          'coverage-info' => false
+        }
+      }
+    end
   end
 
-  it 'repeats prior coverage-info responses with coverage-info disabled' do
-    request = create_service_request
-    mock_previous_request(request)
-    repeated_request = stub_request(:post, service_endpoint)
-      .with do |webmock_request|
-        repeated_body = JSON.parse(webmock_request.body)
-        repeated_body.dig('extension', 'davinci-crd.configuration', 'coverage-info') == false &&
-          repeated_body['hookInstance'] != hook_request['hookInstance']
-      end
-      .to_return(status: 200, body: filtered_response.to_json)
+  def entity_result_messages
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+      .first
+      .messages
+  end
 
-    result = run(runnable, encryption_method: 'RS384')
+  def mock_previous_requests(*requests)
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
+    allow_any_instance_of(runnable).to receive(:requests).and_return(requests)
+  end
+
+  it 'passes when coverage-info disabled responses omit coverage-info content' do
+    original_request = create_service_request
+    disabled_request =
+      create_service_request(body: filtered_response, request_body: coverage_info_disabled_request_body)
+    mock_previous_requests(original_request, disabled_request)
+
+    result = run(runnable)
 
     expect(result.result).to eq('pass')
-    expect(repeated_request).to have_been_made.once
   end
 
-  it 'fails if the repeated response still contains coverage-info content' do
-    request = create_service_request
-    mock_previous_request(request)
-    stub_request(:post, service_endpoint)
-      .to_return(status: 200, body: original_response.to_json)
+  it 'fails if the coverage-info disabled response still contains coverage-info content' do
+    original_request = create_service_request
+    disabled_request = create_service_request(request_body: coverage_info_disabled_request_body)
+    mock_previous_requests(original_request, disabled_request)
 
-    result = run(runnable, encryption_method: 'RS384')
+    result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/included coverage-info content/)
+    expect(result.result_message).to match(/Coverage-info configuration responses were not valid/)
+    expect(entity_result_messages.map(&:message).join(' ')).to match(/included coverage-info content/)
+  end
+
+  it 'fails if no coverage-info disabled follow-up request was made after coverage-info content was returned' do
+    request = create_service_request
+    mock_previous_requests(request)
+
+    result = run(runnable)
+
+    expect(result.result).to eq('fail')
+    expect(entity_result_messages.map(&:message).join(' '))
+      .to match(/No order-sign request was made with `coverage-info` set to `false`/)
   end
 
   it 'skips when prior responses did not include coverage-info content' do
     request = create_service_request(body: filtered_response)
-    mock_previous_request(request)
+    mock_previous_requests(request)
 
-    result = run(runnable, encryption_method: 'RS384')
+    result = run(runnable)
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to match(/No successful order-sign response contained coverage-info/)
