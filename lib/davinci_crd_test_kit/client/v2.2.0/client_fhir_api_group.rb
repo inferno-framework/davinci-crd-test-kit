@@ -41,7 +41,7 @@ module DaVinciCRDTestKit
               This test group verifies that the CRD Client can respond to queries as required by the
               US Core 3.1.1 Server Capability Statement
 
-              Note: these tests od not look for crd-specific data and so only verify conformance against
+              Note: these tests do not look for crd-specific data and so only verify conformance against
               US Core profiles. The hook tests take the CRD-specific profiles into account.
             ),
             required_suite_options: CRDClientOptions::US_CORE_3_REQUIREMENT
@@ -50,7 +50,7 @@ module DaVinciCRDTestKit
               This test group verifies that the CRD Client can respond to queries as required by the
               US Core 6.1.0 Server Capability Statement
 
-              Note: these tests od not look for crd-specific data and so only verify conformance against
+              Note: these tests do not look for crd-specific data and so only verify conformance against
               US Core profiles. The hook tests take the CRD-specific profiles into account.
             ),
             required_suite_options: CRDClientOptions::US_CORE_6_REQUIREMENT
@@ -59,7 +59,7 @@ module DaVinciCRDTestKit
               This test group verifies that the CRD Client can respond to queries as required by the
               US Core 7.0.0 Server Capability Statement
 
-              Note: these tests od not look for crd-specific data and so only verify conformance against
+              Note: these tests do not look for crd-specific data and so only verify conformance against
               US Core profiles. The hook tests take the CRD-specific profiles into account.
             ),
             required_suite_options: CRDClientOptions::US_CORE_7_REQUIREMENT
