@@ -117,6 +117,29 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
       expect(coverage_info_disabled_request).to have_been_made.once
     end
 
+    it 'sends only one coverage-info disabled follow-up request per job' do
+      request_bodies = [service_request_body, service_request_body.deep_dup]
+      original_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil?
+        end
+        .to_return(status: 200, body: coverage_info_response.to_json)
+      coverage_info_disabled_request = stub_request(:post, service_endpoint)
+        .with do |request|
+          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
+        end
+        .to_return(status: 200, body: filtered_response.to_json)
+      stub_request(:get, continuation_url).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, request_bodies, service_endpoint, inferno_base_url,
+        nil, encryption_method, invoked_hook, continuation_url, failure_url, false, true
+      )
+
+      expect(original_request).to have_been_made.twice
+      expect(coverage_info_disabled_request).to have_been_made.once
+    end
+
     it 'does not invoke the continuation url after successful hook invocations if acknowledgement required' do
       hook_request = stub_request(:post, service_endpoint).to_return(status: 200)
       continuation_request = stub_request(:get, continuation_url).to_return(status: 200)

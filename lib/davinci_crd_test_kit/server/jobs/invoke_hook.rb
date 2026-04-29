@@ -11,6 +11,7 @@ module DaVinciCRDTestKit
     class InvokeHook
       include Sidekiq::Job
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::ServerBaseURLs
 
       sidekiq_options retry: false
 
@@ -69,10 +70,6 @@ module DaVinciCRDTestKit
         @service_connection ||= Faraday.new(url: @service_endpoint, request: { open_timeout: 30 })
       end
 
-      def fhir_url
-        @inferno_base_url + FHIR_ROUTE
-      end
-
       def test_done?
         test_runs_repo.status_for_test_run(test_run_id) == 'done'
       end
@@ -119,6 +116,7 @@ module DaVinciCRDTestKit
 
       def send_coverage_info_configuration_invocation(request_body, response)
         return unless @coverage_info_configuration_supported
+        return if @coverage_info_configuration_invoked
         return unless response.status == 200
         return unless coverage_info_response?(parsed_response_body(response))
         return unless test_waiting?
@@ -127,6 +125,7 @@ module DaVinciCRDTestKit
         prepare_hook_request(configured_request_body)
         disable_coverage_info_configuration!(configured_request_body)
         send_hook_invocation(configured_request_body.to_json)
+        @coverage_info_configuration_invoked = true
       end
 
       def parsed_response_body(response)
