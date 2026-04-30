@@ -1,6 +1,14 @@
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
+    def build_mock_hook_response
+      hook_card_response = create_cards_and_system_actions
+      update_specific_hook_card_info(hook_card_response)
+      create_warning_messages(hook_card_response)
+
+      hook_card_response
+    end
+
     def selected_response_types
       @selected_response_types ||=
         JSON.parse(result.input_json)
@@ -113,10 +121,11 @@ module DaVinciCRDTestKit
       return if card_response.nil?
 
       hook_display = hook_name.split('-').map(&:capitalize).join(' ')
-      card_response['cards'].map do |card|
+      card_response['cards']&.tap(&:compact!)&.each do |card|
         card['summary'].prepend("#{hook_display} ")
         card['uuid'] = SecureRandom.uuid
       end
+      card_response['systemActions']&.compact!
       card_response
     end
 
@@ -136,14 +145,6 @@ module DaVinciCRDTestKit
         'encounter-start' => 'Encounter',
         'encounter-discharge' => 'Encounter'
       }[hook_name]
-    end
-
-    def build_mock_hook_response
-      hook_card_response = create_cards_and_system_actions
-      update_specific_hook_card_info(hook_card_response)
-      create_warning_messages(hook_card_response)
-
-      hook_card_response
     end
 
     def make_resource_request(uri, access_token)
@@ -177,6 +178,8 @@ module DaVinciCRDTestKit
     end
 
     def get_context_resource(update_resource_id)
+      return unless update_resource_id.present?
+
       update_resource_id = "#{resource_type_to_update}/#{update_resource_id}" unless update_resource_id.include? '/'
       fhir_server = request_body['fhirServer']
       return if fhir_server.blank?
@@ -231,36 +234,81 @@ module DaVinciCRDTestKit
     def add_coverage_cards(cards)
       return unless add_coverage_cards?
 
+      system_actions = []
       coverage = get_patient_coverage
       if coverage.present?
         if selected_response_types.include?('coverage_information') || coverage_information_required?
-          system_actions =
-            create_coverage_extension_system_actions(coverage.id)
+          system_actions = create_coverage_extension_system_actions(coverage.id)
         end
 
         if selected_response_types.include?('create_update_coverage_info')
-          cards.append(create_or_update_coverage(coverage))
+          coverage_card = create_or_update_coverage(coverage)
+          cards.append(coverage_card) if coverage_card.present?
         end
       end
       system_actions
     end
 
     def create_coverage_extension_system_actions(coverage_id)
-      update_resource = context[resource_to_update_field_name]
-      prefetch_id = resource_to_update_field_name.split(/(?=[A-Z])/).first
-
       fhir_resource =
-        if update_resource.is_a? Hash
-          FHIR.from_contents(update_resource.to_json)
-        elsif request_body['prefetch'] && request_body['prefetch'][prefetch_id]
-          FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
+        if hook_name == 'order-dispatch' && ig_version == 'v221'
+          find_prefetched_order_dispatch_orders
         else
-          get_context_resource(update_resource)
+          identify_resources_for_system_actions
         end
 
       create_system_actions(fhir_resource, coverage_id)
     rescue StandardError
       nil
+    end
+
+    def identify_resources_for_system_actions
+      update_resource = context[resource_to_update_field_name]
+      prefetch_id = prefetch_key_for_system_actions
+
+      if update_resource.is_a? Hash
+        FHIR.from_contents(update_resource.to_json)
+      elsif prefetch_id.present? && request_body['prefetch'] && request_body['prefetch'][prefetch_id]
+        FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
+      elsif update_resource.present?
+        get_context_resource(update_resource)
+      end
+    end
+
+    def prefetch_key_for_system_actions
+      if hook_name.starts_with?('encounter')
+        'encounter'
+      elsif hook_name == 'order-dispatch'
+        'order'
+      end
+    end
+
+    def find_prefetched_order_dispatch_orders
+      orders_bundle = FHIR::Bundle.new
+
+      context['dispatchedOrders']&.each do |order_reference|
+        prefetched_entry = find_one_prefetched_order_dispatch_order(order_reference)
+        if prefetched_entry.present?
+          orders_bundle.entry << prefetched_entry
+          next
+        end
+
+        read_resource = get_context_resource(order_reference)
+        orders_bundle.entry << FHIR::Bundle::Entry.new({ resource: read_resource }) if read_resource.present?
+      end
+
+      orders_bundle if orders_bundle.entry.present?
+    end
+
+    def find_one_prefetched_order_dispatch_order(order_reference)
+      resource_type, id = order_reference.split('/')
+      prefetch_key = "#{resource_type[0].downcase}#{resource_type[1..]}s"
+      return unless request_body['prefetch'].present? && request_body['prefetch'][prefetch_key].present?
+
+      prefetch_bundle = FHIR.from_contents(request_body['prefetch'][prefetch_key].to_json)
+      prefetch_bundle.entry.find do |entry|
+        entry.resource.present? && entry.resource.resourceType == resource_type && entry.resource.id == id
+      end
     end
 
     def create_system_actions(resource, coverage_id)
@@ -405,13 +453,7 @@ module DaVinciCRDTestKit
 
       propose_alternate_request_card = load_json_file('propose_alternate_request.json')
 
-      if hook_name == 'order-dispatch'
-        order_resource = get_context_resource(context['order'])
-      else
-        draft_orders = context['draftOrders']['entry']
-        draft_order_resource = draft_orders[0]['resource']
-        order_resource = FHIR.from_contents(draft_order_resource.to_json)
-      end
+      order_resource = identify_alternate_order_resource
       return if order_resource.nil?
 
       order_resource_type = order_resource.resourceType
@@ -431,6 +473,20 @@ module DaVinciCRDTestKit
         }
       )
       propose_alternate_request_card
+    end
+
+    def identify_alternate_order_resource
+      if hook_name == 'order-dispatch'
+        if ig_version == 'v221'
+          find_prefetched_order_dispatch_orders&.entry&.first&.resource
+        elsif context['order'].present?
+          get_context_resource(context['order'])
+        end
+      else
+        draft_orders = context['draftOrders']['entry']
+        draft_order_resource = draft_orders[0]['resource']
+        FHIR.from_contents(draft_order_resource.to_json)
+      end
     end
   end
 end
