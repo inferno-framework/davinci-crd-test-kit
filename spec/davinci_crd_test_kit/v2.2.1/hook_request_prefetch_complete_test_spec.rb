@@ -37,7 +37,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
   end
 
   before do
-    allow_any_instance_of(DaVinciCRDTestKit::PrefetchChecker)
+    allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
       .to receive(:hook_prefetch_templates).and_return({ 'patient' => 'Patient/{{context.patientId}}' })
   end
 
@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
     expect(run(test).result).to eq('pass')
   end
 
-  it 'fails and surfaces PrefetchChecker errors as test messages' do
+  it 'fails and surfaces PrefetchCompletenessChecker errors as test messages' do
     store_hook_request('order-sign', body: order_sign_request)
     results = run(test)
     expect(results.result).to eq('fail')

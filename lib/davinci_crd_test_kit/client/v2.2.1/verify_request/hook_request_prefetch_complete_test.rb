@@ -1,4 +1,4 @@
-require_relative '../../../cross_suite/prefetch_checker'
+require_relative '../../../cross_suite/prefetch_completeness_checker'
 
 module DaVinciCRDTestKit
   module V221
@@ -46,7 +46,8 @@ module DaVinciCRDTestKit
           next unless hook_request.present?
 
           services_path = File.join(__dir__, '..', 'cds-services-v221.json')
-          PrefetchChecker.new(hook_request, request_index, services_path).check_prefetched_data.each do |error|
+          PrefetchCompletenessChecker.new(hook_request, request_index,
+                                          services_path).check_prefetched_data.each do |error|
             add_message('error', error)
           end
         end

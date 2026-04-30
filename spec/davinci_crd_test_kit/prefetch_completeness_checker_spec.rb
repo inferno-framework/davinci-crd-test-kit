@@ -1,6 +1,6 @@
-require_relative '../../lib/davinci_crd_test_kit/cross_suite/prefetch_checker'
+require_relative '../../lib/davinci_crd_test_kit/cross_suite/prefetch_completeness_checker'
 
-RSpec.describe DaVinciCRDTestKit::PrefetchChecker do
+RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
   let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }
 
   let(:order_sign_request) do
