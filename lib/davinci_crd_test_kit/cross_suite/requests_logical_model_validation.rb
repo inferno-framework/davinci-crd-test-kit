@@ -25,6 +25,7 @@ module DaVinciCRDTestKit
     def check_context_resources_for_ids(request_body, request_index)
       hook_name = request_body['hook']
       context = request_body['context']
+      return unless context.present?
 
       case hook_name
       when 'appointment-book'

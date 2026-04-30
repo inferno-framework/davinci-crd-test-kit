@@ -37,7 +37,7 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
 
   describe '#validate_request_against_logical_model' do
     describe 'when performing additional v2.2.1 verification' do
-      it 'adds an error message when a fullfillmentTask does not have an id' do
+      it 'adds an error message when a resource in a context list does not have an id' do
         order_dispatch_request_v211.dig('context', 'fulfillmentTasks', 0).delete('id')
 
         module_instance.validate_request_against_logical_model(order_dispatch_request_v211, 0, '2.2.1')
@@ -45,11 +45,11 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(module_instance.messages.length).to eq(1)
         message = module_instance.messages.first
         expect(message[:type]).to eq('error')
-        expect(message[:message]).to eq('(Request 1) FHIR resources provided in the hook context must have an id, none ' \
-                                        'found for `context.fulfillmentTasks` entry 1.')
+        expect(message[:message]).to eq('(Request 1) FHIR resources provided in the hook context must have an id, ' \
+                                        'none found for `context.fulfillmentTasks` entry 1.')
       end
 
-      it 'adds an error message when a draftOrder entry does not have an id' do
+      it 'adds an error message when a context Bundle entry does not have an id' do
         order_sign_request.dig('context', 'draftOrders', 'entry', 0, 'resource').delete('id')
 
         module_instance.validate_request_against_logical_model(order_sign_request, 0, '2.2.1')
@@ -57,8 +57,8 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(module_instance.messages.length).to eq(1)
         message = module_instance.messages.first
         expect(message[:type]).to eq('error')
-        expect(message[:message]).to eq('(Request 1) FHIR resources provided in the hook context must have an id, none ' \
-                                        'found for `context.draftOrders` entry 1.')
+        expect(message[:message]).to eq('(Request 1) FHIR resources provided in the hook context must have an id, ' \
+                                        'none found for `context.draftOrders` entry 1.')
       end
     end
   end
