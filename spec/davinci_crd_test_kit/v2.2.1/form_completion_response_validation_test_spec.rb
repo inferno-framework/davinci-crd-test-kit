@@ -82,14 +82,14 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
       'davinci-crd.if-none-exist': ['http://example.org/Questionnaire/XYZ']
     }
     result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                 valid_system_actions: [].to_json)
+                           valid_system_actions: [].to_json)
 
     expect(result.result).to eq('pass'), result.result_message
   end
 
   it 'fails if form creation actions do not include the if-none-exist extension' do
     result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                 valid_system_actions: [].to_json)
+                           valid_system_actions: [].to_json)
 
     expect(result.result).to eq('fail')
   end

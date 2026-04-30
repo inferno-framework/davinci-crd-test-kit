@@ -103,7 +103,7 @@ module DaVinciCRDTestKit
       add_message('error', error_msg)
     end
 
-    def questionnaire_creation_check(action)
+    def questionnaire_creation_check(action) # rubocop:disable Metrics/CyclomaticComplexity
       return unless action.dig('resource', 'resourceType') == 'Questionnaire'
 
       extension_value = action.dig('extension', 'davinci-crd.if-none-exist')
