@@ -1,6 +1,10 @@
+require_relative '../../../cross_suite/requests_logical_model_validation'
+
 module DaVinciCRDTestKit
   module V221
     class HookRequestConformanceTest < Inferno::Test
+      include RequestsLogicalModelValidation
+
       id :crd_v221_hook_request_conformance
       title 'Hook request conforms to required logical model'
       description %(
@@ -25,27 +29,16 @@ module DaVinciCRDTestKit
         crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
       end
 
-      def request_number
-        if @request_number.blank?
-          ''
-        else
-          "(Request #{@request_number}) "
-        end
-      end
-
       run do
         hook_requests = load_tagged_requests(*tags_to_load)
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          @request_number = request_index + 1
-
           request_body = parsed_json_if_valid(request.request_body)
           next unless request_body.present?
 
-          conforms_to_logical_model?(request_body, 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksRequest|2.2.1',
-                                     message_prefix: request_number)
+          validate_request_against_logical_model(request_body, request_index, '2.2.1')
 
           output url: request_body['fhirServer'] if request_body['fhirServer'].present?
           if request_body.dig('fhirAuthorization', 'access_token').present?

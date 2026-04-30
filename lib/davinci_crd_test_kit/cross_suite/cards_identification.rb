@@ -25,7 +25,7 @@ module DaVinciCRDTestKit
     ].freeze
 
     PROPOSE_ALTERNATIVE_REQUEST_EXPECTED_RESOURCE_TYPES = %w[
-      Device DeviceRequest Encounter Medication
+      CommunicationRequest Device DeviceRequest Encounter Medication
       MedicationRequest NutritionOrder ServiceRequest
       VisionPrescription
     ].freeze

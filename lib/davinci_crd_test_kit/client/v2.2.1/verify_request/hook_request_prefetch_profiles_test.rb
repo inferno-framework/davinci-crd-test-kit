@@ -1,9 +1,9 @@
-require_relative '../../../cross_suite/hook_request_field_validation'
+require_relative '../../../cross_suite/prefetch_profile_validation'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestPrefetchProfilesTest < Inferno::Test
-      include HookRequestFieldValidation
+      include PrefetchProfileValidation
 
       id :crd_v221_hook_request_prefetch_profiles
       title 'Prefetched data conforms to required CRD profiles'
@@ -45,45 +45,10 @@ module DaVinciCRDTestKit
           next unless hook_request.present?
           next unless hook_request.key?('prefetch')
 
-          hook_request['prefetch'].each do |key, prefetched_resource|
-            @prefetch_template = key
-            @bundle_entry_index = nil
-            check_resource_profile(prefetched_resource)
-          end
+          check_prefetch_profiles(hook_request['prefetch'])
         end
 
         assert_no_error_messages('Prefetched resources do not all conform to CRD profiles.')
-      end
-
-      def check_resource_profile(prefetched_resource)
-        if prefetched_resource['resourceType'] == 'Bundle'
-          prefetched_resource['entry']&.each_with_index do |entry, bundle_entry_index|
-            @bundle_entry_index = bundle_entry_index
-            check_resource_profile(entry['resource']) if entry['resource'].present?
-          end
-          @bundle_entry_index = nil
-        elsif prefetched_resource['resourceType'].present?
-          check_non_bundle_resource_profile(prefetched_resource)
-        end
-      end
-
-      def check_non_bundle_resource_profile(prefetched_resource)
-        target_crd_profile = structure_definition_map('v221')[prefetched_resource['resourceType']]
-        return unless target_crd_profile.present?
-
-        validation_details = []
-        resource_is_valid?(resource: FHIR.from_contents(prefetched_resource.to_json),
-                           profile_url: target_crd_profile,
-                           validator_response_details: validation_details, add_messages_to_runnable: false)
-        validation_details.each do |issue|
-          add_message(issue.severity, "#{error_prefix}#{issue.message}")
-        end
-      end
-
-      def error_prefix
-        prefix = "(Request #{@request_index + 1}) Prefetch Template '#{@prefetch_template}'"
-        prefix = " #{prefix} Bundle entry #{@bundle_entry_index + 1}" if @bundle_entry_index.present?
-        "#{prefix} validation issue - "
       end
     end
   end

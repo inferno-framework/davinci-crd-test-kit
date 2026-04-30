@@ -55,8 +55,7 @@ module DaVinciCRDTestKit
 
       run do
         load_tagged_requests(*tags_to_load)
-
-        skip_if request.blank?, 'No reponses sent to the client.'
+        skip_if responded_card_types.blank?, 'No responses sent to the client.'
 
         identifier = SecureRandom.hex(32)
         attest_true_url = "#{resume_pass_url}?token=#{identifier}"

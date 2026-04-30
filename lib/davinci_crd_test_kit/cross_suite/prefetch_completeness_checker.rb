@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
   # -----------------------------------------------------------------------
   # Prefetch Check Helper Class
   # -----------------------------------------------------------------------
-  class PrefetchChecker
+  class PrefetchCompletenessChecker
     include FhirpathOnCDSRequest
     include ReplaceTokens
 
