@@ -1,7 +1,7 @@
 ---
 :name: coverage_information
 :version: v2.0.1
-:reformatted_version: vv201
+:reformatted_version: v201
 :profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
 :profile_name: "Extension: Coverage Information"
 :profile_version: 2.0.1

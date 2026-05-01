@@ -29,7 +29,7 @@ module DaVinciCRDTestKit
       ].freeze
 
       def metadata
-        @metadata ||= YAML.load_file(File.join(__dir__, 'coverage-information_stu201_metadata.yml'))
+        @metadata ||= YAML.load_file(File.join(__dir__, 'coverage-information_stu221_metadata.yml'))
       end
 
       def configured_hook_name
