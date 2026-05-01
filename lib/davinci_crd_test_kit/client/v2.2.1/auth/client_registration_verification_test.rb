@@ -31,6 +31,15 @@ module DaVinciCRDTestKit
               This input is required for these tests to pass.
             ),
             optional: true
+      input :inferno_payer_organization_id,
+            title: 'Inferno Payer Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              CRD endpoints. This Organization must be referenced as the
+              payer on Coverages in hook requests.
+            ),
+            type: 'text',
+            optional: true
 
       run do
         assert cds_jwk_set.present?, 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.'

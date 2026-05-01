@@ -12,6 +12,15 @@ module DaVinciCRDTestKit
 
       # verifies_requirements 'cds-hooks_2.0@174'
 
+      input :inferno_payer_organization_id,
+            title: 'Inferno Payer Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              CRD endpoints. This Organization must be referenced as the
+              payer on Coverages in hook requests.
+            ),
+            type: 'text',
+            optional: true
       output :attest_true_url
       output :attest_false_url
 
@@ -26,8 +35,9 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Registration of Inferno as a trusted CRD Service**:
 
-            I attest that Inferno has been registered as a trusted CRD Service that is allowed to access
-            data stored on the CRD Client's FHIR Server.
+            I attest that Inferno has been registered as a trusted CRD Service
+            associated with the payor Organization resource with id #{inferno_payer_organization_id}
+            and that is allowed to access data stored on the CRD Client's FHIR Server.
 
             [Click here](#{attest_true_url}) if the above statement is **true**.
 
