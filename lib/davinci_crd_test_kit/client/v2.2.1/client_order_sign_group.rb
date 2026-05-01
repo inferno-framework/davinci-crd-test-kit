@@ -7,6 +7,8 @@ require_relative 'verify_request/hook_request_conformance_test'
 require_relative 'verify_request/hook_request_requested_version_test'
 require_relative 'verify_request/hook_request_prefetch_profiles_test'
 require_relative 'verify_request/hook_request_prefetch_complete_test'
+require_relative 'verify_request/hook_request_coverage_verification_test'
+require_relative 'verify_request/hook_request_data_fetch_verification_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
 
@@ -80,6 +82,8 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
         test from: :crd_v221_hook_request_prefetch_complete
+        test from: :crd_v221_hook_request_coverage_verification
+        test from: :crd_v221_hook_data_fetch_verification
 
         # TODO: migrate requirements
         # test from: :crd_v221_hook_request_required_fields
