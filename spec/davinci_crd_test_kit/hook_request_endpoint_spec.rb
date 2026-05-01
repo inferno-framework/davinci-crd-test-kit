@@ -259,6 +259,49 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(cov_request).to_not have_been_made
       end
 
+      it 'fetches the coverage payer when coverage with a payer reference is in the prefetch' do
+        allow(test).to receive(:suite).and_return(suite)
+        payer_org_url = "#{fhir_server}/Organization/example-payer"
+        payer_request = stub_request(:get, payer_org_url)
+          .to_return(status: 200, body: { 'resourceType' => 'Organization', 'id' => 'example-payer' }.to_json)
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        hook_instance = order_sign_hook_request['hookInstance']
+        request_with_coverage = order_sign_hook_request.merge(
+          'prefetch' => {
+            'coverage' => {
+              'resourceType' => 'Bundle',
+              'type' => 'searchset',
+              'entry' => [{ 'resource' => {
+                'resourceType' => 'Coverage',
+                'payor' => [{ 'reference' => 'Organization/example-payer' }]
+              } }]
+            }
+          }
+        )
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, request_with_coverage)
+
+        expect(last_response).to be_ok
+        expect(payer_request).to have_been_made.once
+        tagged_requests = requests_repo.tagged_requests(
+          test_session.id,
+          ['payer', hook_instance_tag(hook_instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
+        )
+        expect(tagged_requests.length).to eq(1)
+        expect(tagged_requests.first.url).to eq(payer_org_url)
+      end
+
       it 'makes FHIR data-fetch requests when requestedVersion extension overrides path to v201' do
         allow(test).to receive(:suite).and_return(suite)
         pat_request = stub_request(:get, patient_example_reference_absolute)

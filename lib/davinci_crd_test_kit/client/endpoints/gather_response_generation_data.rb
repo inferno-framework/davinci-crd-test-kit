@@ -179,11 +179,13 @@ module DaVinciCRDTestKit
       end
     end
 
-    def fetch_reference(reference)
+    def fetch_reference(reference, additional_tag: nil)
       response = execute_request(reference)
       return nil unless response.present?
 
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
+      tags = [DATA_FETCH_TAG, hook_instance_tag]
+      tags << additional_tag if additional_tag.present?
+      persist_query_request(response, tags)
       return nil unless response.status.to_s.starts_with?('2')
 
       JSON.parse(response.body)
@@ -223,10 +225,17 @@ module DaVinciCRDTestKit
       @request_coverage ||= find_coverage_for_request
     end
 
-    def find_coverage_for_request
-      resource =
+    def prefetched_coverage
+      @prefetched_coverage ||=
         if request_body.dig('prefetch', 'coverage').present?
           FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
+        end
+    end
+
+    def find_coverage_for_request
+      resource =
+        if prefetched_coverage.present?
+          prefetched_coverage
         else
           query_for_coverages
         end
@@ -331,6 +340,29 @@ module DaVinciCRDTestKit
 
     def resource_has_required_details?(resource)
       resource.is_a?(Hash) && resource['resourceType'].present? && resource['id'].present?
+    end
+
+    # gather additional fhir resources not requested via prefetch
+    # not used for response generation, but verified later
+    def request_additional_fhir_data
+      request_coverage_payer
+    end
+
+    def prefetched_coverage_resource
+      if prefetched_coverage.is_a?(FHIR::Bundle)
+        prefetched_coverage.entry.first&.resource
+      else
+        prefetched_coverage
+      end
+    end
+
+    def request_coverage_payer
+      return unless prefetched_coverage.present?
+
+      coverage_resource = prefetched_coverage_resource
+      return unless coverage_resource.present? && coverage_resource.payor.first&.reference.present?
+
+      fetch_reference(coverage_resource.payor.first.reference, additional_tag: 'payer')
     end
   end
 end
