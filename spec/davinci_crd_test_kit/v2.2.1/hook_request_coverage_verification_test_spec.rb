@@ -1,5 +1,3 @@
-require_relative '../../../lib/davinci_crd_test_kit/client/v2.2.1/verify_request/hook_request_coverage_verification_test'
-
 RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }

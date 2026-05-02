@@ -1,5 +1,3 @@
-require_relative '../../../lib/davinci_crd_test_kit/client/v2.2.1/verify_request/hook_request_data_fetch_verification_test'
-
 RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:hook_name) { 'order-sign' }
