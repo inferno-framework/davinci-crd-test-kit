@@ -116,7 +116,8 @@ module DaVinciCRDTestKit
         return if ['user', 'patient'].include?(level)
 
         add_message('error',
-                    "#{request_prefix} Unexpected level for granted scopes: expected 'user' or 'patient', got '#{level}'.")
+                    "#{request_prefix} Unexpected level for granted scopes: " \
+                    "expected 'user' or 'patient', got '#{level}'.")
       end
 
       def scopes_level(granted_resource_scopes)

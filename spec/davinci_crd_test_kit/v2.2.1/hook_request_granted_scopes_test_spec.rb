@@ -113,8 +113,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
     end
 
     it 'fails when granted scopes use mixed or unsupported interactions' do
-      mixed_scope = resource_scopes(us_core_3_resources.first(10), interaction: 'rs') + ' ' +
-                    resource_scopes(us_core_3_resources.last(9), interaction: 'read')
+      mixed_scope = "#{resource_scopes(us_core_3_resources.first(10), interaction: 'rs')} " \
+                    "#{resource_scopes(us_core_3_resources.last(9), interaction: 'read')}"
       create_hook_request(scope: mixed_scope)
       result = run(test)
       expect(result.result).to eq('fail')
@@ -142,8 +142,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
 
     it 'reports the request number when one of multiple requests fails' do
       create_hook_request(scope: resource_scopes(us_core_3_resources, level: 'user'))
-      mixed_scope = resource_scopes(us_core_3_resources.first(10), interaction: 'rs') + ' ' +
-                    resource_scopes(us_core_3_resources.last(9), interaction: 'read')
+      mixed_scope = "#{resource_scopes(us_core_3_resources.first(10), interaction: 'rs')} " \
+                    "#{resource_scopes(us_core_3_resources.last(9), interaction: 'read')}"
       create_hook_request(scope: mixed_scope)
       result = run(test)
       expect(result.result).to eq('fail')
