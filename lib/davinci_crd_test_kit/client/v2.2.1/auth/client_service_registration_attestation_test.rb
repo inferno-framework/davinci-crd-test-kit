@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
           the Patient's coverage).
         - Granted patient- or user-level read and search access to all US Core resource
           types in the selected US Core version (required to verify the client's support
-          of the US Core FHIR API and used to verify the `fhirAuthorization.scopes`
+          of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
           hook request field).
       )
 
