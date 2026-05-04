@@ -11,9 +11,9 @@ module DaVinciCRDTestKit
         payer CRD Service acting as a part of these tests that evaluate conformance to the CRD specification,
         access to all US Core resource types are required.
 
-        THe test verifies that scopes covering the US Core data types are granted and no more. Clients may
-        choose to grant either user scopes or patient scopes. If choosing patient scopes, note that the token
-        is used by default for testing the complete US Core FHIR API, so with patient scopes either that
+        This test verifies that the requested scopes covering the US Core data types are granted and no more.
+        Clients may choose to grant either user scopes or patient scopes. If choosing patient scopes, note that the
+        token is used by default for testing the complete US Core FHIR API, so with patient scopes either that
         single patient needs to demonstrate the full scope of US Core or another access token will need to be
         provided for those tests.
       )

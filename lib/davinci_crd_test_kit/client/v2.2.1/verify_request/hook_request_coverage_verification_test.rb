@@ -77,7 +77,8 @@ module DaVinciCRDTestKit
       end
 
       run do
-        skip_if inferno_payer_organization_id.blank?, 'Input "Inferno Payer Organization id input" to verify behavior.'
+        skip_if inferno_payer_organization_id.blank?,
+                'Input "Inferno Payer Organization id " is needed to verify behavior.'
 
         hook_requests = load_tagged_requests(*tags_to_load)
 

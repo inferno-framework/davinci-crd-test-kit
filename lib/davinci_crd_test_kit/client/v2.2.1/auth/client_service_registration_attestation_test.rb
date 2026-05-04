@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
               payer on Coverages in hook requests.
             ),
             type: 'text',
-            optional: true
+            optional: false
       output :attest_true_url
       output :attest_false_url
 
