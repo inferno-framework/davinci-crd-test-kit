@@ -79,7 +79,9 @@ module DaVinciCRDTestKit
 
           hook_call_body = JSON.parse(request.request_body)
 
-          # TODO: skip when coverage info config is falsy
+          # TODO: handle when default value for coverage-info is false
+          next if hook_call_body.dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
+
           resources = order_resources(hook_call_body)
 
           next if resources_contain_coverage_information_extension?(resources)

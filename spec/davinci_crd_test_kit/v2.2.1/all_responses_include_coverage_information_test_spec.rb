@@ -48,6 +48,63 @@ RSpec.describe DaVinciCRDTestKit::V221::AllResponsesIncludeCoverageInformationTe
     expect(result.result).to eq('pass'), result.result_message
   end
 
+  it 'passes if every requests are configured to exclude the coverage information system action' do
+    bundle = FHIR::Bundle.new(
+      entry: [
+        {
+          resource: FHIR::Appointment.new(appointment)
+        }
+      ]
+    )
+
+    request_body = { context: { appointments: bundle.to_hash } }.to_json
+    response_body = {
+      systemActions: [
+        {
+          type: 'update',
+          resource: appointment_with_coverage_info
+        }
+      ]
+    }.to_json
+
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body:,
+      response_body:,
+      tags: [DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG],
+      status: 200
+    )
+
+    request_body =
+      {
+        context: {
+          appointments: bundle.to_hash
+        },
+        extension: {
+          'davinci-crd.configuration': {
+            'coverage-info': false
+          }
+        }
+      }.to_json
+    response_body = { systemActions: [] }.to_json
+
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body:,
+      response_body:,
+      tags: [DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG],
+      status: 200
+    )
+    result = run(runnable, { invoked_hook: 'appointment-book' })
+    expect(result.result).to eq('pass'), result.result_message
+  end
+
   it 'fails if not all responses contain the coverage information system action' do
     bundle = FHIR::Bundle.new(
       entry: [
