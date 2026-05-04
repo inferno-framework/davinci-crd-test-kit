@@ -51,7 +51,6 @@ module DaVinciCRDTestKit
       def hook_bundle_field_name
         {
           'appointment-book' => 'appointments',
-          'order-dispatch' => 'dispatchedOrders',
           'order-sign' => 'draftOrders'
         }[tested_hook_name]
       end
@@ -64,6 +63,11 @@ module DaVinciCRDTestKit
         end
       end
 
+      def order_resources(hook_call_body)
+        bundle = FHIR::Bundle.new(hook_call_body.dig('context', hook_bundle_field_name))
+        bundle.entry.map(&:resource).select { |resource| target_resources.include? resource.resourceType }
+      end
+
       run do
         successful_hook_calls_without_coverage_information = 0
         coverage_information_system_actions_received = 0
@@ -74,10 +78,11 @@ module DaVinciCRDTestKit
           next if request.status != 200
 
           hook_call_body = JSON.parse(request.request_body)
-          bundle = FHIR::Bundle.new(hook_call_body.dig('context', hook_bundle_field_name))
-          bundle_resources =
-            bundle.entry.map(&:resource).select { |resource| target_resources.include? resource.resourceType }
-          next if resources_contain_coverage_information_extension?(bundle_resources)
+
+          # TODO: skip when coverage info config is falsy
+          resources = order_resources(hook_call_body)
+
+          next if resources_contain_coverage_information_extension?(resources)
 
           successful_hook_calls_without_coverage_information += 1
 
@@ -96,7 +101,7 @@ module DaVinciCRDTestKit
           next unless resources_contain_coverage_information_extension?(system_actions_resources)
 
           coverage_information_system_actions_received += 1
-        rescue StandardError => e
+        rescue JSON::ParserError => e
           warning(e.message)
           next
         end
