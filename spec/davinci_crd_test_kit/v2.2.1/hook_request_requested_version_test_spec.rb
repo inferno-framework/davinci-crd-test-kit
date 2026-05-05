@@ -1,6 +1,6 @@
 require_relative '../../../lib/davinci_crd_test_kit/client/v2.2.1/verify_request/hook_request_requested_version_test'
 
-RSpec.describe DaVinciCRDTestKit::V221::HookRequestExtensionsTest do
+RSpec.describe DaVinciCRDTestKit::V221::HookRequestRequestedVersionTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
@@ -104,7 +104,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestExtensionsTest do
     create_hook_request(body: 'not valid json')
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Invalid JSON/)
+    expect(entity_result_message.message).to match(/Request body contains invalid JSON./)
   end
 
   describe 'when a crd_test_group is configured' do

@@ -1,9 +1,9 @@
-require_relative '../../client_hook_request_validation'
+require_relative '../../multi_request_message_helper'
 
 module DaVinciCRDTestKit
   module V221
     class TokenHeaderTest < Inferno::Test
-      include ClientHookRequestValidation
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_token_header
       title 'Authorization token header contains required information'
@@ -27,34 +27,32 @@ module DaVinciCRDTestKit
 
         auth_tokens_jwk_json = []
         auth_token_headers.each_with_index do |token_header, index|
-          @request_number = index + 1
-
-          header = JSON.parse(token_header)
+          header = JSON.parse(token_header) # NOTE: pre-verified json
           algorithm = header['alg']
 
-          add_message('error', "#{request_number}Token header must have the `alg` field") if algorithm.blank?
+          add_request_message('error', 'Token header must have the `alg` field', index) if algorithm.blank?
 
-          add_message('error', "#{request_number}Token header `alg` field cannot be set to none") if algorithm == 'none'
+          add_request_message('error', 'Token header `alg` field cannot be set to none', index) if algorithm == 'none'
 
           if header['typ'].blank?
-            add_message('error', "#{request_number}Token header must have the `typ` field")
+            add_request_message('error', 'Token header must have the `typ` field', index)
           elsif header['typ'] != 'JWT'
-            add_message('error', %(
-                      #{request_number}Token header `typ` field must be set to 'JWT', instead was
-                      #{header['typ']}))
+            add_request_message('error',
+                                "Token header `typ` field must be set to 'JWT', instead was #{header['typ']}",
+                                index)
           end
 
           if header['kid'].blank?
-            add_message('error', "#{request_number}Token header must have the `kid` field")
+            add_request_message('error', 'Token header must have the `kid` field', index)
             next
           end
 
           kid = header['kid']
-          keys = JSON.parse(crd_jwks_keys[index])
+          keys = JSON.parse(crd_jwks_keys[index]) # NOTE: pre-verified json
 
           jwk = keys.find { |key| key['kid'] == kid }
           if jwk.blank?
-            add_message('error', "#{request_number}JWKS did not contain a public key with an id of `#{kid}`")
+            add_request_message('error', "JWKS did not contain a public key with an id of `#{kid}`", index)
             next
           end
 
@@ -63,7 +61,8 @@ module DaVinciCRDTestKit
 
         output auth_tokens_jwk_json: auth_tokens_jwk_json.to_json
 
-        no_error_validation('Token headers missing required information.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Token header missing required information. " \
+                                 'See Messages for details.')
       end
     end
   end

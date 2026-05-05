@@ -1,6 +1,12 @@
+require_relative '../../multi_request_message_helper'
+require_relative '../../tagged_request_load_helper'
+
 module DaVinciCRDTestKit
   module V221
-    class HookRequestExtensionsTest < Inferno::Test
+    class HookRequestRequestedVersionTest < Inferno::Test
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
+
       id :crd_v221_hook_request_requested_version
       title 'Hook request contains the CRD version extension'
       description %(
@@ -12,52 +18,33 @@ module DaVinciCRDTestKit
       #                       'cds-hooks_2.0@23', 'cds-hooks_2.0@65', 'cds-hooks_2.0@66', 'cds-hooks_2.0@67',
       #                       'cds-hooks_2.0@68', 'cds-hooks_2.0@69', 'cds-hooks_2.0@70'
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
-      def request_number
-        if @request_number.blank?
-          ''
-        else
-          "(Request #{@request_number}) "
-        end
-      end
-
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          @request_number = request_index + 1
-
-          request_body = parsed_json_if_valid(request.request_body)
+          request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
 
           requested_version = request_body.dig('extension', 'davinci-crd.requestedVersion')
           if requested_version.blank?
-            add_message('error', "#{request_number} Required extension 'davinci-crd.requestedVersion' is not present.")
+            add_request_message('error', "Required extension 'davinci-crd.requestedVersion' is not present.",
+                                request_index)
           elsif !requested_version.is_a?(String)
-            add_message('error',
-                        "#{request_number} For extension 'davinci-crd.requestedVersion' expected a String, " \
-                        "got #{requested_version.class}")
+            add_request_message('error',
+                                "For extension 'davinci-crd.requestedVersion' expected a String, " \
+                                "got #{requested_version.class}",
+                                request_index)
           elsif requested_version != '2.2'
-            add_message('error',
-                        "#{request_number} For extension 'davinci-crd.requestedVersion' expected '2.2', " \
-                        "got '#{requested_version}'")
+            add_request_message('error',
+                                "For extension 'davinci-crd.requestedVersion' expected '2.2', " \
+                                "got '#{requested_version}'",
+                                request_index)
           end
         end
 
-        assert_no_error_messages('Some hook requests did not populate the requested version extension properly. ' \
+        assert_no_error_messages("#{requests_with_errors_prefix}Requested version extension not populated properly. " \
                                  'See Messages for details.')
       end
     end

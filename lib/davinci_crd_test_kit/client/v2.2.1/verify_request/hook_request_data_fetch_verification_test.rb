@@ -1,8 +1,10 @@
 require_relative '../../../cross_suite/tags'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestDataFetchVerificationTest < Inferno::Test
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
       id :crd_v221_hook_data_fetch_verification
       title 'Additional FHIR data could be requested during hook request processing'
       description %(
@@ -14,18 +16,6 @@ module DaVinciCRDTestKit
         all hook requestsmust have been successful and returned at least one
         FHIR resource.
       )
-
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
 
       def fhir_data_returned?(request)
         return false unless request.status.to_s.starts_with?('2')
@@ -43,7 +33,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 

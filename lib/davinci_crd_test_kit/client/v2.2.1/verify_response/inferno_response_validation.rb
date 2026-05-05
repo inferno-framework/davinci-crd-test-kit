@@ -1,11 +1,13 @@
 require_relative '../../../cross_suite/cards_validation'
 require_relative '../../../cross_suite/cards_logical_model_validation'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
     class InfernoResponseValidationTest < Inferno::Test
       include CardsValidation
       include CardsLogicalModelValidation
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       title 'Inferno CDS Service Response is Conformant'
       description %(
@@ -25,18 +27,6 @@ module DaVinciCRDTestKit
 
       input :custom_response_template, optional: true
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
       def response_label(index = nil)
         response_type = (custom_response_template.present? ? 'Custom built' : 'Mocked')
         "#{response_type} response#{index.present? ? " #{index}" : ''}"
@@ -49,7 +39,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        load_tagged_requests(*tags_to_load)
+        load_hook_requests
 
         skip_if request.blank?, "No #{response_label.downcase}s to verify."
 
@@ -69,7 +59,7 @@ module DaVinciCRDTestKit
         skip_if !entity_validated,
                 "No #{response_label.downcase} cards or system actions to verify returned by Inferno."
 
-        no_error_validation("Invalid Inferno #{response_label.downcase}(s). Check messages for issues found.")
+        no_error_validation("Invalid Inferno #{response_label.downcase}(s). See Messages for details.")
       end
     end
   end

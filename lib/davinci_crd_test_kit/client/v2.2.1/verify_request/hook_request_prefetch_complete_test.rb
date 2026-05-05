@@ -1,8 +1,12 @@
 require_relative '../../../cross_suite/prefetch_completeness_checker'
+require_relative '../../tagged_request_load_helper'
+require_relative '../../multi_request_message_helper'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestPrefetchCompleteTest < Inferno::Test
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
       id :crd_v221_hook_request_prefetch_complete
       title 'Hook request contains complete prefetched data set'
       description %(
@@ -23,36 +27,24 @@ module DaVinciCRDTestKit
       )
       # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          hook_request = parsed_json_if_valid(request.request_body,
-                                              "#{hook_name} request #{request_index + 1} malformed.")
+          hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
           services_path = File.join(__dir__, '..', 'cds-services-v221.json')
           PrefetchCompletenessChecker.new(hook_request, request_index,
                                           services_path).check_prefetched_data.each do |error|
-            add_message('error', error)
+            add_message('error', error) # NOTE: PrefetchCompletenessChecker adds the (Request #) prefix
           end
         end
 
-        assert_no_error_messages('Prefetch is not valid.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Incomplete or invalid prefetched data. " \
+                                 'See Messages for details.')
       end
     end
   end

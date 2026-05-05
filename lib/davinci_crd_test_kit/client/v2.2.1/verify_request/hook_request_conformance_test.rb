@@ -1,9 +1,13 @@
 require_relative '../../../cross_suite/requests_logical_model_validation'
+require_relative '../../tagged_request_load_helper'
+require_relative '../../multi_request_message_helper'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestConformanceTest < Inferno::Test
       include RequestsLogicalModelValidation
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_hook_request_conformance
       title 'Hook request conforms to required logical model'
@@ -17,25 +21,13 @@ module DaVinciCRDTestKit
       #                       'cds-hooks_2.0@23', 'cds-hooks_2.0@65', 'cds-hooks_2.0@66', 'cds-hooks_2.0@67',
       #                       'cds-hooks_2.0@68', 'cds-hooks_2.0@69', 'cds-hooks_2.0@70'
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          request_body = parsed_json_if_valid(request.request_body)
+          request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
 
           validate_request_against_logical_model(request_body, request_index, '2.2.1')
@@ -46,7 +38,7 @@ module DaVinciCRDTestKit
           end
         end
 
-        assert_no_error_messages('Non-conformant hook requests detected. See Messages for details.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Non-conformant hook request. See Messages for details.")
       end
     end
   end

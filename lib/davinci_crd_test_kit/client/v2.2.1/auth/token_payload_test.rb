@@ -1,10 +1,11 @@
-require_relative '../../client_hook_request_validation'
+require_relative '../../multi_request_message_helper'
 
 module DaVinciCRDTestKit
   module V221
     class TokenPayloadTest < Inferno::Test
-      include ClientHookRequestValidation
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
       include ClientURLs
+
       id :crd_v221_token_payload
       title 'Authorization token payload has required claims and a valid signature'
       description %(
@@ -44,10 +45,8 @@ module DaVinciCRDTestKit
         skip_if auth_tokens_jwk.empty?, 'No Authorization token JWK produced from the previous test.'
 
         auth_tokens_jwk.each_with_index do |auth_token_jwk, index|
-          @request_number = index + 1
-
           begin
-            jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys
+            jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys # NOTE: pre-verified json
 
             payload, =
               JWT.decode(
@@ -65,7 +64,7 @@ module DaVinciCRDTestKit
                 verify_aud: true
               )
           rescue StandardError => e
-            add_message('error', "#{request_number}Token validation error: #{e.message}")
+            add_request_message('error', "Token validation error: #{e.message}", index)
             next
           end
 
@@ -73,11 +72,12 @@ module DaVinciCRDTestKit
           missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
 
           unless missing_claims.empty?
-            add_message('error', "#{request_number}JWT payload missing required claims: #{missing_claims_string}")
+            add_request_message('error', "JWT payload missing required claims: #{missing_claims_string}", index)
             next
           end
         end
-        no_error_validation('Token payload is missing required claims or does not have a valid signiture.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Token payload is missing required claims or " \
+                                 'does not have a valid signature. See Messages for details.')
       end
     end
   end
