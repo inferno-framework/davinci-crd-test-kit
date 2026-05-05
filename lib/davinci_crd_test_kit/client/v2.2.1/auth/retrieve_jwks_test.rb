@@ -1,9 +1,9 @@
-require_relative '../../client_hook_request_validation'
+require_relative '../../multi_request_message_helper'
 
 module DaVinciCRDTestKit
   module V221
     class RetrieveJWKSTest < Inferno::Test
-      include ClientHookRequestValidation
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_retrieve_jwks
       title 'JWKS can be retrieved'
@@ -32,67 +32,64 @@ module DaVinciCRDTestKit
       output :crd_jwks_json, :crd_jwks_keys_json
 
       run do
-        auth_token_headers = JSON.parse(auth_token_headers_json)
+        auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
         skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous test.'
 
         crd_jwks_json = []
         crd_jwks_keys_json = []
         auth_token_headers.each_with_index do |token_header, index|
-          @request_number = index + 1
-
-          jku = JSON.parse(token_header)['jku']
+          jku = JSON.parse(token_header)['jku'] # NOTE: pre-verified json
           if jku.present?
             get(jku)
 
             if response[:status] != 200
-              add_message('error', %(
-                        #{request_number}Unexpected response status: expected 200, but received
-                        #{response[:status]}))
+              add_request_message('error',
+                                  "Unexpected response status: expected 200, but received #{response[:status]}",
+                                  index)
               next
             end
 
-            @request_number = index + 1
-            jwks = json_parse(response[:body])
+            jwks = parse_json_request_entity(response[:body], 'Fetched jku url response', index)
             next if jwks.blank?
 
             crd_jwks_json << response[:body]
-
-            jwks = JSON.parse(response[:body])
           else
             skip_if cds_jwk_set.blank?,
-                    %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
-                  identified by the jku header field)
+                    "JWK Set must be inputted if Client's JWK Set is not available via a URL " \
+                    'identified by the jku header field'
 
-            jwks = JSON.parse(cds_jwk_set)
+            jwks = parse_json_request_entity(cds_jwk_set, 'JWK Set input', index)
+            next if jwks.blank?
           end
 
           keys = jwks['keys']
           unless keys.is_a?(Array)
-            add_message('error', "#{request_number}JWKS `keys` field must be an array")
+            add_request_message('error', 'JWKS `keys` field must be an array', index)
             next
           end
 
           if keys.blank?
-            add_message('error', "#{request_number}The JWK set returned contains no public keys")
+            add_request_message('error', 'The JWK set returned contains no public keys', index)
             next
           end
 
           keys.each do |jwk|
             JWT::JWK.import(jwk.deep_symbolize_keys)
           rescue StandardError
-            add_message('error', "#{request_number}Invalid JWK: #{jwk.to_json}")
+            add_request_message('error', "Invalid JWK: #{jwk.to_json}", index)
           end
 
           kid_presence = keys.all? { |key| key['kid'].present? }
           if kid_presence.blank?
-            add_message('error',
-                        "#{request_number}`kid` field must be present in each key if JWKS contains multiple keys")
+            add_request_message('error',
+                                '`kid` field must be present in each key if JWKS contains multiple keys',
+                                index)
             next
           end
 
           kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
           if kid_uniqueness.blank?
-            add_message('error', "#{request_number}`kid` must be unique within the client's JWK Set.")
+            add_request_message('error', "`kid` must be unique within the client's JWK Set.", index)
             next
           end
 
@@ -102,7 +99,7 @@ module DaVinciCRDTestKit
         output crd_jwks_json: crd_jwks_json.to_json,
                crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
-        no_error_validation('Retrieving JWKS failed.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Retrieving JWKS failed. See Messages for details.")
       end
     end
   end

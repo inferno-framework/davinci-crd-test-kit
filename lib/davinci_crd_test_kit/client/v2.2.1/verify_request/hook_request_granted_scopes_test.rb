@@ -1,8 +1,12 @@
+require_relative '../../multi_request_message_helper'
 require_relative '../../crd_client_options'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestGrantedScopesTest < Inferno::Test
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
       id :crd_v221_hook_request_granted_scopes
       title 'Hook requests grant the requested scopes'
       description %(
@@ -18,45 +22,24 @@ module DaVinciCRDTestKit
         provided for those tests.
       )
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
-      def request_prefix
-        if @request_number.blank?
-          ''
-        else
-          "(Request #{@request_number}) "
-        end
-      end
-
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          @request_number = request_index + 1
-
-          request_body = parsed_json_if_valid(request.request_body)
+          request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
 
           # check that the resource scopes match what Inferno requested
           granted_resource_scopes = granted_resource_scopes(request_body)
-          check_granted_resources(granted_resource_scopes)
-          check_granted_scopes_level(granted_resource_scopes)
-          check_granted_interactions(granted_resource_scopes)
+          check_granted_resources(granted_resource_scopes, request_index)
+          check_granted_scopes_level(granted_resource_scopes, request_index)
+          check_granted_interactions(granted_resource_scopes, request_index)
         end
 
-        assert_no_error_messages('Granted scopes do not match what was requested. See Messages for details.')
+        assert_no_error_messages("#{requests_with_errors_prefix}Granted scopes do not match the requested scopes. " \
+                                 'See Messages for details.')
       end
 
       def requested_scope_resources
@@ -75,49 +58,49 @@ module DaVinciCRDTestKit
         granted_scopes.split(' ').grep(%r{\A\S+/\S+\.\S+\z}) # rubocop:disable Style/RedundantArgument
       end
 
-      def check_granted_resources(granted_resource_scopes)
+      def check_granted_resources(granted_resource_scopes, request_index)
         granted_scope_resources = granted_resource_scopes.map { |scope| scope.split('/').last.split('.').first }
 
         missing_resources = requested_scope_resources - granted_scope_resources
         extra_resources = granted_scope_resources - requested_scope_resources
         if missing_resources.present?
-          add_message('error', "#{request_prefix} Granted scopes missing the following " \
-                               "requested resource types: #{missing_resources.join(', ')}")
+          add_request_message('error', 'Granted scopes missing the following ' \
+                                       "requested resource types: #{missing_resources.join(', ')}", request_index)
         end
-        if extra_resources.present?
-          add_message('error', "#{request_prefix} Granted scopes included the following resource types " \
-                               "beyond what was requested: #{extra_resources.join(', ')}")
-        end
+        return unless extra_resources.present?
 
-        nil
+        add_request_message('error', 'Granted scopes included the following resource types ' \
+                                     "beyond what was requested: #{extra_resources.join(', ')}", request_index)
       end
 
-      def check_granted_interactions(granted_resource_scopes)
+      def check_granted_interactions(granted_resource_scopes, request_index)
         return if granted_resource_scopes.all? { |scope| scope.split('.').last == 'rs' }
 
         if granted_resource_scopes.all? { |scope| scope.split('.').last == 'read' }
-          add_message('warning',
-                      "#{request_prefix} SMART v1 `read` scope used. Use of SMART v2 `rs` scope recommended.")
+          add_request_message('warning',
+                              'SMART v1 `read` scope used. Use of SMART v2 `rs` scope recommended.',
+                              request_index)
           return
         end
 
-        add_message('error', "#{request_prefix} Some granted resource scopes do not provide " \
-                             "requested 'rs' (read and search) interactions.")
+        add_request_message('error', 'Some granted resource scopes do not provide ' \
+                                     "requested 'rs' (read and search) interactions.", request_index)
       end
 
-      def check_granted_scopes_level(granted_resource_scopes)
+      def check_granted_scopes_level(granted_resource_scopes, request_index)
         level = scopes_level(granted_resource_scopes)
         if level.blank?
-          add_message('error',
-                      "#{request_prefix} Requested scopes did not use a consistent level of scope (patient or user).")
+          add_request_message('error',
+                              'Requested scopes did not use a consistent level of scope (patient or user).',
+                              request_index)
           return
         end
 
         return if ['user', 'patient'].include?(level)
 
-        add_message('error',
-                    "#{request_prefix} Unexpected level for granted scopes: " \
-                    "expected 'user' or 'patient', got '#{level}'.")
+        add_request_message('error',
+                            "Unexpected level for granted scopes: expected 'user' or 'patient', got '#{level}'.",
+                            request_index)
       end
 
       def scopes_level(granted_resource_scopes)
@@ -127,14 +110,7 @@ module DaVinciCRDTestKit
       end
 
       def all_scopes_same_level?(granted_resource_scopes)
-        return true unless granted_resource_scopes.present?
-
-        level = granted_resource_scopes.first.split('/').first
-        granted_resource_scopes.each do |scope|
-          return false if scope.split('/').first != level
-        end
-
-        true
+        granted_resource_scopes.map { |s| s.split('/').first }.uniq.size <= 1
       end
     end
   end
