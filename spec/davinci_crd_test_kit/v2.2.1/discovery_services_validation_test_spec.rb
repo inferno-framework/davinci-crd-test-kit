@@ -61,6 +61,18 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     expect(result.result_message).to match(/is empty/)
   end
 
+  it 'fails when the davinci-crd.version extension contains non-string values' do
+    service1 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.1', '2.2'] })
+    service2 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.1', 2.2] })
+
+    cds_services = { 'services' => [service1, service2] }.to_json
+
+    result = run(runnable, cds_services:)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/contains non-string values/)
+  end
+
   it 'fails when the davinci-crd.version extension contains in improperly formatted version' do
     service1 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.1', '2.2'] })
     service2 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.2.1'] })

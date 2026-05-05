@@ -66,23 +66,27 @@ module DaVinciCRDTestKit
 
         services.each do |service|
           required_fields.each do |field, type|
-            assert(service[field], "Service `#{service}` did not contain required field: `#{field}`")
-            assert(service[field].is_a?(type), "Service `#{service}`: field `#{field}` is not of type #{type}")
+            assert(service[field], "Service `#{service['id']}` did not contain required field: `#{field}`")
+            assert(service[field].is_a?(type), "Service `#{service['id']}`: field `#{field}` is not of type #{type}")
           end
 
           assert service['extension'].key?(EXTENSION_KEY),
-                 "Service `#{service}`: does not contain a `#{EXTENSION_KEY}` extension"
+                 "Service `#{service['id']}`: does not contain a `#{EXTENSION_KEY}` extension"
           assert service['extension'][EXTENSION_KEY].is_a?(Array),
-                 "Service `#{service}`: `#{EXTENSION_KEY}` extension is not of type Array"
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is not of type Array"
           assert service['extension'][EXTENSION_KEY].present?,
-                 "Service `#{service}`: `#{EXTENSION_KEY}` extension is empty"
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is empty"
+          non_string_values = service['extension'][EXTENSION_KEY].reject { |value| value.is_a? String }
+          assert non_string_values.blank?,
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains non-string values: " \
+                 "#{non_string_values.join(', ')}"
 
           invalid_versions =
             service['extension'][EXTENSION_KEY] # rubocop:disable Style/SelectByRegexp
               .reject { |version| version.match?(/\A\d+\.\d+\Z/) }
 
           assert invalid_versions.blank?,
-                 "Service `#{service}`: `#{EXTENSION_KEY}` extension contains invalid " \
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains invalid " \
                  "version strings: #{invalid_versions.join(', ')}"
         end
       end
