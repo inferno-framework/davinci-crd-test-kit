@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
 
       def load_payer_request_for_hook_request(request_body)
         hook_tag = "#{HOOK_INSTANCE_TAG_PREFIX}#{request_body['hookInstance']}"
-        load_tagged_requests('payer', hook_tag, DATA_FETCH_TAG).first
+        load_tagged_requests(PAYER_ORG_FETCH_TAG, hook_tag, DATA_FETCH_TAG).first
       end
 
       def check_payer_request(request_body, request_index)

@@ -179,7 +179,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def fetch_reference(reference, additional_tag: nil)
+    def fetch_reference(reference, additional_tag: nil, parse_as_fhir: false)
       response = execute_request(reference)
       return nil unless response.present?
 
@@ -188,7 +188,11 @@ module DaVinciCRDTestKit
       persist_query_request(response, tags)
       return nil unless response.status.to_s.starts_with?('2')
 
-      JSON.parse(response.body)
+      begin
+        parse_as_fhir ? FHIR.from_contents(response.body) : JSON.parse(response.body)
+      rescue JSON::ParserError
+        nil
+      end
     end
 
     def find_references_to_read(resource, to_read_list)
@@ -346,6 +350,7 @@ module DaVinciCRDTestKit
     # not used for response generation, but verified later
     def request_additional_fhir_data
       request_coverage_payer
+      request_parent_locations
     end
 
     def prefetched_coverage_resource
@@ -362,7 +367,42 @@ module DaVinciCRDTestKit
       coverage_resource = prefetched_coverage_resource
       return unless coverage_resource.present? && coverage_resource.payor.first&.reference.present?
 
-      fetch_reference(coverage_resource.payor.first.reference, additional_tag: 'payer')
+      fetch_reference(coverage_resource.payor.first.reference, additional_tag: PAYER_ORG_FETCH_TAG)
+    end
+
+    def request_parent_locations
+      prefetched_locations_and_parents_hash
+    end
+
+    def prefetched_location_bundle
+      locations = if request_body.dig('prefetch', 'locations').present?
+                    FHIR.from_contents(request_body.dig('prefetch', 'locations').to_json)
+                  end
+      return locations if locations.is_a?(FHIR::Bundle)
+      return nil unless locations.is_a?(FHIR::Location)
+
+      FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
+    end
+
+    def prefetched_locations_and_parents_hash
+      prefetched_location_bundle&.entry&.each_with_object({}) do |entry, hash|
+        add_location_to_hash(entry.resource, hash)
+      end
+    end
+
+    def add_location_to_hash(location, location_hash)
+      return unless location.is_a?(FHIR::Location) && location.id.present?
+
+      relative_reference = "#{location.resourceType}/#{location.id}"
+      return if location_hash.key?(relative_reference)
+
+      location_hash[relative_reference] = location
+      return unless location.partOf&.reference.present?
+
+      parent_location = fetch_reference(location.partOf.reference,
+                                        additional_tag: PARENT_LOCATION_FETCH_TAG,
+                                        parse_as_fhir: true)
+      add_location_to_hash(parent_location, location_hash)
     end
   end
 end
