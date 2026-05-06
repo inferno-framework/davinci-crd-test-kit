@@ -49,6 +49,62 @@ RSpec.describe DaVinciCRDTestKit::V221::OrderDispatchCoverageInformationTest do
     expect(result.result).to eq('pass'), result.result_message
   end
 
+  it 'passes if a dispatchedOrder is in the prefetch' do
+    bundle = FHIR::Bundle.new(
+      entry: [
+        {
+          resource: service_request
+        }
+      ]
+    )
+
+    medication_request = FHIR::MedicationRequest.new(id: 'def456')
+
+    request_body = {
+      context: {
+        dispatchedOrders: [
+          service_request.to_reference.reference,
+          medication_request.to_reference.reference
+        ]
+      },
+      prefetch: {
+        bundle:,
+        resource: medication_request
+      }
+    }.to_json
+
+    response_body = {
+      systemActions: [
+        {
+          type: 'update',
+          resource: service_request_with_coverage_info
+        }
+      ]
+    }.to_json
+
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body:,
+      response_body:,
+      tags: [DaVinciCRDTestKit::ORDER_DISPATCH_TAG],
+      status: 200
+    )
+
+    result =
+      run(
+        runnable,
+        {
+          invoked_hook: 'appointment-book',
+          mock_ehr_bundle: '{"resourceType":"Bundle","type":"collection"}'
+        }
+      )
+
+    expect(result.result).to eq('pass'), result.result_message
+  end
+
   it 'skips if not all referenced orders can be found' do
     bundle = FHIR::Bundle.new(
       entry: [

@@ -28,13 +28,28 @@ module DaVinciCRDTestKit
               references.any? { |reference| resource_matches_reference?(reference, resource) }
             end
 
+        prefetch_resources =
+          (hook_call_body['prefetch'] || {})
+            .values
+            .compact
+            .map { |resource_hash| FHIR.from_contents(resource_hash.to_json) }
+            .flat_map do |resource|
+              if resource.is_a? FHIR::Bundle
+                resource.entry.map(&:resource)
+              else
+                resource
+              end
+            end
+
+        resources += prefetch_resources
+
         unmatched_references =
           references.reject do |reference|
             resources.any? { |resource| resource_matches_reference?(reference, resource) }
           end
 
         skip_if unmatched_references.present?,
-                'The following `dispatchedOrders` are not included in the Mock EHR Data input: ' \
+                'The following `dispatchedOrders` are not included in the Mock EHR Data input or prefetch: ' \
                 "#{unmatched_references.map(&:reference).join(', ')}"
 
         resources
