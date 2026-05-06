@@ -62,7 +62,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       response_body: response_body.is_a?(Hash) ? response_body.to_json : response_body,
       status:,
       headers: [],
-      tags: ['payer', "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{instance}",
+      tags: [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG, "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{instance}",
              DaVinciCRDTestKit::DATA_FETCH_TAG]
     )
   end

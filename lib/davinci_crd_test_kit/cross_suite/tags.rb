@@ -8,5 +8,7 @@ module DaVinciCRDTestKit
   DISCOVERY_TAG = 'cds_discovery'.freeze
   ANY_HOOK_TAG = 'any_hook'.freeze
   DATA_FETCH_TAG = 'data_fetch'.freeze
+  PAYER_ORG_FETCH_TAG = 'payer_org'.freeze
+  PARENT_LOCATION_FETCH_TAG = 'parent_location'.freeze
   HOOK_INSTANCE_TAG_PREFIX = 'hi_'.freeze
 end

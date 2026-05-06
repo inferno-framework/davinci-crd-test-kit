@@ -1,4 +1,5 @@
 require_relative '../../lib/davinci_crd_test_kit/client/endpoints/gather_response_generation_data'
+require_relative '../../lib/davinci_crd_test_kit/cross_suite/tags'
 
 RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
   let(:module_instance) do
@@ -277,6 +278,17 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(pr_request).to have_been_made.once
       expect(p_request).to have_been_made.once
     end
+
+    it 'handles a non-JSON response body without raising' do
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 200, body: 'not valid json')
+
+      module_instance.gather_data_for_request([patient_example_reference_relative], [])
+      expect(module_instance.analyzed_resources.key?(patient_example_reference_relative)).to be(true)
+      expect(module_instance.analyzed_resources[patient_example_reference_relative]).to be_nil
+    end
   end
 
   describe 'when fetching coverage resources' do
@@ -377,6 +389,147 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(module_instance.prefetched_resources.size).to be(2)
       expect(module_instance.prefetched_resources['Patient/123']).to be_present
       expect(module_instance.prefetched_resources['Coverage/456']).to be_present
+    end
+  end
+
+  describe 'when handling prefetched location data' do
+    let(:location_fhir) { FHIR.from_contents(location_example.to_json) }
+    let(:location2_fhir) { FHIR.from_contents(location2_example.to_json) }
+    let(:location_prefetch_bundle) do
+      bundle = FHIR::Bundle.new(type: 'searchset')
+      bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
+      bundle.entry << FHIR::Bundle::Entry.new(resource: location2_fhir)
+      bundle
+    end
+
+    describe '#prefetched_location_bundle' do
+      it 'returns nil when no locations in prefetch' do
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        expect(module_instance.prefetched_location_bundle).to be_nil
+      end
+
+      it 'returns the bundle when prefetch contains a location bundle' do
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.prefetched_location_bundle
+        expect(result).to be_a(FHIR::Bundle)
+        expect(result.entry.count).to eq(2)
+      end
+
+      it 'wraps a single prefetched Location in a Bundle' do
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_fhir.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.prefetched_location_bundle
+        expect(result).to be_a(FHIR::Bundle)
+        expect(result.entry.first.resource.id).to eq('example')
+      end
+
+      it 'returns nil when prefetch locations is neither a Bundle nor a Location' do
+        order_sign_request['prefetch'] = { 'locations' => { 'resourceType' => 'Patient', 'id' => '1' } }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        expect(module_instance.prefetched_location_bundle).to be_nil
+      end
+    end
+
+    describe '#prefetched_locations_and_parents_hash' do
+      it 'returns nil when no locations in prefetch' do
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        expect(module_instance.prefetched_locations_and_parents_hash).to be_nil
+      end
+
+      it 'returns a hash keyed by relative reference for each location' do
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(result.size).to eq(2)
+        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+      end
+
+      it 'skips bundle entries without an id' do
+        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: FHIR::Location.new(name: 'no-id'))
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(result.size).to eq(2)
+      end
+
+      it 'deduplicates entries with the same relative reference' do
+        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(result.size).to eq(2)
+      end
+
+      it 'fetches and includes parent locations when a prefetched location has partOf' do
+        location_with_parent = FHIR.from_contents(location_example.to_json)
+        location_with_parent.partOf = FHIR::Reference.new(reference: location2_example_reference_relative)
+        bundle = FHIR::Bundle.new(type: 'searchset')
+        bundle.entry << FHIR::Bundle::Entry.new(resource: location_with_parent)
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+        parent_request = stub_request(:get, location2_example_reference_absolute)
+          .to_return(status: 200, body: location2_example.to_json)
+
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(result.size).to eq(2)
+        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+        expect(parent_request).to have_been_made.once
+      end
+    end
+
+    describe '#add_location_to_hash' do
+      let(:location_hash) { {} }
+
+      it 'does nothing when given a non-Location resource' do
+        module_instance.add_location_to_hash(nil, location_hash)
+        module_instance.add_location_to_hash('not a location', location_hash)
+        expect(location_hash).to be_empty
+      end
+
+      it 'does nothing when the Location has no id' do
+        module_instance.add_location_to_hash(FHIR::Location.new, location_hash)
+        expect(location_hash).to be_empty
+      end
+
+      it 'adds a valid Location to the hash keyed by relative reference' do
+        module_instance.add_location_to_hash(location_fhir, location_hash)
+        expect(location_hash[location_example_reference_relative]).to eq(location_fhir)
+      end
+
+      it 'does not re-add a Location already present in the hash' do
+        location_hash[location_example_reference_relative] = location_fhir
+        module_instance.add_location_to_hash(location_fhir, location_hash)
+        expect(location_hash.size).to eq(1)
+      end
+
+      it 'fetches and recursively adds the parent location when partOf is present' do
+        location_with_parent = FHIR.from_contents(location_example.to_json)
+        location_with_parent.partOf = FHIR::Reference.new(reference: location2_example_reference_relative)
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        loc_request = stub_request(:get, location2_example_reference_absolute)
+          .to_return(status: 200, body: location2_example.to_json)
+
+        module_instance.add_location_to_hash(location_with_parent, location_hash)
+        expect(location_hash.size).to eq(2)
+        expect(location_hash[location_example_reference_relative]).to eq(location_with_parent)
+        expect(location_hash[location2_example_reference_relative]).to eq(location2_fhir)
+        expect(loc_request).to have_been_made.once
+      end
+    end
+
+    describe '#request_parent_locations' do
+      it 'returns a hash of prefetched locations' do
+        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+        result = module_instance.request_parent_locations
+        expect(result).to be_a(Hash)
+        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+      end
     end
   end
 

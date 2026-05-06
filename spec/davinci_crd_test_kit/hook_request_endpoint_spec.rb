@@ -296,10 +296,55 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(payer_request).to have_been_made.once
         tagged_requests = requests_repo.tagged_requests(
           test_session.id,
-          ['payer', hook_instance_tag(hook_instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
+          [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG, hook_instance_tag(hook_instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
         )
         expect(tagged_requests.length).to eq(1)
         expect(tagged_requests.first.url).to eq(payer_org_url)
+      end
+
+      it 'fetches parent locations when a prefetched location has partOf' do
+        allow(test).to receive(:suite).and_return(suite)
+        parent_url = "#{fhir_server}/Location/parent-loc"
+        parent_request = stub_request(:get, parent_url)
+          .to_return(status: 200, body: { 'resourceType' => 'Location', 'id' => 'parent-loc' }.to_json)
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        hook_instance = order_sign_hook_request['hookInstance']
+        request_with_location = order_sign_hook_request.merge(
+          'prefetch' => {
+            'locations' => {
+              'resourceType' => 'Bundle',
+              'type' => 'searchset',
+              'entry' => [{ 'resource' => {
+                'resourceType' => 'Location',
+                'id' => 'child-loc',
+                'partOf' => { 'reference' => 'Location/parent-loc' }
+              } }]
+            }
+          }
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, request_with_location)
+
+        expect(last_response).to be_ok
+        expect(parent_request).to have_been_made.once
+        tagged_requests = requests_repo.tagged_requests(
+          test_session.id,
+          [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG, hook_instance_tag(hook_instance),
+           DaVinciCRDTestKit::DATA_FETCH_TAG]
+        )
+        expect(tagged_requests.length).to eq(1)
+        expect(tagged_requests.first.url).to eq(parent_url)
       end
 
       it 'makes FHIR data-fetch requests when requestedVersion extension overrides path to v201' do
