@@ -17,6 +17,12 @@ module DaVinciCRDTestKit
         Each CDS service must contain the following required fields:
         `hook`, `description`, and `id`.
 
+        Additionally, the [CRD
+        Spec](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#crd-version-declaration)
+        states that "CRD servers SHALL declare at least one supported CRD
+        version for each supported hook" using the `davinci-crd.version`
+        extension.
+
         This test checks for the presence of the required fields and
         validates that they are of the correct type.
 
@@ -27,11 +33,14 @@ module DaVinciCRDTestKit
       output :appointment_book_service_ids, :encounter_start_service_ids, :encounter_discharge_service_ids,
              :order_dispatch_service_ids, :order_select_service_ids, :order_sign_service_ids
 
+      EXTENSION_KEY = 'davinci-crd.version'.freeze
+
       def required_fields
         {
           'hook' => String,
           'description' => String,
-          'id' => String
+          'id' => String,
+          'extension' => Hash
         }
       end
 
@@ -57,9 +66,28 @@ module DaVinciCRDTestKit
 
         services.each do |service|
           required_fields.each do |field, type|
-            assert(service[field], "Service `#{service}` did not contain required field: `#{field}`")
-            assert(service[field].is_a?(type), "Service `#{service}`: field `#{field}` is not of type #{type}")
+            assert(service[field], "Service `#{service['id']}` did not contain required field: `#{field}`")
+            assert(service[field].is_a?(type), "Service `#{service['id']}`: field `#{field}` is not of type #{type}")
           end
+
+          assert service['extension'].key?(EXTENSION_KEY),
+                 "Service `#{service['id']}`: does not contain a `#{EXTENSION_KEY}` extension"
+          assert service['extension'][EXTENSION_KEY].is_a?(Array),
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is not of type Array"
+          assert service['extension'][EXTENSION_KEY].present?,
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is empty"
+          non_string_values = service['extension'][EXTENSION_KEY].reject { |value| value.is_a? String }
+          assert non_string_values.blank?,
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains non-string values: " \
+                 "#{non_string_values.join(', ')}"
+
+          invalid_versions =
+            service['extension'][EXTENSION_KEY] # rubocop:disable Style/SelectByRegexp
+              .reject { |version| version.match?(/\A[1-9]\d*\.\d+\Z/) }
+
+          assert invalid_versions.blank?,
+                 "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains invalid " \
+                 "version strings: #{invalid_versions.join(', ')}"
         end
       end
     end
