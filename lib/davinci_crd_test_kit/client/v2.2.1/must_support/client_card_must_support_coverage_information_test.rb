@@ -43,6 +43,7 @@ module DaVinciCRDTestKit
 
       run do
         loaded_requests = requests_to_analyze
+        skip_if loaded_requests.blank?, 'No hook requests received.'
 
         sorted_cards = sorted_cards_from_requests(loaded_requests)
 
