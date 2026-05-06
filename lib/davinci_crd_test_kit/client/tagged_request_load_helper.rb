@@ -29,8 +29,8 @@ module DaVinciCRDTestKit
       if hook_name.present?
         load_tagged_requests(*tags_to_load)
       else
-        ALL_HOOKS.each_with_object([]) do |h, request_list|
-          request_list.concat(load_tagged_requests(*tags_to_load(h)))
+        ALL_HOOKS.each_with_object([]) do |hook, request_list|
+          request_list.concat(load_tagged_requests(*tags_to_load(hook)))
         end
       end
     end
