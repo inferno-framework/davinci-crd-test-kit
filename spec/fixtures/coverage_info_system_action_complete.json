@@ -1,0 +1,178 @@
+{
+  "type": "update",
+  "description": "Added coverage information to DeviceRequest resource.",
+  "resource": {
+    "resourceType": "MedicationRequest",
+    "id": "annotated-example",
+    "extension": [
+      {
+        "extension": [
+          {
+            "url": "coverage",
+            "valueReference": {
+              "reference": "Coverage/example"
+            }
+          },
+          {
+            "url": "covered",
+            "valueCode": "conditional"
+          },
+          {
+            "url": "pa-needed",
+            "valueCode": "satisfied"
+          },
+          {
+            "url": "doc-needed",
+            "valueCode": "admin"
+          },
+          {
+            "url": "doc-purpose",
+            "valueCode": "withclaim"
+          },
+          {
+            "url": "info-needed",
+            "valueCode": "performer"
+          },
+          {
+            "url": "billingCode",
+            "valueCoding": {
+              "system": "http://www.ama-assn.org/go/cpt",
+              "code": "77067"
+            }
+          },
+          {
+            "url": "reason",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+                  "code": "gold-card"
+                }
+              ],
+              "text": "Prior auth waved due to gold-card status"
+            }
+          },
+          {
+            "extension": [
+              {
+                "url": "category",
+                "valueCode": "cat-other"
+              },
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+                      "code": "policy-link"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "value",
+                "valueUrl": "http://example.org/somepayer/policy123.pdf#abc"
+              },
+              {
+                "url": "qualification",
+                "valueString": "Additional policy details can be found here"
+              }
+            ],
+            "url": "detail"
+          },
+          {
+            "url": "questionnaire",
+            "valueCanonical": "http://example.org/some-payer/Questionnaire/123|1.3.0"
+          },
+          {
+            "url": "date",
+            "valueDate": "2019-02-15"
+          },
+          {
+            "url": "coverage-assertion-id",
+            "valueString": "12345ABC"
+          },
+          {
+            "url": "satisfied-pa-id",
+            "valueString": "XXYYZ"
+          },
+          {
+            "url": "contact",
+            "valueContactDetail": {
+              "name": "Help Desk",
+              "telecom": [
+                {
+                  "system": "url",
+                  "value": "http://some-payer.org/xyz-sub-org/get-help-here.html"
+                },
+                {
+                  "system": "url",
+                  "value": "http://some-payer.org/xyz-sub-org/get-help-here-too.html"
+                },
+                {
+                  "system": "email",
+                  "value": "notreal@inferno.healthit.gov"
+                }
+              ]
+            }
+          },
+          {
+            "url": "expiry-date",
+            "valueDate": "2019-08-01"
+          }
+        ],
+        "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information"
+      }
+    ],
+    "status": "draft",
+    "intent": "original-order",
+    "medicationCodeableConcept": {
+      "coding": [
+        {
+          "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+          "code": "616447",
+          "display": "mycophenolate mofetil 250 MG Oral Capsule [Cellcept]"
+        }
+      ]
+    },
+    "subject": {
+      "reference": "http://example.org/Patient/123",
+      "display": "Jane Smith"
+    },
+    "encounter": {
+      "reference": "http://example.org/Encounter/ABC"
+    },
+    "authoredOn": "2019-02-15",
+    "requester": {
+      "reference": "http://example.org/PractitionerRole/987",
+      "display": "Dr. Jones"
+    },
+    "note": [
+      {
+        "authorString": "XYZ Insurance",
+        "time": "2019-02-15T15:07:18-05:00",
+        "text": "Unsolicited prior authorization for Jane Smith to receive 6 tablets Cellcept 250 MG Oral Capsule BID granted.  Please note prior authorization # 12345 on claim submission."
+      }
+    ],
+    "dosageInstruction": [
+      {
+        "text": "6 tablets every 12 hours.",
+        "timing": {
+          "repeat": {
+            "frequency": 1,
+            "period": 12,
+            "periodUnit": "h"
+          }
+        },
+        "doseAndRate": [
+          {
+            "doseQuantity": {
+              "value": 6,
+              "unit": "tablet"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

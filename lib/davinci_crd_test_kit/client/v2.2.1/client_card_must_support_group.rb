@@ -1,4 +1,4 @@
-require_relative 'must_support/client_card_must_support_coverage_information'
+require_relative 'must_support/client_card_must_support_coverage_information_test'
 
 module DaVinciCRDTestKit
   module V221
