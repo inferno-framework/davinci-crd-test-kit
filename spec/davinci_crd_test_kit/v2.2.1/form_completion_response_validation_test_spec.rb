@@ -79,7 +79,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
   it 'passes if questionnaire creation actions include the if-none-exist extension' do
     card = base_card
     card['suggestions'].first['actions'].first['extension'] = {
-      'davinci-crd.if-none-exist': ['http://example.org/Questionnaire/XYZ']
+      'davinci-crd.if-none-exist': 'http://example.org/Questionnaire/XYZ'
     }
     result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
                            valid_system_actions: [].to_json)
@@ -92,5 +92,30 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
                            valid_system_actions: [].to_json)
 
     expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(/is not present/)
+  end
+
+  it 'fails if the if-none-exist extension is the wrong type' do
+    card = base_card
+    card['suggestions'].first['actions'].first['extension'] = {
+      'davinci-crd.if-none-exist': ['http://example.org/Questionnaire/XYZ']
+    }
+    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
+                           valid_system_actions: [].to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(entity_result_message.message).to match(/is not a string/)
+  end
+
+  it 'fails if the if-none-exist extension is an empty string' do
+    card = base_card
+    card['suggestions'].first['actions'].first['extension'] = {
+      'davinci-crd.if-none-exist': ''
+    }
+    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
+                           valid_system_actions: [].to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(entity_result_message.message).to match(/is an empty string/)
   end
 end

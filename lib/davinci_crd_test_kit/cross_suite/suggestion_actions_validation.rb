@@ -103,21 +103,17 @@ module DaVinciCRDTestKit
       add_message('error', error_msg)
     end
 
-    def questionnaire_creation_check(action) # rubocop:disable Metrics/CyclomaticComplexity
+    def questionnaire_creation_check(action)
       return unless action.dig('resource', 'resourceType') == 'Questionnaire'
 
       extension_value = action.dig('extension', 'davinci-crd.if-none-exist')
 
-      return if extension_value.is_a?(Array) && extension_value.all? { |value| value.is_a? String }
-
       if extension_value.nil?
         add_message('error', '`davinci-crd.if-none-exist` extension is not present.')
-      elsif !extension_value.is_a? Array
-        add_message('error', '`davinci-crd.if-none-exist` extension is not an Array.')
+      elsif !extension_value.is_a? String
+        add_message('error', '`davinci-crd.if-none-exist` extension is not a string.')
       elsif extension_value.blank?
-        add_message('error', '`davinci-crd.if-none-exist` extension is empty.')
-      elsif extension_value.any? { |value| !value.is_a? String }
-        add_message('error', '`davinci-crd.if-none-exist` extension contains non-String values.')
+        add_message('error', '`davinci-crd.if-none-exist` extension is an empty string.')
       end
     end
 
