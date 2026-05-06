@@ -83,7 +83,7 @@ module DaVinciCRDTestKit
 
           invalid_versions =
             service['extension'][EXTENSION_KEY] # rubocop:disable Style/SelectByRegexp
-              .reject { |version| version.match?(/\A\d+\.\d+\Z/) }
+              .reject { |version| version.match?(/\A[1-9]\d*.\d+\Z/) }
 
           assert invalid_versions.blank?,
                  "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains invalid " \
