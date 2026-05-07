@@ -88,6 +88,7 @@ module DaVinciCRDTestKit
 
     def delegate_execution_to_fhirpath_engine(hash, fhirpath_query)
       return [hash] unless fhirpath_query.present?
+      return [] unless hash.present?
 
       result = fhirpath_evaluator.call_fhirpath_service(hash, fhirpath_query)
       unless result.status.to_s.starts_with?('2')
