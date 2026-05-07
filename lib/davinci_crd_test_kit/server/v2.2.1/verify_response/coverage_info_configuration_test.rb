@@ -30,6 +30,10 @@ module DaVinciCRDTestKit
           "Cards: #{card_summaries.join(', ')}. System actions: #{action_descriptions.join(', ')}."
       end
 
+      def primary_hook?
+        ['appointment-book', 'order-sign', 'order-dispatch'].include? tested_hook_name
+      end
+
       def parsed_body(json)
         JSON.parse(json)
       rescue JSON::ParserError
@@ -43,8 +47,14 @@ module DaVinciCRDTestKit
       run do
         load_tagged_requests(tested_hook_name, COVERAGE_INFO_DISABLED_TAG)
 
-        skip_if requests.empty?,
-                "No successful #{tested_hook_name} response contained coverage-info content to suppress."
+        if requests.empty?
+          message = "No successful #{tested_hook_name} response contained coverage-info content to suppress."
+          if primary_hook?
+            skip message
+          else
+            omit message
+          end
+        end
 
         requests.each do |request|
           unless request.status == 200

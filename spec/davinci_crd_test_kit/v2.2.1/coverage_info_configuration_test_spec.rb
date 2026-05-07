@@ -122,12 +122,23 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     expect(entity_result_messages.map(&:message).join(' ')).to match(/included coverage-info content/)
   end
 
-  it 'skips if no coverage-info disabled follow-up request was made after coverage-info content was returned' do
+  it 'skips if no coverage-info disabled follow-up request was made for primary hooks' do
     create_service_request
 
     result = run(runnable)
 
     expect(result.result).to eq('skip')
+    expect(result.result_message).to match(/response contained coverage-info content to suppress/)
+  end
+
+  it 'omits if no coverage-info disabled follow-up request was made for secondary hooks' do
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-select')
+
+    create_service_request
+
+    result = run(runnable)
+
+    expect(result.result).to eq('omit')
     expect(result.result_message).to match(/response contained coverage-info content to suppress/)
   end
 end
