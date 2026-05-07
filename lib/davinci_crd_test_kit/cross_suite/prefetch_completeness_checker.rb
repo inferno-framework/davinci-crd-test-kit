@@ -80,7 +80,7 @@ module DaVinciCRDTestKit
       check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
     rescue FhirpathServiceError => e
       raise "#{error_prefix} FHIRPath service error while evaluating prefetch template. " \
-            "This indicates an implementation problem in Inferno. Details: #{e.message}"
+            "This indicates an implementation problem in Inferno - please log a ticket. Details: #{e.message}"
     end
 
     def check_provided_against_request(prefetched_value, instantiated_request)
