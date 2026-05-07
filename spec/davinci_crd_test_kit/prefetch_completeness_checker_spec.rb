@@ -312,6 +312,79 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
   end
 
+  describe '#observed_fhirpath_collection_as_comma_delimited_string' do
+    it 'is false by default before check_prefetched_data is called' do
+      checker = make_checker(order_sign_request, {})
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when no _id search template is present' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      checker = make_checker(order_sign_request, { 'patient' => 'Patient/{{context.patientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when the _id template token has no pipe' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
+      checker = make_checker(order_sign_request, { 'patient' => 'Patient?_id={{context.patientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when the token has a pipe but only one id is resolved' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
+      checker = make_checker(order_sign_request,
+                             { 'patient' => 'Patient?_id={{context.patientId|context.nonExistentField}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when the token has a pipe and multiple ids resolve but are all the same' do
+      order_sign_request['context']['duplicatePatientId'] = 'example'
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
+      checker = make_checker(order_sign_request,
+                             { 'patient' => 'Patient?_id={{context.patientId|context.duplicatePatientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'becomes true when the token has a pipe and multiple ids are resolved' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = { 'patient' => {
+        'resourceType' => 'Bundle',
+        'entry' => [
+          { 'resource' => crd_patient_example },
+          { 'resource' => crd_patient_example.merge('id' => 'other') }
+        ]
+      } }
+      checker = make_checker(order_sign_request,
+                             { 'patient' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
+    end
+
+    it 'becomes true when any one of multiple templates demonstrates multi-id collection' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = {
+        'patient' => crd_patient_example,
+        'patients' => {
+          'resourceType' => 'Bundle',
+          'entry' => [
+            { 'resource' => crd_patient_example },
+            { 'resource' => crd_patient_example.merge('id' => 'other') }
+          ]
+        }
+      }
+      checker = make_checker(order_sign_request, {
+                               'patient' => 'Patient/{{context.patientId}}',
+                               'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}'
+                             })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
+    end
+  end
+
   describe 'chained prefetch tokens' do
     let(:templates) do
       {

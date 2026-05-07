@@ -9,12 +9,14 @@ module DaVinciCRDTestKit
     include FhirpathOnCDSRequest
     include ReplaceTokens
 
-    attr_accessor :hook_request, :request_index, :services_file_path
+    attr_accessor :hook_request, :request_index, :services_file_path,
+                  :observed_fhirpath_collection_as_comma_delimited_string
 
     def initialize(hook_request, request_index, services_file_path)
       @hook_request = hook_request
       @request_index = request_index
       @services_file_path = services_file_path
+      @observed_fhirpath_collection_as_comma_delimited_string = false
       extract_prefetched_resources
     end
 
@@ -23,7 +25,11 @@ module DaVinciCRDTestKit
 
       hook_prefetch_templates.each do |prefetch_key, prefetch_request|
         @current_prefetch_key = prefetch_key
+        original_prefetch_request = prefetch_request.dup
         instantiated_request = replace_tokens_in_string(prefetch_request, hook_request)
+        if demonstrates_collection_as_comma_delimited_string?(original_prefetch_request, instantiated_request)
+          @observed_fhirpath_collection_as_comma_delimited_string = true
+        end
         unless hook_request['prefetch'].key?(prefetch_key)
           errors << "#{error_prefix} No prefetch data provided."
           next
@@ -279,6 +285,20 @@ module DaVinciCRDTestKit
                 'was not provided in the prefetched values.'
 
       nil
+    end
+
+    # -------------------------------------------------------------------------
+    # Observe a Collection represented as a comma-delimited string in instantiated search
+    # -------------------------------------------------------------------------
+
+    # client will have demonstrated turning a collection into a comma-delimited string if both
+    # - the prefetch request follows the RESOURCE?_id={{TOKEN}} form when TOKEN has a | indicating 'and', and
+    # - the instantiated query actually has multiple unique ids
+    def demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
+      token = prefetch_request.match(/[a-zA-Z]*\?_id=\{\{(.+?)\}\}/)&.[](1)
+      return false unless token.present? && token.include?('|')
+
+      instantiated_request.split('?_id=').last.split(',').uniq.size > 1
     end
   end
 end
