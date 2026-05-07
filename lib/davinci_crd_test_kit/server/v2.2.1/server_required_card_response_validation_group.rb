@@ -1,6 +1,7 @@
 require_relative 'must_support/external_reference_card_across_hooks_validation_test'
 require_relative 'must_support/instructions_card_received_across_hooks_test'
 require_relative 'must_support/coverage_information_system_action_across_hooks_validation_test'
+require_relative 'must_support/coverage_information_must_support_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -23,6 +24,7 @@ module DaVinciCRDTestKit
       test from: :crd_v221_external_reference_card_across_hooks_validation
       test from: :crd_v221_valid_instructions_card_received_across_hooks
       test from: :crd_v221_coverage_info_system_action_across_hooks_validation
+      test from: :crd_v221_coverage_information_must_support
     end
   end
 end

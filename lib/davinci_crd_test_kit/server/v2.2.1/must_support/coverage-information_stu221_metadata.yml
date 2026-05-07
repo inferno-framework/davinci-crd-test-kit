@@ -1,0 +1,60 @@
+---
+:name: coverage_information
+:version: v2.2.1
+:reformatted_version: v221
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+:profile_name: "Extension: Coverage Information"
+:profile_version: 2.2.1
+:title: Coverage Information
+:must_supports:
+  :extensions:
+  - :id: Extension.extension:coverage
+    :path: extension
+    :url: coverage
+  - :id: Extension.extension:covered
+    :path: extension
+    :url: covered
+  - :id: Extension.extension:pa-needed
+    :path: extension
+    :url: pa-needed
+  - :id: Extension.extension:doc-needed
+    :path: extension
+    :url: doc-needed
+  - :id: Extension.extension:doc-purpose
+    :path: extension
+    :url: doc-purpose
+  - :id: Extension.extension:info-needed
+    :path: extension
+    :url: info-needed
+  - :id: Extension.extension:billingCode
+    :path: extension
+    :url: billingCode
+  - :id: Extension.extension:reason
+    :path: extension
+    :url: reason
+  - :id: Extension.extension:detail
+    :path: extension
+    :url: detail
+  - :id: Extension.extension:dependency
+    :path: extension
+    :url: dependency
+  - :id: Extension.extension:questionnaire
+    :path: extension
+    :url: questionnaire
+  - :id: Extension.extension:date
+    :path: extension
+    :url: date
+  - :id: Extension.extension:coverage-assertion-id
+    :path: extension
+    :url: coverage-assertion-id
+  - :id: Extension.extension:satisfied-pa-id
+    :path: extension
+    :url: satisfied-pa-id
+  - :id: Extension.extension:contact
+    :path: extension
+    :url: contact
+  - :id: Extension.extension:expiry-date
+    :path: extension
+    :url: expiry-date
+  :slices:
+  :elements:
