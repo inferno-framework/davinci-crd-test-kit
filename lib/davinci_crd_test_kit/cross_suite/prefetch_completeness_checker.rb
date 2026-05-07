@@ -9,12 +9,14 @@ module DaVinciCRDTestKit
     include FhirpathOnCDSRequest
     include ReplaceTokens
 
-    attr_accessor :hook_request, :request_index, :services_file_path
+    attr_accessor :hook_request, :request_index, :services_file_path,
+                  :observed_fhirpath_collection_as_comma_delimited_string
 
     def initialize(hook_request, request_index, services_file_path)
       @hook_request = hook_request
       @request_index = request_index
       @services_file_path = services_file_path
+      @observed_fhirpath_collection_as_comma_delimited_string = false
       extract_prefetched_resources
     end
 
@@ -22,13 +24,7 @@ module DaVinciCRDTestKit
       return ["#{request_error_prefix} No prefetch data provided."] unless hook_request.key?('prefetch')
 
       hook_prefetch_templates.each do |prefetch_key, prefetch_request|
-        @current_prefetch_key = prefetch_key
-        instantiated_request = replace_tokens_in_string(prefetch_request, hook_request)
-        unless hook_request['prefetch'].key?(prefetch_key)
-          errors << "#{error_prefix} No prefetch data provided."
-          next
-        end
-        check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
+        check_prefetch_template(prefetch_key, prefetch_request)
       end
 
       hook_request['prefetch'].each_key do |prefetch_template|
@@ -71,6 +67,22 @@ module DaVinciCRDTestKit
     # -----------------------------------------------------------------------
     # Check of actual prefetch against an instantiated request
     # -----------------------------------------------------------------------
+    def check_prefetch_template(prefetch_key, prefetch_request)
+      @current_prefetch_key = prefetch_key
+      instantiated_request = replace_tokens_in_string(prefetch_request.dup, hook_request)
+      if demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
+        @observed_fhirpath_collection_as_comma_delimited_string = true
+      end
+      unless hook_request['prefetch'].key?(prefetch_key)
+        errors << "#{error_prefix} No prefetch data provided."
+        return
+      end
+      check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
+    rescue FhirpathServiceError => e
+      raise "#{error_prefix} FHIRPath service error while evaluating prefetch template. " \
+            "This indicates an implementation problem in Inferno - please log a ticket. Details: #{e.message}"
+    end
+
     def check_provided_against_request(prefetched_value, instantiated_request)
       if instantiated_request.include?('?')
         if id_search?(instantiated_request)
@@ -279,6 +291,20 @@ module DaVinciCRDTestKit
                 'was not provided in the prefetched values.'
 
       nil
+    end
+
+    # -------------------------------------------------------------------------
+    # Observe a Collection represented as a comma-delimited string in instantiated search
+    # -------------------------------------------------------------------------
+
+    # client will have demonstrated turning a collection into a comma-delimited string if both
+    # - the prefetch request follows the RESOURCE?_id={{TOKEN}} form when TOKEN has a | indicating 'and', and
+    # - the instantiated query actually has multiple unique ids
+    def demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
+      token = prefetch_request.match(/[a-zA-Z]*\?_id=\{\{(.+?)\}\}/)&.[](1)
+      return false unless token.present? && token.include?('|')
+
+      instantiated_request.split('?_id=').last.split(',').uniq.size > 1
     end
   end
 end

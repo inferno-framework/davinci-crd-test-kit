@@ -35,6 +35,14 @@ module DaVinciCRDTestKit
       hook_response['systemActions'] = instantiate_actions(hook_response, 'systemActions')
 
       hook_response
+    rescue FhirpathServiceError => e
+      error_response(
+        'FHIRPath service error while generating custom response. ' \
+        'Check the FHIRPath expressions and data in your response template and hook request. ' \
+        "Details: #{e.message}",
+        code: 500
+      )
+      nil
     end
 
     def finalize_card_list(hook_response)

@@ -86,6 +86,16 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
   end
 
   describe 'for fhirpath on resources in the cds object' do
+    it 'returns an empty array without calling the fhirpath service when the target hash is nil' do
+      stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
+      results = module_instance.execute_fhirpath_on_cds_request(
+        order_sign_request,
+        'context.nonExistentField.someProperty'
+      )
+      expect(results).to eq([])
+      expect(a_request(:post, /#{Regexp.escape(fhirpath_url)}/)).to_not have_been_made
+    end
+
     it 'returns the value for a nested FHIR resource field' do
       fhirpath_result = [{ type: 'id', element: 'pureeddiet-simple' },
                          { type: 'id', element: 'smart-MedicationRequest-103' }]
