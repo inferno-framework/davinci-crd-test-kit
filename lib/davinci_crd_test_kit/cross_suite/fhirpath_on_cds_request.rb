@@ -1,4 +1,6 @@
 module DaVinciCRDTestKit
+  class FhirpathServiceError < StandardError; end
+
   # Methods for executing simple fhirpath queries on cds request objects, e.g., to resolve
   # prefetch tokens.
   #
@@ -92,9 +94,10 @@ module DaVinciCRDTestKit
 
       result = fhirpath_evaluator.call_fhirpath_service(hash, fhirpath_query)
       unless result.status.to_s.starts_with?('2')
-        puts "Error on fhirpath #{fhirpath_query} on #{hash.to_json}: #{result.body}"
+        raise FhirpathServiceError,
+              "FHIRPath service returned #{result.status} for query '#{fhirpath_query}' " \
+              "on resource #{hash.to_json}: #{result.body}"
       end
-      return [] unless result.status.to_s.starts_with?('2')
 
       JSON.parse(result.body).map { |entry| entry['element'] }
     end

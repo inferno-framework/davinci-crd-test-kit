@@ -195,6 +195,52 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         .to_return(status: 200, body: crd_coverage_bundle.to_json)
     end
 
+    it 'returns a 500 error when the FHIRPath service fails during inclusion criteria evaluation' do
+      allow(test).to receive(:suite).and_return(suite)
+      stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
+        .to_return(status: 422, body: 'Invalid FHIRPath expression')
+
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+      instructions_card_template['extension'] =
+        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+      response_template = { cards: [instructions_card_template] }
+      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, body)
+
+      expect(last_response).to be_server_error
+      expect(last_response.body).to match(/FHIRPath service error while generating custom response/)
+    end
+
+    it 'returns a 500 error when the FHIRPath service fails during resource selection criteria evaluation' do
+      allow(test).to receive(:suite).and_return(suite)
+      stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
+        .to_return(status: 422, body: 'Invalid FHIRPath expression')
+
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+      system_action_template_delete_with_tokens['extension'] =
+        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
+      response_template = { cards: [], systemActions: [system_action_template_delete_with_tokens] }
+      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, body)
+
+      expect(last_response).to be_server_error
+      expect(last_response.body).to match(/FHIRPath service error while generating custom response/)
+    end
+
     it 'returns 400 when bad json specified in the input' do
       allow(test).to receive(:suite).and_return(suite)
 

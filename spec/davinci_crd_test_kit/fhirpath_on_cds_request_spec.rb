@@ -93,7 +93,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
         'context.nonExistentField.someProperty'
       )
       expect(results).to eq([])
-      expect(a_request(:post, /#{Regexp.escape(fhirpath_url)}/)).not_to have_been_made
+      expect(a_request(:post, /#{Regexp.escape(fhirpath_url)}/)).to_not have_been_made
     end
 
     it 'returns the value for a nested FHIR resource field' do
