@@ -14,6 +14,7 @@ module DaVinciCRDTestKit
   HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX = 'hi_data_fetch_'.freeze
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
+  COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
 
   module TagMethods
     def hook_instance_tag(hook_instance)

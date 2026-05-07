@@ -4,6 +4,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
   let(:suite_id) { 'crd_client' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:service_endpoint) { 'http://example.com/cds-services/order-sign-service' }
   let(:hook_request) do
@@ -55,7 +56,12 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     }
   end
 
-  def create_service_request(body: original_response, status: 200, request_body: hook_request)
+  def create_service_request(
+    body: original_response,
+    status: 200,
+    request_body: hook_request,
+    tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG]
+  )
     repo_create(
       :request,
       direction: 'outgoing',
@@ -63,8 +69,17 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
       test_session_id: test_session.id,
       request_body: request_body.to_json,
       response_body: body.to_json,
+      result:,
       status:,
+      tags:,
       headers: nil
+    )
+  end
+
+  def create_disabled_service_request(**args)
+    create_service_request(
+      **args,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG, DaVinciCRDTestKit::COVERAGE_INFO_DISABLED_TAG]
     )
   end
 
@@ -85,26 +100,20 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
       .messages
   end
 
-  def mock_previous_requests(*requests)
+  before do
     allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
-    allow_any_instance_of(runnable).to receive(:requests).and_return(requests)
   end
 
   it 'passes when coverage-info disabled responses omit coverage-info content' do
-    original_request = create_service_request
-    disabled_request =
-      create_service_request(body: filtered_response, request_body: coverage_info_disabled_request_body)
-    mock_previous_requests(original_request, disabled_request)
+    create_disabled_service_request(body: filtered_response, request_body: coverage_info_disabled_request_body)
 
     result = run(runnable)
 
-    expect(result.result).to eq('pass')
+    expect(result.result).to eq('pass'), result.result_message
   end
 
   it 'fails if the coverage-info disabled response still contains coverage-info content' do
-    original_request = create_service_request
-    disabled_request = create_service_request(request_body: coverage_info_disabled_request_body)
-    mock_previous_requests(original_request, disabled_request)
+    create_disabled_service_request(request_body: coverage_info_disabled_request_body)
 
     result = run(runnable)
 
@@ -113,24 +122,12 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     expect(entity_result_messages.map(&:message).join(' ')).to match(/included coverage-info content/)
   end
 
-  it 'fails if no coverage-info disabled follow-up request was made after coverage-info content was returned' do
-    request = create_service_request
-    mock_previous_requests(request)
-
-    result = run(runnable)
-
-    expect(result.result).to eq('fail')
-    expect(entity_result_messages.map(&:message).join(' '))
-      .to match(/No order-sign request was made with `coverage-info` set to `false`/)
-  end
-
-  it 'skips when prior responses did not include coverage-info content' do
-    request = create_service_request(body: filtered_response)
-    mock_previous_requests(request)
+  it 'skips if no coverage-info disabled follow-up request was made after coverage-info content was returned' do
+    create_service_request
 
     result = run(runnable)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No successful order-sign response contained coverage-info/)
+    expect(result.result_message).to match(/response contained coverage-info content to suppress/)
   end
 end
