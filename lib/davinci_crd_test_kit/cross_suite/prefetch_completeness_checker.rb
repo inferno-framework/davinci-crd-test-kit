@@ -24,17 +24,7 @@ module DaVinciCRDTestKit
       return ["#{request_error_prefix} No prefetch data provided."] unless hook_request.key?('prefetch')
 
       hook_prefetch_templates.each do |prefetch_key, prefetch_request|
-        @current_prefetch_key = prefetch_key
-        original_prefetch_request = prefetch_request.dup
-        instantiated_request = replace_tokens_in_string(prefetch_request, hook_request)
-        if demonstrates_collection_as_comma_delimited_string?(original_prefetch_request, instantiated_request)
-          @observed_fhirpath_collection_as_comma_delimited_string = true
-        end
-        unless hook_request['prefetch'].key?(prefetch_key)
-          errors << "#{error_prefix} No prefetch data provided."
-          next
-        end
-        check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
+        check_prefetch_template(prefetch_key, prefetch_request)
       end
 
       hook_request['prefetch'].each_key do |prefetch_template|
@@ -77,6 +67,22 @@ module DaVinciCRDTestKit
     # -----------------------------------------------------------------------
     # Check of actual prefetch against an instantiated request
     # -----------------------------------------------------------------------
+    def check_prefetch_template(prefetch_key, prefetch_request)
+      @current_prefetch_key = prefetch_key
+      instantiated_request = replace_tokens_in_string(prefetch_request.dup, hook_request)
+      if demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
+        @observed_fhirpath_collection_as_comma_delimited_string = true
+      end
+      unless hook_request['prefetch'].key?(prefetch_key)
+        errors << "#{error_prefix} No prefetch data provided."
+        return
+      end
+      check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
+    rescue FhirpathServiceError => e
+      raise "#{error_prefix} FHIRPath service error while evaluating prefetch template. " \
+            "This indicates an implementation problem in Inferno. Details: #{e.message}"
+    end
+
     def check_provided_against_request(prefetched_value, instantiated_request)
       if instantiated_request.include?('?')
         if id_search?(instantiated_request)

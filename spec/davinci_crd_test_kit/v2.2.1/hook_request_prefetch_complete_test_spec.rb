@@ -103,7 +103,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
 
     it 'sets the output to true when any one of multiple requests demonstrates collection behavior' do
       allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
-        .to receive(:hook_prefetch_templates) { { 'patient' => 'Patient?_id={{context.patientId|context.secondPatientId}}' } }
+        .to receive(:hook_prefetch_templates)
+        .and_return({ 'patient' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
 
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
       store_hook_request('order-sign', body: order_sign_request)

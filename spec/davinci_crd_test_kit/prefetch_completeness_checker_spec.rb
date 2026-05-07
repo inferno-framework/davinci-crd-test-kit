@@ -62,6 +62,17 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       errors = errors_for(order_sign_request, { 'patient' => 'Patient/{{context.patientId}}' })
       expect(errors).to eq(["(Request 1) Extra prefetch data provided in unrequested template 'extra'."])
     end
+
+    it 'raises an error with template context when the FHIRPath service fails during token substitution' do
+      templates = { 'orders' => 'ServiceRequest?_id={{context.draftOrders.entry.resource.id}}' }
+      order_sign_request['prefetch'] = { 'orders' => { 'resourceType' => 'Bundle', 'entry' => [] } }
+      stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
+        .to_return(status: 422, body: 'Invalid FHIRPath expression')
+
+      checker = make_checker(order_sign_request, templates)
+      expect { checker.check_prefetched_data }
+        .to raise_error(RuntimeError, /Prefetch Template orders.*FHIRPath service error/)
+    end
   end
 
   describe 'read template' do
