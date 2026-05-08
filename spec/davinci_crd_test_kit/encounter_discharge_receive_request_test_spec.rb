@@ -9,8 +9,7 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterDischargeReceiveRequestTest, :r
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
   let(:resume_pass_url) do
-    "#{Inferno::Application['base_url']}/custom/crd_client/resume_pass" \
-      "?token=encounter-discharge%20#{example_client_url}"
+    "#{base_url}/resume_pass?token=#{example_client_url}"
   end
   let(:encounter_discharge_url) { "#{base_url}/cds-services/encounter-discharge-service" }
   let(:client_fhir_server) { 'https://example/r4' }

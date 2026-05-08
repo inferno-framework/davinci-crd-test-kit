@@ -42,8 +42,6 @@ module DaVinciCRDTestKit
           auth_tokens: { name: :encounter_discharge_auth_tokens },
           auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json },
           client_access_token: { name: :encounter_discharge_client_access_token },
-          override_access_token: { name: :encounter_discharge_override_access_token,
-                                   title: 'encounter-discharge Prefetch Validation Override Bearer Token' },
           client_fhir_server: { name: :encounter_discharge_client_fhir_server },
           crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json },
           custom_response_template: { name: :encounter_discharge_custom_response_template },
@@ -56,12 +54,10 @@ module DaVinciCRDTestKit
           auth_tokens_jwk_json: { name: :encounter_discharge_auth_tokens_jwk_json },
           client_access_token: { name: :encounter_discharge_client_access_token },
           client_fhir_server: { name: :encounter_discharge_client_fhir_server },
-          crd_jwks_json: { name: :encounter_discharge_crd_jwks_json },
           crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'encounter-discharge',
-          hook_path: ENCOUNTER_DISCHARGE_PATH
+          hook_name: 'encounter-discharge'
         }
       )
 

@@ -1,5 +1,5 @@
-require_relative 'auth/client_registration_verification_test'
-require_relative 'auth/client_service_registration_attestation_test'
+require_relative 'registration/client_registration_verification_test'
+require_relative 'registration/client_service_registration_attestation_test'
 
 module DaVinciCRDTestKit
   module V221

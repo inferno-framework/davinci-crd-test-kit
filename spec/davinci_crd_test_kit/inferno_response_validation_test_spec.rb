@@ -56,7 +56,7 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
                    })
       end
 
-      def hook_name
+      def requested_hook
         DaVinciCRDTestKit::ORDER_SIGN_TAG
       end
     end
@@ -92,8 +92,13 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
 
   describe 'when requests made' do
     it 'skips if only error responses are returned' do
-      store_request('Invalid template provided for custom Inferno CRD response: invalid JSON',
-                    [DaVinciCRDTestKit::ORDER_SIGN_TAG], status: 500)
+      store_request(
+        { resourceType: 'OperationOutcome',
+          issue: [{ severity: 'error', code: 'processing',
+                    details: { text: 'Invalid template provided for custom Inferno CRD response: invalid JSON' } }] }
+          .to_json,
+        [DaVinciCRDTestKit::ORDER_SIGN_TAG], status: 500
+      )
       result = run(order_sign_test)
 
       expect(result.result).to eq('skip')

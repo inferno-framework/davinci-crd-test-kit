@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       @selected_response_types ||=
         JSON.parse(result.input_json)
           .find { |input| input['name'].include?('selected_response_types') }
-          &.dig('value')
+          &.dig('value') || []
     end
 
     def current_time
@@ -67,7 +67,7 @@ module DaVinciCRDTestKit
     end
 
     def coverage_information_required?
-      coverage_information_required_hooks.include? hook_name
+      coverage_information_required_hooks.include? requested_hook
     end
 
     def get_missing_response_types(hook_card_response)
@@ -99,7 +99,7 @@ module DaVinciCRDTestKit
         Inferno::Repositories::Messages.new.create(
           result_id: result.id,
           type: 'warning',
-          message: %(Unable to return response type `#{missing_response_type}` for #{hook_name} hook)
+          message: %(Unable to return response type `#{missing_response_type}` for #{requested_hook} hook)
         )
       end
     end
@@ -120,7 +120,7 @@ module DaVinciCRDTestKit
     def update_specific_hook_card_info(card_response)
       return if card_response.nil?
 
-      hook_display = hook_name.split('-').map(&:capitalize).join(' ')
+      hook_display = requested_hook.split('-').map(&:capitalize).join(' ')
       card_response['cards']&.tap(&:compact!)&.each do |card|
         card['summary'].prepend("#{hook_display} ")
         card['uuid'] = SecureRandom.uuid
@@ -137,14 +137,14 @@ module DaVinciCRDTestKit
         'order-dispatch' => 'order',
         'order-select' => 'draftOrders',
         'order-sign' => 'draftOrders'
-      }[hook_name]
+      }[requested_hook]
     end
 
     def resource_type_to_update
       {
         'encounter-start' => 'Encounter',
         'encounter-discharge' => 'Encounter'
-      }[hook_name]
+      }[requested_hook]
     end
 
     def make_resource_request(uri, access_token)
@@ -251,7 +251,7 @@ module DaVinciCRDTestKit
 
     def create_coverage_extension_system_actions(coverage_id)
       fhir_resource =
-        if hook_name == 'order-dispatch' && ig_version == 'v221'
+        if requested_hook == 'order-dispatch' && ig_version == 'v221'
           find_prefetched_order_dispatch_orders
         else
           identify_resources_for_system_actions
@@ -276,9 +276,9 @@ module DaVinciCRDTestKit
     end
 
     def prefetch_key_for_system_actions
-      if hook_name.starts_with?('encounter')
+      if requested_hook.starts_with?('encounter')
         'encounter'
-      elsif hook_name == 'order-dispatch'
+      elsif requested_hook == 'order-dispatch'
         'order'
       end
     end
@@ -476,7 +476,7 @@ module DaVinciCRDTestKit
     end
 
     def identify_alternate_order_resource
-      if hook_name == 'order-dispatch'
+      if requested_hook == 'order-dispatch'
         if ig_version == 'v221'
           find_prefetched_order_dispatch_orders&.entry&.first&.resource
         elsif context['order'].present?

@@ -22,17 +22,30 @@ module DaVinciCRDTestKit
       run do
         auth_token_headers = JSON.parse(auth_token_headers_json)
         crd_jwks_keys = JSON.parse(crd_jwks_keys_json)
-        skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous tests.'
-        skip_if crd_jwks_keys.empty?, 'No JWKS keys produced from the previous test.'
+        skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous tests.'
+        skip_if crd_jwks_keys.compact.empty?, 'No JWKS keys produced from the previous test.'
 
         auth_tokens_jwk_json = []
         auth_token_headers.each_with_index do |token_header, index|
+          unless token_header.present?
+            auth_tokens_jwk_json << nil
+            next
+          end
+
           header = JSON.parse(token_header) # NOTE: pre-verified json
           algorithm = header['alg']
 
-          add_request_message('error', 'Token header must have the `alg` field', index) if algorithm.blank?
+          if algorithm.blank?
+            add_request_message('error', 'Token header must have the `alg` field', index)
+            auth_tokens_jwk_json << nil
+            next
+          end
 
-          add_request_message('error', 'Token header `alg` field cannot be set to none', index) if algorithm == 'none'
+          if algorithm == 'none'
+            add_request_message('error', 'Token header `alg` field cannot be set to none', index)
+            auth_tokens_jwk_json << nil
+            next
+          end
 
           if header['typ'].blank?
             add_request_message('error', 'Token header must have the `typ` field', index)
@@ -44,15 +57,23 @@ module DaVinciCRDTestKit
 
           if header['kid'].blank?
             add_request_message('error', 'Token header must have the `kid` field', index)
+            auth_tokens_jwk_json << nil
             next
           end
 
           kid = header['kid']
+          if crd_jwks_keys[index].nil?
+            add_request_message('error', 'No JWKS keys available for this request', index)
+            auth_tokens_jwk_json << nil
+            next
+          end
+
           keys = JSON.parse(crd_jwks_keys[index]) # NOTE: pre-verified json
 
           jwk = keys.find { |key| key['kid'] == kid }
           if jwk.blank?
             add_request_message('error', "JWKS did not contain a public key with an id of `#{kid}`", index)
+            auth_tokens_jwk_json << nil
             next
           end
 

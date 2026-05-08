@@ -41,8 +41,6 @@ module DaVinciCRDTestKit
           auth_tokens: { name: :order_dispatch_auth_tokens },
           auth_tokens_jwk_json: { name: :order_dispatch_auth_tokens_jwk_json },
           client_access_token: { name: :order_dispatch_client_access_token },
-          override_access_token: { name: :order_dispatch_override_access_token,
-                                   title: 'order-dispatch Prefetch Validation Override Bearer Token' },
           client_fhir_server: { name: :order_dispatch_client_fhir_server },
           crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json },
           custom_response_template: { name: :order_dispatch_custom_response_template },
@@ -55,12 +53,10 @@ module DaVinciCRDTestKit
           auth_tokens_jwk_json: { name: :order_dispatch_auth_tokens_jwk_json },
           client_access_token: { name: :order_dispatch_client_access_token },
           client_fhir_server: { name: :order_dispatch_client_fhir_server },
-          crd_jwks_json: { name: :order_dispatch_crd_jwks_json },
           crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-dispatch',
-          hook_path: ORDER_DISPATCH_PATH
+          hook_name: 'order-dispatch'
         }
       )
 

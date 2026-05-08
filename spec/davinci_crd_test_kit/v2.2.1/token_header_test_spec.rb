@@ -37,6 +37,19 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenHeaderTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'fails gracefully when crd_jwks_keys_json has a nil entry for a non-nil header' do
+    result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json].to_json,
+                       crd_jwks_keys_json: [nil, jwks_hash_keys.to_json].to_json)
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(/\(Request 1\) No JWKS keys available for this request/)
+  end
+
+  it 'passes and skips nil entries in auth_token_headers_json' do
+    result = run(test, auth_token_headers_json: [nil, token_header.to_json].to_json,
+                       crd_jwks_keys_json: [nil, jwks_hash_keys.to_json].to_json)
+    expect(result.result).to eq('pass')
+  end
+
   it 'fails if it receives at least 1 request with invalid JWT Authorization headers' do
     invalid_token_header = token_header.except(:alg)
     result = run(test, auth_token_headers_json: [token_header.to_json, invalid_token_header.to_json],
@@ -52,6 +65,15 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenHeaderTest do
                        crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/Token header must have the `alg` field/)
+  end
+
+  it 'fails if it receives a JWT header with `alg` set to none' do
+    token_header[:alg] = 'none'
+
+    result = run(test, auth_token_headers_json: [token_header.to_json],
+                       crd_jwks_keys_json: [jwks_hash_keys.to_json])
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(/Token header `alg` field cannot be set to none/)
   end
 
   it 'fails if it receives a JWT header without the `typ` field' do

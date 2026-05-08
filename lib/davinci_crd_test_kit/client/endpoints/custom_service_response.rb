@@ -19,7 +19,9 @@ module DaVinciCRDTestKit
     def parsed_user_input
       JSON.parse(custom_response_template)
     rescue JSON::ParserError
-      error_response('Invalid template provided for custom Inferno CRD response: invalid JSON', code: 500)
+      error_response('Invalid template provided for custom Inferno CRD response: invalid JSON',
+                     code: 500,
+                     outcome_code: 'processing')
       nil
     end
 
@@ -40,7 +42,8 @@ module DaVinciCRDTestKit
         'FHIRPath service error while generating custom response. ' \
         'Check the FHIRPath expressions and data in your response template and hook request. ' \
         "Details: #{e.message}",
-        code: 500
+        code: 500,
+        outcome_code: 'processing'
       )
       nil
     end

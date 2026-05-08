@@ -42,8 +42,6 @@ module DaVinciCRDTestKit
           auth_tokens: { name: :encounter_start_auth_tokens },
           auth_tokens_jwk_json: { name: :encounter_start_auth_tokens_jwk_json },
           client_access_token: { name: :encounter_start_client_access_token },
-          override_access_token: { name: :encounter_start_override_access_token,
-                                   title: 'encounter-start Prefetch Validation Override Bearer Token' },
           client_fhir_server: { name: :encounter_start_client_fhir_server },
           crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json },
           custom_response_template: { name: :encounter_start_custom_response_template },
@@ -56,12 +54,10 @@ module DaVinciCRDTestKit
           auth_tokens_jwk_json: { name: :encounter_start_auth_tokens_jwk_json },
           client_access_token: { name: :encounter_start_client_access_token },
           client_fhir_server: { name: :encounter_start_client_fhir_server },
-          crd_jwks_json: { name: :encounter_start_crd_jwks_json },
           crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'encounter-start',
-          hook_path: ENCOUNTER_START_PATH
+          hook_name: 'encounter-start'
         }
       )
 

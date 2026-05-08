@@ -6,6 +6,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_v221_token_payload') }
+  let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
@@ -37,6 +38,19 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     }
   end
 
+  def create_appointment_hook_request
+    repo_create(
+      :request,
+      name: 'appointment_book',
+      direction: 'incoming',
+      url: appointment_book_url,
+      test_session_id: test_session.id,
+      result:,
+      status: 200,
+      tags: ['appointment-book']
+    )
+  end
+
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -48,13 +62,13 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V221::TokenPayloadTest) do
         config(
-          options: { hook_path: '/cds-services/appointment-book-service' }
+          options: { hook_name: 'appointment-book' }
         )
       end
     end
 
     it 'passes if it receives a valid JWT payload' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: appointment_book_url,
@@ -68,7 +82,8 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     end
 
     it 'passes if it receives multiple valid JWT payloads' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: appointment_book_url,
@@ -82,8 +97,25 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       expect(result.result).to eq('pass')
     end
 
+    it 'passes and skips nil entries in auth_tokens_jwk_json' do
+      create_appointment_hook_request
+      create_appointment_hook_request
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      result = run(test, auth_tokens: [nil, token].to_json, auth_tokens_jwk_json: [nil, jwk.to_json].to_json,
+                         cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('pass')
+    end
+
     it 'fails if it receives at least 1 invalid JWT payload' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: appointment_book_url,
@@ -106,7 +138,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     end
 
     it 'fails if it receives a JWT payload with an invalid `iss` field' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: appointment_book_url,
@@ -121,7 +153,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     end
 
     it 'fails if it receives a JWT payload with an invalid `aud` field' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: 'incorrect_aud.com',
@@ -133,12 +165,12 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(
-        'Token validation error: Invalid audience. Expected http://localhost:4567/custom/crd_client_v221/cds-services/appointment-book-service'
+        /Token validation error: Invalid audience. Expected #{Regexp.escape(appointment_book_url)}/
       )
     end
 
     it 'fails if it receives a JWT Authorization header with invalid signature' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
 
       token = jwt_helper.build(
         aud: appointment_book_url,
@@ -157,7 +189,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     end
 
     it 'fails if it receives a JWT Authorization header with missing claims' do
-      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request
 
       rsa_jwk_hash['alg'] = 'RS384'
       invalid_payload = token_payload.except(:exp).except(:exp)

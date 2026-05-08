@@ -29,47 +29,52 @@ module DaVinciCRDTestKit
           ),
             locked: true,
             optional: true
-      output :crd_jwks_json, :crd_jwks_keys_json
+      output :crd_jwks_keys_json
 
       run do
         auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
-        skip_if auth_token_headers.empty?, 'No Authorization tokens produced from the previous test.'
+        skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
+        skip_if cds_jwk_set.blank? && cds_jwk_set_inpput_needed?(auth_token_headers),
+                "JWK Set must be inputted if Client's JWK Set is not available"
 
-        crd_jwks_json = []
         crd_jwks_keys_json = []
         auth_token_headers.each_with_index do |token_header, index|
+          unless token_header.present?
+            crd_jwks_keys_json << nil
+            next
+          end
+
           jku = JSON.parse(token_header)['jku'] # NOTE: pre-verified json
-          if jku.present?
-            get(jku)
+          jwks =
+            if jku.present?
+              get(jku)
 
-            if response[:status] != 200
-              add_request_message('error',
-                                  "Unexpected response status: expected 200, but received #{response[:status]}",
-                                  index)
-              next
+              if response[:status] == 200
+                parse_json_request_entity(response[:body], 'Fetched jku url response', index)
+              else
+                add_request_message('error',
+                                    "Unexpected response status: expected 200, but received #{response[:status]}",
+                                    index)
+                nil
+              end
+            else
+              parse_json_request_entity(cds_jwk_set, 'JWK Set input', index)
             end
-
-            jwks = parse_json_request_entity(response[:body], 'Fetched jku url response', index)
-            next if jwks.blank?
-
-            crd_jwks_json << response[:body]
-          else
-            skip_if cds_jwk_set.blank?,
-                    "JWK Set must be inputted if Client's JWK Set is not available via a URL " \
-                    'identified by the jku header field'
-
-            jwks = parse_json_request_entity(cds_jwk_set, 'JWK Set input', index)
-            next if jwks.blank?
+          if jwks.blank?
+            crd_jwks_keys_json << nil
+            next
           end
 
           keys = jwks['keys']
           unless keys.is_a?(Array)
             add_request_message('error', 'JWKS `keys` field must be an array', index)
+            crd_jwks_keys_json << nil
             next
           end
 
           if keys.blank?
             add_request_message('error', 'The JWK set returned contains no public keys', index)
+            crd_jwks_keys_json << nil
             next
           end
 
@@ -84,22 +89,29 @@ module DaVinciCRDTestKit
             add_request_message('error',
                                 '`kid` field must be present in each key if JWKS contains multiple keys',
                                 index)
+            crd_jwks_keys_json << nil
             next
           end
 
           kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
           if kid_uniqueness.blank?
             add_request_message('error', "`kid` must be unique within the client's JWK Set.", index)
+            crd_jwks_keys_json << nil
             next
           end
 
           crd_jwks_keys_json << keys.to_json
         end
 
-        output crd_jwks_json: crd_jwks_json.to_json,
-               crd_jwks_keys_json: crd_jwks_keys_json.to_json
+        output crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
         assert_no_error_messages("#{requests_with_errors_prefix}Retrieving JWKS failed. See Messages for details.")
+      end
+
+      def cds_jwk_set_inpput_needed?(auth_token_headers)
+        auth_token_headers.any? do |token_header|
+          token_header.present? && JSON.parse(token_header)['jku'].blank?
+        end
       end
     end
   end
