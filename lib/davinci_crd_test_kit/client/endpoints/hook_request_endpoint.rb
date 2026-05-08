@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
     end
 
     def test_run_identifier
-      "#{hook_name} #{iss}"
+      iss
     end
 
     def hook_name
@@ -60,31 +60,65 @@ module DaVinciCRDTestKit
       @token ||= request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
+    def expected_hook_name
+      request.env['PATH_INFO'].match(%r{cds-services/([^/]+)-service})&.[](1)
+    end
+
+    def wrong_hook?
+      expected = expected_hook_name
+      expected.present? && hook_name != expected
+    end
+
+    def wrong_hook_response
+      {
+        resourceType: 'OperationOutcome',
+        issue: [
+          {
+            severity: 'error',
+            code: 'not-supported',
+            details: {
+              text: "Hook '#{hook_name}' is not being tested in the current session. " \
+                    "This session is currently testing the '#{expected_hook_name}' hook."
+            }
+          }
+        ]
+      }
+    end
+
     def make_response
-      if hook_instance_already_used?
+      if wrong_hook?
+        response.body = wrong_hook_response.to_json
+        response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
+        response.status = 422
+        response.format = :json
+      elsif hook_instance_already_used?
         error_response(
           "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
         )
       elsif AVAILABLE_HOOKS.include?(hook_name)
-        if ig_version == 'v201'
-          send(:"gather_#{hook_name.gsub('-', '_')}_data")
-          request_coverage
-        elsif ig_version == 'v221'
-          request_additional_fhir_data
-        end
-        response_body = apply_hook_configuration(hook_response)
-        if response_body.present?
-          response.body = response_body.to_json
-          response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-          response.status = 200
-          response.format = :json
-        end
+        process_valid_hook
       else
         error_response("Invalid Request: hook `#{hook_name}` is not supported by this server.")
       end
     rescue StandardError => e
       error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
       nil
+    end
+
+    def process_valid_hook
+      if ig_version == 'v201'
+        send(:"gather_#{hook_name.gsub('-', '_')}_data")
+        request_coverage
+      elsif ig_version == 'v221'
+        request_additional_fhir_data
+      end
+      response_body = apply_hook_configuration(hook_response)
+      return unless response_body.present?
+
+      response.body = response_body.to_json
+      response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
+      response.status = 200
+      response.format = :json
     end
 
     def hook_response
@@ -121,7 +155,9 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      if hook_instance_already_used?
+      if wrong_hook?
+        []
+      elsif hook_instance_already_used?
         response.status = 400
         response.body =
           "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."

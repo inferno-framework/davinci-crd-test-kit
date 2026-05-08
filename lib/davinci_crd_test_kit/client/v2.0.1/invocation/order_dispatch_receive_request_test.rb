@@ -89,8 +89,8 @@ module DaVinciCRDTestKit
       output :continuation_url
 
       run do
-        identifier = "order-dispatch #{cds_jwt_iss}"
-        continuation_url = "#{resume_pass_url}?token=#{identifier.gsub(' ', '%20')}"
+        identifier = cds_jwt_iss
+        continuation_url = "#{resume_pass_url}?token=#{identifier}"
         output(continuation_url:)
 
         wait(

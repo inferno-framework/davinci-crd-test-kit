@@ -9,7 +9,7 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
   let(:resume_pass_url) do
-    "#{Inferno::Application['base_url']}/custom/crd_client/resume_pass?token=appointment-book%20#{example_client_url}"
+    "#{base_url}/resume_pass?token=#{example_client_url}"
   end
   let(:appointment_book_url) { "#{base_url}/cds-services/appointment-book-service" }
   let(:client_fhir_server) { 'https://example/r4' }

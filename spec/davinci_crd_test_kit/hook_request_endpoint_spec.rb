@@ -109,7 +109,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         .to match(/Hook instance `#{order_sign_hook_request['hookInstance']}` has already been used in this session./)
     end
 
-    it 'returns 500 when the hook is not supported since cannot find session' do
+    it 'returns 422 with OperationOutcome when request hook does not match the expected hook' do
       allow(test).to receive(:suite).and_return(suite)
       token = jwt_helper.build(
         aud: order_sign_url,
@@ -125,9 +125,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, order_sign_hook_request)
 
-      expect(last_response).to be_server_error
-      expect(last_response.body)
-        .to match(/Unable to find test run with identifier 'not_a_hook #{example_client_url}'./)
+      expect(last_response.status).to eq(422)
+      parsed_body = JSON.parse(last_response.body)
+      expect(parsed_body['resourceType']).to eq('OperationOutcome')
+      expect(parsed_body['issue'].first['details']['text']).to match(/not_a_hook.*order-sign/)
     end
   end
 
