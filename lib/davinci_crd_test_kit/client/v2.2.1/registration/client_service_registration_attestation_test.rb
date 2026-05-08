@@ -16,8 +16,7 @@ module DaVinciCRDTestKit
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
           hook request field).
       )
-
-      # verifies_requirements 'cds-hooks_2.0@174'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
       input :inferno_payer_organization_id,
             title: 'Inferno Payer Organization id',

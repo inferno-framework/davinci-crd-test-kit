@@ -18,6 +18,8 @@ module DaVinciCRDTestKit
         tests, the `hookInstance` field was never reused.
       DESCRIPTION
 
+      verifies_requirements 'cds-hooks_3.0.0-ballot@25'
+
       config(
         options: {
           crd_test_group: DUPLICATED_HOOK_INSTANCE_TAG

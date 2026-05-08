@@ -15,7 +15,8 @@ module DaVinciCRDTestKit
         submit the jwk_set as an input to the test.
       )
 
-      # verifies_requirements 'cds-hooks_2.0@183', 'cds-hooks_2.0@185', 'cds-hooks_2.0@197', 'cds-hooks_2.0@199'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
+                            'cds-hooks_3.0.0-ballot@199'
 
       input :auth_token_headers_json
       input :cds_jwk_set,

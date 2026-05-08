@@ -51,24 +51,28 @@ module DaVinciCRDTestKit
         }
       ]
 
-      # requirement_sets(
-      #   {
-      #     identifier: 'hl7.fhir.us.davinci-crd_2.0.1',
-      #     title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.0.1',
-      #     actor: 'Client'
-      #   },
-      #   {
-      #     identifier: 'cds-hooks_2.0',
-      #     title: 'CDS Hooks',
-      #     actor: 'Client'
-      #   },
-      #   {
-      #     identifier: 'cds-hooks-library_1.0.1',
-      #     title: 'CDS Hooks Library',
-      #     actor: 'Client',
-      #     requirements: 'referenced'
-      #   }
-      # )
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.us.davinci-crd_2.2.1',
+          title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.2.1',
+          actor: 'Client'
+        },
+        {
+          identifier: 'cds-hooks_3.0.0-ballot',
+          title: 'CDS Hooks 3.0.0-ballot',
+          actor: 'Client'
+        },
+        {
+          identifier: 'cds-hooks-library_1.0.1',
+          title: 'CDS Hooks Library',
+          actor: 'Client',
+          requirements: 'referenced'
+        }
+      )
+
+      verifies_requirements 'cds-hooks_3.0.0-ballot@1', # use of json for everything verified across the whole suite
+                            'cds-hooks_3.0.0-ballot@15', # use of POST verified by suite endpoint setup
+                            'cds-hooks_3.0.0-ballot@208' # use of CORS endpoints defined in the suite
 
       fhir_resource_validator do
         igs('hl7.fhir.us.davinci-crd#2.2.1')
@@ -104,8 +108,6 @@ module DaVinciCRDTestKit
       end
 
       route :get, '/cds-services', CDSServicesDiscoveryHandler
-      # TODO
-      # route :post, '/cds-services/:cds-service_id', cds_service_handler
 
       allow_cors APPOINTMENT_BOOK_PATH, ENCOUNTER_START_PATH, ENCOUNTER_DISCHARGE_PATH, ORDER_DISPATCH_PATH,
                  ORDER_SELECT_PATH, ORDER_SIGN_PATH, '/cds-services'

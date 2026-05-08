@@ -25,6 +25,9 @@ module DaVinciCRDTestKit
         which are used by Inferno. Thus, this test checks that exactly the requested
         data is present based on the request context.
       )
+      verifies_requirements 'cds-hooks_3.0.0-ballot@30', 'cds-hooks_3.0.0-ballot@231', 'cds-hooks_3.0.0-ballot@45',
+                            'cds-hooks_3.0.0-ballot@46', 'cds-hooks_3.0.0-ballot@47', 'cds-hooks_3.0.0-ballot@232',
+                            'cds-hooks_3.0.0-ballot@53', 'cds-hooks_3.0.0-ballot@240'
       # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
 
       # output emitted only if the behavior is detected
