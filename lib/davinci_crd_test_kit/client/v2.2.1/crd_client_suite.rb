@@ -55,7 +55,7 @@ module DaVinciCRDTestKit
         {
           identifier: 'hl7.fhir.us.davinci-crd_2.2.1',
           title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.2.1',
-          actor: 'Client'
+          actor: 'CRD Client'
         },
         {
           identifier: 'cds-hooks_3.0.0-ballot',
@@ -67,13 +67,37 @@ module DaVinciCRDTestKit
           title: 'CDS Hooks Library',
           actor: 'Client',
           requirements: 'referenced'
+        },
+        {
+          identifier: 'hl7.fhir.us.core_3.1.1',
+          title: 'US Core Implementation Guide v3.1.1',
+          actor: 'Server',
+          suite_options: {
+            us_core_version: CRDClientOptions::US_CORE_3
+          }
+        },
+        {
+          identifier: 'hl7.fhir.us.core_6.1.0',
+          title: 'US Core Implementation Guide v6.1.0',
+          actor: 'Server',
+          suite_options: {
+            us_core_version: CRDClientOptions::US_CORE_6
+          }
+        },
+        {
+          identifier: 'hl7.fhir.us.core_7.0.0',
+          title: 'US Core Implementation Guide v7.0.0',
+          actor: 'Server',
+          suite_options: {
+            us_core_version: CRDClientOptions::US_CORE_7
+          }
         }
       )
 
-      # verifies_requirements 'cds-hooks_3.0.0-ballot@1', # use of json for everything verified across the whole suite
-      #                       'cds-hooks_3.0.0-ballot@15', # use of POST verified by suite endpoint setup
-      #                       'cds-hooks_3.0.0-ballot@208', # use of CORS endpoints defined in the suite
-      #                       'hl7.fhir.us.davinci-crd_2.2.1@impl-3' # suite verifies system interactions
+      verifies_requirements 'cds-hooks_3.0.0-ballot@1', # use of json for everything verified across the whole suite
+                            'cds-hooks_3.0.0-ballot@15', # use of POST verified by suite endpoint setup
+                            'cds-hooks_3.0.0-ballot@208', # use of CORS endpoints defined in the suite
+                            'hl7.fhir.us.davinci-crd_2.2.1@impl-3' # suite verifies system interactions
 
       fhir_resource_validator do
         igs('hl7.fhir.us.davinci-crd#2.2.1')
