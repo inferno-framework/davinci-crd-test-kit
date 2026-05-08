@@ -39,8 +39,8 @@ module DaVinciCRDTestKit
 
         data_returned = hook_requests.any? do |request|
           request_body = JSON.parse(request.request_body)
-          hook_tag = "#{HOOK_INSTANCE_TAG_PREFIX}#{request_body['hookInstance']}"
-          additional_data_requests = load_tagged_requests(hook_tag, DATA_FETCH_TAG)
+          additional_data_requests =
+            load_tagged_requests(TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance']), DATA_FETCH_TAG)
 
           additional_data_requests.any? { |data_request| fhir_data_returned?(data_request) }
         rescue JSON::ParserError

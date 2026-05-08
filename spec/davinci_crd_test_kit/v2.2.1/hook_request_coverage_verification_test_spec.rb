@@ -1,3 +1,5 @@
+require_relative '../../../lib/davinci_crd_test_kit/cross_suite/tags'
+
 RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }
@@ -62,7 +64,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       response_body: response_body.is_a?(Hash) ? response_body.to_json : response_body,
       status:,
       headers: [],
-      tags: [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG, "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{instance}",
+      tags: [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG,
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance),
              DaVinciCRDTestKit::DATA_FETCH_TAG]
     )
   end

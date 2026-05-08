@@ -41,7 +41,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestFetchedDataTest do
       request_body: body.is_a?(Hash) ? body.to_json : body,
       status:,
       headers:,
-      tags: ['appointment-book', hook_instance_tag(hook_instance), workflow_tag].compact
+      tags: ['appointment-book', DaVinciCRDTestKit::TagMethods.hook_instance_tag(hook_instance), workflow_tag].compact
     )
   end
 
@@ -63,12 +63,9 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestFetchedDataTest do
       request_body: body.is_a?(Hash) ? body.to_json : body,
       status:,
       headers:,
-      tags: [DaVinciCRDTestKit::DATA_FETCH_TAG, hook_instance_tag(hook_instance)]
+      tags: [DaVinciCRDTestKit::DATA_FETCH_TAG,
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance)]
     )
-  end
-
-  def hook_instance_tag(hook_instance)
-    "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
   end
 
   def entity_result_message(test, index: 0)

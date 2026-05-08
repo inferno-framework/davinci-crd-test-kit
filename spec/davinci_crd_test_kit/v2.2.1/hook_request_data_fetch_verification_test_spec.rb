@@ -1,3 +1,5 @@
+require_relative '../../../lib/davinci_crd_test_kit/cross_suite/tags'
+
 RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:hook_name) { 'order-sign' }
@@ -42,7 +44,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
       response_body: response_body.is_a?(Hash) ? response_body.to_json : response_body,
       status:,
       headers: [],
-      tags: ["#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{instance}", DaVinciCRDTestKit::DATA_FETCH_TAG]
+      tags: [DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
     )
   end
 

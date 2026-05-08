@@ -46,8 +46,8 @@ module DaVinciCRDTestKit
       ]
     }.freeze
 
-    def hook_instance_tag
-      @hook_instance_tag ||= "#{HOOK_INSTANCE_TAG_PREFIX}#{request_body['hookInstance']}"
+    def hook_instance_data_fetch_tag
+      @hook_instance_data_fetch_tag ||= TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
     end
 
     def gather_appointment_book_data
@@ -183,7 +183,7 @@ module DaVinciCRDTestKit
       response = execute_request(reference)
       return nil unless response.present?
 
-      tags = [DATA_FETCH_TAG, hook_instance_tag]
+      tags = [DATA_FETCH_TAG, hook_instance_data_fetch_tag]
       tags << additional_tag if additional_tag.present?
       persist_query_request(response, tags)
       return nil unless response.status.to_s.starts_with?('2')
@@ -296,7 +296,7 @@ module DaVinciCRDTestKit
       response = execute_request(query)
       return nil unless response.present?
 
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_tag])
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_data_fetch_tag])
       return nil unless response.status.to_s.starts_with?('2')
 
       FHIR.from_contents(response.body)
