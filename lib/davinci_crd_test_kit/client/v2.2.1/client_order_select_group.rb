@@ -79,7 +79,8 @@ module DaVinciCRDTestKit
       group do
         title 'Verify Requests'
         test from: :crd_v221_hook_request_conformance do
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-35'
+          verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
+                                'hl7.fhir.us.davinci-crd_2.2.1@hook-35')
         end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
@@ -88,29 +89,6 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_data_fetch_verification
         test from: :crd_v221_hook_request_granted_scopes
         test from: :crd_v221_hook_request_secured_transport
-
-        # TODO: migrate requirements
-        # test from: :crd_v221_hook_request_required_fields
-        # test from: :crd_v221_hook_request_optional_fields
-        # test from: :crd_v221_hook_request_valid_context do
-        #   # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@150',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@212', 'hl7.fhir.us.davinci-crd_2.0.1@213',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@214', 'hl7.fhir.us.davinci-crd_2.0.1@215',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
-        #   #                      'cds-hooks-library_1.0.1@74', 'cds-hooks-library_1.0.1@75',
-        #   #                      'cds-hooks-library_1.0.1@76', 'cds-hooks-library_1.0.1@78',
-        #   #                      'cds-hooks-library_1.0.1@79', 'cds-hooks-library_1.0.1@80',
-        #   #                      'cds-hooks-library_1.0.1@82', 'cds-hooks-library_1.0.1@83',
-        #   #                      'cds-hooks-library_1.0.1@84', 'cds-hooks-library_1.0.1@86',
-        #   #                      'cds-hooks-library_1.0.1@87', 'cds-hooks-library_1.0.1@88',
-        #   #                       'cds-hooks-library_1.0.1@90', 'cds-hooks-library_1.0.1@91',
-        #   #                       'cds-hooks-library_1.0.1@92'
-        # end
       end
 
       group do

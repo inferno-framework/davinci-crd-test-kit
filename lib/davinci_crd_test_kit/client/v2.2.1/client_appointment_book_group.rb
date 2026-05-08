@@ -77,7 +77,8 @@ module DaVinciCRDTestKit
       group do
         title 'Verify Requests'
         test from: :crd_v221_hook_request_conformance do
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-24'
+          verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
+                                'hl7.fhir.us.davinci-crd_2.2.1@hook-24')
         end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
@@ -86,24 +87,6 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_data_fetch_verification
         test from: :crd_v221_hook_request_granted_scopes
         test from: :crd_v221_hook_request_secured_transport
-
-        # TODO: migrate requirements
-        # test from: :crd_v221_hook_request_required_fields
-        # test from: :crd_v221_hook_request_optional_fields
-        # test from: :crd_v221_hook_request_valid_context do
-        #   # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@177', 'hl7.fhir.us.davinci-crd_2.0.1@178',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@179', 'hl7.fhir.us.davinci-crd_2.0.1@180',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@286',
-        #   #                      'cds-hooks-library_1.0.1@17', 'cds-hooks-library_1.0.1@18',
-        #                           'cds-hooks-library_1.0.1@19',
-        #   #                      'cds-hooks-library_1.0.1@21', 'cds-hooks-library_1.0.1@22',
-        #                           'cds-hooks-library_1.0.1@23',
-        #   #                      'cds-hooks-library_1.0.1@25', 'cds-hooks-library_1.0.1@26',
-        #                           'cds-hooks-library_1.0.1@27',
-        #   #                       'cds-hooks-library_1.0.1@29', 'cds-hooks-library_1.0.1@30',
-        #                           'cds-hooks-library_1.0.1@31'
-        # end
       end
 
       group do
