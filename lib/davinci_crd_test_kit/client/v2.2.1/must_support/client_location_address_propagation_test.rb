@@ -21,6 +21,8 @@ module DaVinciCRDTestKit
         in addition to propagation.
       DESCRIPTION
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@prof-13'
+
       run do
         skip_if loaded_requests.blank?, 'No hook requests received.'
         pass_if prefetched_location_hash.blank?, 'No Location resources in use, so verification not needed.'

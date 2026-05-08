@@ -20,6 +20,8 @@ module DaVinciCRDTestKit
         "demonstrates_fhirpath_collection_as_comma_delimited_string" as true.
       DESCRIPTION
 
+      verifies_requirements 'cds-hooks_3.0.0-ballot@239', 'cds-hooks_3.0.0-ballot@242'
+
       run do
         completeness_tests = find_completeness_tests
         pass_if completeness_tests_demonstrate_collection_token_substitution?(completeness_tests)

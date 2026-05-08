@@ -31,8 +31,9 @@ module DaVinciCRDTestKit
 
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
-
       run_as_group
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-A'
 
       input_order :cds_jwt_iss, :cds_jwk_set
 
@@ -76,7 +77,10 @@ module DaVinciCRDTestKit
 
       group do
         title 'Verify Requests'
-        test from: :crd_v221_hook_request_conformance
+        test from: :crd_v221_hook_request_conformance do
+          verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
+                                'hl7.fhir.us.davinci-crd_2.2.1@hook-27')
+        end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
         test from: :crd_v221_hook_request_prefetch_complete
@@ -84,19 +88,6 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_data_fetch_verification
         test from: :crd_v221_hook_request_granted_scopes
         test from: :crd_v221_hook_request_secured_transport
-
-        # TODO: migrate requirements
-        # test from: :crd_v221_hook_request_required_fields
-        # test from: :crd_v221_hook_request_optional_fields
-        # test from: :crd_v221_hook_request_valid_context do
-        #   # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@201', 'hl7.fhir.us.davinci-crd_2.0.1@202',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@203',
-        #   #                      'cds-hooks-library_1.0.1@45', 'cds-hooks-library_1.0.1@46',
-        #   #                      'cds-hooks-library_1.0.1@47', 'cds-hooks-library_1.0.1@49',
-        #   #                      'cds-hooks-library_1.0.1@50', 'cds-hooks-library_1.0.1@51',
-        #   #                       'cds-hooks-library_1.0.1@53', 'cds-hooks-library_1.0.1@54',
-        #   #                       'cds-hooks-library_1.0.1@55'
-        # end
       end
 
       group do

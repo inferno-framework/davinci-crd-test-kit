@@ -25,6 +25,9 @@ module DaVinciCRDTestKit
       id :crd_v221_inferno_response_validation
       simulation_verification
 
+      verifies_requirements 'cds-hooks_3.0.0-ballot@3', 'cds-hooks_3.0.0-ballot@222', 'cds-hooks_3.0.0-ballot@223',
+                            'cds-hooks_3.0.0-ballot@224'
+
       input :custom_response_template, optional: true
 
       def response_label(index = nil)

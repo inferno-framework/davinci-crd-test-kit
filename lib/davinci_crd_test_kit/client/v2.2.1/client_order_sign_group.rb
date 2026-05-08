@@ -31,8 +31,9 @@ module DaVinciCRDTestKit
         This version of the CRD implementation guide refers to version 1.1 of the hook which, at the time of publication,
         was not available as a snapshot. Therefore the preceding link refers to the CDS hooks current build.
       DESCRIPTION
-
       run_as_group
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-A', 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-B'
 
       input_order :cds_jwt_iss, :cds_jwk_set
 
@@ -76,7 +77,10 @@ module DaVinciCRDTestKit
 
       group do
         title 'Verify Requests'
-        test from: :crd_v221_hook_request_conformance
+        test from: :crd_v221_hook_request_conformance do
+          verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
+                                'hl7.fhir.us.davinci-crd_2.2.1@hook-37')
+        end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
         test from: :crd_v221_hook_request_prefetch_complete
@@ -84,27 +88,6 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_data_fetch_verification
         test from: :crd_v221_hook_request_granted_scopes
         test from: :crd_v221_hook_request_secured_transport
-
-        # TODO: migrate requirements
-        # test from: :crd_v221_hook_request_required_fields
-        # test from: :crd_v221_hook_request_optional_fields
-        # test from: :crd_v221_hook_request_valid_context do
-        #   # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@71', 'hl7.fhir.us.davinci-crd_2.0.1@150',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@221', 'hl7.fhir.us.davinci-crd_2.0.1@221',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@222', 'hl7.fhir.us.davinci-crd_2.0.1@223',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@284', 'hl7.fhir.us.davinci-crd_2.0.1@285',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@286', 'hl7.fhir.us.davinci-crd_2.0.1@287',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@288', 'hl7.fhir.us.davinci-crd_2.0.1@289',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@290', 'hl7.fhir.us.davinci-crd_2.0.1@291',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@292', 'hl7.fhir.us.davinci-crd_2.0.1@293',
-        #   #                       'hl7.fhir.us.davinci-crd_2.0.1@294', 'hl7.fhir.us.davinci-crd_2.0.1@295',
-        #   #                       'cds-hooks-library_1.0.1@1', 'cds-hooks-library_1.0.1@2',
-        #   #                       'cds-hooks-library_1.0.1@3', 'cds-hooks-library_1.0.1@5',
-        #   #                       'cds-hooks-library_1.0.1@6', 'cds-hooks-library_1.0.1@7',
-        #   #                       'cds-hooks-library_1.0.1@9', 'cds-hooks-library_1.0.1@10',
-        #   #                       'cds-hooks-library_1.0.1@11', 'cds-hooks-library_1.0.1@13',
-        #   #                       'cds-hooks-library_1.0.1@14', 'cds-hooks-library_1.0.1@15'
-        # end
       end
 
       group do

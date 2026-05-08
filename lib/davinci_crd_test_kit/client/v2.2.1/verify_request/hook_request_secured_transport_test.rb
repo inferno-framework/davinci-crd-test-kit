@@ -15,6 +15,8 @@ module DaVinciCRDTestKit
         requests made by both the client and Inferno's simulated service are made against
         TLS-secured endpoints using the `https` protocol.
       )
+      verifies_requirements 'cds-hooks_3.0.0-ballot@2', 'cds-hooks_3.0.0-ballot@168', 'cds-hooks_3.0.0-ballot@172',
+                            'hl7.fhir.us.davinci-crd_2.2.1@sec-2'
 
       run do
         hook_requests = load_hook_requests

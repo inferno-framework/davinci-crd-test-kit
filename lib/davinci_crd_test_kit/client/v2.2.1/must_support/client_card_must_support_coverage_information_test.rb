@@ -21,6 +21,8 @@ module DaVinciCRDTestKit
         and support for them is demonstrated.
       DESCRIPTION
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-14'
+
       def metadata
         @metadata ||= YAML.load_file(File.join(__dir__, 'coverage-information_stu221_metadata.yml'))
       end

@@ -15,6 +15,8 @@ module DaVinciCRDTestKit
       DESCRIPTION
       id :crd_v221_client_fhir_api
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-1'
+
       input_instructions %(
         Details on how and what to access the Client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
