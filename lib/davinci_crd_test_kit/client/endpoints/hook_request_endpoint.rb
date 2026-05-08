@@ -153,12 +153,22 @@ module DaVinciCRDTestKit
     end
 
     def tags
+      return [LONG_RUNNING_GROUP_TAG] if long_running_group?
+
       return [] if invoked_hook != requested_hook ||
                    wrong_hook_for_test? ||
                    hook_instance_already_used? ||
                    !AVAILABLE_HOOKS.include?(requested_hook)
 
-      [hook_instance_tag, DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")]
+      [hook_instance_tag, hook_or_group_tag]
+    end
+
+    def hook_or_group_tag
+      if test.config.options[:crd_test_group].present?
+        test.config.options[:crd_test_group]
+      else
+        DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")
+      end
     end
 
     def error_response(error_message, code: 400, outcome_code: 'invalid')
@@ -185,6 +195,29 @@ module DaVinciCRDTestKit
 
     def name
       requested_hook.gsub('-', '_')
+    end
+
+    # -----------------------
+    # Long Running Group handling
+    # -----------------------
+
+    def long_running_group?
+      test.config.options[:crd_test_group] == LONG_RUNNING_GROUP_TAG
+    end
+
+    def long_running_pause_time
+      JSON.parse(result.input_json)
+        .find { |input| input['name'].include?('long_running_pause_time') }
+        &.dig('value').to_i
+    end
+
+    # end the wait immediately after the long-running request returns
+    # pause here because update_result runs before response generation
+    def update_result
+      return unless long_running_group?
+
+      sleep long_running_pause_time
+      results_repo.update(result.id, result: 'pass')
     end
   end
 end

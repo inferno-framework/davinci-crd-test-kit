@@ -11,4 +11,5 @@ module DaVinciCRDTestKit
   PAYER_ORG_FETCH_TAG = 'payer_org'.freeze
   PARENT_LOCATION_FETCH_TAG = 'parent_location'.freeze
   HOOK_INSTANCE_TAG_PREFIX = 'hi_'.freeze
+  LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
 end

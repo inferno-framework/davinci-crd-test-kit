@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       @selected_response_types ||=
         JSON.parse(result.input_json)
           .find { |input| input['name'].include?('selected_response_types') }
-          &.dig('value')
+          &.dig('value') || []
     end
 
     def current_time

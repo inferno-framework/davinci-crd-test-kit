@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
     end
 
     def tags_to_load(hook = hook_name)
-      crd_test_group.present? ? [hook, crd_test_group] : [hook]
+      crd_test_group.present? ? [crd_test_group] : [hook]
     end
 
     def load_hook_requests
