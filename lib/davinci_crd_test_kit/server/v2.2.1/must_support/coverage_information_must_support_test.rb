@@ -30,13 +30,9 @@ module DaVinciCRDTestKit
       ].freeze
 
       def metadata
-        @metadata ||= YAML.load_file(File.join(__dir__, 'coverage-information_stu221_metadata.yml'))
-      end
-
-      def requests_to_analyze
-        ALL_HOOKS.each_with_object([]) do |hook_tag, requests|
-          requests.concat(load_tagged_requests(hook_tag))
-        end
+        @metadata ||= YAML.load_file(
+          File.join(__dir__, '..', '..', '..', 'cross_suite', 'coverage-information_stu221_metadata.yml')
+        )
       end
 
       class MustSupportMetadataHolder
@@ -56,7 +52,8 @@ module DaVinciCRDTestKit
       end
 
       run do
-        sorted_cards = sorted_cards_from_requests(requests_to_analyze)
+        ALL_HOOKS.each { |hook_tag| load_tagged_requests(hook_tag) }
+        sorted_cards = sorted_cards_from_requests(requests)
         coverage_info_system_actions = sorted_cards['actions'][COVERAGE_INFORMATION_RESPONSE_TYPE]
 
         assert coverage_info_system_actions.present?,
