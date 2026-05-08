@@ -133,8 +133,8 @@ module DaVinciCRDTestKit
 
         group from: :crd_v221_client_registration
         group from: :crd_v221_client_hooks
-        group from: :crd_v221_client_long_running_hook
         group from: :crd_v221_client_cross_hook
+        group from: :crd_v221_client_long_running_hook
       end
 
       group from: :crd_v221_client_fhir_api
