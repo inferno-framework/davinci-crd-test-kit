@@ -57,12 +57,10 @@ module DaVinciCRDTestKit
           auth_tokens_jwk_json: { name: :order_select_auth_tokens_jwk_json },
           client_access_token: { name: :order_select_client_access_token },
           client_fhir_server: { name: :order_select_client_fhir_server },
-          crd_jwks_json: { name: :order_select_crd_jwks_json },
           crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-select',
-          hook_path: ORDER_SELECT_PATH
+          hook_name: 'order-select'
         }
       )
 

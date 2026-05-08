@@ -56,12 +56,10 @@ module DaVinciCRDTestKit
           auth_tokens_jwk_json: { name: :order_sign_auth_tokens_jwk_json },
           client_access_token: { name: :order_sign_client_access_token },
           client_fhir_server: { name: :order_sign_client_fhir_server },
-          crd_jwks_json: { name: :order_sign_crd_jwks_json },
           crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-sign',
-          hook_path: ORDER_SIGN_PATH
+          hook_name: 'order-sign'
         }
       )
 

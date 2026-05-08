@@ -1,9 +1,11 @@
 require_relative '../../multi_request_message_helper'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
     class TokenPayloadTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include ClientURLs
 
       id :crd_v221_token_payload
@@ -30,8 +32,11 @@ module DaVinciCRDTestKit
         REQUIRED_CLAIMS.dup
       end
 
-      def hook_url
-        inferno_base_url + config.options[:hook_path]
+      # Replace the scheme+host of request.url with the configured external host
+      # so that aud validation works correctly when Inferno is behind a reverse proxy.
+      def public_hook_url(request)
+        hook_suffix = URI.parse(request.url).path.delete_prefix(URI.parse(inferno_base_url).path)
+        inferno_base_url + hook_suffix
       end
 
       input :auth_tokens,
@@ -41,10 +46,15 @@ module DaVinciCRDTestKit
       run do
         auth_tokens_list = JSON.parse(auth_tokens)
         auth_tokens_jwk = JSON.parse(auth_tokens_jwk_json)
-        skip_if auth_tokens_list.empty?, 'No Authorization tokens produced from the previous tests.'
-        skip_if auth_tokens_jwk.empty?, 'No Authorization token JWK produced from the previous test.'
+        requests = load_hook_requests
+        skip_if auth_tokens_list.compact.empty?, 'No Authorization tokens produced from the previous tests.'
+        skip_if auth_tokens_jwk.compact.empty?, 'No Authorization token JWK produced from the previous test.'
 
         auth_tokens_jwk.each_with_index do |auth_token_jwk, index|
+          next unless auth_token_jwk.present?
+
+          request = requests[index]
+
           begin
             jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys # NOTE: pre-verified json
 
@@ -56,7 +66,7 @@ module DaVinciCRDTestKit
                 algorithms: [jwk[:alg]],
                 exp_leeway: 60,
                 iss: cds_jwt_iss,
-                aud: hook_url,
+                aud: public_hook_url(request),
                 verify_not_before: false,
                 verify_iat: false,
                 verify_jti: true,

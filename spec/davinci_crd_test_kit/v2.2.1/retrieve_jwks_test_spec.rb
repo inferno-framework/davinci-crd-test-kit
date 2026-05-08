@@ -4,6 +4,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:test) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:example_client_jwks_url) { "#{example_client_url}/jwks.json" }
@@ -39,6 +40,10 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       .first
   end
 
+  def session_output(name)
+    JSON.parse(session_data_repo.load(test_session_id: test_session.id, name:))
+  end
+
   it 'passes if it receives a valid JWT Authorization header with jku field populated' do
     jwks_request = stub_request(:get, example_client_jwks_url)
       .to_return(status: 200, body: jwks_hash.to_json)
@@ -46,6 +51,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('pass')
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json).length).to eq(1)
+    expect(session_output(:crd_jwks_keys_json).first).to_not be_nil
   end
 
   it 'passes if it receives multiple valid JWT Authorization headers with jku field populated' do
@@ -56,6 +63,18 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
                        cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('pass')
     expect(jwks_request).to have_been_made.times(2)
+    expect(session_output(:crd_jwks_keys_json).length).to eq(2)
+  end
+
+  it 'passes and skips nil entries in auth_token_headers_json' do
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [nil, token_header.to_json].to_json,
+                       cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('pass')
+    expect(jwks_request).to have_been_made.once
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil, JSON.parse(jwks_hash.to_json)['keys'].to_json])
   end
 
   it 'fails if it receives at least 1 invalid JWT Authorization headers' do
@@ -70,6 +89,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       /\(Request 2\) Unexpected response status: expected 200, but received/
     )
     expect(jwks_request).to have_been_made.times(2)
+    expect(session_output(:crd_jwks_keys_json).length).to eq(2)
+    expect(session_output(:crd_jwks_keys_json).last).to be_nil
   end
 
   it 'passes if it receives a valid jwk_set input' do
@@ -87,6 +108,15 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result_message).to match("JWK Set must be inputted if Client's JWK Set is not available")
   end
 
+  it 'does not skip when all headers have jku even if no jwk_set is provided' do
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header.to_json])
+    expect(result.result).to eq('pass')
+    expect(jwks_request).to have_been_made
+  end
+
   it 'fails if it receives non 200 response' do
     jwks_request = stub_request(:get, example_client_jwks_url)
       .to_return(status: 404, body: jwks_hash.to_json)
@@ -95,6 +125,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received/)
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 
   it 'fails if jwks returned is not a valid json' do
@@ -105,6 +136,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/Fetched jku url response contains invalid JSON\./)
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 
   it 'fails if jwks returned is not an array' do
@@ -115,6 +147,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/JWKS `keys` field must be an array/)
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 
   it 'fails if jwks returned has no keys' do
@@ -125,6 +158,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/The JWK set returned contains no public keys/)
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 
   it 'fails if jwks returned does not contain kid field' do
@@ -137,6 +171,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       /`kid` field must be present in each key if JWKS contains multiple keys/
     )
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 
   it 'fails if jwks returned contains duplicate kid fields' do
@@ -146,5 +181,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/`kid` must be unique within the client's JWK Set\./)
     expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
 end

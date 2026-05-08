@@ -30,6 +30,9 @@ module DaVinciCRDTestKit
 
           unless authorization_header&.start_with?('Bearer ')
             add_request_message('error', 'Authorization token must be a JWT presented as a `Bearer` token', index)
+            auth_tokens << nil
+            auth_token_payloads_json << nil
+            auth_token_headers_json << nil
             next
           end
 
@@ -48,6 +51,8 @@ module DaVinciCRDTestKit
             auth_token_headers_json << header.to_json
           rescue StandardError => e
             add_request_message('error', "Token is not a properly constructed JWT: #{e.message}", index)
+            auth_token_payloads_json << nil
+            auth_token_headers_json << nil
           end
         end
         output auth_tokens: auth_tokens.to_json,

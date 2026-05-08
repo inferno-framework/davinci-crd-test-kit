@@ -7,6 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_v221_decode_auth_token') }
+  let(:session_data_repo) { Inferno::Repositories::SessionData.new }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
@@ -45,6 +46,10 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
       .first
       .messages
       .first
+  end
+
+  def session_output(name)
+    JSON.parse(session_data_repo.load(test_session_id: test_session.id, name:))
   end
 
   describe 'Appointment Book Decode Auth Token Test' do
@@ -101,6 +106,11 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
       expect(entity_result_message.message).to match(
         /\(Request 2\) Authorization token must be a JWT presented as a `Bearer` token/
       )
+      expect(session_output(:auth_tokens)).to eq([token, nil])
+      expect(session_output(:auth_token_payloads_json).length).to eq(2)
+      expect(session_output(:auth_token_payloads_json).last).to be_nil
+      expect(session_output(:auth_token_headers_json).length).to eq(2)
+      expect(session_output(:auth_token_headers_json).last).to be_nil
     end
 
     it 'fails if authorization header does not present the JWT as a `Bearer` token' do
@@ -116,6 +126,20 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/Authorization token must be a JWT presented as a `Bearer` token/)
+      expect(session_output(:auth_tokens)).to eq([nil])
+      expect(session_output(:auth_token_payloads_json)).to eq([nil])
+      expect(session_output(:auth_token_headers_json)).to eq([nil])
+    end
+
+    it 'fails if one request has a malformed JWT and outputs nil for payload and header entries' do
+      create_appointment_hook_request(body: appointment_book_hook_request,
+                                      auth_header: 'Bearer not.a.valid.jwt')
+
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(session_output(:auth_tokens)).to eq(['not.a.valid.jwt'])
+      expect(session_output(:auth_token_payloads_json)).to eq([nil])
+      expect(session_output(:auth_token_headers_json)).to eq([nil])
     end
   end
 end
