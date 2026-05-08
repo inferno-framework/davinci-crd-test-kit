@@ -49,10 +49,6 @@ module DaVinciCRDTestKit
         assert messages.none? { |msg| msg[:type] == 'error' }, message
       end
 
-      def hook_instance_tag(hook_instance)
-        "#{HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
-      end
-
       run do
         hook_requests = load_tagged_requests(*tags_to_load)
 
@@ -65,7 +61,7 @@ module DaVinciCRDTestKit
           end
 
           failed_data_fetches =
-            load_tagged_requests(hook_instance_tag(hook_instance), DATA_FETCH_TAG).reject do |fetch|
+            load_tagged_requests(TagMethods.hook_instance_data_fetch_tag(hook_instance)).reject do |fetch|
               fetch.status.to_s.starts_with?('2')
             end
 

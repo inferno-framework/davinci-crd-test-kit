@@ -1,6 +1,7 @@
 require_relative 'must_support/client_card_must_support_coverage_information_test'
 require_relative 'must_support/client_location_address_propagation_test'
 require_relative 'must_support/client_fhirpath_collection_as_comma_delimited_string_test'
+require_relative 'must_support/client_hook_instances_unique_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -19,6 +20,7 @@ module DaVinciCRDTestKit
       test from: :crd_v221_client_card_must_support_coverage_information
       test from: :crd_v221_client_location_address_propagation
       test from: :crd_v221_client_fhir_path_collection_as_comma_delimited_string
+      test from: :crd_v221_client_hook_instances_unique
     end
   end
 end

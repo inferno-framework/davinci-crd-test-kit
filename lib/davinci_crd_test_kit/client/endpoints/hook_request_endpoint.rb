@@ -154,13 +154,17 @@ module DaVinciCRDTestKit
 
     def tags
       return [LONG_RUNNING_GROUP_TAG] if long_running_group?
+      return [DUPLICATED_HOOK_INSTANCE_TAG] if hook_instance_already_used?
 
       return [] if invoked_hook != requested_hook ||
                    wrong_hook_for_test? ||
-                   hook_instance_already_used? ||
                    !AVAILABLE_HOOKS.include?(requested_hook)
 
       [hook_instance_tag, hook_or_group_tag]
+    end
+
+    def hook_instance_tag
+      TagMethods.hook_instance_tag(request_body['hookInstance'])
     end
 
     def hook_or_group_tag

@@ -84,10 +84,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
     Inferno::TestRunner.new(test_session:, test_run:).run(runnable, scratch)
   end
 
-  def hook_instance_tag(hook_instance)
-    "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
-  end
-
   describe 'When responding' do
     it 'returns 400 when the hookInstance has already been used' do
       allow(test).to receive(:suite).and_return(suite)
@@ -268,9 +264,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(p_request).to have_been_made.once
       expect(pat_request).to have_been_made.once
       expect(cov_request).to have_been_made.once
-      tagged_requests = requests_repo.tagged_requests(test_session.id,
-                                                      [hook_instance_tag(hook_instance),
-                                                       DaVinciCRDTestKit::DATA_FETCH_TAG])
+      tagged_requests =
+        requests_repo.tagged_requests(test_session.id,
+                                      [DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance),
+                                       DaVinciCRDTestKit::DATA_FETCH_TAG])
       expect(tagged_requests.length).to eq(3)
       expect(tagged_requests.one? { |request| request.url == patient_example_reference_absolute }).to be(true)
       expect(tagged_requests.one? { |request| request.url == practitioner_example_reference_absolute }).to be(true)
@@ -350,7 +347,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(payer_request).to have_been_made.once
         tagged_requests = requests_repo.tagged_requests(
           test_session.id,
-          [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG, hook_instance_tag(hook_instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
+          [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG,
+           DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance),
+           DaVinciCRDTestKit::DATA_FETCH_TAG]
         )
         expect(tagged_requests.length).to eq(1)
         expect(tagged_requests.first.url).to eq(payer_org_url)
@@ -394,7 +393,8 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(parent_request).to have_been_made.once
         tagged_requests = requests_repo.tagged_requests(
           test_session.id,
-          [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG, hook_instance_tag(hook_instance),
+          [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG,
+           DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance),
            DaVinciCRDTestKit::DATA_FETCH_TAG]
         )
         expect(tagged_requests.length).to eq(1)

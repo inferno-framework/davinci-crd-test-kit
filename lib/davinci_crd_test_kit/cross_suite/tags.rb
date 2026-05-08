@@ -11,5 +11,19 @@ module DaVinciCRDTestKit
   PAYER_ORG_FETCH_TAG = 'payer_org'.freeze
   PARENT_LOCATION_FETCH_TAG = 'parent_location'.freeze
   HOOK_INSTANCE_TAG_PREFIX = 'hi_'.freeze
+  HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX = 'hi_data_fetch_'.freeze
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
+  DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
+
+  module TagMethods
+    def hook_instance_tag(hook_instance)
+      "#{HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
+    end
+
+    def hook_instance_data_fetch_tag(hook_instance)
+      "#{HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX}#{hook_instance}"
+    end
+
+    module_function :hook_instance_tag, :hook_instance_data_fetch_tag
+  end
 end

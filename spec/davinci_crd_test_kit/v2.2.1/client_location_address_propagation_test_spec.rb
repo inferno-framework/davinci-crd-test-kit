@@ -1,3 +1,5 @@
+require_relative '../../../lib/davinci_crd_test_kit/cross_suite/tags'
+
 RSpec.describe DaVinciCRDTestKit::V221::ClienntLocationAddressPropagationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }
@@ -55,7 +57,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClienntLocationAddressPropagationTest do
       status:,
       headers: [],
       tags: [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG,
-             "#{DaVinciCRDTestKit::HOOK_INSTANCE_TAG_PREFIX}#{instance}",
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance),
              DaVinciCRDTestKit::DATA_FETCH_TAG]
     )
   end
