@@ -10,8 +10,8 @@ module DaVinciCRDTestKit
           type of card they support
 
         This test verifies that all primary hook services contain at least one
-        valid configuration option. Secondary hooks are not expected to return
-        cards, so they are ignored in this test.
+        valid configuration option for `coverage-info`. Secondary hooks are not
+        expected to return cards, so they are ignored in this test.
       )
 
       input :cds_services
