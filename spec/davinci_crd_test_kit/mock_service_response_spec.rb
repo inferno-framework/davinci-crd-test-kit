@@ -27,7 +27,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
                      })
         end
 
-        def hook_name
+        def requested_hook
           DaVinciCRDTestKit::ORDER_SIGN_TAG
         end
 
@@ -59,7 +59,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         define_method(:ig_version) { 'v201' }
         define_method(:selected_response_types) { @selected_response_types ||= types.dup }
         define_method(:request_body) { @request_body ||= rb }
-        define_method(:hook_name) { hook }
+        define_method(:requested_hook) { hook }
         define_method(:result) { @result ||= Struct.new(:id).new('test-result-id') }
       end.new
     end
@@ -118,7 +118,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
                      })
         end
 
-        def hook_name
+        def requested_hook
           DaVinciCRDTestKit::ORDER_SIGN_TAG
         end
 
@@ -149,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
                                            'order-dispatch-request_complete-prefetch.json')))
         end
 
-        def hook_name
+        def requested_hook
           DaVinciCRDTestKit::ORDER_DISPATCH_TAG
         end
 
@@ -224,7 +224,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         define_method(:ig_version) { 'v221' }
         define_method(:selected_response_types) { @selected_response_types ||= types.dup }
         define_method(:request_body) { @request_body ||= rb }
-        define_method(:hook_name) { hook }
+        define_method(:requested_hook) { hook }
         define_method(:result) { @result ||= Struct.new(:id).new('test-result-id') }
       end.new
     end

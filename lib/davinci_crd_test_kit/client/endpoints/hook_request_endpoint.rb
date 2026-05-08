@@ -42,10 +42,6 @@ module DaVinciCRDTestKit
       iss
     end
 
-    def hook_name
-      @hook_name ||= request.params[:hook]
-    end
-
     def iss
       @iss ||=
         begin
@@ -60,54 +56,56 @@ module DaVinciCRDTestKit
       @token ||= request.headers['authorization']&.delete_prefix('Bearer ')
     end
 
-    def expected_hook_name
-      request.env['PATH_INFO'].match(%r{cds-services/([^/]+)-service})&.[](1)
+    # from the hook body
+    def requested_hook
+      @requested_hook ||= request_body['hook']
     end
 
-    def wrong_hook?
-      expected = expected_hook_name
-      expected.present? && hook_name != expected
+    # from the url
+    def invoked_hook
+      @invoked_hook ||= request.env['PATH_INFO'].match(%r{/([^/]+)-service$})&.[](1)
     end
 
-    def wrong_hook_response
-      {
-        resourceType: 'OperationOutcome',
-        issue: [
-          {
-            severity: 'error',
-            code: 'not-supported',
-            details: {
-              text: "Hook '#{hook_name}' is not being tested in the current session. " \
-                    "This session is currently testing the '#{expected_hook_name}' hook."
-            }
-          }
-        ]
-      }
+    # from the waiting test
+    def tested_hook
+      @tested_hook ||= test.config.options[:hook_name]
+    end
+
+    def wrong_hook_for_test?
+      tested_hook.present? && tested_hook != ANY_HOOK_TAG && requested_hook != tested_hook
     end
 
     def make_response
-      if wrong_hook?
-        response.body = wrong_hook_response.to_json
-        response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-        response.status = 422
-        response.format = :json
+      if invoked_hook != requested_hook
+        error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
+                       "requested the #{requested_hook} hook.",
+                       code: 400,
+                       outcome_code: 'value')
+      elsif wrong_hook_for_test?
+        error_response("Hook '#{requested_hook}' is not being tested in the current session. " \
+                       "This session is currently testing the '#{tested_hook}' hook.",
+                       code: 422,
+                       outcome_code: 'value')
       elsif hook_instance_already_used?
         error_response(
-          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
+          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session.",
+          outcome_code: 'value'
         )
-      elsif AVAILABLE_HOOKS.include?(hook_name)
+      elsif AVAILABLE_HOOKS.include?(requested_hook)
         process_valid_hook
       else
-        error_response("Invalid Request: hook `#{hook_name}` is not supported by this server.")
+        error_response("Invalid Request: hook `#{requested_hook}` is not supported by this server.",
+                       outcome_code: 'value')
       end
     rescue StandardError => e
-      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
-      nil
+      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}",
+                     code: 500,
+                     outcome_code: 'exception')
     end
 
     def process_valid_hook
       if ig_version == 'v201'
-        send(:"gather_#{hook_name.gsub('-', '_')}_data")
+        send(:"gather_#{requested_hook.gsub('-', '_')}_data")
         request_coverage
       elsif ig_version == 'v221'
         request_additional_fhir_data
@@ -155,27 +153,38 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      if wrong_hook?
-        []
-      elsif hook_instance_already_used?
-        response.status = 400
-        response.body =
-          "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session."
-        []
-      elsif AVAILABLE_HOOKS.include?(hook_name)
-        [hook_instance_tag, DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")]
-      else
-        error_response('Invalid Request: Request did not contain a valid hook in the `hook` field.')
-      end
+      return [] if invoked_hook != requested_hook ||
+                   wrong_hook_for_test? ||
+                   hook_instance_already_used? ||
+                   !AVAILABLE_HOOKS.include?(requested_hook)
+
+      [hook_instance_tag, DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")]
     end
 
-    def error_response(error_message, code: 400)
+    def error_response(error_message, code: 400, outcome_code: 'invalid')
       response.status = code
-      response.body = error_message
+      response.body = error_operation_outcome(outcome_code, error_message).to_json
+      response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
+      response.format = :json
+    end
+
+    def error_operation_outcome(code, text)
+      {
+        resourceType: 'OperationOutcome',
+        issue: [
+          {
+            severity: 'error',
+            code:,
+            details: {
+              text:
+            }
+          }
+        ]
+      }
     end
 
     def name
-      hook_name.gsub('-', '_')
+      requested_hook.gsub('-', '_')
     end
   end
 end
