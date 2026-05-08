@@ -217,7 +217,7 @@ module DaVinciCRDTestKit
       return unless long_running_group?
 
       sleep long_running_pause_time
-      results_repo.update(result.id, result: 'pass')
+      results_repo.update(result.id, result: 'pass', result_message: '')
     end
   end
 end

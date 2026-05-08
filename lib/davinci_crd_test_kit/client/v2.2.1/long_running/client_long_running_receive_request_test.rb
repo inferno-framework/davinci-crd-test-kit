@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_long_running_receive_request
-      title 'Send a Hook Request that will take a long time to return'
+      title 'Send a hook request that will take a long time to return'
       description %(
         This test waits for a single incoming hook request of any type and will return a mocked response
         but only after pausing for a configured amount of time, which must be 5 seconds or longer. The details

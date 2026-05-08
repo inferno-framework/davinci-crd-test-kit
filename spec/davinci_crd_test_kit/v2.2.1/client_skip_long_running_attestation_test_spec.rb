@@ -1,5 +1,3 @@
-require_relative '../../../lib/davinci_crd_test_kit/client/v2.2.1/long_running/client_skip_long_running_attest'
-
 RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :request do
   let(:suite_id) { 'crd_client_v221' }
   let(:test) { described_class }

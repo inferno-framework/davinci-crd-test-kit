@@ -1,5 +1,5 @@
 require_relative 'long_running/client_long_running_receive_request_test'
-require_relative 'long_running/client_skip_long_running_attest'
+require_relative 'long_running/client_skip_long_running_attestation_test'
 
 module DaVinciCRDTestKit
   module V221
