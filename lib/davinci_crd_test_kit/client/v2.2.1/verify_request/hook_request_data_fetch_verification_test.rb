@@ -17,6 +17,8 @@ module DaVinciCRDTestKit
         FHIR resource.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-20'
+
       def fhir_data_returned?(request)
         return false unless request.status.to_s.starts_with?('2')
 

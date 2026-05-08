@@ -16,6 +16,8 @@ module DaVinciCRDTestKit
         profile.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@hook-1'
+
       input :inferno_payer_organization_id,
             title: 'Inferno Payer Organization id',
             description: %(

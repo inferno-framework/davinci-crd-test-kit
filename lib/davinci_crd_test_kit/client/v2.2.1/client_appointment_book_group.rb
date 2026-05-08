@@ -30,9 +30,9 @@ module DaVinciCRDTestKit
 
         This version of the CRD implementation guide refers to version 1.0 of the hook.
       DESCRIPTION
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@172'
-
       run_as_group
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-A'
 
       input_order :cds_jwt_iss, :cds_jwk_set
 
@@ -76,7 +76,9 @@ module DaVinciCRDTestKit
 
       group do
         title 'Verify Requests'
-        test from: :crd_v221_hook_request_conformance
+        test from: :crd_v221_hook_request_conformance do
+          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-24'
+        end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
         test from: :crd_v221_hook_request_prefetch_complete

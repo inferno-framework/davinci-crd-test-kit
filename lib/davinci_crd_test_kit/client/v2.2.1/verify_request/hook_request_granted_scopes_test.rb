@@ -22,6 +22,8 @@ module DaVinciCRDTestKit
         provided for those tests.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-21'
+
       run do
         hook_requests = load_hook_requests
 

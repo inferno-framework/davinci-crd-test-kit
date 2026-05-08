@@ -14,7 +14,8 @@ module DaVinciCRDTestKit
         to use the `davinci-crd.requestedVersion` extension on each request.
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@214'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@214', 'hl7.fhir.us.davinci-crd_2.2.1@dev-3-A',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-12'
 
       run do
         hook_requests = load_hook_requests

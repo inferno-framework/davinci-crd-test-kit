@@ -16,6 +16,8 @@ module DaVinciCRDTestKit
         request to return.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-6'
+
       output :attest_true_url
       output :attest_false_url
 

@@ -70,9 +70,10 @@ module DaVinciCRDTestKit
         }
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@1', # use of json for everything verified across the whole suite
-                            'cds-hooks_3.0.0-ballot@15', # use of POST verified by suite endpoint setup
-                            'cds-hooks_3.0.0-ballot@208' # use of CORS endpoints defined in the suite
+      # verifies_requirements 'cds-hooks_3.0.0-ballot@1', # use of json for everything verified across the whole suite
+      #                       'cds-hooks_3.0.0-ballot@15', # use of POST verified by suite endpoint setup
+      #                       'cds-hooks_3.0.0-ballot@208', # use of CORS endpoints defined in the suite
+      #                       'hl7.fhir.us.davinci-crd_2.2.1@impl-3' # suite verifies system interactions
 
       fhir_resource_validator do
         igs('hl7.fhir.us.davinci-crd#2.2.1')
