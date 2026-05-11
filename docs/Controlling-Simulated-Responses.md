@@ -109,6 +109,8 @@ Cards can be found in the top-level `cards` field. Testers are responsible for p
 replace it with a random uuid each time it is returned so that it will always be unique. The
 same is true for the `suggestion.uuid` field. The following configuration options are
 available to control which cards are returned for a given request and their content:
+- The [`com.inferno.includeForServices` extension](#cominfernoincludeforservices-extension) can
+  be included to limit the Inferno service endpoints for which the card is included in the response.
 - The [`com.inferno.inclusionCriteria` extension](#cominfernoinclusioncriteria-extension) can
   be included to limit the requests for which the card is included in the response. 
 - [Expression tokens](#expression-tokens) can appear in any descendant field or FHIR element to
@@ -129,6 +131,8 @@ is defined. In that case, the contents of the `resource` field will be merged in
 resource(s) when instantiating the action.
 
 The same configuration options and logic apply in both cases:
+- The [`com.inferno.includeForServices` extension](#cominfernoincludeforservices-extension) can
+  be included to limit the Inferno service endpoints for which the action is included in the response.
 - The [`com.inferno.inclusionCriteria` extension](#cominfernoinclusioncriteria-extension) can
   be included to limit the requests for which the action is included in the response. 
 - The [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
@@ -173,6 +177,57 @@ on a certain type of order:
 
 Notes:
 - This extension will be removed from the card or action before Inferno returns it to the requesting client.
+
+#### `com.inferno.includeForServices` Extension
+
+When defined on a card or action, this extension limits the Inferno service endpoints for which
+the entity will be included in the response. The extension value is a comma-delimited list of
+relative URL strings. Specifics for each type of value:
+- *No value*: If the extension is not present or has an empty value, then no service-based
+  filtering is applied and the entity is always eligible for inclusion (subject to any other
+  extensions such as `com.inferno.inclusionCriteria`).
+- *Comma-delimited URL list*: The entity is included only if at least one of the listed strings
+  is a substring of the URL path that received the hook request. Matching is case-sensitive.
+
+This is useful, for example, when you want Inferno to return different responses from the
+payers associated with Inferno's two endpoints (`cds-services/...` and `cds-subset/...`).
+Only a single custom response template is associated with a test and it is used by
+both Inferno service endpoints.
+
+For example, to return a card only when the request is received for any of the `cds-subset` hooks:
+
+```json
+{
+  "cards": [
+    {
+      "summary": "Subset endpoint instructions",
+      "...",
+      "extension": {
+        "com.inferno.includeForServices": "cds-subset"
+      }
+    }
+  ]
+}
+```
+
+Or to include a card for both of Inferno's named order-sign endpoints but not others:
+
+```json
+{
+  "extension": {
+    "com.inferno.includeForServices": "cds-services/order-sign-service, cds-subset/order-sign-subset"
+  }
+}
+```
+
+Notes:
+- This extension is evaluated before `com.inferno.inclusionCriteria`. If a card or action is
+  excluded by this extension, `com.inferno.inclusionCriteria` is not evaluated for that entity.
+- Shorter strings will match more broadly. For example, `cds-subset` matches any subset
+  endpoint while `cds-subset/order-sign-subset` matches only the order-sign subset endpoint.
+- You can target all order-sign endpoints using `order-sign` or all order hooks with `order-`.
+- This extension will be removed from the card or action before Inferno returns it to the
+  requesting client.
 
 #### `com.inferno.resourceSelectionCriteria` Extension
 

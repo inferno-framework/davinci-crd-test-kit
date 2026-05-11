@@ -942,6 +942,92 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         .to_not eq(defaults_from_empty['extension'][4]['valueString'])
     end
 
+    describe 'com.inferno.includeForServices filter' do
+      let(:token) do
+        jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+      end
+
+      before { allow(test).to receive(:suite).and_return(suite) }
+
+      it 'includes cards when the extension is not present' do
+        response_template = { cards: [instructions_card_template] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards'].length).to eq(1)
+      end
+
+      it 'includes cards when the extension value matches the request URL' do
+        instructions_card_template['extension'] = {
+          'com.inferno.includeForServices': 'cds-services/order-sign-service'
+        }
+        response_template = { cards: [instructions_card_template] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        cards = JSON.parse(last_response.body)['cards']
+        expect(cards.length).to eq(1)
+        expect(cards[0]['extension']).to be_nil
+      end
+
+      it 'excludes cards when the extension value does not match the request URL' do
+        instructions_card_template['extension'] = {
+          'com.inferno.includeForServices': 'cds-subset/order-sign-subset'
+        }
+        response_template = { cards: [instructions_card_template] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards'].length).to eq(0)
+      end
+
+      it 'includes cards when any one of multiple comma-delimited service URLs matches' do
+        instructions_card_template['extension'] = {
+          'com.inferno.includeForServices': 'cds-subset/order-sign-subset, cds-services/order-sign-service'
+        }
+        response_template = { cards: [instructions_card_template] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards'].length).to eq(1)
+      end
+
+      it 'includes systemActions when the extension value matches the request URL' do
+        system_action_template_static['extension'] = {
+          'com.inferno.includeForServices': 'cds-services/order-sign-service'
+        }
+        response_template = { cards: [], systemActions: [system_action_template_static] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        actions = JSON.parse(last_response.body)['systemActions']
+        expect(actions.length).to eq(1)
+        expect(actions[0]['extension']).to be_nil
+      end
+
+      it 'excludes systemActions when the extension value does not match the request URL' do
+        system_action_template_static['extension'] = {
+          'com.inferno.includeForServices': 'cds-subset/order-sign-subset'
+        }
+        response_template = { cards: [], systemActions: [system_action_template_static] }
+        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['systemActions'].length).to eq(0)
+      end
+    end
+
     it 'returns success and does not duplicate sub-extensions when coverage-information is instantiated twice' do
       allow(test).to receive(:suite).and_return(suite)
       fhirpath_result = [{ type: 'resource',

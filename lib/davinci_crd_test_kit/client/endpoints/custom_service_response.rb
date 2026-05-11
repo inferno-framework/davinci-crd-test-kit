@@ -160,6 +160,10 @@ module DaVinciCRDTestKit
       defaults_ext = default_extension_name(list_element)
       define_extension(parent, defaults_ext, [])
       parent[list_element]&.select! do |object|
+        next false unless enabled_on_service?(object)
+
+        remove_extension(object, 'com.inferno.includeForServices')
+
         if object_has_inclusion_criteria?(object)
           if object_is_a_default?(object)
             remove_inclusion_criteria(object)
@@ -176,6 +180,13 @@ module DaVinciCRDTestKit
           true
         end
       end
+    end
+
+    def enabled_on_service?(object)
+      services = get_extension_value(object, 'com.inferno.includeForServices')
+      return true unless services.present?
+
+      services.split(',').map(&:strip).any? { |url| request.env['PATH_INFO'].include?(url) }
     end
 
     def object_is_a_default?(object)
