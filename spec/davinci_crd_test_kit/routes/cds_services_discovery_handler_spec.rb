@@ -76,7 +76,7 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
       get '/custom/crd_client_v221/cds-subset'
       subset_body = last_response.body
 
-      expect(subset_body).not_to eq(full_body)
+      expect(subset_body).to_not eq(full_body)
     end
   end
 end

@@ -100,9 +100,11 @@ module DaVinciCRDTestKit
 
           expected_payer_org_id = payer_org_id_for_request(request)
           if expected_payer_org_id.blank?
-            add_request_message('warning',
-                                'No Inferno Payer Organization id configured for this endpoint; skipping coverage check.',
-                                request_index)
+            add_request_message(
+              'warning',
+              'No Inferno Payer Organization id configured for this endpoint; skipping coverage check.',
+              request_index
+            )
             next
           end
 

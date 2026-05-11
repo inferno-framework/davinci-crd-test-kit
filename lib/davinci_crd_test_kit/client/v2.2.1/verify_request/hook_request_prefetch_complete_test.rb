@@ -34,36 +34,58 @@ module DaVinciCRDTestKit
       # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
 
       # output emitted only if the behavior is detected
-      output :demonstrates_fhirpath_collection_as_comma_delimited_string
+      output :demonstrates_fhirpath_collection_as_comma_delimited_string,
+             :demonstrates_prefetch_subset_distinct_from_complete,
+             :demonstrates_prefetch_complete_distinct_from_subset
+
+      SERVICE_FILENAMES = {
+        complete: 'cds-services-v221.json',
+        subset: 'cds-services-prefetch-subset-v221.json'
+      }.freeze
+
+      def service_path_for_target(target)
+        File.join(__dir__, '..', SERVICE_FILENAMES[target])
+      end
+
+      def service_path_for_opposite(target)
+        opposite = target == :complete ? :subset : :complete
+        service_path_for_target(opposite)
+      end
 
       run do
         hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
-        collection_as_comma_delimited_string_demonstrated = false
-
         hook_requests.each_with_index do |request, request_index|
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          services_filename = if request.url.include?('cds-subset')
-                                'cds-services-prefetch-subset-v221.json'
-                              else
-                                'cds-services-v221.json'
-                              end
-          services_path = File.join(__dir__, '..', services_filename)
+          prefetch_target = if request.url.include?('cds-subset')
+                              :subset
+                            else
+                              :complete
+                            end
+
+          services_path = service_path_for_target(prefetch_target)
           checker = PrefetchCompletenessChecker.new(hook_request, request_index, services_path)
-          checker.check_prefetched_data.each do |error|
+          completeness_errors = checker.check_prefetched_data
+          completeness_errors.each do |error|
             add_message('error', error) # NOTE: PrefetchCompletenessChecker adds the (Request #) prefix
           end
           if checker.observed_fhirpath_collection_as_comma_delimited_string
-            collection_as_comma_delimited_string_demonstrated = true
+            output demonstrates_fhirpath_collection_as_comma_delimited_string: true
           end
-        end
-
-        if collection_as_comma_delimited_string_demonstrated
-          output demonstrates_fhirpath_collection_as_comma_delimited_string: true
+          if completeness_errors.blank? &&
+             PrefetchCompletenessChecker.new(
+               hook_request, request_index, service_path_for_opposite(prefetch_target)
+             ).check_prefetched_data.present?
+            if prefetch_target == :subset
+              output demonstrates_prefetch_subset_distinct_from_complete: true
+            else
+              output demonstrates_prefetch_complete_distinct_from_subset: true
+            end
+          end
         end
 
         assert_no_error_messages("#{requests_with_errors_prefix}Incomplete or invalid prefetched data. " \

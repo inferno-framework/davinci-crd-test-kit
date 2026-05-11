@@ -31,8 +31,8 @@ module DaVinciCRDTestKit
       end
 
       def find_completeness_tests
-        hooks_group = self.class.parent.parent.groups.find do |g|
-          g.id.to_s.include?('crd_v221_client_hooks')
+        hooks_group = self.class.parent.parent.groups.find do |group|
+          group.id.to_s.include?('crd_v221_client_hooks')
         end
         hooks_group.groups.map do |group|
           group.groups.flat_map(&:tests).find do |test|

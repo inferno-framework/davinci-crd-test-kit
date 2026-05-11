@@ -232,7 +232,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       create_subset_hook_request
       create_payer_fetch_request(response_body: subset_payer_organization)
       result = run(test, inferno_payer_organization_id: payer_org_id,
-                        inferno_payer_organization_subset_id: subset_payer_org_id)
+                         inferno_payer_organization_subset_id: subset_payer_org_id)
       expect(result.result).to eq('pass')
     end
 
@@ -241,7 +241,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       create_subset_hook_request
       create_payer_fetch_request(response_body: { 'resourceType' => 'Organization', 'id' => 'wrong-id' })
       result = run(test, inferno_payer_organization_id: payer_org_id,
-                        inferno_payer_organization_subset_id: subset_payer_org_id)
+                         inferno_payer_organization_subset_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
       expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
     end
@@ -252,7 +252,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       # Return the main payer org id instead of the subset org id — should still fail
       create_payer_fetch_request(response_body: payer_organization)
       result = run(test, inferno_payer_organization_id: payer_org_id,
-                        inferno_payer_organization_subset_id: subset_payer_org_id)
+                         inferno_payer_organization_subset_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
       expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
     end
@@ -275,7 +275,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       # This request has both tags and is valid
       create_hook_request(tags: [hook_name, 'some-group'])
       create_payer_fetch_request
-      result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+      result = run(test, inferno_payer_organization_id: payer_org_id,
+                         inferno_payer_organization_subset_id: payer_org_id)
       expect(result.result).to eq('pass')
     end
   end

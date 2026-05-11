@@ -72,7 +72,7 @@
       "description": "A simulated CDS Service that is invoked when the user is performing the discharge process for an encounter - typically an inpatient encounter.",
       "id": "encounter-discharge-service",
       "prefetch" : {
-       "patient": "Patient/{{context.patientId}}",
+        "patient": "Patient/{{context.patientId}}",
         "encounter": "Encounter/{{context.encounterId}}",
         "coverage": "Coverage?patient={{context.patientId}}&status=active",
         "practitionerRoles" : "PractitionerRole?_id={{%encounter.participant.individual.resolve().ofType(PractitionerRole).id}}",

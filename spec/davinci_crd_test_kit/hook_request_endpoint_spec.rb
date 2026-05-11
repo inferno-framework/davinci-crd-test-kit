@@ -449,11 +449,10 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
-                  order_sign_custom_response_template: instructions_card_template.to_json)
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, order_sign_hook_request)
-
         expect(last_response).to be_ok
       end
 
@@ -467,7 +466,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
-                  order_sign_custom_response_template: instructions_card_template.to_json)
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         order_sign_hook_request['hook'] = 'appointment-book'
         header('Authorization', "Bearer #{token}")
