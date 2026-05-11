@@ -433,6 +433,53 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       end
     end
 
+    describe 'when posting to the v221 cds-subset endpoint' do
+      let(:suite_id) { 'crd_client_v221' }
+      let(:test) { DaVinciCRDTestKit::V221::OrderSignReceiveRequestTest }
+      let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
+      let(:server_endpoint) { '/custom/crd_client_v221/cds-subset/order-sign-subset' }
+
+      it 'correctly identifies the hook from the subset endpoint path and returns 200' do
+        allow(test).to receive(:suite).and_return(suite)
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: instructions_card_template.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+      end
+
+      it 'returns 400 when the requested hook does not match the subset endpoint' do
+        allow(test).to receive(:suite).and_return(suite)
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: instructions_card_template.to_json)
+
+        order_sign_hook_request['hook'] = 'appointment-book'
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response.status).to eq(400)
+        parsed_body = JSON.parse(last_response.body)
+        expect(parsed_body['resourceType']).to eq('OperationOutcome')
+        expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
+      end
+    end
+
     it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do
       allow(test).to receive(:suite).and_return(suite)
       pat_request = stub_request(:get, patient_example_reference_absolute)

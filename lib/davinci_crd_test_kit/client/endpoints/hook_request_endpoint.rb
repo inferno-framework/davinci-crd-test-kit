@@ -63,7 +63,7 @@ module DaVinciCRDTestKit
 
     # from the url
     def invoked_hook
-      @invoked_hook ||= request.env['PATH_INFO'].match(%r{/([^/]+)-service$})&.[](1)
+      @invoked_hook ||= request.env['PATH_INFO'].match(%r{/([^/]+)-(?:service|subset)$})&.[](1)
     end
 
     # from the waiting test

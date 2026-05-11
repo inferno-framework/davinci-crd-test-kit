@@ -50,4 +50,33 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
       end
     end
   end
+
+  describe 'GET /cds-subset' do
+    it 'returns the prefetch-subset services JSON for v221' do
+      get '/custom/crd_client_v221/cds-subset'
+
+      expect(last_response).to be_ok
+      expect(last_response.headers['Content-Type']).to eq('application/json')
+
+      response_json = JSON.parse(last_response.body)
+
+      expect(response_json).to include('services')
+      services = response_json['services']
+      expect(services).to be_an(Array)
+
+      services.all? do |service|
+        expect(service).to include('hook', 'description', 'id')
+      end
+    end
+
+    it 'returns different content than the full cds-services endpoint' do
+      get '/custom/crd_client_v221/cds-services'
+      full_body = last_response.body
+
+      get '/custom/crd_client_v221/cds-subset'
+      subset_body = last_response.body
+
+      expect(subset_body).not_to eq(full_body)
+    end
+  end
 end

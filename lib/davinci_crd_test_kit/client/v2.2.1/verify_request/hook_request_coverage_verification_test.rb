@@ -29,13 +29,32 @@ module DaVinciCRDTestKit
             type: 'text',
             optional: true,
             locked: true
+      input :inferno_payer_organization_subset_id,
+            title: 'Inferno Payer Organization id (prefetch subset)',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              CRD prefetch-subset endpoints. This Organization must be referenced
+              as the payer on Coverages in hook requests sent to those endpoints.
+              Run the Client Registration group to change this value.
+            ),
+            type: 'text',
+            optional: true,
+            locked: true
+
+      def payer_org_id_for_request(request)
+        if request.url.include?('cds-subset')
+          inferno_payer_organization_subset_id
+        else
+          inferno_payer_organization_id
+        end
+      end
 
       def load_payer_request_for_hook_request(request_body)
         hook_data_fetch_tag = TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
         load_tagged_requests(PAYER_ORG_FETCH_TAG, hook_data_fetch_tag, DATA_FETCH_TAG).first
       end
 
-      def check_payer_request(request_body, request_index)
+      def check_payer_request(request_body, request_index, expected_payer_org_id)
         payer_request = load_payer_request_for_hook_request(request_body)
         unless payer_request.present? && payer_request.status.to_s.starts_with?('2')
           add_request_message('error',
@@ -54,9 +73,9 @@ module DaVinciCRDTestKit
           add_request_message('error', 'Payer for the Coverage is not an Organization: ' \
                                        "got '#{payer_resource.resourceType}'", request_index)
         end
-        if payer_resource.id != inferno_payer_organization_id
+        if payer_resource.id != expected_payer_org_id
           add_request_message('error', 'Payer for the Coverage has the wrong id: ' \
-                                       "expected '#{inferno_payer_organization_id}', got '#{payer_resource.id}'.",
+                                       "expected '#{expected_payer_org_id}', got '#{payer_resource.id}'.",
                               request_index)
         end
 
@@ -68,8 +87,8 @@ module DaVinciCRDTestKit
       end
 
       run do
-        skip_if inferno_payer_organization_id.blank?,
-                'Input "Inferno Payer Organization id " is needed to verify behavior.'
+        skip_if inferno_payer_organization_id.blank? || inferno_payer_organization_subset_id.blank?,
+                'Both "Inferno Payer Organization id" inputs are needed to verify behavior.'
 
         hook_requests = load_hook_requests
 
@@ -78,6 +97,14 @@ module DaVinciCRDTestKit
         hook_requests.each_with_index do |request, request_index|
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
+
+          expected_payer_org_id = payer_org_id_for_request(request)
+          if expected_payer_org_id.blank?
+            add_request_message('warning',
+                                'No Inferno Payer Organization id configured for this endpoint; skipping coverage check.',
+                                request_index)
+            next
+          end
 
           coverage = request_body.dig('prefetch', 'coverage', 'entry', 0, 'resource')
           unless coverage.present?
@@ -91,7 +118,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          check_payer_request(request_body, request_index)
+          check_payer_request(request_body, request_index, expected_payer_org_id)
         end
 
         assert_no_error_messages("#{requests_with_errors_prefix}Invalid coverage. " \

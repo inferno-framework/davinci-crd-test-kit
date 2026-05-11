@@ -68,6 +68,46 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
     expect(entity_result_message(test)).to include('(Request 2)')
   end
 
+  describe 'services file selection based on request URL' do
+    let(:subset_url) do
+      "#{Inferno::Application['base_url']}/custom/crd_client/cds-subset/order-sign-subset"
+    end
+
+    it 'uses the standard services file for cds-services endpoint requests' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new)
+        .with(anything, anything, a_string_including('cds-services-v221.json'))
+        .and_call_original
+      run(test)
+    end
+
+    it 'uses the prefetch-subset services file for cds-subset endpoint requests' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new)
+        .with(anything, anything, a_string_including('cds-services-prefetch-subset-v221.json'))
+        .and_call_original
+      run(test)
+    end
+
+    it 'selects the correct file independently for each request when both endpoint types are present' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new)
+        .with(anything, 0, a_string_including('cds-services-v221.json'))
+        .and_call_original
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new)
+        .with(anything, 1, a_string_including('cds-services-prefetch-subset-v221.json'))
+        .and_call_original
+      run(test)
+    end
+  end
+
   describe 'demonstrates_fhirpath_collection_as_comma_delimited_string output' do
     let(:id_search_template) { { 'patient' => 'Patient?_id={{context.patientId|context.secondPatientId}}' } }
     let(:crd_patient_example_bundle) do

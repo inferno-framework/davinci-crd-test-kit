@@ -27,6 +27,15 @@ module DaVinciCRDTestKit
             ),
             type: 'text',
             optional: false
+      input :inferno_payer_organization_subset_id,
+            title: 'Inferno Payer Organization id (prefetch subset)',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              CRD prefetch-subset endpoints. This Organization must be referenced
+              as the payer on Coverages in hook requests sent to those endpoints.
+            ),
+            type: 'text',
+            optional: false
       output :attest_true_url
       output :attest_false_url
 
@@ -64,7 +73,8 @@ module DaVinciCRDTestKit
             I attest that Inferno has been registered as a trusted CRD Service
             able to access data stored on the CRD Client's FHIR Server and that
             Inferno
-            - Is associated with the payor Organization resource with id `#{inferno_payer_organization_id}`
+            - Is associated with the payor Organization resource with id `#{inferno_payer_organization_id}` for the CDS service endpoints
+            - Is associated with the payor Organization resource with id `#{inferno_payer_organization_subset_id}` for the CDS prefetch-subset endpoints
             - Has been granted patient- or user-level read and search access scopes for
               all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
 

@@ -47,7 +47,12 @@ module DaVinciCRDTestKit
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          services_path = File.join(__dir__, '..', 'cds-services-v221.json')
+          services_filename = if request.url.include?('cds-subset')
+                                'cds-services-prefetch-subset-v221.json'
+                              else
+                                'cds-services-v221.json'
+                              end
+          services_path = File.join(__dir__, '..', services_filename)
           checker = PrefetchCompletenessChecker.new(hook_request, request_index, services_path)
           checker.check_prefetched_data.each do |error|
             add_message('error', error) # NOTE: PrefetchCompletenessChecker adds the (Request #) prefix
