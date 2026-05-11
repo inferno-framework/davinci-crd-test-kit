@@ -38,6 +38,8 @@ module DaVinciCRDTestKit
         same test).
       DESCRIPTION
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-25-A', 'hl7.fhir.us.davinci-crd_2.2.1@found-25-B'
+
       run do
         subset_prefetch_requests, complete_prefetch_requests =
           requests_to_analyze.partition { |request| request.url.include?('cds-subset') }

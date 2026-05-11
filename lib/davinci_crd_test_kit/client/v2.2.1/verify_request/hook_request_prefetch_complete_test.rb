@@ -19,19 +19,19 @@ module DaVinciCRDTestKit
 
         [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
         This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format,
-        contains exactly what is requested in by the
-        [prefetch templates published by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json).
+        contains exactly what is requested in by the prefetch templates published by the simulated CRD Server that
+        the request wasy made against. Inferno simulates two CDS services, one requiring the
+        [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
+        and the other [requesting only a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
         Clients must be able to return all data in the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
-        which are used by Inferno. Thus, this test checks that exactly the requested
-        data is present based on the request context.
+        so this test checks that exactly the requested data is present based on the request context.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@30', 'cds-hooks_3.0.0-ballot@231', 'cds-hooks_3.0.0-ballot@45',
                             'cds-hooks_3.0.0-ballot@46', 'cds-hooks_3.0.0-ballot@47', 'cds-hooks_3.0.0-ballot@232',
                             'cds-hooks_3.0.0-ballot@53', 'cds-hooks_3.0.0-ballot@240',
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@found-23',
                             'hl7.fhir.us.davinci-crd_2.2.1@found-24', 'hl7.fhir.us.davinci-crd_2.2.1@found-25-A',
-                            'hl7.fhir.us.davinci-crd_2.2.1@found-24'
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
+                            'hl7.fhir.us.davinci-crd_2.2.1@found-25-B', 'hl7.fhir.us.davinci-crd_2.2.1@found-31'
 
       # output emitted only if the behavior is detected
       output :demonstrates_fhirpath_collection_as_comma_delimited_string,
