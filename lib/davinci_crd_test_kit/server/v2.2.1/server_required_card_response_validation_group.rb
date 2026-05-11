@@ -1,0 +1,23 @@
+require_relative 'must_support/coverage_information_system_action_across_hooks_validation_test'
+
+module DaVinciCRDTestKit
+  module V221
+    class ServerRequiredCardResponseValidationGroup < Inferno::TestGroup
+      title 'Required Card Response Validation'
+      description %(
+        This group contains tests to verify the presence and validity of required response types
+        across all hooks invoked. As per the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-26),
+        CRD clients and servers SHALL, at minimum, support returning and
+        processing the Coverage Information system action for all invocations of
+        the appointment-book hook.
+      )
+      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@247', 'hl7.fhir.us.davinci-crd_2.0.1@248',
+      #                       'hl7.fhir.us.davinci-crd_2.0.1@249'
+
+      id :crd_v221_server_required_card_response_validation
+      run_as_group
+
+      test from: :crd_v221_coverage_info_system_action_across_hooks_validation
+    end
+  end
+end
