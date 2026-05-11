@@ -1,7 +1,7 @@
-require_relative 'must_support/client_card_must_support_coverage_information_test'
-require_relative 'must_support/client_location_address_propagation_test'
-require_relative 'must_support/client_fhirpath_collection_as_comma_delimited_string_test'
-require_relative 'must_support/client_hook_instances_unique_test'
+require_relative 'cross_hook/client_card_must_support_coverage_information_test'
+require_relative 'cross_hook/client_location_address_propagation_test'
+require_relative 'cross_hook/client_fhirpath_collection_as_comma_delimited_string_test'
+require_relative 'cross_hook/client_hook_instances_unique_test'
 
 module DaVinciCRDTestKit
   module V221
