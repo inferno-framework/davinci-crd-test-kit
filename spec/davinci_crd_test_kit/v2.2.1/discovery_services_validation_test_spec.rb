@@ -140,4 +140,15 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
 
     expect(result.result).to eq('pass'), result.result_message
   end
+
+  it 'skips if all discovered services are ignored for CRD validation' do
+    result = run(
+      runnable,
+      cds_services: { 'services' => [non_crd_service] }.to_json,
+      crd_discovery_service_ignore_list: 'non-crd-appointment-book-service'
+    )
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to eq('Ignore list excludes all CDS Services from validation.')
+  end
 end

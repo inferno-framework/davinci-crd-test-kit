@@ -73,6 +73,9 @@ module DaVinciCRDTestKit
             info "Ignoring service `#{service['id']}` because it is in the ignore list."
           end
         services_for_crd_validation = services.reject { |service| ignored_service_ids.include?(service['id']) }
+
+        skip_if services_for_crd_validation.empty?, 'Ignore list excludes all CDS Services from validation.'
+
         service_hooks_to_ids = services_for_crd_validation.each_with_object({}) do |service, hash|
           hash[service['hook']] ||= []
           hash[service['hook']] << service['id'] if service['id']
