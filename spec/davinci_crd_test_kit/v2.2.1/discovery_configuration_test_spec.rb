@@ -115,4 +115,17 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     expect(result.result).to eq('fail'), result.result_message
     expect(first_error_message.message).to match(/field `description` to be a String, but found Array/)
   end
+
+  it 'fails if configuration options contain duplicate values' do
+    cds_services['services'].first['extension'] =
+      {
+        'davinci-crd.configuration-options' => [valid_config_option, valid_config_option]
+      }
+
+    result = run(runnable, cds_services: cds_services.to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/contain invalid configuration options/)
+    expect(first_error_message.message).to match(/`appointment-book` contain duplicate values for `code`:/)
+  end
 end

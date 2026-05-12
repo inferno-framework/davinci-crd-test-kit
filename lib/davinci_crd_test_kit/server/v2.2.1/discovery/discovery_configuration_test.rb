@@ -16,12 +16,53 @@ module DaVinciCRDTestKit
 
       input :cds_services
 
+      def verify_unique_values(hook, service)
+        unique_fields = ['code', 'name', 'description']
+
+        config_options =
+          service
+            .dig('extension', 'davinci-crd.configuration-options')
+
+        return if config_options.blank?
+
+        unique_fields.each do |unique_field|
+          value_counts =
+            config_options
+              .map { |config_option| config_option[unique_field] }
+              .tally
+
+          duplicate_values =
+            value_counts
+              .select { |_value, count| count > 1 }
+              .keys
+
+          next if duplicate_values.blank?
+
+          duplicate_values_string = duplicate_values.map { |value| "\n- `#{value}`" }.join
+
+          add_message(
+            'error',
+            "Services for hook `#{hook}` contain duplicate values for `#{unique_field}`:" \
+            "#{duplicate_values_string}"
+          )
+        end
+      end
+
       run do
         services = JSON.parse(cds_services)['services']
 
+        services_by_hook = services.group_by { |service| service['hook'] }
+
+        services_by_hook.each do |hook, hook_services|
+          hook_services.each { |service| verify_unique_values(hook, service) }
+        end
+
         primary_hooks = ['appointment-book', 'order-sign', 'order-dispatch']
 
-        primary_hook_services = services.select { |service| primary_hooks.include? service['hook'] }
+        primary_hook_services = services_by_hook.slice(*primary_hooks).values.flatten
+
+        assert messages.none? { |message| message[:type] == 'error' },
+               'Some services contain invalid configuration options.'
 
         omit_if primary_hook_services.blank?, 'No services for primary hooks found'
 
