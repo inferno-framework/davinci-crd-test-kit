@@ -8,12 +8,12 @@ module DaVinciCRDTestKit
   ORDER_SELECT_PATH = '/cds-services/order-select-service'.freeze
   ORDER_SIGN_PATH = '/cds-services/order-sign-service'.freeze
 
-  APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH = '/cds-subset/appointment-book-subset'.freeze
-  ENCOUNTER_START_PREFETCH_SUBSET_PATH = '/cds-subset/encounter-start-subset'.freeze
-  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH = '/cds-subset/encounter-discharge-subset'.freeze
-  ORDER_DISPATCH_PREFETCH_SUBSET_PATH = '/cds-subset/order-dispatch-subset'.freeze
-  ORDER_SELECT_PREFETCH_SUBSET_PATH = '/cds-subset/order-select-subset'.freeze
-  ORDER_SIGN_PREFETCH_SUBSET_PATH = '/cds-subset/order-sign-subset'.freeze
+  APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/appointment-book-subset'.freeze
+  ENCOUNTER_START_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-start-subset'.freeze
+  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-discharge-subset'.freeze
+  ORDER_DISPATCH_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-dispatch-subset'.freeze
+  ORDER_SELECT_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-select-subset'.freeze
+  ORDER_SIGN_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-sign-subset'.freeze
 
   module ClientBaseURLs
     include BaseURLs

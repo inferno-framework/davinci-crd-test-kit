@@ -61,7 +61,7 @@ module DaVinciCRDTestKit
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          prefetch_target = if request.url.include?('cds-subset')
+          prefetch_target = if request.url.include?('prefetch-subset')
                               :subset
                             else
                               :complete

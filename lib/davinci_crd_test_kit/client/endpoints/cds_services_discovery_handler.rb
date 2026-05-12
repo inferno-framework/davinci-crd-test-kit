@@ -23,7 +23,7 @@ module DaVinciCRDTestKit
     def call(env)
       path_parts = env['PATH_INFO'].split('/')
       # /custom/<suite>/[prefetch-subset/]cds-services
-      prefetch_subset = path_parts.include?('cds-subset')
+      prefetch_subset = path_parts.include?('prefetch-subset')
       suite = path_parts.find { |p| p.start_with?('crd_client_') } || path_parts[-2]
       version_no_dots = suite.split('_')[2] # crd_client_<version>
       version_no_dots = 'v201' if version_no_dots.blank?

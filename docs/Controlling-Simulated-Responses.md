@@ -190,11 +190,11 @@ relative URL strings. Specifics for each type of value:
   is a substring of the URL path that received the hook request. Matching is case-sensitive.
 
 This is useful, for example, when you want Inferno to return different responses from the
-payers associated with Inferno's two endpoints (`cds-services/...` and `cds-subset/...`).
+payers associated with Inferno's two endpoints (`cds-services/...` and `prefetch-subset/cds-services/...`).
 Only a single custom response template is associated with a test and it is used by
 both Inferno service endpoints.
 
-For example, to return a card only when the request is received for any of the `cds-subset` hooks:
+For example, to return a card only when the request is received for any of the `prefetch-subset` hooks:
 
 ```json
 {
@@ -203,7 +203,7 @@ For example, to return a card only when the request is received for any of the `
       "summary": "Subset endpoint instructions",
       "...",
       "extension": {
-        "com.inferno.includeForServices": "cds-subset"
+        "com.inferno.includeForServices": "prefetch-subset"
       }
     }
   ]
@@ -215,7 +215,7 @@ Or to include a card for both of Inferno's named order-sign endpoints but not ot
 ```json
 {
   "extension": {
-    "com.inferno.includeForServices": "cds-services/order-sign-service, cds-subset/order-sign-subset"
+    "com.inferno.includeForServices": "cds-services/order-sign-service, prefetch-subset/cds-services/order-sign-subset"
   }
 }
 ```
@@ -223,8 +223,8 @@ Or to include a card for both of Inferno's named order-sign endpoints but not ot
 Notes:
 - This extension is evaluated before `com.inferno.inclusionCriteria`. If a card or action is
   excluded by this extension, `com.inferno.inclusionCriteria` is not evaluated for that entity.
-- Shorter strings will match more broadly. For example, `cds-subset` matches any subset
-  endpoint while `cds-subset/order-sign-subset` matches only the order-sign subset endpoint.
+- Shorter strings will match more broadly. For example, `prefetch-subset` matches any subset
+  endpoint while `prefetch-subset/cds-services/order-sign-subset` matches only the order-sign subset endpoint.
 - You can target all order-sign endpoints using `order-sign` or all order hooks with `order-`.
 - This extension will be removed from the card or action before Inferno returns it to the
   requesting client.

@@ -24,7 +24,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientPrefetchCompleteAndSubsetTest do
 
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
-  let(:subset_url) { "#{base_url}/cds-subset/order-sign-subset" }
+  let(:subset_url) { "#{base_url}/prefetch-subset/cds-services/order-sign-subset" }
   let(:service_url) { "#{base_url}/cds-services/order-sign-service" }
 
   def create_completeness_result(output_json: '[]')

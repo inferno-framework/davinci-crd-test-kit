@@ -979,7 +979,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'excludes cards when the extension value does not match the request URL' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices': 'cds-subset/order-sign-subset'
+          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [instructions_card_template] }
         run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
@@ -991,7 +991,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes cards when any one of multiple comma-delimited service URLs matches' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices': 'cds-subset/order-sign-subset, cds-services/order-sign-service'
+          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset, cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
         run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
@@ -1017,7 +1017,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'excludes systemActions when the extension value does not match the request URL' do
         system_action_template_static['extension'] = {
-          'com.inferno.includeForServices': 'cds-subset/order-sign-subset'
+          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [], systemActions: [system_action_template_static] }
         run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)

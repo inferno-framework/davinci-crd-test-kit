@@ -133,7 +133,7 @@ module DaVinciCRDTestKit
       end
 
       route :get, '/cds-services', CDSServicesDiscoveryHandler
-      route :get, '/cds-subset', CDSServicesDiscoveryHandler
+      route :get, '/prefetch-subset/cds-services', CDSServicesDiscoveryHandler
 
       allow_cors APPOINTMENT_BOOK_PATH, ENCOUNTER_START_PATH, ENCOUNTER_DISCHARGE_PATH, ORDER_DISPATCH_PATH,
                  ORDER_SELECT_PATH, ORDER_SIGN_PATH, '/cds-services'
@@ -147,7 +147,7 @@ module DaVinciCRDTestKit
       allow_cors APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH, ENCOUNTER_START_PREFETCH_SUBSET_PATH,
                  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH, ORDER_DISPATCH_PREFETCH_SUBSET_PATH,
                  ORDER_SELECT_PREFETCH_SUBSET_PATH, ORDER_SIGN_PREFETCH_SUBSET_PATH,
-                 '/cds-subset'
+                 '/prefetch-subset/cds-services'
       suite_endpoint :post, APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_START_PREFETCH_SUBSET_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH, HookRequestEndpoint

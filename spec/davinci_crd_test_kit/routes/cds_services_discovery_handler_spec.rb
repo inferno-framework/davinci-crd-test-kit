@@ -51,9 +51,9 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
     end
   end
 
-  describe 'GET /cds-subset' do
+  describe 'GET /prefetch-subset/cds-services' do
     it 'returns the prefetch-subset services JSON for v221' do
-      get '/custom/crd_client_v221/cds-subset'
+      get '/custom/crd_client_v221/prefetch-subset/cds-services'
 
       expect(last_response).to be_ok
       expect(last_response.headers['Content-Type']).to eq('application/json')
@@ -73,7 +73,7 @@ RSpec.describe DaVinciCRDTestKit::CDSServicesDiscoveryHandler, :request do
       get '/custom/crd_client_v221/cds-services'
       full_body = last_response.body
 
-      get '/custom/crd_client_v221/cds-subset'
+      get '/custom/crd_client_v221/prefetch-subset/cds-services'
       subset_body = last_response.body
 
       expect(subset_body).to_not eq(full_body)

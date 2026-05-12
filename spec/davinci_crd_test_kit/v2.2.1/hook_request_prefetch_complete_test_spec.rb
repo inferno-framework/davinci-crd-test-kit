@@ -79,7 +79,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
 
   describe 'services file selection based on request URL' do
     let(:subset_url) do
-      "#{Inferno::Application['base_url']}/custom/crd_client/cds-subset/order-sign-subset"
+      "#{Inferno::Application['base_url']}/custom/crd_client/prefetch-subset/cds-services/order-sign-subset"
     end
 
     it 'uses the standard services file for cds-services endpoint requests' do
@@ -91,7 +91,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
         .with(anything, anything, a_string_including('cds-services-v221.json'))
     end
 
-    it 'uses the prefetch-subset services file for cds-subset endpoint requests' do
+    it 'uses the prefetch-subset services file for prefetch-subset endpoint requests' do
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
       store_hook_request('order-sign', url: subset_url, body: order_sign_request)
       allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_call_original
@@ -174,7 +174,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
 
   describe 'demonstrates_prefetch_subset_distinct_from_complete output' do
     let(:subset_url) do
-      "#{Inferno::Application['base_url']}/custom/crd_client/cds-subset/order-sign-subset"
+      "#{Inferno::Application['base_url']}/custom/crd_client/prefetch-subset/cds-services/order-sign-subset"
     end
 
     it 'does not set the output when the primary (subset) check fails' do

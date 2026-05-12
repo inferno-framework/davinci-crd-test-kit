@@ -433,11 +433,11 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       end
     end
 
-    describe 'when posting to the v221 cds-subset endpoint' do
+    describe 'when posting to the v221 prefetch-subset endpoint' do
       let(:suite_id) { 'crd_client_v221' }
       let(:test) { DaVinciCRDTestKit::V221::OrderSignReceiveRequestTest }
       let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
-      let(:server_endpoint) { '/custom/crd_client_v221/cds-subset/order-sign-subset' }
+      let(:server_endpoint) { '/custom/crd_client_v221/prefetch-subset/cds-services/order-sign-subset' }
 
       it 'correctly identifies the hook from the subset endpoint path and returns 200' do
         allow(test).to receive(:suite).and_return(suite)
