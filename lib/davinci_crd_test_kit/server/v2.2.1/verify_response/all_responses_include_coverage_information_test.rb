@@ -56,7 +56,7 @@ module DaVinciCRDTestKit
       end
 
       def resources_contain_coverage_information_extension?(resources)
-        resources.any? do |resource|
+        resources.all? do |resource|
           resource.extension&.any? do |extension|
             extension.url == 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
           end
