@@ -64,7 +64,6 @@ module DaVinciCRDTestKit
 
         services = object['services']
         assert services.is_a?(Array), 'Services field of the CDS Discovery response object is not an array.'
-        skip_if services.empty?, 'Server hosts no CDS Services.'
 
         ignored_service_ids = crd_discovery_service_ignore_list.to_s.split(',').map(&:strip).reject(&:blank?)
         services
@@ -73,8 +72,6 @@ module DaVinciCRDTestKit
             info "Ignoring service `#{service['id']}` because it is in the ignore list."
           end
         services_for_crd_validation = services.reject { |service| ignored_service_ids.include?(service['id']) }
-
-        skip_if services_for_crd_validation.empty?, 'Ignore list excludes all CDS Services from validation.'
 
         service_hooks_to_ids = services_for_crd_validation.each_with_object({}) do |service, hash|
           hash[service['hook']] ||= []
@@ -87,6 +84,9 @@ module DaVinciCRDTestKit
                order_dispatch_service_ids: service_hooks_to_ids['order-dispatch']&.join(', '),
                order_select_service_ids: service_hooks_to_ids['order-select']&.join(', '),
                order_sign_service_ids: service_hooks_to_ids['order-sign']&.join(', ')
+
+        skip_if services.empty?, 'Server hosts no CDS Services.'
+        skip_if services_for_crd_validation.empty?, 'Ignore list excludes all CDS Services from validation.'
 
         services_for_crd_validation.each do |service|
           required_fields.each do |field, type|

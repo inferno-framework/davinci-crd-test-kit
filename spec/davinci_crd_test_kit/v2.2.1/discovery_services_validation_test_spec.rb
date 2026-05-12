@@ -141,7 +141,24 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     expect(result.result).to eq('pass'), result.result_message
   end
 
+  it 'persists blank service id outputs if no services are discovered' do
+    session_data_repo.save(test_session_id: test_session.id, name: 'appointment_book_service_ids',
+                           value: 'stale-service-id', type: 'text')
+
+    result = run(
+      runnable,
+      cds_services: { 'services' => [] }.to_json
+    )
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to eq('Server hosts no CDS Services.')
+    expect(session_data_repo.load(test_session_id: test_session.id, name: 'appointment_book_service_ids')).to be_nil
+  end
+
   it 'skips if all discovered services are ignored for CRD validation' do
+    session_data_repo.save(test_session_id: test_session.id, name: 'appointment_book_service_ids',
+                           value: 'stale-service-id', type: 'text')
+
     result = run(
       runnable,
       cds_services: { 'services' => [non_crd_service] }.to_json,
@@ -150,5 +167,6 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
 
     expect(result.result).to eq('skip'), result.result_message
     expect(result.result_message).to eq('Ignore list excludes all CDS Services from validation.')
+    expect(session_data_repo.load(test_session_id: test_session.id, name: 'appointment_book_service_ids')).to be_nil
   end
 end
