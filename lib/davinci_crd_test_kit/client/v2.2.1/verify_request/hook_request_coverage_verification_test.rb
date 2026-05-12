@@ -18,34 +18,42 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@hook-1'
 
-      input :inferno_payer_organization_id,
-            title: 'Inferno Payer Organization id',
+      input :complete_prefetch_service_organization_id,
+            title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              CRD endpoints. This Organization must be referenced as the
-              payer on Coverages in hook requests. Run the Client Registration
-              group to change this value.
+              complete prefetch CRD services. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services under the `cds-services`
+              discovery endpoint.
             ),
             type: 'text',
             optional: true,
             locked: true
-      input :inferno_payer_organization_subset_id,
-            title: 'Inferno Payer Organization id (prefetch subset)',
+      input :subset_prefetch_service_organization_id,
+            title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              CRD prefetch-subset endpoints. This Organization must be referenced
-              as the payer on Coverages in hook requests sent to those endpoints.
-              Run the Client Registration group to change this value.
+              subset prefetch CRD services. This Organization must be referenced
+              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
+              discovery endpoint.
             ),
             type: 'text',
             optional: true,
             locked: true
 
-      def payer_org_id_for_request(request)
-        if request.url.include?('cds-subset')
-          inferno_payer_organization_subset_id
+      def prefetch_target(request)
+        if request.url.include?('prefetch-subset')
+          :subset
         else
-          inferno_payer_organization_id
+          :complete
+        end
+      end
+
+      def payer_org_id_for_request(request)
+        if prefetch_target(request) == :subset
+          subset_prefetch_service_organization_id
+        else
+          complete_prefetch_service_organization_id
         end
       end
 
@@ -87,7 +95,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        skip_if inferno_payer_organization_id.blank? || inferno_payer_organization_subset_id.blank?,
+        skip_if complete_prefetch_service_organization_id.blank? || subset_prefetch_service_organization_id.blank?,
                 'Both "Inferno Payer Organization id" inputs are needed to verify behavior.'
 
         hook_requests = load_hook_requests
@@ -108,7 +116,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          coverage = request_body.dig('prefetch', 'coverage', 'entry', 0, 'resource')
+          coverage = prefetched_coverage(request_body)
           unless coverage.present?
             add_request_message('warning', 'Request has no coverage.', request_index)
             next
@@ -125,6 +133,12 @@ module DaVinciCRDTestKit
 
         assert_no_error_messages("#{requests_with_errors_prefix}Invalid coverage. " \
                                  'See Messages for details.')
+      end
+
+      def prefetched_coverage(request_body)
+        coverage = request_body.dig('prefetch', 'coverage', 'entry', 0, 'resource')
+        coverage = request_body.dig('prefetch', 'cov', 'entry', 0, 'resource') unless coverage.present?
+        coverage
       end
     end
   end

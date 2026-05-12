@@ -4,10 +4,17 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_service_registration_attestation
-      title 'Attest to the registration of the Inferno Service by the CRD Client'
+      title 'Attest to the registration of the Inferno Services by the CRD Client'
       description %(
-        During this test, the tester will confirm that Inferno has been registered as a
-        trusted CRD Service that can access the CRD Client's FHIR Server, which has also been
+        Inferno simulates two CRD Services which can be discovered at the following endpoints:
+        - Complete Prefetch Service Discovery Endpoint:
+          #{Inferno::Application['base_url']}/custom/crd_client_v221/cds-services
+        - Subset Prefetch Service Discovery Endpoint:
+          #{Inferno::Application['base_url']}/custom/crd_client_v221/prefetch-subset/cds-services
+
+        During this test, the tester will confirm that these two endpoints
+        have been registered as trusted CRD Services that can access the CRD Client's FHIR Server
+        and that they have each been
         - Associated with a particular payer organization (used to check that the
           hook requests are sent by the client system to the appropriate payers based on
           the Patient's coverage).
@@ -18,21 +25,23 @@ module DaVinciCRDTestKit
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
-      input :inferno_payer_organization_id,
-            title: 'Inferno Payer Organization id',
+      input :complete_prefetch_service_organization_id,
+            title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              CRD endpoints. This Organization must be referenced as the
-              payer on Coverages in hook requests.
+              complete prefetch CRD services. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services under the `cds-services`
+              discovery endpoint.
             ),
             type: 'text',
             optional: false
-      input :inferno_payer_organization_subset_id,
-            title: 'Inferno Payer Organization id (prefetch subset)',
+      input :subset_prefetch_service_organization_subset_id,
+            title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              CRD prefetch-subset endpoints. This Organization must be referenced
-              as the payer on Coverages in hook requests sent to those endpoints.
+              subset prefetch CRD services. This Organization must be referenced
+              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
+              discovery endpoint.
             ),
             type: 'text',
             optional: false
@@ -70,12 +79,18 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Registration of Inferno as a trusted CRD Service**:
 
-            I attest that Inferno has been registered as a trusted CRD Service
-            able to access data stored on the CRD Client's FHIR Server and that
-            Inferno
-            - Is associated with the payor Organization resource with id `#{inferno_payer_organization_id}` for the CDS service endpoints
-            - Is associated with the payor Organization resource with id `#{inferno_payer_organization_subset_id}` for the CDS prefetch-subset endpoints
-            - Has been granted patient- or user-level read and search access scopes for
+            I attest that the following Inferno endpoints have been registered as follows:
+
+            - Complete Prefetch Service Discovery Endpoint:
+              #{Inferno::Application['base_url']}/custom/crd_client_v221/cds-services
+              - Has been registered with payer Organization resource with id `#{complete_prefetch_service_organization_id}`
+              - Has been granted patient- or user-level read and search access scopes for
+              all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
+
+            - Subset Prefetch Service Discovery Endpoint:
+              #{Inferno::Application['base_url']}/custom/crd_client_v221/prefetch-subset/cds-services
+              - Has been registered with payer Organization resource with id `#{subset_prefetch_service_organization_id}`
+              - Has been granted patient- or user-level read and search access scopes for
               all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
 
             [Click here](#{attest_true_url}) if the above statement is **true**.

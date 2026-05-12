@@ -76,25 +76,29 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       .messages
   end
 
-  it 'skips when inferno_payer_organization_id is blank' do
-    result = run(test, inferno_payer_organization_id: '', inferno_payer_organization_subset_id: payer_org_id)
+  it 'skips when complete_prefetch_service_organization_id is blank' do
+    result = run(test, complete_prefetch_service_organization_id: '',
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('skip')
   end
 
-  it 'skips when inferno_payer_organization_subset_id is blank' do
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: '')
+  it 'skips when subset_prefetch_service_organization_id is blank' do
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: '')
     expect(result.result).to eq('skip')
   end
 
   it 'skips when no hook requests received' do
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('skip')
     expect(result.result_message).to match(/No #{hook_name} hook requests received/)
   end
 
   it 'passes with a warning when no coverage is present in the prefetch' do
     create_hook_request(body: { 'hookInstance' => hook_instance, 'hook' => hook_name })
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('pass')
     expect(result_messages.map(&:message).join).to match(/Request has no coverage/)
   end
@@ -103,7 +107,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
     create_hook_request
     create_payer_fetch_request
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('pass')
   end
 
@@ -113,7 +118,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       'prefetch' => { 'coverage' => { 'entry' => [{ 'resource' => no_payer_coverage }] } }
     )
     create_hook_request(body:)
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/Coverage has no payer reference/)
   end
@@ -121,7 +127,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
   it 'fails when Inferno did not successfully retrieve the payer during hook processing' do
     create_hook_request
     # No payer fetch request stored
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/failed to retrieve the Coverage's payer/)
   end
@@ -129,7 +136,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
   it 'fails when the payer fetch request returned a non-2xx status' do
     create_hook_request
     create_payer_fetch_request(status: 404)
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/failed to retrieve the Coverage's payer/)
   end
@@ -137,7 +145,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
   it 'fails when the payer fetch response is not valid FHIR' do
     create_hook_request
     create_payer_fetch_request(response_body: '{"not": "fhir"}')
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/returned invalid FHIR data/)
   end
@@ -146,7 +155,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
     create_hook_request
     create_payer_fetch_request(response_body: { 'resourceType' => 'Patient', 'id' => payer_org_id })
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/Payer for the Coverage is not an Organization/)
   end
@@ -155,7 +165,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
     create_hook_request
     create_payer_fetch_request(response_body: { 'resourceType' => 'Organization', 'id' => 'wrong-id' })
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
   end
@@ -167,7 +178,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
     end
     create_hook_request
     create_payer_fetch_request
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/does not conform to profile/)
   end
@@ -189,12 +201,13 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
     create_hook_request
     create_payer_fetch_request
     create_hook_request(body: second_body)
-    result = run(test, inferno_payer_organization_id: payer_org_id, inferno_payer_organization_subset_id: payer_org_id)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to match(/\(Request 2\).*Coverage has no payer reference/m)
   end
 
-  describe 'when the request was sent to the cds-subset endpoint' do
+  describe 'when the request was sent to the prefetch-subset endpoint' do
     let(:subset_payer_org_id) { 'inferno-subset-payer-org' }
     let(:subset_payer_organization) { { 'resourceType' => 'Organization', 'id' => subset_payer_org_id } }
     let(:subset_hook_request_body) do
@@ -217,7 +230,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       repo_create(
         :request,
         direction: 'incoming',
-        url: "https://example.com/cds-subset/#{hook_name}-subset",
+        url: "https://example.com/prefetch-subset/cds-services/#{hook_name}-subset",
         result:,
         test_session_id: test_session.id,
         request_body: body.is_a?(Hash) ? body.to_json : body,
@@ -227,12 +240,12 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       )
     end
 
-    it 'uses inferno_payer_organization_subset_id for coverage verification' do
+    it 'uses subset_prefetch_service_organization_id for coverage verification' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
       create_subset_hook_request
       create_payer_fetch_request(response_body: subset_payer_organization)
-      result = run(test, inferno_payer_organization_id: payer_org_id,
-                         inferno_payer_organization_subset_id: subset_payer_org_id)
+      result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                         subset_prefetch_service_organization_id: subset_payer_org_id)
       expect(result.result).to eq('pass')
     end
 
@@ -240,19 +253,19 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
       create_subset_hook_request
       create_payer_fetch_request(response_body: { 'resourceType' => 'Organization', 'id' => 'wrong-id' })
-      result = run(test, inferno_payer_organization_id: payer_org_id,
-                         inferno_payer_organization_subset_id: subset_payer_org_id)
+      result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                         subset_prefetch_service_organization_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
       expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
     end
 
-    it 'does not use inferno_payer_organization_id for subset endpoint requests' do
+    it 'does not use complete_prefetch_service_organization_id for subset endpoint requests' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
       create_subset_hook_request
       # Return the main payer org id instead of the subset org id — should still fail
       create_payer_fetch_request(response_body: payer_organization)
-      result = run(test, inferno_payer_organization_id: payer_org_id,
-                         inferno_payer_organization_subset_id: subset_payer_org_id)
+      result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                         subset_prefetch_service_organization_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
       expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
     end
@@ -275,8 +288,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       # This request has both tags and is valid
       create_hook_request(tags: [hook_name, 'some-group'])
       create_payer_fetch_request
-      result = run(test, inferno_payer_organization_id: payer_org_id,
-                         inferno_payer_organization_subset_id: payer_org_id)
+      result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                         subset_prefetch_service_organization_id: payer_org_id)
       expect(result.result).to eq('pass')
     end
   end
