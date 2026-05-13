@@ -123,7 +123,7 @@ module DaVinciCRDTestKit
         # Merge extension lists, keeping duplicate url from action's resource,
         # otherwise replace (top-level elements)
         instantiated_action['resource'] =
-          merge_action_resouce_into_target(instantiated_action['resource'], target_resource)
+          merge_action_resource_into_target(instantiated_action['resource'], target_resource)
 
         coverage_information_ext = instantiated_action['resource']['extension']&.find do |ext|
           ext['url'] == 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
@@ -136,7 +136,7 @@ module DaVinciCRDTestKit
       instantiated_action
     end
 
-    def merge_action_resouce_into_target(action_resource, target_resource)
+    def merge_action_resource_into_target(action_resource, target_resource)
       target_resource.merge(action_resource) do |key, old_value, new_value|
         if key == 'extension'
           old_value.select do |existing_extention|

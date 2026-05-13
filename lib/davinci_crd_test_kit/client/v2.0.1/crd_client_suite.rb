@@ -95,9 +95,6 @@ module DaVinciCRDTestKit
       end
 
       route :get, '/cds-services', CDSServicesDiscoveryHandler
-      # TODO
-      # route :post, '/cds-services/:cds-service_id', cds_service_handler
-
       allow_cors APPOINTMENT_BOOK_PATH, ENCOUNTER_START_PATH, ENCOUNTER_DISCHARGE_PATH, ORDER_DISPATCH_PATH,
                  ORDER_SELECT_PATH, ORDER_SIGN_PATH, '/cds-services'
       suite_endpoint :post, APPOINTMENT_BOOK_PATH, HookRequestEndpoint

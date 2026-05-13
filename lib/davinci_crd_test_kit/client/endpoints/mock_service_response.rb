@@ -71,9 +71,13 @@ module DaVinciCRDTestKit
     end
 
     def get_missing_response_types(hook_card_response)
-      selected_response_types.append('coverage_information').uniq! if coverage_information_required?
+      expected_types = if coverage_information_required?
+                         selected_response_types | ['coverage_information']
+                       else
+                         selected_response_types
+                       end
 
-      selected_response_types
+      expected_types
         .select do |response_type|
           response_type = response_type
             .split('_')

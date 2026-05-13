@@ -25,9 +25,8 @@ module DaVinciCRDTestKit
       # /custom/<suite>/[prefetch-subset/]cds-services
       prefetch_subset = path_parts.include?('prefetch-subset')
       suite = path_parts.find { |p| p.start_with?('crd_client_') } || path_parts[-2]
-      version_no_dots = suite.split('_')[2] # crd_client_<version>
-      version_no_dots = 'v201' if version_no_dots.blank?
-      version = "#{version_no_dots[0..1]}.#{version_no_dots[2]}.#{version_no_dots[3]}" # v###
+      version_no_dots = suite.split('_')[2].presence || 'v201' # crd_client_<version>
+      version = version_no_dots.sub(/\A(v\d)(\d)(\d)\z/, '\1.\2.\3')
       [200, { 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' },
        [self.class.cds_services(version, prefetch_subset:)]]
     end

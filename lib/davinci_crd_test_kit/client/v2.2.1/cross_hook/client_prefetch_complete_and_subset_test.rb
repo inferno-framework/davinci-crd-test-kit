@@ -87,8 +87,8 @@ module DaVinciCRDTestKit
 
         return if demonstrated
 
-        add_message('error', "Requests made to the service endpoint requesting #{target_name} prefetch data ' \
-                             'did not demonstrate a difference between the two level of prefetch data.")
+        add_message('error', "Requests made to the service endpoint requesting #{target_name} prefetch data " \
+                             'did not demonstrate a difference between the two level of prefetch data.')
       end
     end
   end

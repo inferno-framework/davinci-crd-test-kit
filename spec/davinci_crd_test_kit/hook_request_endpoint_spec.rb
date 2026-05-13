@@ -477,6 +477,30 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(parsed_body['resourceType']).to eq('OperationOutcome')
         expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
       end
+
+      it 'tags the request with hook_instance_tag and ORDER_SIGN_TAG so it can be found by prefetch analysis tests' do
+        allow(test).to receive(:suite).and_return(suite)
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        hook_instance = order_sign_hook_request['hookInstance']
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+        tagged_requests = requests_repo.tagged_requests(
+          test_session.id,
+          [DaVinciCRDTestKit::TagMethods.hook_instance_tag(hook_instance), DaVinciCRDTestKit::ORDER_SIGN_TAG]
+        )
+        expect(tagged_requests.length).to eq(1)
+      end
     end
 
     it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do

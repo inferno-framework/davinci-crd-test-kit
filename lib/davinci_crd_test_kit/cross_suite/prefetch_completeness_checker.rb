@@ -40,17 +40,28 @@ module DaVinciCRDTestKit
       errors.uniq
     end
 
+    # -----------------------------------------------------------------------
+    # Complete vs Subset Prefetch Difference Checking
+    # -----------------------------------------------------------------------
+
     def data_set_different_with_alternate_service?(alternate_services_file_path, compare_key_map)
       PrefetchCompletenessChecker.new(hook_request, request_index, alternate_services_file_path)
         .data_sets_different?(self, compare_key_map)
     end
 
+    # Precondition: the original checker passed without errors meaning the expected set was present
+    # handles both subset < complete and complete > subset checks via two checks.
+    # - differences in the calculated id set for `_id` searches signal differences in the data sets.
+    # - errors during instantiation signal that a resource in the set wasn't present. Since the original
+    #   set was complete, this will only happen if the original set was a subset and the complete set
+    #   includes more data, meaning that the sets are different. (NOTE: triggers an error rather than a different
+    #   set of ids because fhirpath like `...resolve().id` requires the resource be present to evaluate it)
     def data_sets_different?(original_service_checker, compare_key_map)
       hook_prefetch_templates.each do |prefetch_key, prefetch_request|
         next if ['patient', 'pat', 'encounter', 'enc', 'coverage', 'cov'].include?(prefetch_key)
 
         instantiated_request = instantiate_template(prefetch_key, prefetch_request)
-        return true if errors.size > 1 # fetch errors - there was more data to include for complete (complete > subset)
+        return true if errors.present? # fetch errors - there was more data to include for complete (complete > subset)
 
         compare_prefetch_key = compare_key_map.key?(prefetch_key) ? compare_key_map[prefetch_key] : prefetch_key
         original_instantiated_request = original_service_checker.instantiated_prefetch_templates[compare_prefetch_key]
@@ -348,7 +359,7 @@ module DaVinciCRDTestKit
         errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
                   'was not provided in the prefetched values.'
 
-        nil
+        return nil
       end
 
       @current_base_fhir_server = base_fhir_server_for_identity(key)

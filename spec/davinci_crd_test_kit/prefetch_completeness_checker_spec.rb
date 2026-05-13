@@ -400,6 +400,42 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       errors = errors_for(order_sign_request, templates)
       expect(errors).to include(match('is invalid'))
     end
+
+    it 'does not update the base FHIR server when resolve() fails, ' \
+       'so relative references after the failure resolve correctly' do
+      order_sign_request['context']['draftOrders'] = {
+        'resourceType' => 'Bundle',
+        'entry' => [{
+          'fullUrl' => "#{base_fhir_url}/NutritionOrder/example",
+          'resource' => {
+            'resourceType' => 'NutritionOrder',
+            'id' => 'example',
+            'basedOn' => [
+              { 'reference' => 'https://other-server/r4/Patient/missing' },
+              { 'reference' => 'Patient/example' }
+            ]
+          }
+        }]
+      }
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
+
+      stub_request(:post, "#{fhirpath_url}?path=basedOn")
+        .to_return(status: 200,
+                   body: [
+                     { type: 'Reference', element: { 'reference' => 'https://other-server/r4/Patient/missing' } },
+                     { type: 'Reference', element: { 'reference' => 'Patient/example' } }
+                   ].to_json)
+      stub_request(:post, "#{fhirpath_url}?path=id")
+        .with(body: /"resourceType":"Patient"/)
+        .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+      errors = errors_for(order_sign_request,
+                          { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.basedOn.resolve().id}}' })
+      expect(errors).to eq(
+        ["(Request 1) Prefetch Template patient - resource 'https://other-server/r4/Patient/missing' " \
+         'needed to instantiate the query was not provided in the prefetched values.']
+      )
+    end
   end
 
   describe '#observed_fhirpath_collection_as_comma_delimited_string' do
@@ -651,11 +687,11 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(alternate.data_sets_different?(original, { 'unrelated' => 'something' })).to be(false)
     end
 
-    it 'returns true when the alternate has multiple errors indicating failed resource resolution' do
+    it 'returns true when any errors occurred indicating failed resource resolution' do
       original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=example' })
       alternate = make_checker(order_sign_request,
                                { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
-      alternate.instance_variable_set(:@errors, ['error one', 'error two'])
+      alternate.instance_variable_set(:@errors, ['error one'])
 
       expect(alternate.data_sets_different?(original, {})).to be(true)
     end

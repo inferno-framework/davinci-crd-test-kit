@@ -206,6 +206,7 @@ module DaVinciCRDTestKit
       end
     end
 
+    # Precondition: at most one level of nesting in the path
     def get_literal_reference_values(resource, path)
       if path.include?('.')
         first_element, path = path.split('.')
