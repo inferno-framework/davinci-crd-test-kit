@@ -991,7 +991,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes cards when any one of multiple comma-delimited service URLs matches' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset, cds-services/order-sign-service'
+          'com.inferno.includeForServices':
+            'prefetch-subset/cds-services/order-sign-subset, cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
         run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)

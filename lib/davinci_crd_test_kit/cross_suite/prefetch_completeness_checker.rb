@@ -1,5 +1,6 @@
 require_relative 'fhirpath_on_cds_request'
 require_relative 'replace_tokens'
+require 'uri'
 
 module DaVinciCRDTestKit
   # -----------------------------------------------------------------------
@@ -34,7 +35,7 @@ module DaVinciCRDTestKit
                   "provided in unrequested template '#{prefetch_template}'."
       end
 
-      errors
+      errors.uniq
     end
 
     private
@@ -241,7 +242,7 @@ module DaVinciCRDTestKit
     end
 
     # -----------------------------------------------------------------------
-    # Map of prefetched resources by refernce
+    # Map of prefetched resources by fullUrl
     # -----------------------------------------------------------------------
     def prefetched_resources
       @prefetched_resources ||= {}
@@ -261,17 +262,30 @@ module DaVinciCRDTestKit
 
     def extract_resources_from_prefetched_bundle(bundle)
       bundle['entry']&.each do |entry|
-        next unless entry.dig('resource', 'resourceType').present?
+        next unless entry['resource'].present?
 
-        # TODO: assuming relative references
-        extract_prefetched_resource_instance(entry['resource'])
+        if entry['fullUrl'].present?
+          prefetched_resources[entry['fullUrl']] = entry['resource'] unless prefetched_resources.key?(entry['fullUrl'])
+        else
+          extract_prefetched_resource_instance(entry['resource'])
+        end
       end
     end
 
+    # no fullUrl available, so assume that it is a restful FHIR url
+    # relative to the fhirServer of the hook request
     def extract_prefetched_resource_instance(resource_instance)
-      return unless resource_instance['id'].present?
+      return unless resource_instance['id'].present? &&
+                    resource_instance['resourceType'].present? &&
+                    hook_request['fhirServer'].present?
 
-      key = "#{resource_instance['resourceType']}/#{resource_instance['id']}"
+      fhir_server =
+        if hook_request['fhirServer'].ends_with?('/')
+          hook_request['fhirServer']
+        else
+          "#{hook_request['fhirServer']}/"
+        end
+      key = "#{fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
       return if prefetched_resources.key?(key)
 
       prefetched_resources[key] = resource_instance
@@ -282,15 +296,61 @@ module DaVinciCRDTestKit
     # -------------------------------------------------------------------------
 
     def resolve(reference)
-      key = reference.is_a?(Hash) ? reference['reference'] : reference
+      return nil unless reference.present?
+
+      key = absolute_reference(reference)
       return nil unless key.present?
-      # TODO: assuming relative references
-      return prefetched_resources[key] if prefetched_resources.key?(key)
 
-      errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
-                'was not provided in the prefetched values.'
+      unless prefetched_resources[key].present?
+        errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
+                  'was not provided in the prefetched values.'
 
+        nil
+      end
+
+      @current_base_fhir_server = base_fhir_server_for_identity(key)
+      prefetched_resources[key]
+    end
+
+    def absolute_reference(reference)
+      reference = reference['reference'] if reference.is_a?(Hash)
+      if URI.parse(reference).absolute?
+        reference
+      else
+        relative_to_absolute_reference(reference)
+      end
+    rescue URI::InvalidURIError => e
+      errors << "#{error_prefix} '#{reference}' needed to instantiate the query " \
+                "is invalid: #{e.message}."
       nil
+    end
+
+    def relative_to_absolute_reference(relative_reference)
+      return nil unless relative_reference_valid?(relative_reference)
+
+      if @current_base_fhir_server.nil?
+        errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
+                  'is a relative reference, but the base FHIR Server is not known.'
+        return nil
+      end
+
+      "#{@current_base_fhir_server}/#{relative_reference}"
+    end
+
+    def relative_reference_valid?(relative_reference)
+      if relative_reference.split('/').length > 2
+        errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
+                  'is not an absolute reference but has too many segments to be a relative reference.'
+        return false
+      end
+
+      resource_type, id = relative_reference.split('/')
+      if resource_type.blank? || id.blank?
+        errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
+                  'is not a valid relative reference of the form <resource type>/<id>.'
+      end
+
+      true
     end
 
     # -------------------------------------------------------------------------

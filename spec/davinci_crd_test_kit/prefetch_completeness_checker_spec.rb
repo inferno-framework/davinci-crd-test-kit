@@ -2,6 +2,7 @@ require_relative '../../lib/davinci_crd_test_kit/cross_suite/prefetch_completene
 
 RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
   let(:fhirpath_url) { 'https://example.com/fhirpath/evaluate' }
+  let(:base_fhir_url) { 'https://example/r4' }
 
   let(:order_sign_request) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'order_sign_hook_request.json')))
@@ -10,25 +11,30 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'crd_patient_example.json')))
   end
   let(:crd_patient_example_bundle) do
-    { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_patient_example }] }
+    { 'resourceType' => 'Bundle', 'entry' => [{ 'fullUrl' => "#{base_fhir_url}/Patient/example",
+                                                'resource' => crd_patient_example }] }
   end
   let(:crd_coverage_example) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'crd_coverage_example.json')))
   end
   let(:crd_coverage_example_bundle) do
-    { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_coverage_example }] }
+    { 'resourceType' => 'Bundle', 'entry' => [{ 'fullUrl' => "#{base_fhir_url}/Coverage/coverage_example",
+                                                'resource' => crd_coverage_example }] }
   end
   let(:crd_practitioner_example) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'crd_practitioner_example.json')))
   end
   let(:crd_practitioner_example_bundle) do
-    { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_practitioner_example }] }
+    { 'resourceType' => 'Bundle',
+      'entry' => [{ 'fullUrl' => "#{base_fhir_url}/Practitioner/example", 'resource' => crd_practitioner_example }] }
   end
   let(:crd_practitioner_role_example) do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'crd_practitioner_role_example.json')))
   end
   let(:crd_practitioner_role_example_bundle) do
-    { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_practitioner_role_example }] }
+    { 'resourceType' => 'Bundle',
+      'entry' => [{ 'fullUrl' => "#{base_fhir_url}/PractitionerRole/example",
+                    'resource' => crd_practitioner_role_example }] }
   end
 
   def make_checker(hook_request, templates, request_index: 0)
@@ -72,6 +78,20 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       checker = make_checker(order_sign_request, templates)
       expect { checker.check_prefetched_data }
         .to raise_error(RuntimeError, /Prefetch Template orders.*FHIRPath service error/)
+    end
+
+    it 'deduplicates errors when the same error occurs multiple times across token evaluation' do
+      order_sign_request['context']['draftOrders']['entry'].each do |entry|
+        entry['resource']['patient'] = { 'reference' => 'Patient/example' }
+      end
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      templates = { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.patient.resolve().id}}' }
+      errors = errors_for(order_sign_request, templates)
+      expect(errors.count { |e| e.include?("resource '#{base_fhir_url}/Patient/example'") }).to eq(1)
     end
   end
 
@@ -299,7 +319,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
 
     it 'passes when the referenced resource is in the prefetch set' do
-      stub_request(:post, "#{fhirpath_url}?path=entry.resource.patient")
+      stub_request(:post, "#{fhirpath_url}?path=patient")
         .to_return(status: 200, body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
       stub_request(:post, "#{fhirpath_url}?path=id")
         .with(body: /"resourceType":"Patient"/)
@@ -310,16 +330,74 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
 
     it 'returns an error when the referenced resource is not in the prefetch set' do
-      stub_request(:post, "#{fhirpath_url}?path=entry.resource.patient")
+      stub_request(:post, "#{fhirpath_url}?path=patient")
         .to_return(status: 200, body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
       stub_request(:post, "#{fhirpath_url}?path=id")
         .with(body: /"resourceType":"Patient"/)
         .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
 
       order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
-      expect(errors_for(order_sign_request, templates))
-        .to eq(["(Request 1) Prefetch Template patient - resource 'Patient/example' needed to instantiate " \
-                'the query was not provided in the prefetched values.'])
+      errors = errors_for(order_sign_request, templates)
+      expect(errors)
+        .to eq(["(Request 1) Prefetch Template patient - resource 'https://example/r4/Patient/example' needed to " \
+                'instantiate the query was not provided in the prefetched values.'])
+    end
+
+    it 'resolves absolute references directly without base server lookup' do
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference',
+                            element: { 'reference' => "#{base_fhir_url}/Patient/example" } }].to_json)
+      stub_request(:post, "#{fhirpath_url}?path=id")
+        .with(body: /"resourceType":"Patient"/)
+        .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
+      expect(errors_for(order_sign_request, templates)).to be_empty
+    end
+
+    it 'returns an error when resolving a relative reference without a known base FHIR server' do
+      order_sign_request.delete('fhirServer')
+      order_sign_request['context']['draftOrders']['entry'].each { |e| e.delete('fullUrl') }
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(match('is a relative reference, but the base FHIR Server is not known'))
+    end
+
+    it 'returns an error for a reference with too many path segments' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference',
+                            element: { 'reference' => 'Patient/example/extra' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(match('too many segments to be a relative reference'))
+    end
+
+    it 'returns an error for a malformed relative reference missing the resource id' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(match('is not a valid relative reference of the form'))
+    end
+
+    it 'returns an error for a reference that is an invalid URI' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference',
+                            element: { 'reference' => 'http://example.com/bad path' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(match('is invalid'))
     end
   end
 
@@ -396,6 +474,101 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
   end
 
+  describe 'prefetch resource extraction' do
+    let(:resolve_patient_template) do
+      { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.patient.resolve().id}}' }
+    end
+
+    before do
+      order_sign_request['context']['draftOrders']['entry'][0]['resource']['patient']['reference'] = 'Patient/example'
+    end
+
+    context 'when bundle entries have no fullUrl' do
+      let(:bundle_without_fullurl) do
+        { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_patient_example }] }
+      end
+
+      it 'are registered using the fhirServer-based key and can be resolved' do
+        order_sign_request['prefetch'] = { 'patient' => bundle_without_fullurl }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=id")
+          .with(body: /"resourceType":"Patient"/)
+          .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+        expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
+      end
+
+      it 'are not registered when fhirServer is absent, causing resource not found during resolve' do
+        order_sign_request.delete('fhirServer')
+        order_sign_request['prefetch'] = { 'patient' => bundle_without_fullurl }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+        errors = errors_for(order_sign_request, resolve_patient_template)
+        expect(errors).to include(match("resource '#{base_fhir_url}/Patient/example' needed to instantiate"))
+      end
+    end
+
+    context 'when the prefetch resource is direct (not in a bundle)' do
+      # Direct prefetch is a single resource, so use a read template (not _id search)
+      # to avoid a resourceType mismatch when check_id_search expects a Bundle.
+      let(:resolve_patient_template) do
+        { 'patient' => 'Patient/{{context.draftOrders.entry.resource.patient.resolve().id}}' }
+      end
+
+      it 'are registered using the fhirServer-based key and can be resolved' do
+        order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"NutritionOrder"/)
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"MedicationRequest"/)
+          .to_return(status: 200, body: [].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=id")
+          .with(body: /"resourceType":"Patient"/)
+          .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+        expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
+      end
+
+      it 'are not registered when fhirServer is absent, causing resource not found during resolve' do
+        order_sign_request.delete('fhirServer')
+        order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"NutritionOrder"/)
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"MedicationRequest"/)
+          .to_return(status: 200, body: [].to_json)
+
+        errors = errors_for(order_sign_request, resolve_patient_template)
+        expect(errors).to include(match("resource '#{base_fhir_url}/Patient/example' needed to instantiate"))
+      end
+
+      it 'are registered correctly when fhirServer has a trailing slash' do
+        order_sign_request['fhirServer'] = "#{base_fhir_url}/"
+        order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"NutritionOrder"/)
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .with(body: /"resourceType":"MedicationRequest"/)
+          .to_return(status: 200, body: [].to_json)
+        stub_request(:post, "#{fhirpath_url}?path=id")
+          .with(body: /"resourceType":"Patient"/)
+          .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+        expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
+      end
+    end
+  end
+
   describe 'chained prefetch tokens' do
     let(:templates) do
       {
@@ -411,12 +584,12 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
 
     it 'passes when all chained resources are present' do
-      stub_request(:post, "#{fhirpath_url}?path=entry.resource.orderer")
+      stub_request(:post, "#{fhirpath_url}?path=orderer")
         .to_return(status: 200,
                    body: [{ type: 'Reference', element: { 'reference' => 'PractitionerRole/example' } }].to_json)
       stub_request(:post, "#{fhirpath_url}?path=ofType(PractitionerRole).id")
         .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
-      stub_request(:post, "#{fhirpath_url}?path=entry.resource.practitioner")
+      stub_request(:post, "#{fhirpath_url}?path=practitioner")
         .to_return(status: 200,
                    body: [{ type: 'Reference', element: { 'reference' => 'Practitioner/example' } }].to_json)
       stub_request(:post, "#{fhirpath_url}?path=id")
@@ -424,7 +597,8 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
       order_sign_request['prefetch'] = { 'practitionerRoles' => crd_practitioner_role_example_bundle,
                                          'practitioners' => crd_practitioner_example_bundle }
-      expect(errors_for(order_sign_request, templates)).to be_empty
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to be_empty
     end
   end
 end

@@ -86,6 +86,24 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
   end
 
   describe 'for fhirpath on resources in the cds object' do
+    it 'clears current_fhir_base_server after execution' do
+      hook_request = {
+        'context' => {
+          'draftOrders' => {
+            'resourceType' => 'Bundle',
+            'entry' => [{ 'fullUrl' => 'http://example.com/fhir/NutritionOrder/1',
+                          'resource' => { 'resourceType' => 'NutritionOrder', 'id' => '1' } }]
+          }
+        }
+      }
+      stub_request(:post, "#{fhirpath_url}?path=entry.resource.id")
+        .to_return(status: 200, body: [{ type: 'id', element: '1' }].to_json)
+
+      module_instance.execute_fhirpath_on_cds_request(hook_request, 'context.draftOrders.entry.resource.id')
+
+      expect(module_instance.instance_variable_get(:@current_fhir_base_server)).to be_nil
+    end
+
     it 'returns an empty array without calling the fhirpath service when the target hash is nil' do
       stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
       results = module_instance.execute_fhirpath_on_cds_request(
@@ -97,10 +115,9 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     end
 
     it 'returns the value for a nested FHIR resource field' do
-      fhirpath_result = [{ type: 'id', element: 'pureeddiet-simple' },
-                         { type: 'id', element: 'smart-MedicationRequest-103' }]
       stub_request(:post, "#{fhirpath_url}?path=entry.resource.id")
-        .to_return(status: 200, body: fhirpath_result.to_json)
+        .to_return(status: 200, body: [{ type: 'id', element: 'pureeddiet-simple' },
+                                       { type: 'id', element: 'smart-MedicationRequest-103' }].to_json)
 
       results =
         module_instance.execute_fhirpath_on_cds_request(order_sign_request, 'context.draftOrders.entry.resource.id')
@@ -112,9 +129,8 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     end
 
     it 'returns the value for a nested FHIR resource field filtered by type' do
-      fhirpath_result = [{ type: 'id', element: 'smart-MedicationRequest-103' }]
       stub_request(:post, "#{fhirpath_url}?path=entry.resource.ofType(MedicationRequest).id")
-        .to_return(status: 200, body: fhirpath_result.to_json)
+        .to_return(status: 200, body: [{ type: 'id', element: 'smart-MedicationRequest-103' }].to_json)
 
       results =
         module_instance
@@ -147,71 +163,147 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
       expect(results[0]['reference']).to eq('ServiceRequest/example')
       expect(results[1]['reference']).to eq('MedicationRequest/smart-MedicationRequest-103')
     end
+  end
 
-    # it 'supports chained resolves' do
-    #   fhirpath_result_one = [{ type: 'Reference', element: { 'reference' => 'Practitioner/example' } }]
-    #   stub_request(:post, "#{fhirpath_url}?path=orderer")
-    #     .with(body: /"resourceType":"ServiceRequest"/)
-    #     .to_return(status: 200, body: fhirpath_result_one.to_json)
-    #   stub_request(:post, "#{fhirpath_url}?path=orderer")
-    #     .with(body: /"resourceType":"MedicationRequest"/)
-    #     .to_return(status: 200, body: [].to_json)
-    #   fhirpath_result_three = [{ type: 'id', element: 'example' }]
-    #   stub_request(:post, "#{fhirpath_url}?path=id")
-    #     .to_return(status: 200, body: fhirpath_result_three.to_json)
+  describe 'current_base_fhir_server during execution' do
+    let(:captured_base_servers) { [] }
+    let(:capturing_instance) do
+      servers = captured_base_servers
+      Class.new do
+        include DaVinciCRDTestKit::FhirpathOnCDSRequest
 
-    #   results = module_instance.execute_fhirpath_on_cds_request(
-    #     order_dispatch_v221_request,
-    #     'context.dispatchedOrders.resolve().orderer.resolve().id',
-    #     fetched_resources:
-    #       { 'ServiceRequest/example' => JSON.parse(crd_service_request_example.to_json),
-    #         'MedicationRequest/smart-MedicationRequest-103' => JSON.parse(medication_request.to_json),
-    #         'Practitioner/example' => JSON.parse(crd_practitioner_example.to_json) }
-    #   )
+        private
 
-    #   expect(results).to be_an_instance_of(Array)
-    #   expect(results.length).to eq(1)
-    #   expect(results[0]).to eq('example')
-    # end
+        define_method(:resolve) do |_reference|
+          servers << @current_base_fhir_server
+          nil
+        end
+      end.new
+    end
 
-    # it 'resolves references found in FHIR resources' do
-    #   fhirpath_result = [{ type: 'Reference', element: nutrition_order.orderer }]
-    #   stub_request(:post, "#{fhirpath_url}?path=entry.resource.orderer")
-    #     .to_return(status: 200, body: fhirpath_result.to_json)
+    it 'defaults @current_base_fhir_server from hook request fhirServer' do
+      hook_request = {
+        'fhirServer' => 'http://example.com/fhir',
+        'context' => { 'patient' => 'Patient/123' }
+      }
+      capturing_instance.execute_fhirpath_on_cds_request(hook_request, 'context.patient.resolve()')
+      expect(captured_base_servers).to eq(['http://example.com/fhir'])
+    end
 
-    #   results =
-    #     module_instance.execute_fhirpath_on_cds_request(
-    #       order_sign_request,
-    #       'context.draftOrders.entry.resource.orderer.resolve()',
-    #       fetched_resources: { 'Practitioner/example' => JSON.parse(crd_practitioner_example.to_json) }
-    #     )
+    it 'overrides @current_base_fhir_server from entry fullUrl during entry.resource processing' do
+      hook_request = {
+        'fhirServer' => 'http://example.com/fhir',
+        'context' => {
+          'draftOrders' => {
+            'resourceType' => 'Bundle',
+            'entry' => [{
+              'fullUrl' => 'http://entry.example.com/fhir/NutritionOrder/1',
+              'resource' => { 'resourceType' => 'NutritionOrder', 'id' => '1' }
+            }]
+          }
+        }
+      }
+      stub_request(:post, "#{fhirpath_url}?path=subject")
+        .to_return(status: 200, body: [{ type: 'string', element: 'Patient/123' }].to_json)
 
-    #   expect(results).to be_an_instance_of(Array)
-    #   expect(results.length).to eq(1)
-    #   expect(results[0]).to be_a(Hash)
-    #   expect(results[0]['resourceType']).to eq('Practitioner')
-    #   expect(results[0]['id']).to eq('example')
-    # end
+      capturing_instance.execute_fhirpath_on_cds_request(
+        hook_request,
+        'context.draftOrders.entry.resource.subject.resolve()'
+      )
+      expect(captured_base_servers).to eq(['http://entry.example.com/fhir'])
+    end
+  end
 
-    # it 'executes more fhirpath after resolving references found in FHIR resources' do
-    #   fhirpath_result_one = [{ type: 'Reference', element: nutrition_order.orderer }]
-    #   stub_request(:post, "#{fhirpath_url}?path=entry.resource.orderer")
-    #     .to_return(status: 200, body: fhirpath_result_one.to_json)
-    #   fhirpath_result_two = [{ type: 'id', element: 'example' }]
-    #   stub_request(:post, "#{fhirpath_url}?path=id")
-    #     .to_return(status: 200, body: fhirpath_result_two.to_json)
+  describe 'entry.resource queries with resolve()' do
+    let(:hook_request_with_entry) do
+      {
+        'fhirServer' => 'http://example.com/fhir',
+        'context' => {
+          'draftOrders' => {
+            'resourceType' => 'Bundle',
+            'entry' => [{
+              'fullUrl' => 'http://example.com/fhir/NutritionOrder/1',
+              'resource' => { 'resourceType' => 'NutritionOrder', 'id' => '1' }
+            }]
+          }
+        }
+      }
+    end
 
-    #   results =
-    #     module_instance.execute_fhirpath_on_cds_request(
-    #       order_sign_request,
-    #       'context.draftOrders.entry.resource.orderer.resolve().id',
-    #       fetched_resources: { 'Practitioner/example' => JSON.parse(crd_practitioner_example.to_json) }
-    #     )
+    it 'raises FhirpathServiceError when an unsupported function appears after resolve()' do
+      expect do
+        module_instance.execute_fhirpath_on_cds_request(
+          hook_request_with_entry,
+          'context.draftOrders.entry.resource.subject.resolve().exists()'
+        )
+      end.to raise_error(DaVinciCRDTestKit::FhirpathServiceError, /exists/)
+    end
 
-    #   expect(results).to be_an_instance_of(Array)
-    #   expect(results.length).to eq(1)
-    #   expect(results[0]).to be_a(String)
-    #   expect(results[0]).to eq('example')
-    # end
+    it 'raises before making any fhirpath service calls' do
+      stub_request(:post, /#{Regexp.escape(fhirpath_url)}/)
+      expect do
+        module_instance.execute_fhirpath_on_cds_request(
+          hook_request_with_entry,
+          'context.draftOrders.entry.resource.subject.resolve().count()'
+        )
+      end.to raise_error(DaVinciCRDTestKit::FhirpathServiceError)
+      expect(a_request(:post, /#{Regexp.escape(fhirpath_url)}/)).to_not have_been_made
+    end
+
+    it 'permits ofType() after resolve()' do
+      stub_request(:post, "#{fhirpath_url}?path=subject")
+        .to_return(status: 200, body: [{ type: 'string', element: 'Patient/123' }].to_json)
+      expect do
+        module_instance.execute_fhirpath_on_cds_request(
+          hook_request_with_entry,
+          'context.draftOrders.entry.resource.subject.resolve().ofType(Patient)'
+        )
+      end.to_not raise_error
+    end
+
+    it 'permits chained resolve() after resolve()' do
+      stub_request(:post, "#{fhirpath_url}?path=subject")
+        .to_return(status: 200, body: [{ type: 'string', element: 'Patient/123' }].to_json)
+      expect do
+        module_instance.execute_fhirpath_on_cds_request(
+          hook_request_with_entry,
+          'context.draftOrders.entry.resource.subject.resolve().resolve()'
+        )
+      end.to_not raise_error
+    end
+  end
+
+  describe '#base_fhir_server_for_identity' do
+    def base_fhir_server(url)
+      module_instance.send(:base_fhir_server_for_identity, url)
+    end
+
+    it 'returns nil for nil input' do
+      expect(base_fhir_server(nil)).to be_nil
+    end
+
+    it 'returns nil for an empty string' do
+      expect(base_fhir_server('')).to be_nil
+    end
+
+    it 'returns the base server for an http URL' do
+      expect(base_fhir_server('http://example.com/fhir/NutritionOrder/1')).to eq('http://example.com/fhir')
+    end
+
+    it 'returns the base server for an https URL' do
+      expect(base_fhir_server('https://example.com/fhir/Patient/123')).to eq('https://example.com/fhir')
+    end
+
+    it 'returns nil for a relative URL' do
+      expect(base_fhir_server('NutritionOrder/1')).to be_nil
+    end
+
+    it 'returns nil for a urn scheme' do
+      expect(base_fhir_server('urn:uuid:some-uuid')).to be_nil
+    end
+
+    it 'returns nil for an invalid URI' do
+      expect(base_fhir_server('http://example.com/foo bar')).to be_nil
+    end
   end
 end

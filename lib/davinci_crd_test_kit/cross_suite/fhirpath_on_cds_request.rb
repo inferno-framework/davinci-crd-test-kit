@@ -1,3 +1,5 @@
+require 'uri'
+
 module DaVinciCRDTestKit
   class FhirpathServiceError < StandardError; end
 
@@ -7,14 +9,23 @@ module DaVinciCRDTestKit
   # If resolve() calls are in scope (CRD 2.2.1 and beyond), then an implementation of the
   # `resolve(target)` method must be provided, where `target` is
   module FhirpathOnCDSRequest
+    SUPPORTED_POST_RESOLVE_FUNCTIONS = %w[ofType today resolve].freeze
+
     # fhirpath services doesn't handle the following, which are handled manually
     # - non-fhir objects
     # - resolve()
+    # - Bundle.entry.resource when resolve() appears in the remaining query (to track entry.fullUrl per entry)
     def execute_fhirpath_on_cds_request(hook_request, fhirpath_query)
       cds_component, remaining_query = identify_cds_component(fhirpath_query)
       execution_targets = cds_component.present? ? get_cds_field(hook_request, cds_component) : hook_request
 
-      iteratively_execute_and_resolve(execution_targets, remaining_query)
+      execution_targets.map do |execution_target|
+        @current_base_fhir_server = hook_request['fhirServer']
+        execute(execution_target, remaining_query)
+      end.flatten.compact
+    ensure
+      # clean-up identity
+      @current_base_fhir_server = nil
     end
 
     private
@@ -26,7 +37,7 @@ module DaVinciCRDTestKit
     # input is either
     # - string representing a FHIR reference, absolute or relative
     # - a FHIR Reference object with an absolute or relative reference in the `reference` element
-    # Default implementation does not perform any resolving
+    # Default implementation does not perform any resolution
     def resolve(_reference)
       nil
     end
@@ -59,25 +70,64 @@ module DaVinciCRDTestKit
     # Main execution loop
     # -------------------------------------------------------------------------
 
-    def iteratively_execute_and_resolve(execution_targets, fhirpath_query)
-      remaining_query = fhirpath_query
+    def execute(execution_target, fhirpath_query)
+      return execution_target unless fhirpath_query.present? && execution_target.present?
 
-      while remaining_query.present? && execution_targets.present?
-        if remaining_query.starts_with?('resolve()')
-          execution_targets = execution_targets.map do |target|
-            resolve(target) # external implementation must be provided
-          end.compact
-          remaining_query = remaining_query[10..]
-        else
-          path_to_execute, query_after_next_resolve = remaining_query.split('.resolve()', 2)
-          execution_targets = execution_targets.map do |target|
-            delegate_execution_to_fhirpath_engine(target, path_to_execute)
-          end.flatten
-          remaining_query = "#{'resolve()' if remaining_query.include?('resolve()')}#{query_after_next_resolve}"
-        end
+      if fhirpath_query.starts_with?('resolve()')
+        execute_resolve(execution_target, fhirpath_query)
+      elsif fhirpath_query.starts_with?('entry.resource.') && fhirpath_query.include?('resolve()')
+        execute_entry_resource_step(execution_target, fhirpath_query)
+      else
+        execute_fhirpath_step(execution_target, fhirpath_query)
       end
+    end
 
-      execution_targets
+    def execute_fhirpath_step(execution_target, fhirpath_query)
+      path_to_execute, query_after_next_resolve = fhirpath_query.split('.resolve()', 2)
+      remaining_query = "#{'resolve()' if fhirpath_query.include?('resolve()')}#{query_after_next_resolve}"
+      delegate_execution_to_fhirpath_engine(execution_target, path_to_execute).compact.map do |result|
+        execute(result, remaining_query)
+      end.flatten.compact
+    end
+
+    def execute_resolve(execution_target, fhirpath_query)
+      referenced = resolve(execution_target)
+      return nil unless referenced.present?
+
+      execute(referenced, fhirpath_query[10..])
+    end
+
+    def execute_entry_resource_step(execution_target, fhirpath_query)
+      validate_entry_resource_query!(fhirpath_query)
+      return nil unless execution_target['entry'].present?
+
+      Array.wrap(execution_target['entry']).map do |entry|
+        @current_base_fhir_server = base_fhir_server_for_identity(entry['fullUrl'])
+        execute(entry['resource'], fhirpath_query[15..])
+      end.flatten.compact
+    end
+
+    def validate_entry_resource_query!(fhirpath_query)
+      _, post_resolve = fhirpath_query.split('.resolve()', 2)
+      return unless post_resolve.present?
+
+      unsupported = post_resolve.scan(/[a-zA-Z_]\w*(?=\()/).uniq - SUPPORTED_POST_RESOLVE_FUNCTIONS
+      return if unsupported.empty?
+
+      raise FhirpathServiceError,
+            "Unsupported function(s) after resolve() in '#{fhirpath_query}': #{unsupported.join(', ')}. " \
+            "Supported: #{SUPPORTED_POST_RESOLVE_FUNCTIONS.join(', ')}."
+    end
+
+    def base_fhir_server_for_identity(current_resource_identity)
+      return nil unless current_resource_identity.present?
+
+      parsed_identity = URI.parse(current_resource_identity)
+      return nil unless ['http', 'https'].include?(parsed_identity.scheme)
+
+      current_resource_identity.split('/')[0..-3].join('/')
+    rescue URI::InvalidURIError
+      nil
     end
 
     # -------------------------------------------------------------------------
