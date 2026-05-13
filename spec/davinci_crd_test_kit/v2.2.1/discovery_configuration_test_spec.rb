@@ -128,4 +128,27 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     expect(result.result_message).to match(/contain invalid configuration options/)
     expect(first_error_message.message).to match(/`appointment-book` contain duplicate values for `code`:/)
   end
+
+  it 'ignores services in the ignore list' do
+    cds_services['services'].first['extension'] =
+      {
+        'davinci-crd.configuration-options' => [valid_config_option]
+      }
+    bad_config_option = valid_config_option.dup
+    bad_config_option.delete 'description'
+    cds_services['services'] << cds_services['services'].first.dup
+    cds_services['services'].last['id'] = 'id_to_ignore'
+    cds_services['services'].last['extension'] =
+      {
+        'davinci-crd.configuration-options' => [bad_config_option]
+      }
+
+    result = run(
+      runnable,
+      cds_services: cds_services.to_json,
+      crd_discovery_service_ignore_list: 'id1, id_to_ignore, id3'
+    )
+
+    expect(result.result).to eq('pass'), result.result_message
+  end
 end

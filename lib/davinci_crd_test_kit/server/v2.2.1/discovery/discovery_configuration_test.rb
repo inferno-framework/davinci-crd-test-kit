@@ -15,6 +15,8 @@ module DaVinciCRDTestKit
       )
 
       input :cds_services
+      input :crd_discovery_service_ignore_list,
+            optional: true
 
       def primary_hooks
         ['appointment-book', 'order-sign', 'order-dispatch']
@@ -87,7 +89,10 @@ module DaVinciCRDTestKit
       end
 
       run do
-        services = JSON.parse(cds_services)['services']
+        ignore_list = crd_discovery_service_ignore_list.to_s.split(',').map(&:strip).reject(&:blank?)
+        services =
+          JSON.parse(cds_services)['services']
+            .reject { |service| ignore_list.include? service['id'] }
 
         services_by_hook = services.group_by { |service| service['hook'] }
 
