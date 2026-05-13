@@ -2,6 +2,7 @@ require_relative 'must_support/coverage_information_system_action_across_hooks_v
 require_relative 'must_support/coverage_information_must_support_test'
 require_relative 'verify_response/verify_response_without_billing_options_test'
 require_relative 'must_support/supported_us_core_versions_test'
+require_relative 'verify_response/verify_response_without_configuration_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -20,6 +21,7 @@ module DaVinciCRDTestKit
       test from: :crd_v221_coverage_info_system_action_across_hooks_validation
       test from: :crd_v221_coverage_information_must_support
       test from: :verify_response_without_billing_options
+      test from: :verify_response_without_configuration
       test from: :crd_v221_supported_us_core_versions
     end
   end
