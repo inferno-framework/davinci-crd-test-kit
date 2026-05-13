@@ -36,15 +36,6 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
       .first.messages.map(&:message).join(' ')
   end
 
-  def make_checker_double(pass:)
-    dbl = instance_double(DaVinciCRDTestKit::PrefetchCompletenessChecker)
-    allow(dbl).to receive_messages(
-      check_prefetched_data: pass ? [] : ['(Request 1) Missing data'],
-      observed_fhirpath_collection_as_comma_delimited_string: false
-    )
-    dbl
-  end
-
   before do
     allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
       .to receive(:hook_prefetch_templates).and_return({ 'patient' => 'Patient/{{context.patientId}}' })
@@ -185,24 +176,22 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
       expect(output&.dig('value')).to be_blank
     end
 
-    it 'does not set the output when the opposite (complete) check also passes' do
+    it 'does not set the output when data sets are not distinct' do
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
       store_hook_request('order-sign', url: subset_url, body: order_sign_request)
-      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_return(make_checker_double(pass: true))
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(false)
       result = run(test)
       expect(result.result).to eq('pass')
       output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_subset_distinct_from_complete' }
       expect(output&.dig('value')).to be_blank
     end
 
-    it 'sets the output when the subset check passes and the opposite (complete) check fails' do
+    it 'sets the output when the primary check passes and data sets are distinct' do
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
       store_hook_request('order-sign', url: subset_url, body: order_sign_request)
-      subset_checker = make_checker_double(pass: true)
-      complete_checker = make_checker_double(pass: false)
-      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new) do |_, _, path|
-        path.include?('prefetch-subset') ? subset_checker : complete_checker
-      end
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(true)
       result = run(test)
       expect(result.result).to eq('pass')
       output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_subset_distinct_from_complete' }
@@ -219,24 +208,22 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
       expect(output&.dig('value')).to be_blank
     end
 
-    it 'does not set the output when the opposite (subset) check also passes' do
+    it 'does not set the output when data sets are not distinct' do
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
       store_hook_request('order-sign', body: order_sign_request)
-      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_return(make_checker_double(pass: true))
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(false)
       result = run(test)
       expect(result.result).to eq('pass')
       output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_complete_distinct_from_subset' }
       expect(output&.dig('value')).to be_blank
     end
 
-    it 'sets the output when the complete check passes and the opposite (subset) check fails' do
+    it 'sets the output when the primary check passes and data sets are distinct' do
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
       store_hook_request('order-sign', body: order_sign_request)
-      complete_checker = make_checker_double(pass: true)
-      subset_checker = make_checker_double(pass: false)
-      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new) do |_, _, path|
-        path.include?('prefetch-subset') ? subset_checker : complete_checker
-      end
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(true)
       result = run(test)
       expect(result.result).to eq('pass')
       output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_complete_distinct_from_subset' }

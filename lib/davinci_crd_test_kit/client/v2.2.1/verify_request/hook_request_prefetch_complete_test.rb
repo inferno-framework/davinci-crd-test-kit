@@ -52,6 +52,31 @@ module DaVinciCRDTestKit
         service_path_for_target(opposite)
       end
 
+      PREFETCH_KEY_COMPARISON_MAP = {
+        'patient' => 'pat',
+        'encounter' => 'enc',
+        'coverage' => 'cov',
+        'communicationRequests' => 'comReqs',
+        'deviceRequests' => 'devReqs',
+        'medicationRequests' => 'medReqs',
+        'nutritionOrders' => 'nutOrds',
+        'serviceRequests' => 'servReqs',
+        'visionPrescriptions' => 'visRxs',
+        'devices' => 'devs',
+        'medications' => 'meds',
+        'practitionerRoles' => 'roles',
+        'practitioners' => 'pracs',
+        'locations' => 'locs'
+      }.freeze
+
+      def key_comparison_map_for_target(target)
+        if target == :complete
+          PREFETCH_KEY_COMPARISON_MAP.invert
+        else
+          PREFETCH_KEY_COMPARISON_MAP
+        end
+      end
+
       run do
         hook_requests = load_hook_requests
 
@@ -77,9 +102,10 @@ module DaVinciCRDTestKit
             output demonstrates_fhirpath_collection_as_comma_delimited_string: true
           end
           if completeness_errors.blank? &&
-             PrefetchCompletenessChecker.new(
-               hook_request, request_index, service_path_for_opposite(prefetch_target)
-             ).check_prefetched_data.present?
+             checker.data_set_different_with_alternate_service?(
+               service_path_for_opposite(prefetch_target),
+               key_comparison_map_for_target(prefetch_target)
+             )
             if prefetch_target == :subset
               output demonstrates_prefetch_subset_distinct_from_complete: true
             else

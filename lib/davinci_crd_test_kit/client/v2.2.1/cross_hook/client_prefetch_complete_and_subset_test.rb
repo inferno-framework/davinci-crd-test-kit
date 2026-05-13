@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class ClientPrefetchCompleteAndSubsetTest < Inferno::Test
       include TaggedRequestLoadHelper
 
-      title 'Include a subset of the standard prefetch requirements'
+      title 'Provides both the complete standard prefetch data set and a subset'
       id :crd_v221_client_prefetch_complete_and_subset
       description <<~DESCRIPTION
         CRD requires clients to be able to prefetch a standard set of resources that

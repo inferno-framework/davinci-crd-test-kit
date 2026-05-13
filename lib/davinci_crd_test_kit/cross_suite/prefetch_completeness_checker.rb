@@ -11,6 +11,7 @@ module DaVinciCRDTestKit
     include ReplaceTokens
 
     attr_accessor :hook_request, :request_index, :services_file_path,
+                  :instantiated_prefetch_templates,
                   :observed_fhirpath_collection_as_comma_delimited_string
 
     def initialize(hook_request, request_index, services_file_path)
@@ -18,6 +19,7 @@ module DaVinciCRDTestKit
       @request_index = request_index
       @services_file_path = services_file_path
       @observed_fhirpath_collection_as_comma_delimited_string = false
+      @instantiated_prefetch_templates = {}
       extract_prefetched_resources
     end
 
@@ -36,6 +38,32 @@ module DaVinciCRDTestKit
       end
 
       errors.uniq
+    end
+
+    def data_set_different_with_alternate_service?(alternate_services_file_path, compare_key_map)
+      PrefetchCompletenessChecker.new(hook_request, request_index, alternate_services_file_path)
+        .data_sets_different?(self, compare_key_map)
+    end
+
+    def data_sets_different?(original_service_checker, compare_key_map)
+      hook_prefetch_templates.each do |prefetch_key, prefetch_request|
+        next if ['patient', 'pat', 'encounter', 'enc', 'coverage', 'cov'].include?(prefetch_key)
+
+        instantiated_request = instantiate_template(prefetch_key, prefetch_request)
+        return true if errors.size > 1 # fetch errors - there was more data to include for complete (complete > subset)
+
+        compare_prefetch_key = compare_key_map.key?(prefetch_key) ? compare_key_map[prefetch_key] : prefetch_key
+        original_instantiated_request = original_service_checker.instantiated_prefetch_templates[compare_prefetch_key]
+        next unless original_instantiated_request.present? # don't try to compare when the original didn't have this key
+
+        _, alternate_ids = resource_type_and_ids_from_search(instantiated_request)
+        _, original_ids = resource_type_and_ids_from_search(original_instantiated_request)
+
+        # missing ids - the subset requested strictly less data (subset < complete)
+        return true unless alternate_ids == original_ids
+      end
+
+      false
     end
 
     private
@@ -66,11 +94,20 @@ module DaVinciCRDTestKit
     end
 
     # -----------------------------------------------------------------------
+    # Instantiated Prefetch Templates
+    # -----------------------------------------------------------------------
+    def instantiate_template(prefetch_key, prefetch_request)
+      instantiated_request = replace_tokens_in_string(prefetch_request.dup, hook_request)
+      instantiated_prefetch_templates[prefetch_key] = instantiated_request
+      instantiated_request
+    end
+
+    # -----------------------------------------------------------------------
     # Check of actual prefetch against an instantiated request
     # -----------------------------------------------------------------------
     def check_prefetch_template(prefetch_key, prefetch_request)
       @current_prefetch_key = prefetch_key
-      instantiated_request = replace_tokens_in_string(prefetch_request.dup, hook_request)
+      instantiated_request = instantiate_template(prefetch_key, prefetch_request)
       if demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
         @observed_fhirpath_collection_as_comma_delimited_string = true
       end
@@ -91,8 +128,8 @@ module DaVinciCRDTestKit
         elsif instantiated_request.starts_with?('Coverage')
           check_coverage_search(prefetched_value, instantiated_request)
         else
-          # TODO: better error handling for this case - or maybe none since we control the prefetches
-          errors << "#{error_prefix} unexpected search template: #{instantiated_request}."
+          raise "#{error_prefix} Unexpected search template '#{instantiated_request}'. " \
+                'This indicates an implementation problem in the test kit — please log a ticket.'
         end
       else
         check_read(prefetched_value, instantiated_request)
@@ -169,9 +206,15 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def check_id_search(prefetched_value, instantiated_request)
-      resource_type, id_list = instantiated_request.split('?_id=')
+    def resource_type_and_ids_from_search(instantiated_search)
+      resource_type, id_list = instantiated_search.split('?_id=')
       target_ids = id_list.present? ? id_list.split(',').map { |id| "#{resource_type}/#{id}" }.uniq.sort : []
+
+      [resource_type, target_ids]
+    end
+
+    def check_id_search(prefetched_value, instantiated_request)
+      resource_type, target_ids = resource_type_and_ids_from_search(instantiated_request)
       resources_requested = target_ids.present?
 
       unless prefetched_value.present?
@@ -314,6 +357,8 @@ module DaVinciCRDTestKit
 
     def absolute_reference(reference)
       reference = reference['reference'] if reference.is_a?(Hash)
+      return nil unless reference.present?
+
       if URI.parse(reference).absolute?
         reference
       else

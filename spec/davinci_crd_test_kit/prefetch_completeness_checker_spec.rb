@@ -303,9 +303,10 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
   describe 'unsupported search template' do
     let(:templates) { { 'unsupported' => 'Patient?birthdate=20200101' } }
 
-    it 'returns an error for a non-_id search on a non-Coverage resource' do
+    it 'raises an exception for a non-_id search on a non-Coverage resource' do
       order_sign_request['prefetch'] = { 'unsupported' => crd_coverage_example_bundle }
-      expect(errors_for(order_sign_request, templates).first).to match('unexpected search template')
+      expect { errors_for(order_sign_request, templates) }
+        .to raise_error(RuntimeError, /Unexpected search template.*implementation problem/)
     end
   end
 
@@ -566,6 +567,128 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
         expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
       end
+    end
+  end
+
+  describe '#instantiated_prefetch_templates' do
+    it 'is empty before any methods are called' do
+      checker = make_checker(order_sign_request, {})
+      expect(checker.instantiated_prefetch_templates).to be_empty
+    end
+
+    it 'is populated with instantiated templates after check_prefetched_data' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      checker = make_checker(order_sign_request, { 'patient' => 'Patient/{{context.patientId}}' })
+      checker.check_prefetched_data
+      expect(checker.instantiated_prefetch_templates).to eq({ 'patient' => 'Patient/example' })
+    end
+
+    it 'stores instantiated templates for all checked keys' do
+      order_sign_request['prefetch'] = {
+        'patient' => crd_patient_example,
+        'coverage' => crd_coverage_example_bundle
+      }
+      checker = make_checker(order_sign_request, {
+                               'patient' => 'Patient/{{context.patientId}}',
+                               'coverage' => 'Coverage?patient={{context.patientId}}&status=active'
+                             })
+      checker.check_prefetched_data
+      expect(checker.instantiated_prefetch_templates.keys).to contain_exactly('patient', 'coverage')
+      expect(checker.instantiated_prefetch_templates['patient']).to eq('Patient/example')
+    end
+  end
+
+  describe '#data_sets_different?' do
+    def make_original_with_instantiated(instantiated_templates)
+      checker = make_checker(order_sign_request, {})
+      checker.instantiated_prefetch_templates.merge!(instantiated_templates)
+      checker
+    end
+
+    it 'returns false when the alternate requests the same resources as the original' do
+      original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=example' })
+      alternate = make_checker(order_sign_request,
+                               { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
+
+      expect(alternate.data_sets_different?(original, {})).to be(false)
+    end
+
+    it 'returns true when the alternate requests different resources than the original' do
+      original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=other-id' })
+      alternate = make_checker(order_sign_request,
+                               { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
+
+      expect(alternate.data_sets_different?(original, {})).to be(true)
+    end
+
+    it 'skips patient, encounter, and coverage keys and their short forms' do
+      original = make_original_with_instantiated({})
+      alternate = make_checker(order_sign_request, {
+                                 'patient' => 'Patient/{{context.patientId}}',
+                                 'pat' => 'Patient/{{context.patientId}}',
+                                 'encounter' => 'Encounter/unused',
+                                 'enc' => 'Encounter/unused',
+                                 'coverage' => 'Coverage?patient=unused&status=active',
+                                 'cov' => 'Coverage?patient=unused&status=active'
+                               })
+
+      expect(alternate.data_sets_different?(original, {})).to be(false)
+    end
+
+    it 'uses the compare_key_map to find the matching key in the original' do
+      original = make_original_with_instantiated({ 'original_orders' => 'ServiceRequest?_id=example' })
+      alternate = make_checker(order_sign_request,
+                               { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
+
+      expect(alternate.data_sets_different?(original, { 'orders' => 'original_orders' })).to be(false)
+    end
+
+    it 'uses the alternate key directly when it is not in the compare_key_map' do
+      original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=example' })
+      alternate = make_checker(order_sign_request,
+                               { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
+
+      expect(alternate.data_sets_different?(original, { 'unrelated' => 'something' })).to be(false)
+    end
+
+    it 'returns true when the alternate has multiple errors indicating failed resource resolution' do
+      original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=example' })
+      alternate = make_checker(order_sign_request,
+                               { 'orders' => 'ServiceRequest?_id={{context.patientId}}' })
+      alternate.instance_variable_set(:@errors, ['error one', 'error two'])
+
+      expect(alternate.data_sets_different?(original, {})).to be(true)
+    end
+  end
+
+  describe '#data_set_different_with_alternate_service?' do
+    it 'creates a new checker for the alternate path and delegates to data_sets_different?' do
+      original_checker = make_checker(order_sign_request, {})
+      alternate_checker = instance_double(described_class)
+      compare_key_map = { 'orders' => 'alt_orders' }
+      allow(described_class).to receive(:new)
+        .with(order_sign_request, 0, '/alternate/services.json')
+        .and_return(alternate_checker)
+      allow(alternate_checker).to receive(:data_sets_different?).and_return(true)
+
+      result = original_checker.data_set_different_with_alternate_service?('/alternate/services.json',
+                                                                           compare_key_map)
+
+      expect(alternate_checker).to have_received(:data_sets_different?).with(original_checker, compare_key_map)
+      expect(result).to be(true)
+    end
+
+    it 'returns false when the alternate service requests the same data' do
+      original_checker = make_checker(order_sign_request, {})
+      alternate_checker = instance_double(described_class)
+      allow(described_class).to receive(:new)
+        .with(order_sign_request, 0, '/alternate/services.json')
+        .and_return(alternate_checker)
+      allow(alternate_checker).to receive(:data_sets_different?).and_return(false)
+
+      result = original_checker.data_set_different_with_alternate_service?('/alternate/services.json', {})
+
+      expect(result).to be(false)
     end
   end
 
