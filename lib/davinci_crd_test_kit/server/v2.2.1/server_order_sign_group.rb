@@ -170,8 +170,17 @@ module DaVinciCRDTestKit
                    name: :order_sign_coverage_info
                  }
                }
-             }
-        test from: :crd_v221_all_responses_include_coverage_information
+             },
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-25',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
+             ]
+        test from: :crd_v221_all_responses_include_coverage_information,
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-39',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
+             ]
         test from: :crd_v221_propose_alternate_request_card_validation,
              config: {
                inputs: {

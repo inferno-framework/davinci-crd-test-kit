@@ -164,8 +164,17 @@ module DaVinciCRDTestKit
                    name: :appointment_book_coverage_info
                  }
                }
-             }
-        test from: :crd_v221_all_responses_include_coverage_information
+             },
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-25',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
+             ]
+        test from: :crd_v221_all_responses_include_coverage_information,
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-26',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
+             ]
         test from: :crd_v221_request_form_completion_response_validation,
              config: {
                inputs: {

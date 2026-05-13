@@ -21,6 +21,9 @@ module DaVinciCRDTestKit
         `Action.type` of `create`.
       )
       optional
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-55'
+
       input :valid_cards_with_suggestions, :contexts
 
       run do

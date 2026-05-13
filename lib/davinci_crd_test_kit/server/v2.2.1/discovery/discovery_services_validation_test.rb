@@ -33,6 +33,8 @@ module DaVinciCRDTestKit
         The test will be skipped if the server hosts no CRD CDS services.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-1'
+
       input :cds_services
       input :crd_discovery_service_ignore_list,
             title: 'Service ID Ignore List',
