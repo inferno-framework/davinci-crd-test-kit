@@ -81,7 +81,7 @@ module DaVinciCRDTestKit
             type = config_option[field_name].class
             add_message(
               'error',
-              "Expected hook `#{hook}` service `#{service['id']}` configuration option `#{service['code']}` " \
+              "Expected hook `#{hook}` service `#{service['id']}` configuration option `#{config_option['code']}` " \
               "field `#{field_name}` to be a String, but found #{type}"
             )
           end
