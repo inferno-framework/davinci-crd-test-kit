@@ -36,9 +36,9 @@ module DaVinciCRDTestKit
         In these tests, Inferno acts as a [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
         that initiates CDS Hooks calls. This test sequence is broken up into groups,
         each group corresponding to a supported hook and defining a set of tests verifying
-        the ability of the server to respond to the given hook invocation. Additionally, an additional
-        group checks the required [response types](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#potential-crd-response-types)
-        across all hooks invoked.
+        the ability of the server to respond to the given hook invocation. An
+        additional group checks that the Coverage Information response type is
+        supported for at least one hook.
 
         Each hook group test verifies that:
         - The hook can be invoked.
