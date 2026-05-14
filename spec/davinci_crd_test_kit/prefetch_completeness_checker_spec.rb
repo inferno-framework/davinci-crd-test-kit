@@ -118,7 +118,8 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     it 'returns an error when a requested resource is not provided' do
       order_sign_request['prefetch'] = { 'patient' => nil }
       expect(errors_for(order_sign_request, templates))
-        .to eq(["(Request 1) Prefetch Template patient - requested resource '#{base_fhir_url}/Patient/example' not provided."])
+        .to eq(['(Request 1) Prefetch Template patient - ' \
+                "requested resource '#{base_fhir_url}/Patient/example' not provided."])
     end
 
     it 'returns an error when the prefetched value has no resourceType' do
@@ -204,9 +205,9 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(errors_for(order_sign_request, templates)).to contain_exactly(
         '(Request 1) Prefetch Template patient - prefetched Bundle entry 1 has an unexpected resourceType: ' \
         'expected Patient, got NotPatient.',
-        "(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: " \
+        '(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: ' \
         "#{base_fhir_url}/Patient/example.",
-        "(Request 1) Prefetch Template patient - prefetched Bundle includes unrequested entries: " \
+        '(Request 1) Prefetch Template patient - prefetched Bundle includes unrequested entries: ' \
         "#{base_fhir_url}/Patient/example."
       )
     end
@@ -223,9 +224,9 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       crd_patient_example_bundle['entry'][0]['resource']['id'] = 'wrong'
       order_sign_request['prefetch'] = { 'patient' => crd_patient_example_bundle }
       expect(errors_for(order_sign_request, templates)).to contain_exactly(
-        "(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: " \
+        '(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: ' \
         "#{base_fhir_url}/Patient/example.",
-        "(Request 1) Prefetch Template patient - prefetched Bundle includes unrequested entries: " \
+        '(Request 1) Prefetch Template patient - prefetched Bundle includes unrequested entries: ' \
         "#{base_fhir_url}/Patient/example."
       )
     end
@@ -233,14 +234,14 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     it 'returns an error when no prefetch provided and ids are requested' do
       order_sign_request['prefetch'] = { 'patient' => nil }
       expect(errors_for(order_sign_request, templates))
-        .to eq(["(Request 1) Prefetch Template patient - requested resources not provided: " \
+        .to eq(['(Request 1) Prefetch Template patient - requested resources not provided: ' \
                 "#{base_fhir_url}/Patient/example."])
     end
 
     it 'returns an error when an empty Bundle is provided and ids are requested' do
       order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
       expect(errors_for(order_sign_request, templates))
-        .to eq(["(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: " \
+        .to eq(['(Request 1) Prefetch Template patient - prefetched Bundle missing expected entries: ' \
                 "#{base_fhir_url}/Patient/example."])
     end
   end
