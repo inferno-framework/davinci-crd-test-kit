@@ -213,7 +213,9 @@ module DaVinciCRDTestKit
       resource_requested = resource_id.present?
 
       unless prefetched_value.present?
-        errors << "#{error_prefix} requested resource '#{instantiated_request}' not provided." if resource_requested
+        if resource_requested
+          errors << "#{error_prefix} requested resource '#{full_url_for_target_id(instantiated_request)}' not provided."
+        end
         return
       end
 
@@ -242,7 +244,10 @@ module DaVinciCRDTestKit
       resources_requested = target_ids.present?
 
       unless prefetched_value.present?
-        errors << "#{error_prefix} requested resources not provided: #{target_ids.join(', ')}." if resources_requested
+        if resources_requested
+          errors << "#{error_prefix} requested resources not provided: " \
+                    "#{target_ids.map { |id| full_url_for_target_id(id) }.join(', ')}."
+        end
         return
       end
 
@@ -253,33 +258,51 @@ module DaVinciCRDTestKit
     end
 
     def actual_ids(prefetched_value)
-      if prefetched_value['entry'].present?
-        prefetched_value['entry'].map do |entry|
-          type = entry.dig('resource', 'resourceType')
-          id = entry.dig('resource', 'id')
-          "#{type}/#{id}" if type.present? && id.present?
-        end.compact
-      else
-        []
-      end
+      return [] unless prefetched_value['entry'].present?
+
+      prefetched_value['entry'].map do |entry|
+        type = entry.dig('resource', 'resourceType')
+        id = entry.dig('resource', 'id')
+        next unless type.present? && id.present?
+
+        type_and_id = "#{type}/#{id}"
+        [type_and_id, entry['fullUrl'].presence || type_and_id]
+      end.compact
     end
 
-    def check_ids(target_ids, actual_ids)
-      actual_ids_no_dups = actual_ids.compact.uniq
-      unless actual_ids.size == actual_ids_no_dups.size
+    def check_ids(target_ids, actual_id_pairs)
+      actual_type_ids = actual_id_pairs.map(&:first)
+      unless actual_type_ids.size == actual_type_ids.uniq.size
         errors << "#{error_prefix} prefetched Bundle has multiple entries with the same resource id."
       end
 
-      missing_ids = target_ids - actual_ids
+      actual_ids_map = actual_id_pairs.to_h
+
+      missing_ids = target_ids - actual_type_ids
       if missing_ids.present?
         errors << "#{error_prefix} prefetched Bundle missing expected entries: " \
-                  "#{missing_ids.join('\', \'')}."
+                  "#{missing_ids.map { |id| full_url_for_target_id(id) }.join('\', \'')}."
       end
-      extra_ids = actual_ids - target_ids
+
+      extra_ids = actual_type_ids - target_ids
       return unless extra_ids.present?
 
       errors << "#{error_prefix} prefetched Bundle includes unrequested entries: " \
-                "#{extra_ids.join('\', \'')}."
+                "#{extra_ids.map { |id| actual_ids_map[id] }.join('\', \'')}."
+    end
+
+    # NOTE: would possibly fail in the case of duplicate <resource>/<id> with different
+    # base urls but this will cause other problems since in the _id search form those
+    # would be the same. So not worth trying to work around it.
+    def full_url_for_target_id(type_and_id)
+      prefetched_resources.keys.find { |url| url.end_with?("/#{type_and_id}") } ||
+        fhir_server_url_for(type_and_id)
+    end
+
+    def fhir_server_url_for(type_and_id)
+      return type_and_id unless hook_request['fhirServer'].present?
+
+      "#{hook_request['fhirServer'].chomp('/')}/#{type_and_id}"
     end
 
     def check_bundle_entry_resource_type(bundle, target_resource_type)
