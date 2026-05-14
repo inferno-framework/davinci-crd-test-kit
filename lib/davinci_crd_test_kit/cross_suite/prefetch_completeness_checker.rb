@@ -57,27 +57,40 @@ module DaVinciCRDTestKit
     #   includes more data, meaning that the sets are different. (NOTE: triggers an error rather than a different
     #   set of ids because fhirpath like `...resolve().id` requires the resource be present to evaluate it)
     def data_sets_different?(original_service_checker, compare_key_map)
+      template_key_map = compare_key_map.transform_keys { |key| "%#{key}." }.transform_values { |value| "%#{value}." }
       hook_prefetch_templates.each do |prefetch_key, prefetch_request|
-        next if ['patient', 'pat', 'encounter', 'enc', 'coverage', 'cov'].include?(prefetch_key)
+        data_set_different = data_set_different?(original_service_checker,
+                                                 compare_key_map,
+                                                 template_key_map,
+                                                 prefetch_key,
+                                                 prefetch_request)
 
-        instantiated_request = instantiate_template(prefetch_key, prefetch_request)
-        return true if errors.present? # fetch errors - there was more data to include for complete (complete > subset)
-
-        compare_prefetch_key = compare_key_map.key?(prefetch_key) ? compare_key_map[prefetch_key] : prefetch_key
-        original_instantiated_request = original_service_checker.instantiated_prefetch_templates[compare_prefetch_key]
-        next unless original_instantiated_request.present? # don't try to compare when the original didn't have this key
-
-        _, alternate_ids = resource_type_and_ids_from_search(instantiated_request)
-        _, original_ids = resource_type_and_ids_from_search(original_instantiated_request)
-
-        # missing ids - the subset requested strictly less data (subset < complete)
-        return true unless alternate_ids == original_ids
+        return true if data_set_different
       end
 
       false
     end
 
     private
+
+    def data_set_different?(original_service_checker, compare_key_map, template_key_map, prefetch_key, prefetch_request)
+      return false if ['patient', 'pat', 'encounter', 'enc', 'coverage', 'cov'].include?(prefetch_key)
+
+      mapped_prefetch_request = prefetch_request.gsub(/%[a-zA-Z]+\./, template_key_map)
+      instantiated_request = instantiate_template(prefetch_key, mapped_prefetch_request)
+      return true if errors.present? # fetch errors - there was more data to include for complete (complete > subset)
+
+      compare_prefetch_key = compare_key_map.key?(prefetch_key) ? compare_key_map[prefetch_key] : prefetch_key
+      original_instantiated_request = original_service_checker.instantiated_prefetch_templates[compare_prefetch_key]
+      # don't try to compare when the original didn't have this key
+      return false unless original_instantiated_request.present?
+
+      _, alternate_ids = resource_type_and_ids_from_search(instantiated_request)
+      _, original_ids = resource_type_and_ids_from_search(original_instantiated_request)
+
+      # missing ids - the subset requested strictly less data (subset < complete)
+      alternate_ids != original_ids
+    end
 
     # -----------------------------------------------------------------------
     # Errors to return

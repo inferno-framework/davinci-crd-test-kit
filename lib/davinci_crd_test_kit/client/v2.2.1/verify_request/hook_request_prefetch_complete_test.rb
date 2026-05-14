@@ -66,6 +66,7 @@ module DaVinciCRDTestKit
         'medications' => 'meds',
         'practitionerRoles' => 'roles',
         'practitioners' => 'pracs',
+        'organizations' => 'orgs',
         'locations' => 'locs'
       }.freeze
 

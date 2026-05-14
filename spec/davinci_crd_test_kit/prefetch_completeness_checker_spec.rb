@@ -695,6 +695,61 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
       expect(alternate.data_sets_different?(original, {})).to be(true)
     end
+
+    context 'with %key. prefix remapping in alternate templates' do
+      it 'remaps %key. prefixes in the template before evaluation, enabling ID comparison' do
+        order_sign_request['prefetch'] = { 'newKey' => { 'resourceType' => 'ServiceRequest', 'id' => 'sr-1' } }
+        stub_request(:post, "#{fhirpath_url}?path=id")
+          .with(body: /"resourceType":"ServiceRequest"/)
+          .to_return(status: 200, body: [{ type: 'id', element: 'sr-1' }].to_json)
+
+        # Template uses %oldKey. but hook_request has data under 'newKey';
+        # compare_key_map maps oldKey → newKey, so %oldKey. is replaced with %newKey. before evaluation
+        original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=sr-2' })
+        alternate = make_checker(order_sign_request, { 'orders' => 'ServiceRequest?_id={{%oldKey.id}}' })
+
+        expect(alternate.data_sets_different?(original, { 'oldKey' => 'newKey' })).to be(true)
+      end
+
+      it 'returns false when the remapped template produces the same IDs as the original' do
+        order_sign_request['prefetch'] = { 'newKey' => { 'resourceType' => 'ServiceRequest', 'id' => 'sr-1' } }
+        stub_request(:post, "#{fhirpath_url}?path=id")
+          .with(body: /"resourceType":"ServiceRequest"/)
+          .to_return(status: 200, body: [{ type: 'id', element: 'sr-1' }].to_json)
+
+        original = make_original_with_instantiated({ 'orders' => 'ServiceRequest?_id=sr-1' })
+        alternate = make_checker(order_sign_request, { 'orders' => 'ServiceRequest?_id={{%oldKey.id}}' })
+
+        expect(alternate.data_sets_different?(original, { 'oldKey' => 'newKey' })).to be(false)
+      end
+
+      it 'returns true via error when remapping enables resolve() of a resource absent from prefetch' do
+        encounter = {
+          'resourceType' => 'Encounter',
+          'id' => 'encounter-1',
+          'participant' => [{ 'individual' => { 'reference' => 'PractitionerRole/role-1' } }]
+        }
+        order_sign_request['prefetch'] = { 'enc' => encounter }
+
+        stub_request(:post, "#{fhirpath_url}?path=participant.individual")
+          .with(body: /"resourceType":"Encounter"/)
+          .to_return(status: 200,
+                     body: [{ type: 'Reference',
+                              element: { 'reference' => 'PractitionerRole/role-1' } }].to_json)
+
+        # Template uses %encounter. which remaps to %enc. via compare_key_map;
+        # after remapping, the encounter is found and resolve() is attempted for PractitionerRole/role-1;
+        # PractitionerRole is absent from prefetch, so resolve() adds an error → returns true
+        original = make_original_with_instantiated({})
+        alternate = make_checker(
+          order_sign_request,
+          { 'practitionerRoles' =>
+              'PractitionerRole?_id={{%encounter.participant.individual.resolve().ofType(PractitionerRole).id}}' }
+        )
+
+        expect(alternate.data_sets_different?(original, { 'encounter' => 'enc' })).to be(true)
+      end
+    end
   end
 
   describe '#data_set_different_with_alternate_service?' do
