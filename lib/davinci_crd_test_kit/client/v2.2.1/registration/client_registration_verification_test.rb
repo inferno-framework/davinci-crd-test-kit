@@ -31,17 +31,47 @@ module DaVinciCRDTestKit
               This input is required for these tests to pass.
             ),
             optional: true
+      input :complete_prefetch_service_organization_id,
+            title: 'Complete Prefetch Service Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              complete prefetch CRD services. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services under the `cds-services`
+              discovery endpoint.
+            ),
+            type: 'text',
+            optional: false
+      input :subset_prefetch_service_organization_id,
+            title: 'Subset Prefetch Service Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              subset prefetch CRD services. This Organization must be referenced
+              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
+              discovery endpoint.
+            ),
+            type: 'text',
+            optional: false
 
       run do
-        assert cds_jwk_set.present?, 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.'
+        if cds_jwk_set.present?
+          check_jwks
+        else
+          add_message('error', 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.')
+        end
 
+        unless complete_prefetch_service_organization_id != subset_prefetch_service_organization_id
+          add_message('error', 'Each Inferno CRD service must be assigned a unique Organization id')
+        end
+
+        assert_no_error_messages 'Invalid registration information provided. See messages for details'
+      end
+
+      def check_jwks
         jwks_warnings = []
         parsed_jwk_set = jwk_set(cds_jwk_set, jwks_warnings)
         jwks_warnings.each { |warning| add_message('warning', warning) }
 
-        assert parsed_jwk_set.length.positive?, 'JWKS content does not include any valid keys.'
-
-        assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See messages for details'
+        add_message('error', 'JWKS content does not include any valid keys.') unless parsed_jwk_set.length.positive?
       end
 
       def jwk_set(jku, warning_messages = []) # rubocop:disable Metrics/CyclomaticComplexity

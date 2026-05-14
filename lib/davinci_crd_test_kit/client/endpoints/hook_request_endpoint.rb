@@ -24,9 +24,9 @@ module DaVinciCRDTestKit
       @ig_version ||= requested_version || request.env['PATH_INFO'].match(/(v\d+)/)&.[](1) || 'v201'
     end
 
+    # JSON round-trip normalizes the Hanami params object to a plain string-keyed Hash
     def request_body
-      @request_body ||=
-        JSON.parse(request.params.to_json)
+      @request_body ||= JSON.parse(request.params.to_json)
     end
 
     def requested_version
@@ -63,7 +63,7 @@ module DaVinciCRDTestKit
 
     # from the url
     def invoked_hook
-      @invoked_hook ||= request.env['PATH_INFO'].match(%r{/([^/]+)-service$})&.[](1)
+      @invoked_hook ||= request.env['PATH_INFO'].match(%r{/([^/]+)-(?:service|subset)$})&.[](1)
     end
 
     # from the waiting test

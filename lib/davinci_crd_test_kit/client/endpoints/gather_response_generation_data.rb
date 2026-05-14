@@ -206,6 +206,7 @@ module DaVinciCRDTestKit
       end
     end
 
+    # Precondition: at most one level of nesting in the path
     def get_literal_reference_values(resource, path)
       if path.include?('.')
         first_element, path = path.split('.')
@@ -233,6 +234,8 @@ module DaVinciCRDTestKit
       @prefetched_coverage ||=
         if request_body.dig('prefetch', 'coverage').present?
           FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
+        elsif request_body.dig('prefetch', 'cov').present?
+          FHIR.from_contents(request_body.dig('prefetch', 'cov').to_json)
         end
     end
 
@@ -375,9 +378,8 @@ module DaVinciCRDTestKit
     end
 
     def prefetched_location_bundle
-      locations = if request_body.dig('prefetch', 'locations').present?
-                    FHIR.from_contents(request_body.dig('prefetch', 'locations').to_json)
-                  end
+      locations_data = request_body.dig('prefetch', 'locations') || request_body.dig('prefetch', 'locs')
+      locations = FHIR.from_contents(locations_data.to_json) if locations_data.present?
       return locations if locations.is_a?(FHIR::Bundle)
       return nil unless locations.is_a?(FHIR::Location)
 

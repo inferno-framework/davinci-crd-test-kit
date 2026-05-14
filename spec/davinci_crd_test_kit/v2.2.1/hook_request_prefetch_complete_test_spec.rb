@@ -68,6 +68,42 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
     expect(entity_result_message(test)).to include('(Request 2)')
   end
 
+  describe 'services file selection based on request URL' do
+    let(:subset_url) do
+      "#{Inferno::Application['base_url']}/custom/crd_client/prefetch-subset/cds-services/order-sign-subset"
+    end
+
+    it 'uses the standard services file for cds-services endpoint requests' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_call_original
+      run(test)
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to have_received(:new)
+        .with(anything, anything, a_string_including('cds-services-v221.json'))
+    end
+
+    it 'uses the prefetch-subset services file for prefetch-subset endpoint requests' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_call_original
+      run(test)
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to have_received(:new)
+        .with(anything, anything, a_string_including('cds-services-prefetch-subset-v221.json'))
+    end
+
+    it 'selects the correct file independently for each request when both endpoint types are present' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+      allow(DaVinciCRDTestKit::PrefetchCompletenessChecker).to receive(:new).and_call_original
+      run(test)
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to have_received(:new)
+        .with(anything, 0, a_string_including('cds-services-v221.json'))
+      expect(DaVinciCRDTestKit::PrefetchCompletenessChecker).to have_received(:new)
+        .with(anything, 1, a_string_including('cds-services-prefetch-subset-v221.json'))
+    end
+  end
+
   describe 'demonstrates_fhirpath_collection_as_comma_delimited_string output' do
     let(:id_search_template) { { 'patient' => 'Patient?_id={{context.patientId|context.secondPatientId}}' } }
     let(:crd_patient_example_bundle) do
@@ -123,6 +159,74 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
       result = run(test)
       expect(result.result).to eq('pass')
       output = result.outputs.find { |o| o['name'] == 'demonstrates_fhirpath_collection_as_comma_delimited_string' }
+      expect(output['value']).to eq('true')
+    end
+  end
+
+  describe 'demonstrates_prefetch_subset_distinct_from_complete output' do
+    let(:subset_url) do
+      "#{Inferno::Application['base_url']}/custom/crd_client/prefetch-subset/cds-services/order-sign-subset"
+    end
+
+    it 'does not set the output when the primary (subset) check fails' do
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_subset_distinct_from_complete' }
+      expect(output&.dig('value')).to be_blank
+    end
+
+    it 'does not set the output when data sets are not distinct' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(false)
+      result = run(test)
+      expect(result.result).to eq('pass')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_subset_distinct_from_complete' }
+      expect(output&.dig('value')).to be_blank
+    end
+
+    it 'sets the output when the primary check passes and data sets are distinct' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', url: subset_url, body: order_sign_request)
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(true)
+      result = run(test)
+      expect(result.result).to eq('pass')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_subset_distinct_from_complete' }
+      expect(output['value']).to eq('true')
+    end
+  end
+
+  describe 'demonstrates_prefetch_complete_distinct_from_subset output' do
+    it 'does not set the output when the primary (complete) check fails' do
+      store_hook_request('order-sign', body: order_sign_request)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_complete_distinct_from_subset' }
+      expect(output&.dig('value')).to be_blank
+    end
+
+    it 'does not set the output when data sets are not distinct' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(false)
+      result = run(test)
+      expect(result.result).to eq('pass')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_complete_distinct_from_subset' }
+      expect(output&.dig('value')).to be_blank
+    end
+
+    it 'sets the output when the primary check passes and data sets are distinct' do
+      order_sign_request['prefetch'] = { 'patient' => crd_patient_example }
+      store_hook_request('order-sign', body: order_sign_request)
+      allow_any_instance_of(DaVinciCRDTestKit::PrefetchCompletenessChecker)
+        .to receive(:data_set_different_with_alternate_service?).and_return(true)
+      result = run(test)
+      expect(result.result).to eq('pass')
+      output = result.outputs.find { |o| o['name'] == 'demonstrates_prefetch_complete_distinct_from_subset' }
       expect(output['value']).to eq('true')
     end
   end

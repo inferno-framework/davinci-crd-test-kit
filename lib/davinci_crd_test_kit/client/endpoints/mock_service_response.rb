@@ -71,9 +71,13 @@ module DaVinciCRDTestKit
     end
 
     def get_missing_response_types(hook_card_response)
-      selected_response_types.append('coverage_information').uniq! if coverage_information_required?
+      expected_types = if coverage_information_required?
+                         selected_response_types | ['coverage_information']
+                       else
+                         selected_response_types
+                       end
 
-      selected_response_types
+      expected_types
         .select do |response_type|
           response_type = response_type
             .split('_')
@@ -159,9 +163,9 @@ module DaVinciCRDTestKit
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
-      prefetch = request_body['prefetch']
-      if prefetch.present? && prefetch['coverage']
-        coverage_or_bundle = FHIR.from_contents(prefetch['coverage'].to_json)
+      prefetched_coverage =  extract_prefetched_coverage(request_body['prefetch'])
+      if prefetched_coverage.present?
+        coverage_or_bundle = FHIR.from_contents(prefetched_coverage.to_json)
         coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
       else
         fhir_server = request_body['fhirServer']
@@ -175,6 +179,14 @@ module DaVinciCRDTestKit
           )
         end
       end
+    end
+
+    def extract_prefetched_coverage(prefetch)
+      return nil unless prefetch.present?
+      return prefetch['coverage'] if prefetch['coverage'].present?
+      return prefetch['cov'] if prefetch['cov'].present?
+
+      nil
     end
 
     def get_context_resource(update_resource_id)

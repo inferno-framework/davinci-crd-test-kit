@@ -8,6 +8,13 @@ module DaVinciCRDTestKit
   ORDER_SELECT_PATH = '/cds-services/order-select-service'.freeze
   ORDER_SIGN_PATH = '/cds-services/order-sign-service'.freeze
 
+  APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/appointment-book-subset'.freeze
+  ENCOUNTER_START_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-start-subset'.freeze
+  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-discharge-subset'.freeze
+  ORDER_DISPATCH_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-dispatch-subset'.freeze
+  ORDER_SELECT_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-select-subset'.freeze
+  ORDER_SIGN_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-sign-subset'.freeze
+
   module ClientBaseURLs
     include BaseURLs
 
@@ -33,6 +40,30 @@ module DaVinciCRDTestKit
 
     def order_sign_url
       @order_sign_url ||= inferno_base_url + ORDER_SIGN_PATH
+    end
+
+    def appointment_book_prefetch_subset_url
+      @appointment_book_prefetch_subset_url ||= inferno_base_url + APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH
+    end
+
+    def encounter_start_prefetch_subset_url
+      @encounter_start_prefetch_subset_url ||= inferno_base_url + ENCOUNTER_START_PREFETCH_SUBSET_PATH
+    end
+
+    def encounter_discharge_prefetch_subset_url
+      @encounter_discharge_prefetch_subset_url ||= inferno_base_url + ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH
+    end
+
+    def order_dispatch_prefetch_subset_url
+      @order_dispatch_prefetch_subset_url ||= inferno_base_url + ORDER_DISPATCH_PREFETCH_SUBSET_PATH
+    end
+
+    def order_select_prefetch_subset_url
+      @order_select_prefetch_subset_url ||= inferno_base_url + ORDER_SELECT_PREFETCH_SUBSET_PATH
+    end
+
+    def order_sign_prefetch_subset_url
+      @order_sign_prefetch_subset_url ||= inferno_base_url + ORDER_SIGN_PREFETCH_SUBSET_PATH
     end
   end
 end

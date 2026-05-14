@@ -19,46 +19,100 @@ module DaVinciCRDTestKit
 
         [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
         This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format,
-        contains exactly what is requested in by the
-        [prefetch templates published by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json).
+        contains exactly what is requested in by the prefetch templates published by the simulated CRD Server that
+        the request wasy made against. Inferno simulates two CDS services, one requiring the
+        [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
+        and the other [requesting only a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
         Clients must be able to return all data in the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
-        which are used by Inferno. Thus, this test checks that exactly the requested
-        data is present based on the request context.
+        so this test checks that exactly the requested data is present based on the request context.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@30', 'cds-hooks_3.0.0-ballot@231', 'cds-hooks_3.0.0-ballot@45',
                             'cds-hooks_3.0.0-ballot@46', 'cds-hooks_3.0.0-ballot@47', 'cds-hooks_3.0.0-ballot@232',
                             'cds-hooks_3.0.0-ballot@53', 'cds-hooks_3.0.0-ballot@240',
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@found-23',
                             'hl7.fhir.us.davinci-crd_2.2.1@found-24', 'hl7.fhir.us.davinci-crd_2.2.1@found-25-A',
-                            'hl7.fhir.us.davinci-crd_2.2.1@found-24'
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
+                            'hl7.fhir.us.davinci-crd_2.2.1@found-25-B', 'hl7.fhir.us.davinci-crd_2.2.1@found-31'
 
       # output emitted only if the behavior is detected
-      output :demonstrates_fhirpath_collection_as_comma_delimited_string
+      output :demonstrates_fhirpath_collection_as_comma_delimited_string,
+             :demonstrates_prefetch_subset_distinct_from_complete,
+             :demonstrates_prefetch_complete_distinct_from_subset
+
+      SERVICE_FILENAMES = {
+        complete: 'cds-services-v221.json',
+        subset: 'cds-services-prefetch-subset-v221.json'
+      }.freeze
+
+      def service_path_for_target(target)
+        File.join(__dir__, '..', SERVICE_FILENAMES[target])
+      end
+
+      def service_path_for_opposite(target)
+        opposite = target == :complete ? :subset : :complete
+        service_path_for_target(opposite)
+      end
+
+      PREFETCH_KEY_COMPARISON_MAP = {
+        'patient' => 'pat',
+        'encounter' => 'enc',
+        'coverage' => 'cov',
+        'communicationRequests' => 'comReqs',
+        'deviceRequests' => 'devReqs',
+        'medicationRequests' => 'medReqs',
+        'nutritionOrders' => 'nutOrds',
+        'serviceRequests' => 'servReqs',
+        'visionPrescriptions' => 'visRxs',
+        'devices' => 'devs',
+        'medications' => 'meds',
+        'practitionerRoles' => 'roles',
+        'practitioners' => 'pracs',
+        'organizations' => 'orgs',
+        'locations' => 'locs'
+      }.freeze
+
+      def key_comparison_map_for_target(target)
+        if target == :complete
+          PREFETCH_KEY_COMPARISON_MAP.invert
+        else
+          PREFETCH_KEY_COMPARISON_MAP
+        end
+      end
 
       run do
         hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
-        collection_as_comma_delimited_string_demonstrated = false
-
         hook_requests.each_with_index do |request, request_index|
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          services_path = File.join(__dir__, '..', 'cds-services-v221.json')
+          prefetch_target = if request.url.include?('prefetch-subset')
+                              :subset
+                            else
+                              :complete
+                            end
+
+          services_path = service_path_for_target(prefetch_target)
           checker = PrefetchCompletenessChecker.new(hook_request, request_index, services_path)
-          checker.check_prefetched_data.each do |error|
+          completeness_errors = checker.check_prefetched_data
+          completeness_errors.each do |error|
             add_message('error', error) # NOTE: PrefetchCompletenessChecker adds the (Request #) prefix
           end
           if checker.observed_fhirpath_collection_as_comma_delimited_string
-            collection_as_comma_delimited_string_demonstrated = true
+            output demonstrates_fhirpath_collection_as_comma_delimited_string: true
           end
-        end
-
-        if collection_as_comma_delimited_string_demonstrated
-          output demonstrates_fhirpath_collection_as_comma_delimited_string: true
+          if completeness_errors.blank? &&
+             checker.data_set_different_with_alternate_service?(
+               service_path_for_opposite(prefetch_target),
+               key_comparison_map_for_target(prefetch_target)
+             )
+            if prefetch_target == :subset
+              output demonstrates_prefetch_subset_distinct_from_complete: true
+            else
+              output demonstrates_prefetch_complete_distinct_from_subset: true
+            end
+          end
         end
 
         assert_no_error_messages("#{requests_with_errors_prefix}Incomplete or invalid prefetched data. " \

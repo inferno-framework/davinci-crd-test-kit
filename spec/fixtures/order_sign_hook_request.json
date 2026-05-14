@@ -14,8 +14,10 @@
     "patientId": "example",
     "draftOrders": {
       "resourceType": "Bundle",
+      "type": "collection",
       "entry": [
         {
+          "fullUrl": "https://example/r4/NutritionOrder/pureeddiet-simple",
           "resource": {
             "resourceType": "NutritionOrder",
             "id": "pureeddiet-simple",
@@ -125,6 +127,7 @@
           }
         },
         {
+          "fullUrl": "https://example/r4/MedicationRequest/smart-MedicationRequest-103",
           "resource": {
             "resourceType": "MedicationRequest",
             "id": "smart-MedicationRequest-103",

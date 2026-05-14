@@ -123,7 +123,7 @@ module DaVinciCRDTestKit
         # Merge extension lists, keeping duplicate url from action's resource,
         # otherwise replace (top-level elements)
         instantiated_action['resource'] =
-          merge_action_resouce_into_target(instantiated_action['resource'], target_resource)
+          merge_action_resource_into_target(instantiated_action['resource'], target_resource)
 
         coverage_information_ext = instantiated_action['resource']['extension']&.find do |ext|
           ext['url'] == 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
@@ -136,7 +136,7 @@ module DaVinciCRDTestKit
       instantiated_action
     end
 
-    def merge_action_resouce_into_target(action_resource, target_resource)
+    def merge_action_resource_into_target(action_resource, target_resource)
       target_resource.merge(action_resource) do |key, old_value, new_value|
         if key == 'extension'
           old_value.select do |existing_extention|
@@ -160,6 +160,10 @@ module DaVinciCRDTestKit
       defaults_ext = default_extension_name(list_element)
       define_extension(parent, defaults_ext, [])
       parent[list_element]&.select! do |object|
+        next false unless enabled_on_service?(object)
+
+        remove_extension(object, 'com.inferno.includeForServices')
+
         if object_has_inclusion_criteria?(object)
           if object_is_a_default?(object)
             remove_inclusion_criteria(object)
@@ -176,6 +180,13 @@ module DaVinciCRDTestKit
           true
         end
       end
+    end
+
+    def enabled_on_service?(object)
+      services = get_extension_value(object, 'com.inferno.includeForServices')
+      return true unless services.present?
+
+      services.split(',').map(&:strip).any? { |url| request.env['PATH_INFO'].include?(url) }
     end
 
     def object_is_a_default?(object)
