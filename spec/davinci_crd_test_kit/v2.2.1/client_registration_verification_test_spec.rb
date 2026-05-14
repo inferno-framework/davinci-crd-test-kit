@@ -19,12 +19,12 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
 
   def run_with_defaults(cds_jwk_set: jwks_hash.to_json,
                         complete_prefetch_service_organization_id: complete_org_id,
-                        subset_prefetch_service_organization_subset_id: subset_org_id)
+                        subset_prefetch_service_organization_id: subset_org_id)
     run(test,
         cds_jwt_iss: jwt_iss,
         cds_jwk_set:,
         complete_prefetch_service_organization_id:,
-        subset_prefetch_service_organization_subset_id:)
+        subset_prefetch_service_organization_id:)
   end
 
   it 'passes with valid raw JWKS and distinct organization ids' do
@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
   it 'fails when both organization ids are the same' do
     result = run_with_defaults(
       complete_prefetch_service_organization_id: 'same-org',
-      subset_prefetch_service_organization_subset_id: 'same-org'
+      subset_prefetch_service_organization_id: 'same-org'
     )
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message)).to include(match(/unique Organization id/))
@@ -69,7 +69,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
   it 'passes when organization ids differ' do
     result = run_with_defaults(
       complete_prefetch_service_organization_id: 'org-a',
-      subset_prefetch_service_organization_subset_id: 'org-b'
+      subset_prefetch_service_organization_id: 'org-b'
     )
     expect(result.result).to eq('pass')
   end
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     result = run_with_defaults(
       cds_jwk_set: nil,
       complete_prefetch_service_organization_id: 'same-org',
-      subset_prefetch_service_organization_subset_id: 'same-org'
+      subset_prefetch_service_organization_id: 'same-org'
     )
     expect(result.result).to eq('fail')
     messages = result_messages.map(&:message)

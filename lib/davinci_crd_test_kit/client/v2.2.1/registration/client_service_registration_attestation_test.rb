@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
             ),
             type: 'text',
             optional: false
-      input :subset_prefetch_service_organization_subset_id,
+      input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated

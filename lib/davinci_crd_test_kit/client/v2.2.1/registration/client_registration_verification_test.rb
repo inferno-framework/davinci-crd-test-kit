@@ -41,7 +41,7 @@ module DaVinciCRDTestKit
             ),
             type: 'text',
             optional: false
-      input :subset_prefetch_service_organization_subset_id,
+      input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
@@ -59,7 +59,7 @@ module DaVinciCRDTestKit
           add_message('error', 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.')
         end
 
-        unless complete_prefetch_service_organization_id != subset_prefetch_service_organization_subset_id
+        unless complete_prefetch_service_organization_id != subset_prefetch_service_organization_id
           add_message('error', 'Each Inferno CRD service must be assigned a unique Organization id')
         end
 
