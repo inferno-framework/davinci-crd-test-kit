@@ -59,10 +59,10 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(last_response.headers['Content-Type']).to include('application/fhir+json')
     end
 
-    it 'returns 400 with an OperationOutcome when the resource is not found' do
+    it 'returns 404 with an OperationOutcome when the resource is not found' do
       wait_and_auth
       get "/custom/#{suite_id}/fhir/Patient/nonexistent-id"
-      expect(last_response.status).to eq(400)
+      expect(last_response.status).to eq(404)
       outcome = FHIR.from_contents(last_response.body)
       expect(outcome.resourceType).to eq('OperationOutcome')
     end

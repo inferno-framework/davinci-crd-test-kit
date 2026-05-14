@@ -92,7 +92,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(last_response.status).to eq(204)
 
       get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
-      expect(last_response.status).to eq(400)
+      expect(last_response.status).to eq(404)
     end
   end
 end

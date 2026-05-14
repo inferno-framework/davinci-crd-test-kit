@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
       def token_to_session_id(token_to_decode)
         JSON.parse(Base64.urlsafe_decode64(token_to_decode))&.dig('session_id')
-      rescue JSON::ParserError
+      rescue JSON::ParserError, ArgumentError
         nil
       end
 
@@ -160,7 +160,7 @@ module DaVinciCRDTestKit
 
       def target_resource_present?
         if target_resource.blank?
-          response.status = 400
+          response.status = 404
           response.body = error_body('error', 'not-found',
                                      "No resource found with id #{resource_type}/#{resource_id}")
           return false
