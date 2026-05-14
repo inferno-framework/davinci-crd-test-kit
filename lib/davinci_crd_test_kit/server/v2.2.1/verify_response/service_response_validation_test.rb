@@ -21,8 +21,7 @@ module DaVinciCRDTestKit
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-32'
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5'
 
       input :invoked_hook
       output :valid_cards, :valid_system_actions
