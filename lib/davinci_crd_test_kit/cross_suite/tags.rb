@@ -15,6 +15,7 @@ module DaVinciCRDTestKit
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
+  UNKNOWN_CONFIGURATION_TAG = 'unknown-configuration'.freeze
 
   module TagMethods
     def hook_instance_tag(hook_instance)
