@@ -40,10 +40,6 @@ module DaVinciCRDTestKit
         nil
       end
 
-      def coverage_info_disabled_request?(request)
-        coverage_info_configuration_disabled?(parsed_body(request.request_body))
-      end
-
       run do
         load_tagged_requests(tested_hook_name, COVERAGE_INFO_DISABLED_TAG)
 
