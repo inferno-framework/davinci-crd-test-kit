@@ -18,15 +18,6 @@ module DaVinciCRDTestKit
         values are ignored.
       )
 
-      def coverage_info_message(cards, actions)
-        card_summaries = cards.map { |card| card['summary'] }.compact
-        action_descriptions = actions.map { |action| action['description'] }.compact
-
-        'Coverage-info disabled server response included coverage-info content despite ' \
-          "`#{COVERAGE_INFO_CONFIGURATION_CODE}` being set to `false`. " \
-          "Cards: #{card_summaries.join(', ')}. System actions: #{action_descriptions.join(', ')}."
-      end
-
       def primary_hook?
         ['appointment-book', 'order-sign', 'order-dispatch'].include? tested_hook_name
       end
