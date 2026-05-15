@@ -473,7 +473,7 @@ module DaVinciCRDTestKit
         key = [resource_type, resource_id]
         return if included_set.include?(key) || matching_entry_set.include?(key)
 
-        included_entry = resolve_refrence_to_entry_in_bundle(resource_type, resource_id)
+        included_entry = resolve_reference_to_entry_in_bundle(resource_type, resource_id)
         return unless included_entry.present?
 
         included_entries << included_entry
@@ -503,7 +503,7 @@ module DaVinciCRDTestKit
         end
       end
 
-      def resolve_refrence_to_entry_in_bundle(resource_type, resource_id)
+      def resolve_reference_to_entry_in_bundle(resource_type, resource_id)
         bundle_entry_index[[resource_type, resource_id]]
       end
 
