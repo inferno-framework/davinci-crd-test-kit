@@ -7,11 +7,13 @@ module DaVinciCRDTestKit
     class ClientFHIRAPIGroup < Inferno::TestGroup
       title 'FHIR API'
       description <<~DESCRIPTION
-        Systems wishing to conform to the [CRD client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
-        role are responsible for returning data requested by the CRD server needed to provide decision support. The Da
-        Vinci CRD client FHIR API Test Group contains tests that test the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
-        of the CRD client and ensures that the CRD client can respond to CRD server queriers. These 'server' capabilities
-        are based on [US Core](https://hl7.org/fhir/us/core/STU3.1.1/).
+        CRD client systems are responsible for returning data requested by the CRD server needed to provide decision support.
+        This group contains tests that verify the required 'server' FHIR API capabilities.
+        These 'server' capabilities are based on the US Core Server Capability Statement for the US Core version chosen
+        when initiating the test session:
+        - [US Core 3.1.1 Server Capability Statement](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html)
+        - [US Core 6.1.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html)
+        - [US Core 7.0.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html)
       DESCRIPTION
       id :crd_v221_client_fhir_api
 
@@ -42,7 +44,7 @@ module DaVinciCRDTestKit
       group from: :'us_core_v311-us_core_v311_fhir_api' do
         description %(
           This test group verifies that the CRD client can respond to queries as required by the
-          US Core 3.1.1 Server Capability Statement
+          [US Core 3.1.1 Server Capability Statement](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html).
 
           Note: these tests do not look for crd-specific data and so only verify conformance against
           US Core profiles. The hook tests take the CRD-specific profiles into account.
@@ -56,7 +58,7 @@ module DaVinciCRDTestKit
       group from: :'us_core_v610-us_core_v610_fhir_api' do
         description %(
           This test group verifies that the CRD client can respond to queries as required by the
-          US Core 6.1.0 Server Capability Statement
+          [US Core 6.1.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html).
 
           Note: these tests do not look for crd-specific data and so only verify conformance against
           US Core profiles. The hook tests take the CRD-specific profiles into account.
@@ -70,7 +72,7 @@ module DaVinciCRDTestKit
       group from: :'us_core_v700-us_core_v700_fhir_api' do
         description %(
           This test group verifies that the CRD client can respond to queries as required by the
-          US Core 7.0.0 Server Capability Statement
+          [US Core 7.0.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html).
 
           Note: these tests do not look for crd-specific data and so only verify conformance against
           US Core profiles. The hook tests take the CRD-specific profiles into account.

@@ -10,9 +10,8 @@ module DaVinciCRDTestKit
       id :crd_v221_hook_request_secured_transport
       title 'Hook request interactions use TLS'
       description %(
-        CRD and the underlying CDS Hooks specification require the use of TLS to protect
-        information passed between the client and service. This test verifies that
-        requests made by both the client and Inferno's simulated service are made against
+        During this test, Inferno will verify that
+        requests made by both the client and Inferno's simulated CRD servers are made against
         TLS-secured endpoints using the `https` protocol.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@2', 'cds-hooks_3.0.0-ballot@168', 'cds-hooks_3.0.0-ballot@172',

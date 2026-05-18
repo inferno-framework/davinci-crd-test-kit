@@ -6,13 +6,12 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_retrieve_jwks
-      title 'JWKS can be retrieved'
+      title 'JWKSs can be retrieved'
       description %(
-        Verify that the JWKS can be retrieved from the JWKS uri if it is present in the `jku` field within the JWT token
-        header. As per the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#trusting-cds-clients), if the jku
-        header field is omitted, the CDS client and CDS service SHALL communicate the JWK Set out-of-band. Therefore,
-        if the client does not make their keys publicly available via a uri in the `jku` field, the user must
-        submit the jwk_set as an input to the test.
+        During this test, Inferno will verify that for each request the JWKS can be retrieved from the JWKS uri if
+        it is present in the `jku` field within the JWT token header. Additionally, keys will be extracted and
+        outputted for use in subsequent tests. If the client does not provide a uri in the `jku` field,
+        Inferno will extract keys from the raw JWKS JSON provided out of band as a part of the Registration group.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
@@ -23,10 +22,12 @@ module DaVinciCRDTestKit
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
             description: %(
-            The client's registered JWK Set containing it's public key, either
-            as a publicly accessible url containing the JWKS, or the raw JWKS.
-            Run or re-run the **Registration** group to set or
-            change this value. Used if the `jku` header is not found in the auth token jwt.
+            The client's registered JWK Set containing it's public key. Used
+            only when a request was received with a JWT without the `jku` header.
+            Inferno assumes this input, provided during the Registration
+            group, contains the raw JSON representation of a JWKS (if a URI was provided
+            it would be populated in the `jku` header). Run or re-run the Registration
+            group to set or change this value.
           ),
             locked: true,
             optional: true

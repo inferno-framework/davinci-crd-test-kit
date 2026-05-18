@@ -319,7 +319,7 @@ Notes:
 #### `coverage-information` Defaulting
 
 System actions that add the `coverage-information` extension to resources are a response type
-for which CRD requires client support. To help testers specify this card type, Inferno will
+for which the CRD IG requires client support. To help testers specify this card type, Inferno will
 populate the following `coverage-information` sub-extensions when not found in
 `coverage-information` extensions within the response template:
 - `coverage` sub-extension: Inferno will add a reference to the target Patient's coverage, as

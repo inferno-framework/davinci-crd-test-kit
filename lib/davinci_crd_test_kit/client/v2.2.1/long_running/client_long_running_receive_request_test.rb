@@ -6,25 +6,23 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_long_running_receive_request
-      title 'Send a hook request that will take a long time to return'
+      title 'Client invokes any hook'
       description %(
-        This test waits for a single incoming hook request of any type and will return a mocked response
+        During this test, Inferno will wait while the client makes a single hook requests of any type.
+        Inferno will return a [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
         but only after pausing for a configured amount of time, which must be 5 seconds or longer. The details
         of the request and its response do not matter for the purposes of this test and they will not be
-        evaluated. The test will automatically continue after Inferno receives a hook request, the
-        configured pause time has elapsed, and a response has been returned.
+        evaluated, checked for conformance, or included in cross-hook evaluations. The test will automatically
+        continue after Inferno receives a hook request, the configured pause time has elapsed,
+        and a response has been returned.
       )
       config options: { accepts_multiple_requests: true }
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@171',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@183', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
-      #                       'cds-hooks_2.0@15'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
               Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the **Registration** group to set or
+              header of all requests. Run or re-run the Registration group to set or
               change this value.
             ),
             locked: true

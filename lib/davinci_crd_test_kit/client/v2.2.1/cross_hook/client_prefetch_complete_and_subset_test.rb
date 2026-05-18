@@ -6,22 +6,22 @@ module DaVinciCRDTestKit
     class ClientPrefetchCompleteAndSubsetTest < Inferno::Test
       include TaggedRequestLoadHelper
 
-      title 'Provides both the complete standard prefetch data set and a subset'
+      title 'Client can provide both the complete standard prefetch data set and a subset'
       id :crd_v221_client_prefetch_complete_and_subset
       description <<~DESCRIPTION
-        CRD requires clients to be able to prefetch a standard set of resources that
+        The CRD IG requires clients to be able to prefetch a standard set of resources that
         payers are expected to need to evaluate coverage requirements. They are also
         required to be able to prefetch a subset of these standard prefetch requirements
         if a payer does not always need the complete set of standard prefetch resources.
 
-        This test verifies that the client has demonstrated requests
-        - made against both of Inferno's service endpoints,
+        During this test, Inferno will verify that the client has demonstrated requests
+        - made against both of Inferno's simulated CRD servers,
           one of which requests the all standard prefetch resources while the
           other requests only a subset.
         - which demonstrate the capability to distinguish the difference between
           the two prefetch sets.
 
-        The service that requests only a subset of the standard prefetch data does not request
+        The CRD server that requests only a subset of the standard prefetch data does not request
         resources referenced from the following elements. Request made to each Inferno service
         endpoint with one of these elements populated with a reference to a resource not referenced
         elsewhere will demonstrate the required capability.
@@ -35,9 +35,10 @@ module DaVinciCRDTestKit
             - A NutritionOrder that references a Practitioner or PractitionerRole resource in its orderer element
             - A VisionPrescription that references a Practitioner or PractitionerRole resource in its prescriber element
 
-        This test relies on the evaluation performed by the Prefetch Completeness tests
-        present in each hook group. One of these groups must have been run and resulted
-        in a Prefetch Completeness test that outputs
+        This test relies on the evaluation performed by the "Hook requests include the
+        requested prefetch data" tests present in each hook group. One of these groups must
+        have been run and resulted in a "Hook requests include the
+        requested prefetch data" test that outputs
         "demonstrates_prefetch_subset_distinct_from_complete" and
         "demonstrates_prefetch_complete_distinct_from_subset" as true (does not have to be the
         same test).

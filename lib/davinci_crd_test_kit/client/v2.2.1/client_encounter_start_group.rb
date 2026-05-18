@@ -20,15 +20,10 @@ module DaVinciCRDTestKit
       title 'encounter-start'
       id :crd_v221_client_encounter_start
       description <<~DESCRIPTION
-        The encounter-start hook is invoked when the user is initiating a new encounter. These tests are based on the
-        following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start),
-          which include the profiles that are expected to be used for the resources resolved to by `context` FHIR ID
-          fields
-          * Specific [encounter-start `context` requirements](https://cds-hooks.hl7.org/hooks/encounter-start/2023SepSTU1Ballot/encounter-start/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.0 of the hook.
+        The [encounter-start](https://cds-hooks.hl7.org/hooks/STU1/encounter-start.html) hook is invoked
+        when the user is initiating a new encounter. The CRD IG places [additional constraints on the use
+        of the encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start),
+        including the profiles that resources in each request must conform to.
       DESCRIPTION
       run_as_group
 
@@ -62,12 +57,12 @@ module DaVinciCRDTestKit
       )
 
       group do
-        title 'Make Hook Requests'
+        title 'Interaction'
         test from: :crd_v221_encounter_start_request
       end
 
       group do
-        title 'Verify Authorization'
+        title 'Authorization'
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header
@@ -75,7 +70,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Requests'
+        title 'Requests'
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-29')
@@ -90,7 +85,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Response Handling'
+        title 'Response Handling'
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test

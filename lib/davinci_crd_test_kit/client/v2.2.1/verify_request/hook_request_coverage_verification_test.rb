@@ -13,8 +13,10 @@ module DaVinciCRDTestKit
       id :crd_v221_hook_request_coverage_verification
       title 'Hook request coverages are valid'
       description %(
-        The coverage associated with a hook request must be issued by the payer
-        associated with Inferno's simulated CRD endpoints and conform to the
+        During this test, Inferno will verify that the issuing payer Organization id from the `payor` element
+        of each hook request's prefetched coverage matches the Organization id associated with the
+        invoked simulated CRD server provided by the tester during the Registration group.
+        Inferno also checks that the Organization resources conform to the
         [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
         profile.
       )

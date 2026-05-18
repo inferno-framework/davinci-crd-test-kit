@@ -7,7 +7,7 @@ require_relative 'cross_hook/client_prefetch_complete_and_subset_test'
 module DaVinciCRDTestKit
   module V221
     class ClientCrossHookGroup < Inferno::TestGroup
-      title 'Cross Hook Verification'
+      title 'Cross Hook'
       id :crd_v221_client_cross_hook
       description <<~DESCRIPTION
         This group checks CRD requirements that pertain across all hooks

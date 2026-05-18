@@ -14,8 +14,9 @@ module DaVinciCRDTestKit
 
         This group must be run before any other tests in the Hook Invocation group because inputs
         provided to this group will be used by Inferno for the remainder of the tests
-        to identify client requests and verify behavior. If changes to these values are needed
-        re-run this group providing the corrected input values.
+        to identify client requests and verify behavior. The inputs will appear as locked and
+        unchangeable on these subsequent tests. If changes to these values are needed,
+        re-run this group and provide the corrected input values.
       )
       run_as_group
 

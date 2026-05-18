@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_registration_verification
-      title 'Verify CRD client registration information'
+      title 'CRD client registers with Inferno'
       description %(
         In order to register with and be able to make hook requests against Inferno's
         simulated CRD servers, the tester must provide the `iss` (issuer) claim in
@@ -26,9 +26,14 @@ module DaVinciCRDTestKit
         - A FHIR Organization id associated with each of Inferno's two simulated CRD services,
           one at `#{ClientURLs.discovery_url}` requesting the [complete standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
           and the other at `#{ClientURLs.prefetch_subset_discovery_url}` requesting a subset of that data set.
-          This is used to verify that the prefetch coverage is linked to the correct payer for the invoked
+          These are used to verify that the prefetched coverage is linked to the correct payer for the invoked
           service.
+
+        During this test, registration information provided will be checked for conformance
+        with these requirements.
       )
+
+      verifies_requirements 'cds-hooks_3.0.0-ballot@199'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',

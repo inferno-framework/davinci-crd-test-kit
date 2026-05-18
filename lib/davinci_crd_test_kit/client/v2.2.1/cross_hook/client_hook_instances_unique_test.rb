@@ -7,14 +7,14 @@ module DaVinciCRDTestKit
     class ClientHookInstancesUniqueTest < Inferno::Test
       include TaggedRequestLoadHelper
       include MultiRequestMessageHelper
-      title 'Request hookInstance values are globally unique'
+      title 'Client does not reuse hookInstance values'
       id :crd_v221_client_hook_instances_unique
       description <<~DESCRIPTION
         CDS Hooks requires that the `hookInstance` field of each hook
         request be globally unique so that it can be used for tracking
         and auditing.
 
-        This test checks that across all hook invocations performed during these
+        During this test, Inferno will check that across all hook invocations performed during these
         tests, the `hookInstance` field was never reused.
       DESCRIPTION
 

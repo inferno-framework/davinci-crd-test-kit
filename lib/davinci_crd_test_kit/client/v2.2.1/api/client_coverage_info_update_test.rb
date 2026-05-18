@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include CardsIdentification
       include TaggedRequestLoadHelper
 
-      title 'Verify Coverage Information Updates'
+      title "Client's FHIR server stores updates from coverage-information responses"
       id :crd_v221_client_coverage_info_update
       description <<~DESCRIPTION
         This test verifies that when it receive a coverage-information response type,

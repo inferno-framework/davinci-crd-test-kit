@@ -6,12 +6,14 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_token_header
-      title 'Authorization token header contains required information'
+      title 'Authorization token headers contains required information'
       description %(
-        Verify that the JWT header contains the header fields required by the
-        [CDS hooks spec](https://cds-hooks.hl7.org/2.0#trusting-cds-clients).
-        The `alg`, `kid`, and `typ` fields are required. This test also verifies that the `typ` field is set to
-        `JWT` and that the key used to sign the token can be identified in the JWKS.
+        During this test, Inferno will verify that for each request the JWT header is conformant to the
+        requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
+        including the following:
+        - The `alg`, `kid`, and `typ` fields are required.
+        - The `typ` field must be "JWT".
+        - The key used to sign the token must be present in the JWKS.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184', 'cds-hooks_3.0.0-ballot@202'

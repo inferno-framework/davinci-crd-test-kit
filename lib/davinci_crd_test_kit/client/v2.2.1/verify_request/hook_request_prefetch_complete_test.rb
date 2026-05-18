@@ -10,24 +10,25 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_hook_request_prefetch_complete
-      title 'Hook request contains complete prefetched data set'
+      title 'Hook requests include the requested prefetch data'
       description %(
-        As stated in the [CDS hooks specification](https://build.fhir.org/ig/HL7/cds-hooks/en/#http-request-1),
-        a CDS service request's `prefetch` field contains key/value pairs of FHIR queries that the service is
-        requesting the CDS client to perform and provide on each service call. The key is a string that describes
-        the type of data being requested and the value is a string representing the FHIR query.
-        See [Prefetch Template](https://build.fhir.org/ig/HL7/cds-hooks/en/#prefetch-template)
-        for more information about how the `prefetch` formatting works.
+        The [CDS service discovery response `prefetch` field](https://cds-hooks.hl7.org/2026Jan/en/#response)
+        contains key/value pairs describing additional information needed to render a response. Each key is a
+        string that describes the type of data being requested and the corresponding
+        value is a FHIR query (read or search) that will return the desired scope.
+        See the [Prefetch Template](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-template)
+        section for more information about the format of `prefetch` templates.
 
-        [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
-        This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format and
-        contains exactly what is requested in by the prefetch templates published by the simulated CRD server that
-        the request wasy made against. Inferno simulates two CDS services, one at `#{ClientURLs.discovery_url}`
-        requiring the
-        [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
-        and the other at `#{ClientURLs.prefetch_subset_discovery_url}` [requesting only a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
-        Clients must be able to return all data in the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
-        so this test checks that exactly the requested data is present based on the request context.
+        [The CRD IG requires client support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
+        including the ability to provide all data in and subsets of the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
+        when they are requested by the invoked CRD server. Inferno simulates two CRD servers,
+        one at `#{ClientURLs.discovery_url}` requiring the [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
+        and the other at `#{ClientURLs.prefetch_subset_discovery_url}`
+        [requesting a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
+
+        During this test, Inferno will verify that each hook request body includes a `prefetch` field populated with
+        valid JSON that contains exactly the requested prefetch keys and data sets described in the service description
+        for the invoked service as calculated by Inferno based on the resources provided in the request.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@30', 'cds-hooks_3.0.0-ballot@231', 'cds-hooks_3.0.0-ballot@45',
                             'cds-hooks_3.0.0-ballot@46', 'cds-hooks_3.0.0-ballot@47', 'cds-hooks_3.0.0-ballot@232',

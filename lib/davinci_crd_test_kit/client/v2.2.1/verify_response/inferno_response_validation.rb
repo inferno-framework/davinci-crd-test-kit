@@ -9,18 +9,21 @@ module DaVinciCRDTestKit
       include CardsLogicalModelValidation
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
-      title 'Inferno CDS Service Response is Conformant'
+      title 'Hook responses have the correct structure and content'
       description %(
-        This test verifies that each service response built by Inferno and returned to the client is conformant.
-        These responses must be conformant for the client to demonstrate its ability to accept CDS Service responses.
+        During this test, Inferno will verify that each hook response built by Inferno's simulated CRD servers
+        and returned to the client conforms to CDS Hooks and CRD requirements. These responses must be conformant
+        for the client to demonstrate its ability to accept and process valid CRD responses.
 
-        If this test fails when a custom response was provided, adjust the custom response template
-        and the submitted requests so that the response built by Inferno is conformant. See
-        the documentation for details on how Inferno builds a response from the provided
-        custom template.
-
-        If this test fails when Inferno mocked the response based on selected card types, please
-        report this failure to the Inferno team via github issues.
+        If this test fails when the tester provided a custom response template, adjust the
+        provided template and the submitted requests so that the response built by Inferno
+        is conformant. If this test fails when Inferno mocked the response based on selected
+        card types, first ensure that the client's request is conformant. If the request is conformant
+        but Inferno's response(s) are still not conformant, please report this failure to the
+        Inferno team via [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
+        For more details on how Inferno builds responses, see the
+        [Controlling Simulated Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+        section of the [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
       )
       id :crd_v221_inferno_response_validation
       simulation_verification

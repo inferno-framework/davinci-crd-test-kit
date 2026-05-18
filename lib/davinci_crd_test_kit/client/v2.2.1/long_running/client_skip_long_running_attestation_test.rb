@@ -8,12 +8,11 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_client_skip_long_running_attestation_test
-      title 'Attest that the user was able to continue their workflow during the long-running request'
+      title 'Client allows the user to continue their workflow during long-running requests (Attestation)'
       description %(
-        Since Inferno has no way to evaluate the client's UI, testers must manually
-        verify and atttest that users of the system had an option to continue with their
-        workflow while the system was waiting for a long-running hook
-        request to return.
+        During this test, the tester will confirm that the client system allowed
+        its user to continue with their workflow while the sytem was waiting for the previous
+        long-running hook request to return.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-6'

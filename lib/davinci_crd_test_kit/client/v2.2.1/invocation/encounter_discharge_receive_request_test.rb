@@ -6,18 +6,19 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_encounter_discharge_request
-      title 'Request received for encounter-discharge hook'
+      title 'Client invokes the encounter-discharge hook'
       description %(
-        This test waits for multiple incoming [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
-        hook requests and responds to the client with the response types selected as an input.
-
-        For more details on how Inferno's simulated CDS Service behave during hook invocation see the
-        [simulated CRD server(https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
+        During this test, Inferno will wait while the client makes one or more [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        hook requests against Inferno's simulated CRD servers. Inferno will respond
+        based on the response configuration provided when running the test.
+        For more details on how Inferno's simulated CRD servers behave during
+        hook invocation see the [simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
         documentation.
+
+        Inferno will pause and wait for inbound requests until told explicitly to continue
+        by the tester by clicking on the link in the "User Action Required" dialog (NOTE: after
+        5 minutes the test will become inactive and unresponsive to anything except cancelation).
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@197', 'hl7.fhir.us.davinci-crd_2.0.1@243',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@244', 'hl7.fhir.us.davinci-crd_2.0.1@245',
-      #                       'cds-hooks_2.0@15'
 
       config options: { accepts_multiple_requests: true }
 
@@ -25,7 +26,7 @@ module DaVinciCRDTestKit
             title: 'CRD JWT Issuer',
             description: %(
               Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the **Registration** group to set or
+              header of all requests. Run or re-run the Registration group to set or
               change this value.
             ),
             locked: true

@@ -1,7 +1,7 @@
 module DaVinciCRDTestKit
   module V221
     class ClientFHIRPathCollectionAsCommaDelimitedStringTest < Inferno::Test
-      title 'Prefetch FHIRPath Collection Token Substitution'
+      title 'Client correctly interprets collections when substituting FHIRPath results in prefetch templates'
       id :crd_v221_client_fhir_path_collection_as_comma_delimited_string
       description <<~DESCRIPTION
         CDS Hooks requires that when a Prefetch FHIRPath token resolves
@@ -9,15 +9,16 @@ module DaVinciCRDTestKit
         gets turned into a comma-delimited string when instantiating the prefetch
         template.
 
-        This test checks that during a hook test, there was at least one instance
-        of a prefetch template identified that has a token Inferno expects to result
-        in a collection. Note that this does not test whether the client correctly
+        During this test, Inferno will verify that during a previously-run hook test,
+        there was at least one instance of a prefetch template identified that has a
+        token Inferno expects to result in a collection with multiple unique members.
+        Note that this does not test whether the client correctly
         handles the collection, which is checked by the Prefetch Completeness test.
 
-        This test relies on the evaluation performed by the Prefetch Completeness tests
-        present in each hook group. One of these groups must have been run and resulted
-        in a Prefetch Completeness test that outputs
-        "demonstrates_fhirpath_collection_as_comma_delimited_string" as true.
+        This test relies on the evaluation performed by the "Hook requests include the
+        requested prefetch data" test present in each hook group. One of these groups
+        must have been run and resulted in a "Hook requests include the requested prefetch data"
+        test that outputs "demonstrates_fhirpath_collection_as_comma_delimited_string" as true.
       DESCRIPTION
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@239', 'cds-hooks_3.0.0-ballot@242'
