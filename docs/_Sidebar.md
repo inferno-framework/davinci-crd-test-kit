@@ -4,12 +4,13 @@
 *   [Getting Started](https://github.com/inferno-framework/davinci-crd-test-kit/?tab=readme-ov-file#getting-started)
 *   [Test Kit Overview](Overview)
 
-**Client Suite**
+**Client Suites**
 *   [Client Testing Details](Client-Details)
-*   [Client Testing Instructions](Client-Instructions)
+*   [Client v2.0.1 Testing Instructions](Client-Instructions)
+*   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
 *   [Simulated CRD Service Responses](Controlling-Simulated-Responses)
 
-**Server Suite**
+**Server Suites**
 *   [Server Testing Details](Server-Details)
 *   [Server Testing Instructions](Server-Instructions)
 
@@ -18,9 +19,15 @@
 *   [Running the Suites Against Each Other](Running-Suites-Against-Each-Other)
 
 **Reference Documents & External Links**
-*   [CRD Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx)
-*   [CDS Hooks Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx)
+*   CRD Requirements Spreadsheets
+    * [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx)
+    * [v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.2.1_requirements.xlsx)
+*   CDS Hooks Requirements Spreadsheets
+    * [v2.0 for CRD v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx)
+    * [v3.0.0-ballot for CRD v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_3.0.0-ballot_requirements.xlsx)
 *   [CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)
-*   [Da Vinci CRD IG (STU2)](https://hl7.org/fhir/us/davinci-crd/STU2/)
+*   Da Vinci CRD IG
+    * [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/)
+    * [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/)
 *   [Inferno Framework](https://inferno-framework.github.io/)
 *   [Report an Issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues)

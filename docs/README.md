@@ -1,14 +1,20 @@
 # Da Vinci CRD Test Kit Documentation
 
 The **Da Vinci Coverage Requirements Discovery (CRD) Test Kit** is a testing tool
-that is designed to help implementers validate systems against the STU2
-version of the HL7® FHIR® [Da Vinci Coverage Requirements Discovery Implementation
-Guide](https://hl7.org/fhir/us/davinci-crd/STU2/). The following documentation
-provides information on how to use and contribute to this test kit.
+that is designed to help implementers validate systems against the 
+HL7® FHIR® [Da Vinci Coverage Requirements Discovery Implementation
+Guide](https://hl7.org/fhir/us/davinci-crd/). Currently, it includes
+suites that verify the behavior of CRD Clients and CRD Servers
+against the following versions of the CRD IG
+- [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
+- [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
+
+The following documentation provides information on how to use and contribute
+to this test kit.
 
 ## Using this Test Kit
 
-*   **[Getting Started](../tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
+*   **[Getting Started](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 
 ### Using the CRD Client Test Suite
@@ -17,7 +23,7 @@ provides information on how to use and contribute to this test kit.
 *   **[Controlling Simulated CRD Service Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD Service during client testing.
 
 ### Using the CRD Server Test Suite 
-*   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)**: Description of the server tests.
+*   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.
 *   **[Server Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)**: Step-by-step guide for testing server systems, including demonstration executions.
 
 ## Contributing to this Test Kit
