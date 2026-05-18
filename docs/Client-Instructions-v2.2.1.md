@@ -4,6 +4,45 @@ This document provides a step-by-step guide for using the Da Vinci CRD v2.2.1 Cl
 a **CRD client system**, including instructions for a [demonstration execution](#demonstration-execution)
 against the public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
 
+## Pre-execution Setup and Required Information
+
+### Minimum Requirements
+
+To run against the CRD Client v2.2.1 suite, a CRD Client implementation must at minimum
+- Be configured to make CRD hook requests to one of the suite's
+  [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+- [Authenticate](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients) each hook request
+  by sending a JWT with a known `iss` (issuer) claim in the payload.
+
+### Passing Requirements
+
+Addition configuration and information is needed to demonstrate conformance to all tested requirements.
+In order to pass all tests in the suite, a CRD Client implementation must
+- Be configured to make CRD hook requests to both suite's
+  [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+  Inferno will use requests to both endpoints to verify the client's ability to satisfy
+  both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25).
+- Associate each of these endpoints with a FHIR Organization id representing the payer
+  that provides the insurance coverage and is responsible for determining coverage requirements.
+  Inferno will uses this information to verify that Hook calls are made against the
+  [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformancedetails.html#ci-c-dev-26).
+- Sign JWTs sent as a part of hook request authentication and provide the JSON Web Key Set (JWKS)
+  containing the key used for the signature, either as a URL where it is publicly hosted or the
+  raw JWKS as JSON.
+- Support the capabilities of the US Core Server Capability Statement for one of the following versions:
+  - [US Core 3.1.1](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html)
+  - [US Core 6.1.0](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html)
+  - [US Core 7.0.0](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html)
+- Be able to provide Inferno with a long-lived or refreshable access token to use when verifying support for
+  the US Core FHIR API. This can come from the hook request itself, or be provided via a test input.
+
+Additionally, because the [mocked responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+created by Inferno's simulation do not demonstrate all of the must support elements on the
+[coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html),
+testers will need to provide some [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+that demonstrate all of those elements as required by the
+[must support definition](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-6).
+
 ## Quick Start
 
 To execute a simple set of tests targeting a single hook using Inferno's mocked response,
@@ -106,6 +145,22 @@ on in the hook request may not be usable for these tests. If the token is not us
 may override the token and provide an appropriate token (and other details such as a refresh token and corresponding
 endpoints) in the "OAuth Credentials" input of the the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
+
+## Interpretting Results
+
+Due to [limitations of these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#test-scope-and-limitations),
+passing this test suite in its entirety [does not prove conformance to the specification](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#conformance-criteria--interpreting-results).
+Additionally, some of the capabilities tested by this suite are optional including many of the hooks
+and response types, meaning that a conformant system will not necessarily be able to pass all tests
+in the suite.
+
+With those caveats, a passing execution of this suite would include:
+- Passing the corresponding hook group under the 1.2 Hooks group for each hook supported.
+- Passing all other groups, including
+  - 1.1 Client Registration
+  - 1.3 Cross Hook Verification
+  - 1.4 Long-running Hook Request
+  - 2 FHIR API
 
 ## Demonstration Execution
 

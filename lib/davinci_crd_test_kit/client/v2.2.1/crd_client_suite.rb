@@ -18,22 +18,22 @@ module DaVinciCRDTestKit
       description <<~DESCRIPTION
         The Da Vinci CRD Client Test Suite tests the conformance of client systems
         to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
 
-        For details on the design and use of these tests, see the wiki including
-        - [Suite Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)
-          for a high-level description of the test
-          organization, including its components and limitations.
-        - [Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
-          for a step-by-step guide to execution of these
-          tests against a CRD client, including [instructions for a demonstration execution](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions#demonstration-execution)
-          against the [public reference implementation](https://crd-request-generator.davinci.hl7.org/).
+        Detailed information about this test suite can be found in the
+        [Client section of the CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details),
+        including:
+        - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
+        - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
+          and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)
+          instructions for executing against a client system], and
+        - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#interpretting-results).
       DESCRIPTION
 
       suite_summary <<~SUMMARY
         The Da Vinci CRD Client Test Suite tests the conformance of client systems
-        to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
+        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
       SUMMARY
 
       links [
@@ -115,15 +115,15 @@ module DaVinciCRDTestKit
                    title: 'US Core Version',
                    list_options: [
                      {
-                       label: 'US Core 3.1.1 / USCDI v1',
+                       label: 'US Core 3.1.1',
                        value: CRDClientOptions::US_CORE_3
                      },
                      {
-                       label: 'US Core 6.1.0 / USCDI v3',
+                       label: 'US Core 6.1.0',
                        value: CRDClientOptions::US_CORE_6
                      },
                      {
-                       label: 'US Core 7.0.0 / USCDI v4',
+                       label: 'US Core 7.0.0',
                        value: CRDClientOptions::US_CORE_7
                      }
                    ]

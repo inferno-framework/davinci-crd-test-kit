@@ -202,6 +202,6 @@ Specific general limitations across all versions include:
 
 ### Additional v2.2.1 Client Suite Limitations
 
-- The logical models defined in the v2.2.1 CRD IG contain some bugs and inconsistencies.
-  These have been reported and will be resolved in future versions of the CRD IG.
+- The [logical models defined in the v2.2.1 CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)
+  contain some bugs and inconsistencies. These have been reported and will be resolved in future versions of the CRD IG.
   Work-arounds may be added to the test suite to prevent the spurious errors and cover gaps.

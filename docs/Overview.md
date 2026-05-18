@@ -91,7 +91,9 @@ A test run is considered successful if all mandatory tests pass:
 * **Warnings**: Highlight potential concerns that require manual review
 * **Skipped Tests**: Occur when prerequisites are not met
 
-Given the known limitations, passing all automated tests does **not** solely constitute full CRD IG conformance. Systems should also meet requirements verified through attestation or other means.
+Given the [known limitations](#test-scope-and-limitations), passing all automated tests does **not**
+solely constitute full CRD IG conformance. Systems should also meet requirements verified through
+attestation or other means.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
 * [Client v2.0.1 Instructions](Client-Instructions.md)
