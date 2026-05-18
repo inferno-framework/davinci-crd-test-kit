@@ -100,7 +100,7 @@ module DaVinciCRDTestKit
           MockEHR::FHIRRequestHandler.session_id_to_token(@test_session_id, fhir_authorization['expires_in'].to_i / 60)
       end
 
-      def send_hook_invocation(request_body)
+      def send_hook_invocation(request_body, extra_tags = [])
         token = JwtHelper.build(
           aud: @service_endpoint,
           iss: @inferno_base_url,
@@ -110,7 +110,7 @@ module DaVinciCRDTestKit
         )
         headers = { 'Content-type' => 'application/json', 'Authorization' => "Bearer #{token}" }
         response = invoke_hook(request_body, headers)
-        persist_hook_request(response, [@request_tag], headers)
+        persist_hook_request(response, [@request_tag] + extra_tags, headers)
         response
       end
 
@@ -124,7 +124,7 @@ module DaVinciCRDTestKit
         configured_request_body = JSON.parse(request_body.to_json)
         prepare_hook_request(configured_request_body)
         disable_coverage_info_configuration!(configured_request_body)
-        send_hook_invocation(configured_request_body.to_json)
+        send_hook_invocation(configured_request_body.to_json, [COVERAGE_INFO_DISABLED_TAG])
         @coverage_info_configuration_invoked = true
       end
 

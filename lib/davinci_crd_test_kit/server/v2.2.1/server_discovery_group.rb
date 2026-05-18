@@ -1,4 +1,5 @@
 require 'tls_test_kit'
+require_relative 'discovery/discovery_configuration_test'
 require_relative 'discovery/discovery_endpoint_test'
 require_relative 'discovery/discovery_services_validation_test'
 
@@ -35,7 +36,8 @@ module DaVinciCRDTestKit
       test from: :tls_version_test do
         title 'CRD Server is secured by transport layer security'
         description <<~DESCRIPTION
-          Under [Privacy, Security, and Safety](https://hl7.org/fhir/us/davinci-crd/STU2/security.html),
+          Under [Privacy, Safety, and
+          Security](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/security.html),
           the CRD Implementation Guide imposes the following rule about TLS:
 
           As per the [CDS Hook specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
@@ -57,6 +59,7 @@ module DaVinciCRDTestKit
 
       test from: :crd_v221_discovery_endpoint_test
       test from: :crd_v221_discovery_services_validation
+      test from: :crd_v221_discovery_configuration
     end
   end
 end
