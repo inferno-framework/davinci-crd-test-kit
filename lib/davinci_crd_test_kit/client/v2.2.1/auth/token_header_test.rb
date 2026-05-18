@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_token_header
-      title 'Authorization token headers contains required information'
+      title 'Authorization token headers contain required information'
       description %(
         During this test, Inferno will verify that for each request the JWT header is conformant to the
         requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),

@@ -224,7 +224,7 @@ module DaVinciCRDTestKit
         service_response = JSON.parse(request.response_body)
         perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, index)
       rescue JSON::ParserError
-        add_message('error', "Invalid JSON: #{response_label(response_index + 1).downcase} is not a valid JSON.")
+        add_message('error', "Invalid JSON: #{response_label(index + 1).downcase} is not valid JSON.")
       end
     end
 

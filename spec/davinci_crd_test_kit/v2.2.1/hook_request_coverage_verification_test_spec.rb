@@ -1,6 +1,6 @@
 require_relative '../../../lib/davinci_crd_test_kit/cross_suite/tags'
 
-RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
+RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }

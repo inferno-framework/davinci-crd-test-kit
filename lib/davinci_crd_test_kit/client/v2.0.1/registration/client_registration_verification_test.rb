@@ -42,7 +42,7 @@ module DaVinciCRDTestKit
 
         assert parsed_jwk_set.length.positive?, 'JWKS content does not include any valid keys.'
 
-        assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See messages for details'
+        assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See Messages for details.'
       end
 
       def jwk_set(jku, warning_messages = []) # rubocop:disable Metrics/CyclomaticComplexity

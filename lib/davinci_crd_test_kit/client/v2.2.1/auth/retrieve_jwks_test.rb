@@ -36,7 +36,7 @@ module DaVinciCRDTestKit
       run do
         auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
-        skip_if cds_jwk_set.blank? && cds_jwk_set_inpput_needed?(auth_token_headers),
+        skip_if cds_jwk_set.blank? && cds_jwk_set_input_needed?(auth_token_headers),
                 "JWK Set must be inputted if the client's JWK Set is not available"
 
         crd_jwks_keys_json = []
@@ -110,7 +110,7 @@ module DaVinciCRDTestKit
         assert_no_error_messages("#{requests_with_errors_prefix}Retrieving JWKS failed. See Messages for details.")
       end
 
-      def cds_jwk_set_inpput_needed?(auth_token_headers)
+      def cds_jwk_set_input_needed?(auth_token_headers)
         auth_token_headers.any? do |token_header|
           token_header.present? && JSON.parse(token_header)['jku'].blank?
         end

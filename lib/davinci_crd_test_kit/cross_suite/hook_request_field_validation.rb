@@ -239,7 +239,7 @@ module DaVinciCRDTestKit
         end
 
         unless request_body[field].is_a?(type)
-          add_message('error', "#{request_number}Hook request field #{field} is not of type #{type}")
+          add_message('error', "#{request_number}Hook request field `#{field}` is not of type #{type}")
           next
         end
       end
@@ -253,7 +253,7 @@ module DaVinciCRDTestKit
           fhir_auth_valid = false
         end
         unless fhir_authorization[field].is_a?(type)
-          add_message('error', "#{request_number}`fhirAuthorization` field #{field} is not of type #{type}")
+          add_message('error', "#{request_number}`fhirAuthorization` field `#{field}` is not of type #{type}")
           fhir_auth_valid = false
         end
       end
@@ -308,7 +308,7 @@ module DaVinciCRDTestKit
         end
 
         if request_body[field] && !request_body[field].is_a?(type)
-          add_message('error', "#{request_number}Hook request field #{field} is not of type #{type}")
+          add_message('error', "#{request_number}Hook request field `#{field}` is not of type #{type}")
         end
       end
     end

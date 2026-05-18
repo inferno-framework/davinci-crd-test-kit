@@ -57,7 +57,7 @@ module DaVinciCRDTestKit
 
       def verify_long_running_pause_time_input
         assert long_running_pause_time.to_i >= 5,
-               "The 'Long-running Request Pause Time' input must be at lesat 5 seconds."
+               'The **Long-running Request Pause Time** input must be at least 5 seconds.'
       end
     end
   end

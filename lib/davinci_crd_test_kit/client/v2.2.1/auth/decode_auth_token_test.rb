@@ -61,7 +61,7 @@ module DaVinciCRDTestKit
                auth_token_headers_json: auth_token_headers_json.to_json
 
         assert_no_error_messages("#{requests_with_errors_prefix}Decoding Authorization header Bearer tokens failed. " \
-                                 'See Messages for details')
+                                 'See Messages for details.')
       end
     end
   end

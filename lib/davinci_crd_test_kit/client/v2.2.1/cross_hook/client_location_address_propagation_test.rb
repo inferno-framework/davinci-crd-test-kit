@@ -3,7 +3,7 @@ require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
-    class ClienntLocationAddressPropagationTest < Inferno::Test
+    class ClientLocationAddressPropagationTest < Inferno::Test
       include TaggedRequestLoadHelper
 
       title 'Client propagates addresses to child Location resources'

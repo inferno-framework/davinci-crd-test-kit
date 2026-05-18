@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
       description <<~DESCRIPTION
         The [appointment-book](https://cds-hooks.hl7.org/hooks/STU1/appointment-book.html) hook is invoked when
         the user is scheduling one or more future encounters/visits for the patient.
-        The CRD IG places [additional constraints on the use of the apppintment-book hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book),
+        The CRD IG places [additional constraints on the use of the appintment-book hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book),
         including the profiles that resources in each request must conform to.
       DESCRIPTION
       run_as_group

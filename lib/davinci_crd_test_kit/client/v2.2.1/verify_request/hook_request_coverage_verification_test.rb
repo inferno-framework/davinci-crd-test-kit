@@ -5,7 +5,7 @@ require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
-    class HookRequestCoverageVerficationTest < Inferno::Test
+    class HookRequestCoverageVerificationTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include ClientURLs

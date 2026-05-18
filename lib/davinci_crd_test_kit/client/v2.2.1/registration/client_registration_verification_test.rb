@@ -101,7 +101,7 @@ module DaVinciCRDTestKit
           add_message('error', 'Each Inferno CRD service must be assigned a unique Organization id.')
         end
 
-        assert_no_error_messages 'Invalid registration information provided. See messages for details'
+        assert_no_error_messages 'Invalid registration information provided. See Messages for details.'
       end
 
       def check_jwks

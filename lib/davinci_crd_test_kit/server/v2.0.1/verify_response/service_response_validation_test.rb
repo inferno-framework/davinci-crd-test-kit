@@ -41,7 +41,7 @@ module DaVinciCRDTestKit
       def perform_system_actions_validation(system_actions, response_index)
         if SYSTEM_ACTIONS_HOOK_NAMES.include?(invoked_hook) && system_actions.nil?
           msg = "Server response #{response_index + 1} did not have the `systemActions` field, " \
-                "which must be present for the `'#{invoked_hook}' hook."
+                "which must be present for the `#{invoked_hook}` hook."
           add_message('error', msg)
         end
         return if system_actions.nil?
@@ -70,7 +70,7 @@ module DaVinciCRDTestKit
 
           perform_system_actions_validation(service_response['systemActions'], index)
         rescue JSON::ParserError
-          add_message('error', "Invalid JSON: server response #{index + 1} is not a valid JSON.")
+          add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end
 
         output valid_system_actions: valid_system_actions.to_json
