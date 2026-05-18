@@ -17,6 +17,7 @@ module DaVinciCRDTestKit
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   UNKNOWN_CONFIGURATION_TAG = 'unknown-configuration'.freeze
   UNKNOWN_CONTEXT_TAG = 'unknown-context'.freeze
+  UNKNOWN_ELEMENT_TAG = 'unknown-element'.freeze
 
   module TagMethods
     def hook_instance_tag(hook_instance)
