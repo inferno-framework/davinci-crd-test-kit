@@ -10,12 +10,12 @@ module DaVinciCRDTestKit
       description %(
         This test waits for multiple incoming [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
         hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
-        hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+        hook, meaning that CRD servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
 
         For more details on how Inferno's simulated CDS Service behave during hook invocation see the
-        [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+        [simulated CRD server(https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
         documentation.
       )
       config options: { accepts_multiple_requests: true }
@@ -70,7 +70,7 @@ module DaVinciCRDTestKit
               ]
             }
       input :appointment_book_custom_response_template,
-            title: 'Custom response for appointment-book hook requests',
+            title: 'Custom response template for appointment-book hook requests',
             description: %(
               A JSON string may be provided here to replace the normal response
               from the hook request endpoint

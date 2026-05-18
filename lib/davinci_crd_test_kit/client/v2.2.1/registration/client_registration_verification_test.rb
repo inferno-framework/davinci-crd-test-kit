@@ -1,4 +1,5 @@
 require 'jwt'
+require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
@@ -6,19 +7,40 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_registration_verification
-      title 'Verify CRD Client Registration'
+      title 'CRD client registers with Inferno'
       description %(
-        During this test, Inferno will verify that the CRD Client registration details
-        provided are conformant.
+        In order to register with and be able to make hook requests against Inferno's
+        simulated CRD servers, the tester must provide the `iss` (issuer) claim in
+        the payload of the JWT sent in the Authorization header of hook requests
+        made by the client against Inferno. This information is used to
+        associate inbound requests to Inferno's simulated CRD servers with this session.
+        Requests made without a JWT or with a different `iss` value will not appear in this
+        session or be analyzed.
+
+        Inferno also requires some additional information to verify conformant client behavior.
+        This information is not needed to execute the tests, but the tests will not completely
+        pass without it:
+        - A JSON Web Key Set (JWKS) containing the key used to sign the JWT sent in the Authorization
+          header for use in signature validation. It can be provided either as a URL where it is
+          publicly hosted (preferred) or the raw JWKS as JSON.
+        - A FHIR Organization id associated with each of Inferno's two simulated CRD servers,
+          one at `#{ClientURLs.discovery_url}` requesting the [complete standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
+          and the other at `#{ClientURLs.prefetch_subset_discovery_url}` requesting a subset of that data set.
+          These are used to verify that the prefetched coverage is linked to the correct payer for the invoked
+          service.
+
+        During this test, registration information provided will be checked for conformance
+        with these requirements.
       )
 
-      # verifies_requirements 'cds-hooks_2.0@174', 'cds-hooks_2.0@197'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@199'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              The `iss` claim of the JWT in the Authorization header sent by the CRD client under test on
-              all CRD requests. This value will be used to associate incoming requests with this test
+              Value of the `iss` claim that will be sent in the JWT used to authorize the client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              This value will be used to associate incoming requests with this test
               session and any requests that use a different `iss` value will not be recognized.
             ),
             type: 'text'
@@ -28,29 +50,34 @@ module DaVinciCRDTestKit
             description: %(
               The CRD client's JWK Set containing it's public key. May be either
               a publicly accessible url containing the JWKS, or the raw JWKS.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             optional: true
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD services. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services under the `cds-services`
-              discovery endpoint.
+              complete prefetch CRD server. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services described by the
+              `#{ClientURLs.discovery_url}` discovery endpoint.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             type: 'text',
-            optional: false
+            optional: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD services. This Organization must be referenced
-              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
-              discovery endpoint.
+              subset prefetch CRD server. This Organization must be referenced
+              payer on Coverages in hook requests made to services described by the
+              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             type: 'text',
-            optional: false
+            optional: true
 
       run do
         if cds_jwk_set.present?
@@ -59,11 +86,22 @@ module DaVinciCRDTestKit
           add_message('error', 'Provide a jwk set in the **CRD JSON Web Key Set (JWKS)** input.')
         end
 
-        unless complete_prefetch_service_organization_id != subset_prefetch_service_organization_id
-          add_message('error', 'Each Inferno CRD service must be assigned a unique Organization id')
+        unless complete_prefetch_service_organization_id.present?
+          add_message('error', 'Provide an Organization id associated with the Complete Prefetch Service ' \
+                               "at endpoint #{discovery_url}")
         end
 
-        assert_no_error_messages 'Invalid registration information provided. See messages for details'
+        unless subset_prefetch_service_organization_id.present?
+          add_message('error', 'Provide an Organization id associated with the Subset Prefetch Service ' \
+                               "at endpoint #{prefetch_subset_discovery_url}")
+        end
+
+        unless complete_prefetch_service_organization_id.present? && subset_prefetch_service_organization_id.present? &&
+               complete_prefetch_service_organization_id != subset_prefetch_service_organization_id
+          add_message('error', 'Each Inferno CRD service must be assigned a unique Organization id.')
+        end
+
+        assert_no_error_messages 'Invalid registration information provided. See Messages for details.'
       end
 
       def check_jwks

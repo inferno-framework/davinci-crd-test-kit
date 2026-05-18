@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       id :crd_v201_client_registration_verification
       title 'Verify CRD Client Registration'
       description %(
-        During this test, Inferno will verify that the CRD Client registration details
+        During this test, Inferno will verify that the CRD client registration details
         provided are conformant.
       )
 
@@ -28,7 +28,8 @@ module DaVinciCRDTestKit
             description: %(
               The CRD client's JWK Set containing it's public key. May be either
               a publicly accessible url containing the JWKS, or the raw JWKS.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             optional: true
 
@@ -41,7 +42,7 @@ module DaVinciCRDTestKit
 
         assert parsed_jwk_set.length.positive?, 'JWKS content does not include any valid keys.'
 
-        assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See messages for details'
+        assert messages.none? { |msg| msg[:type] == 'error' }, 'Invalid key set provided. See Messages for details.'
       end
 
       def jwk_set(jku, warning_messages = []) # rubocop:disable Metrics/CyclomaticComplexity

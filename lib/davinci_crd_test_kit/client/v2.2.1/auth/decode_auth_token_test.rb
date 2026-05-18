@@ -7,10 +7,11 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       id :crd_v221_decode_auth_token
-      title 'Bearer token can be decoded'
+      title 'Bearer tokens can be decoded'
       description %(
-        Verify that the Bearer token is a properly constructed JWT. As per the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#trusting-cds-clients),
-        each time a CDS Client transmits a request to a CDS Service which requires authentication, the request MUST
+        During this test, Inferno will verify that for each request the Bearer token is a properly constructed JWT.
+        As per the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
+        each time a CDS client transmits a request to a CDS Service which requires authentication, the request MUST
         include an Authorization header presenting the JWT as a "Bearer" token.
       )
 
@@ -60,7 +61,7 @@ module DaVinciCRDTestKit
                auth_token_headers_json: auth_token_headers_json.to_json
 
         assert_no_error_messages("#{requests_with_errors_prefix}Decoding Authorization header Bearer tokens failed. " \
-                                 'See Messages for details')
+                                 'See Messages for details.')
       end
     end
   end

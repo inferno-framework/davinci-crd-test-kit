@@ -1,7 +1,7 @@
-# Controlling Responses from Inferno's Simulated CRD Service
+# Controlling Responses from Inferno's Simulated CRD Server
 
-During the CRD Client tests, provider systems are asked to demonstrate
-that they can handle conformant cards and system actions retured by CRD Payer Services
+During the CRD client tests, provider systems are asked to demonstrate
+that they can handle conformant cards and system actions retured by CRD server
 and allow users to see and take actions based on these returned details.
 However, provider systems are not expected to be able to handle all conformant
 responses because details within them, such as specific orders or terminologies
@@ -15,8 +15,9 @@ mock simple responses so that testers can get started more easily.
 
 ## Mocked Responses
 
-Inferno can generate (mostly) static versions of [each of the cards and system actions specified
-by the CRD IG](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html). When no custom response
+Inferno can generate (mostly) static versions of each of the cards and system actions specified
+by the CRD IG ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/cards.html)). When no custom response
 template is provided in the test inputs for a hook group, Inferno will mock an example of each
 card type selected in the "Response types to return..." input. In addition to the logic described
 below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
@@ -77,7 +78,7 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   a draft self-pay coverage for the patient indicated in the hook request (`context.patientId`).
 - **[Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application)**:
   Inferno's [static launch SMART application card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/launch_smart_app.json)
-  points to the launch url for the CRD Client test suite. 
+  points to the launch url for the CRD client test suite. 
 
 ## Tester-directed Custom Responses
 
@@ -152,12 +153,14 @@ string `default`. Specifics for each type of value:
   converted to a boolean (e.g., collection with one boolean `true` entry or one resource entry) after
   execution against the hook request, then the entity will be included in the response (see FHIRPath's rules for
   [conversion of collections to singletons](https://hl7.org/fhirpath/N1/index.html#singleton-evaluation-of-collections)
-  for details on what will constitute ). Otherwise, the entity is not included in the response.
+  for details on what will constitute a `true` result). Otherwise, the entity is not included in the
+  response.
 - *`default`*: The specifics depend of whether the entity is a card or action:
   - **Card**: If no other cards are (yet) included in the response, then this card will be included.
-  - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension) and no other actions are (yet) included in the
-    response, then this card will be included. If there is a [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension), then the action will be
-    instantiated against any selected resource for which no action has yet been
+  - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
+    and no other actions are (yet) included in the response, then this card will be included.
+    If there is a [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension),
+    then the action will be instantiated against any selected resource for which no action has yet been
     instantiated.
 
 This can be used, for example, to only include a card when the hook has been triggered
@@ -308,13 +311,15 @@ Notes:
 - Entries within the returned collection that are not data types (lists or objects) will be ignored.
 - If multiple entries (not including ignored and nil entries) are returned, then the results will
   be turned into a comma-delimited list for use in replacing the token.
-- While the syntax follows CDS Hooks prefetch tokens, Inferno allows full FHIRPath expressions
-  instead of the limited set that CDS Hooks allows.
+- While the syntax follows CDS Hooks prefetch tokens, Inferno allows additional FHIRPath functions
+  beyond the [limited set allowed by CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-tokens-containing-simpler-fhirpath)
+  when they are made on FHIR resources within the CDS Hooks request. See 
+  the [FHIRPath Evaluation Limitations](#fhirpath-evaluation-limitations) section for details.
 
 #### `coverage-information` Defaulting
 
 System actions that add the `coverage-information` extension to resources are a response type
-for which CRD requires client support. To help testers specify this card type, Inferno will
+for which the CRD IG requires client support. To help testers specify this card type, Inferno will
 populate the following `coverage-information` sub-extensions when not found in
 `coverage-information` extensions within the response template:
 - `coverage` sub-extension: Inferno will add a reference to the target Patient's coverage, as
@@ -352,10 +357,11 @@ Inferno's use of the HL7 FHIR Validator's FHIRPath engine comes with some restri
 - The engine is not configured to resolve profiles or value sets. It has the base FHIR R4
   definions loaded, so functions like `ofType` will work, but types defined in IGs or elsewhere
   cannot be used.
-- The FHIRPath engine may not implement the entire [FHIRPath specication](https://hl7.org/fhirpath/N1/index.html).
+- The FHIRPath engine may not implement the entire [FHIRPath specication](https://hl7.org/fhirpath/N1/index.html),
+  for example the `resolve()` function is not supported.
 
 The Inferno team is open to adding support for additional FHIRPath functions. Please submit a
-[github issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues) with details
+[GitHub issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues) with details
 of your use case and the additional features that you believe are necessary.
 
 ### Complete Example

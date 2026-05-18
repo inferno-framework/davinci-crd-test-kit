@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
       id :crd_v201_client_order_select
       description <<~DESCRIPTION
         The order-select hook fires when a clinician selects one or more orders to place for a patient,
-        (including orders for medications, procedures, labs and other orders). If supported by the CDS Client, this
+        (including orders for medications, procedures, labs and other orders). If supported by the CDS client, this
         hook may also be invoked each time the clinician selects a detail regarding the order. These tests are based on
         the following criteria:
           * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-selecte),

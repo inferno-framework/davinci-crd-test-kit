@@ -77,7 +77,7 @@ module DaVinciCRDTestKit
             next
           end
         end
-        no_error_validation('Token payload is missing required claims or does not have a valid signiture.')
+        no_error_validation('Token payload is missing required claims or does not have a valid signature.')
       end
     end
   end

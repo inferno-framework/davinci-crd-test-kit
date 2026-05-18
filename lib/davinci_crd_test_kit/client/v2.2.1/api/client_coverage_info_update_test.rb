@@ -7,33 +7,33 @@ module DaVinciCRDTestKit
       include CardsIdentification
       include TaggedRequestLoadHelper
 
-      title 'Verify Coverage Information Updates'
+      title "Client's FHIR server stores updates from coverage-information responses"
       id :crd_v221_client_coverage_info_update
       description <<~DESCRIPTION
-        This test verifies that when it receive a coverage-information response type,
-        the client stores the coverage-information extension and makes it available
-        when accessing the associated resource.
+        This test verifies that when the client receives a [Coverage Information response type](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
+        it stores the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+        and makes it available when accessing the associated resource.
 
-        During this test, Inferno will find all coverage-info responses, attempt to read
-        the target FHIR resource, and verify that the coverage-information extension in the
-        response is now present in the target resource. When comparing the coverage-information
-        extension in the response with what is stored in the client FHIR server, Inferno
-        expects that client stores and exposes the extension without modification meaning
+        During this test, Inferno will find all [Coverage Information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
+        attempt to read the updated FHIR resource from the client's FHIR server, and verify
+        that the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+        in the response is now present in the returned resource. When comparing the
+        [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+        in the response with what is returned from the client FHIR server, Inferno
+        expects that client stores and exposes the extension without modification, meaning
         that the exact set of sub-extensions in the response and their values are present
         in the stored version.
 
         Inferno will not always be able to perform this check. CRD clients are not required
-        to expose FHIR Read APIs for all request resource types, so resource types for which
+        to expose FHIR read APIs for all request resource types, so resource types for which
         the client's CapabilityStatement does not indicate read interaction support will be omitted.
         Additionally, Inferno will not check complex cases where determining the expected
-        stored extensions is difficult. For example, when there are multiple coverage-info
+        stored extensions is difficult. For example, when there are multiple Coverage Information
         responses for a single resource or multiple coverage-information extensions in a
-        single coverage-info response. Implementers are still responsible for storing updates
-        in these cases.
-
-        To pass the test at least one target resource that Inferno can access must be found.
-        The stored coverage-information extension must be correct for all resources checked
-        by Inferno.
+        single Coverage Information response. Implementers are still responsible for storing updates
+        in these cases. To pass this test at least one target resource that Inferno can access must be found.
+        The stored [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+        must be correct for all resources checked by Inferno.
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-36-B', 'hl7.fhir.us.davinci-crd_2.2.1@resp-46'

@@ -10,12 +10,11 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_card_display_attest_test
-      title 'Check that returned decision support details are displayed to the user'
+      title 'Client displays returned decision support details to the user (Attestation)'
       description %(
-        Since Inferno has no way to evaluate the client's UI, testers must manually
-        verify that the cards and system actions returned by Inferno are presented
-        to the user in an appopriate way that allows for consideration and action
-        if warranted.
+        During this test, the tester will confirm that the received cards and actions in the
+        hook responses have been displayed or otherwise made available to users of the client system
+        in an appopriate way that allows for consideration and action if warranted.
       )
 
       def responded_card_types
@@ -57,8 +56,10 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Card Display Attestation**:
 
-            I attest that the following CDS response types returned were processed by the
-            client system and displayed to the user:
+            I attest that the following CRD response types returned by Inferno's simulated
+            CRD servers were processed by the client system and displayed or otherwise made
+            available to users of the client system in an appropriate way that allows for
+            consideration and action if warranted:
 
             #{format_responded_response_types}
 

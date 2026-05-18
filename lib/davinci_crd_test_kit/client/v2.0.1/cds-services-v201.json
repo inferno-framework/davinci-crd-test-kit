@@ -4,7 +4,7 @@
     {
       "hook": "appointment-book",
       "title": "Appointment Booking CDS Service",
-      "description": "An example of a CDS Service that is invoked when user of a CRD Client books a future appointment for a patient",
+      "description": "An example of a CDS Service that is invoked when user of a CRD client books a future appointment for a patient",
       "id": "appointment-book-service",
       "prefetch": {
         "user": "{{context.userId}}",

@@ -10,20 +10,24 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_hook_request_prefetch_profiles
-      title 'Prefetched data conforms to required CRD profiles'
+      title 'Prefetched resources conform to the required CRD profiles'
       description %(
-        As stated in the [CDS hooks specification](https://build.fhir.org/ig/HL7/cds-hooks/en/#http-request-1),
-        a CDS service request's `prefetch` field contains key/value pairs of FHIR queries that the service is
-        requesting the CDS Client to perform and provide on each service call. The key is a string that describes
-        the type of data being requested and the value is a string representing the FHIR query.
-        See [Prefetch Template](https://build.fhir.org/ig/HL7/cds-hooks/en/#prefetch-template)
-        for more information about how the `prefetch` formatting works.
+        The [CDS service discovery response `prefetch` field](https://cds-hooks.hl7.org/2026Jan/en/#response)
+        contains key/value pairs describing additional information needed to render a response. Each key is a
+        string that describes the type of data being requested and the corresponding
+        value is a FHIR query (read or search) that will return the desired scope.
+        See the [Prefetch Template](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-template)
+        section for more information about the format of `prefetch` templates.
 
-        [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
-        This test verifies that the incoming hook request's `prefetch` field is present and that the provided
-        FHIR resources conform to the appropriate CRD profile.
+        [The CRD IG requires client support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
+        including that the provided resources, which are part of the data included in the hook invocation,
+        [conform to the appropriate CRD profile](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-21).
+
+        During this test, Inferno will verify that each FHIR resources found under the `prefetch`
+        field of each request body conforms to the appropriate CRD profile.
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@54', 'cds-hooks_2.0@30', 'cds-hooks_2.0@47'
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-21'
 
       run do
         hook_requests = load_hook_requests

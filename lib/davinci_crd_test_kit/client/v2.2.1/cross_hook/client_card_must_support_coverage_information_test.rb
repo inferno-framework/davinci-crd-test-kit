@@ -7,17 +7,17 @@ module DaVinciCRDTestKit
       include CardsIdentification
       include TaggedRequestLoadHelper
 
-      title 'Coverage Information Action Support'
+      title 'Client supports the Coverage Information response type'
       id :crd_v221_client_card_must_support_coverage_information
       description <<~DESCRIPTION
-        Checks that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
-        action type. At least one hook invocation performed during this test session must have returned a Coverage Information action.
+        During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+        action type. At least one hook invocation performed during this session must have returned a Coverage Information action.
         Additionally, all [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         must support elements must be demonstrated across all the returned actions.
 
-        If this test fails, adjust the [cards returned by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+        If this test fails, adjust the [cards returned by Inferno's simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
         and/or the hook requests made by the client during the Hooks tests such that Coverage Information actions are returned
-        that cover the full scope of the coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+        that cover the full scope of the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         and support for them is demonstrated.
       DESCRIPTION
 

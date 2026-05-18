@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       id :crd_v201_client_registration
       title 'Client Registration'
       description %(
-        Register the CRD client under test with Inferno's simulated CRD Server by
+        Register the CRD client under test with Inferno's simulated CRD server by
         providing required information for Inferno to use in identifying and verify
         hook requests.
 

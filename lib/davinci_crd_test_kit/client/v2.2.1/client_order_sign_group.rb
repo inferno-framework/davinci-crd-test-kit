@@ -20,16 +20,11 @@ module DaVinciCRDTestKit
       title 'order-sign'
       id :crd_v221_client_order_sign
       description <<~DESCRIPTION
-        The order-sign hook fires when a clinician is ready to sign one or more orders for a patient, (including orders
-        for medications, procedures, labs and other orders). These tests are based on the following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign),
-          which includes the profiles that are expected to be used for the resources resolved to by `context`
-          FHIR ID fields
-          * Specific [order-sign `context` requirements](https://cds-hooks.org/hooks/order-sign/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.1 of the hook which, at the time of publication,
-        was not available as a snapshot. Therefore the preceding link refers to the CDS hooks current build.
+        The [order-sign](https://cds-hooks.hl7.org/hooks/STU1/order-sign.html) hook fires
+        when a clinician is ready to sign one or more orders for a patient (including orders
+        for medications, procedures, labs and other orders). The CRD IG places [additional constraints on the use
+        of the order-sign hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-sign),
+        including the profiles that resources in each request must conform to.
       DESCRIPTION
       run_as_group
 
@@ -63,12 +58,12 @@ module DaVinciCRDTestKit
       )
 
       group do
-        title 'Make Hook Requests'
+        title 'Interaction'
         test from: :crd_v221_order_sign_request
       end
 
       group do
-        title 'Verify Authorization'
+        title 'Authorization'
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header
@@ -76,7 +71,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Requests'
+        title 'Requests'
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-37')
@@ -91,7 +86,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Response Handling'
+        title 'Response Handling'
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test

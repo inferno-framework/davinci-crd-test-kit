@@ -10,16 +10,19 @@ module DaVinciCRDTestKit
       id :crd_v221_hook_request_granted_scopes
       title 'Hook requests grant the requested scopes'
       description %(
-        As a part of registration, CRD Clients and Services agree on a set of scopes that the Service needs
-        to obtain all data that goes into creating hook responses. For the purposes of Inferno's simulated
-        payer CRD Service acting as a part of these tests that evaluate conformance to the CRD specification,
-        access to all US Core resource types are required.
+        As a part of registration, CRD clients and servers agree on a set of scopes that the server needs
+        to obtain all data that goes into creating hook responses. For the purposes of simulating a
+        payer CRD server acting as a part of these tests that evaluate conformance to the CRD specification,
+        Inferno requires access to all US Core resource types. While in a real exchange scenario, a CRD client
+        organization might well reject such a set of scopes as too large, for the purposes of testing, the client
+        must grant these scopes in order for Inferno to verify its conformance.
 
-        This test verifies that the requested scopes covering the US Core data types are granted and no more.
-        Clients may choose to grant either user scopes or patient scopes. If choosing patient scopes, note that the
-        token is used by default for testing the complete US Core FHIR API, so with patient scopes either that
-        single patient needs to demonstrate the full scope of US Core or another access token will need to be
-        provided for those tests.
+        During this test, Inferno will verify that the requested scopes covering all resource types profiled in
+        the selected version of the US Core IG are granted and no more. Clients may choose to grant either user scopes
+        or patient scopes. If choosing patient scopes, note that the token is used by default for complete testing
+        of the client's US Core FHIR API, so either that single patient would need to
+        demonstrate all US Core resources and must support elements or another access token would need
+        to be provided when testing the client's FHIR API.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-21'

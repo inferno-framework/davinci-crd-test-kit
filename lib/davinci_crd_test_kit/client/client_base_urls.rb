@@ -1,22 +1,29 @@
 require_relative '../cross_suite/base_urls'
 
 module DaVinciCRDTestKit
-  APPOINTMENT_BOOK_PATH = '/cds-services/appointment-book-service'.freeze
-  ENCOUNTER_START_PATH = '/cds-services/encounter-start-service'.freeze
-  ENCOUNTER_DISCHARGE_PATH = '/cds-services/encounter-discharge-service'.freeze
-  ORDER_DISPATCH_PATH = '/cds-services/order-dispatch-service'.freeze
-  ORDER_SELECT_PATH = '/cds-services/order-select-service'.freeze
-  ORDER_SIGN_PATH = '/cds-services/order-sign-service'.freeze
+  DISCOVERY_PATH = '/cds-services'.freeze
+  APPOINTMENT_BOOK_PATH = "#{DISCOVERY_PATH}/appointment-book-service".freeze
+  ENCOUNTER_START_PATH = "#{DISCOVERY_PATH}/encounter-start-service".freeze
+  ENCOUNTER_DISCHARGE_PATH = "#{DISCOVERY_PATH}/encounter-discharge-service".freeze
+  ORDER_DISPATCH_PATH = "#{DISCOVERY_PATH}/order-dispatch-service".freeze
+  ORDER_SELECT_PATH = "#{DISCOVERY_PATH}/order-select-service".freeze
+  ORDER_SIGN_PATH = "#{DISCOVERY_PATH}/order-sign-service".freeze
 
-  APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/appointment-book-subset'.freeze
-  ENCOUNTER_START_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-start-subset'.freeze
-  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/encounter-discharge-subset'.freeze
-  ORDER_DISPATCH_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-dispatch-subset'.freeze
-  ORDER_SELECT_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-select-subset'.freeze
-  ORDER_SIGN_PREFETCH_SUBSET_PATH = '/prefetch-subset/cds-services/order-sign-subset'.freeze
+  PREFETCH_SUBSET_PREFIX = '/prefetch-subset'.freeze
+  PREFETCH_DISCOVERY_PATH = PREFETCH_SUBSET_PREFIX + DISCOVERY_PATH
+  APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/appointment-book-subset".freeze
+  ENCOUNTER_START_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/encounter-start-subset".freeze
+  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/encounter-discharge-subset".freeze
+  ORDER_DISPATCH_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/order-dispatch-subset".freeze
+  ORDER_SELECT_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/order-select-subset".freeze
+  ORDER_SIGN_PREFETCH_SUBSET_PATH = "#{PREFETCH_DISCOVERY_PATH}/order-sign-subset".freeze
 
   module ClientBaseURLs
     include BaseURLs
+
+    def discovery_url
+      @discovery_url ||= inferno_base_url + DISCOVERY_PATH
+    end
 
     def appointment_book_url
       @appointment_book_url ||= inferno_base_url + APPOINTMENT_BOOK_PATH
@@ -40,6 +47,10 @@ module DaVinciCRDTestKit
 
     def order_sign_url
       @order_sign_url ||= inferno_base_url + ORDER_SIGN_PATH
+    end
+
+    def prefetch_subset_discovery_url
+      @prefetch_subset_discovery_url ||= inferno_base_url + PREFETCH_SUBSET_PREFIX + DISCOVERY_PATH
     end
 
     def appointment_book_prefetch_subset_url

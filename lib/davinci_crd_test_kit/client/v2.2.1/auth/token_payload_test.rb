@@ -9,17 +9,16 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_token_payload
-      title 'Authorization token payload has required claims and a valid signature'
+      title 'Authorization token payloads have required claims and valid signatures'
       description %(
-        Verify that the JWT payload contains the payload fields required by the
-        [CDS hooks spec](https://cds-hooks.hl7.org/2.0#trusting-cds-clients).
-        The `iss`, `aud`, `exp`, `iat`, and `jti` claims are required.
-        Additionally:
-
-        - `iss` must match the `issuer` from the **CRD JWT Issuer** input
-        - `aud` must match the URL of the CDS Service endpoint being invoked
-        - `exp` must represent a time in the future
-        - `jti` must be a non-blank string that uniquely identifies this authentication JWT
+        During this test, Inferno will verify that for each request the JWT payload is conformant to the
+        requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
+        including the following:
+        - The `iss`, `aud`, `exp`, `iat`, and `jti` claims are required.
+        - `iss` must match the `issuer` from the **CRD JWT Issuer** input.
+        - `aud` must match the URL of the CDS Service endpoint being invoked.
+        - `exp` must represent a time in the future.
+        - `jti` must be a non-blank string that uniquely identifies this authentication JWT.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@180', 'cds-hooks_3.0.0-ballot@181', 'cds-hooks_3.0.0-ballot@187',

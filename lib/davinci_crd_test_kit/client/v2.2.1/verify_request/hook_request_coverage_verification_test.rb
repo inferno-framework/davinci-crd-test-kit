@@ -1,17 +1,22 @@
 require_relative '../../../cross_suite/tags'
 require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
+require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
-    class HookRequestCoverageVerficationTest < Inferno::Test
+    class HookRequestCoverageVerificationTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include ClientURLs
+
       id :crd_v221_hook_request_coverage_verification
-      title 'Hook request coverages are valid'
+      title 'Prefetched coverages are valid'
       description %(
-        The coverage associated with a hook request must be issued by the payer
-        associated with Inferno's simulated CRD endpoints and conform to the
+        During this test, Inferno will verify that the issuing payer Organization id from the `payor` element
+        of each hook request's prefetched coverage matches the Organization id associated with the
+        invoked simulated CRD server provided by the tester during the "Registration" group.
+        Inferno also checks that the Organization resources conform to the
         [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
         profile.
       )
@@ -22,9 +27,11 @@ module DaVinciCRDTestKit
             title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD services. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services under the `cds-services`
-              discovery endpoint.
+              complete prefetch CRD server. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services described by the `#{ClientURLs.discovery_url}`
+              discovery endpoint. The client suite may be run without this input, but it is required
+              for the tests to pass.
+              Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
             optional: true,
@@ -33,16 +40,19 @@ module DaVinciCRDTestKit
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD services. This Organization must be referenced
-              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
-              discovery endpoint.
+              subset prefetch CRD server. This Organization must be referenced
+              payer on Coverages in hook requests made to services described by the
+              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
+              Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
             optional: true,
             locked: true
 
       def prefetch_target(request)
-        if request.url.include?('prefetch-subset')
+        if request.url.include?(PREFETCH_SUBSET_PREFIX)
           :subset
         else
           :complete
@@ -95,9 +105,6 @@ module DaVinciCRDTestKit
       end
 
       run do
-        skip_if complete_prefetch_service_organization_id.blank? || subset_prefetch_service_organization_id.blank?,
-                'Both "Inferno Payer Organization id" inputs are needed to verify behavior.'
-
         hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
@@ -109,8 +116,8 @@ module DaVinciCRDTestKit
           expected_payer_org_id = payer_org_id_for_request(request)
           if expected_payer_org_id.blank?
             add_request_message(
-              'warning',
-              'No Inferno Payer Organization id configured for this endpoint; skipping coverage check.',
+              'error',
+              'No Inferno Payer Organization id configured for this endpoint; skipping required coverage check.',
               request_index
             )
             next

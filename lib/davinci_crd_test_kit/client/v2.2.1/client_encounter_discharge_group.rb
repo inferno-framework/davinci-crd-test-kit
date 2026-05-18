@@ -20,16 +20,11 @@ module DaVinciCRDTestKit
       title 'encounter-discharge'
       id :crd_v221_client_encounter_discharge
       description <<~DESCRIPTION
-        The encounter-discharge hook is invoked when the user is performing the discharge process for an encounter where
-        the notion of 'discharge' is relevant - typically an inpatient encounter. These tests are based on the
-        following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge),
-          which includes the profiles that are expected to be used for the resources resolved to by `context`
-          FHIR ID fields
-          * Specific [encounter-discharge `context` requirements](https://cds-hooks.hl7.org/hooks/encounter-discharge/2023SepSTU1Ballot/encounter-discharge/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.0 of the hook.
+        The [encounter-discharge](https://cds-hooks.hl7.org/hooks/STU1/encounter-discharge.html) hook is
+        invoked when the user is performing the discharge process for an encounter where
+        the notion of 'discharge' is relevant - typically an inpatient encounter.
+        The CRD IG places [additional constraints on the use of the encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge),
+        including the profiles that resources in each request must conform to.
       DESCRIPTION
       run_as_group
 
@@ -63,12 +58,12 @@ module DaVinciCRDTestKit
       )
 
       group do
-        title 'Make Hook Requests'
+        title 'Interaction'
         test from: :crd_v221_encounter_discharge_request
       end
 
       group do
-        title 'Verify Authorization'
+        title 'Authorization'
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header
@@ -76,7 +71,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Requests'
+        title 'Requests'
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-27')
@@ -91,7 +86,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Response Handling'
+        title 'Response Handling'
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test

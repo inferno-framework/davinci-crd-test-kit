@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
         Checks that the client demonstrated support for the [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)
         card type. At least one hook invocation performed during this test session must have returned an Instructions card.
 
-        If this test fails, adjust the [cards returned by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+        If this test fails, adjust the [cards returned by Inferno's simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
         and/or the hook requests made by the client during the Hooks tests such that an Instructions card is returned and support for it is demonstrated.
       DESCRIPTION
 

@@ -20,15 +20,11 @@ module DaVinciCRDTestKit
       title 'order-dispatch'
       id :crd_v221_client_order_dispatch
       description <<~DESCRIPTION
-        The order-dispatch hook fires when a practitioner is selecting a candidate performer for a pre-existing order
-        that was not tied to a specific performer. These tests are based on the following criteria:
-          * [CRD IG requirements for this hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch),
-          which includes the profiles that are expected to be used for the resources resolved to by `context`
-          FHIR ID fields
-          * Specific [order-dispatch `context` requirements](https://cds-hooks.hl7.org/hooks/order-dispatch/2023SepSTU1Ballot/order-dispatch/)
-          defined in the CDS Hooks specification
-
-        This version of the CRD implementation guide refers to version 1.0 of the hook.
+        The [order-dispatch](https://cds-hooks.hl7.org/hooks/STU1/order-dispatch.html) hook fires when a
+        practitioner is selecting a candidate performer for a pre-existing order
+        that was not tied to a specific performer. The CRD IG places [additional constraints on the use
+        of the order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch),
+        including the profiles that resources in each request must conform to.
       DESCRIPTION
       run_as_group
 
@@ -62,12 +58,12 @@ module DaVinciCRDTestKit
       )
 
       group do
-        title 'Make Hook Requests'
+        title 'Interaction'
         test from: :crd_v221_order_dispatch_request
       end
 
       group do
-        title 'Verify Authorization'
+        title 'Authorization'
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header
@@ -75,7 +71,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Requests'
+        title 'Requests'
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-31')
@@ -90,7 +86,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Response Handling'
+        title 'Response Handling'
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test

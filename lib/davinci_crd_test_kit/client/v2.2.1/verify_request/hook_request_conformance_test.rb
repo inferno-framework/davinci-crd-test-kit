@@ -10,9 +10,10 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
 
       id :crd_v221_hook_request_conformance
-      title 'Hook request conforms to required logical model'
+      title 'Hook requests have the correct structure and contents'
       description %(
-        CRD defines logical models representing requirements for the request for each hook.
+        During this test, Inferno will check each request body against the structural and content
+        requirements for the invoked hook.
       )
 
       output :url, :smart_auth_info
@@ -21,10 +22,6 @@ module DaVinciCRDTestKit
                             'cds-hooks_3.0.0-ballot@224',
                             'hl7.fhir.us.davinci-crd_2.2.1@billopt-1', 'hl7.fhir.us.davinci-crd_2.2.1@found-36-A',
                             'hl7.fhir.us.davinci-crd_2.2.1@hook-20', 'hl7.fhir.us.davinci-crd_2.2.1@hook-21'
-
-      # verifies_requirements 'cds-hooks_2.0@1', 'cds-hooks_2.0@3', 'cds-hooks_2.0@20', 'cds-hooks_2.0@21',
-      #                       'cds-hooks_2.0@23', 'cds-hooks_2.0@65', 'cds-hooks_2.0@66', 'cds-hooks_2.0@67',
-      #                       'cds-hooks_2.0@68', 'cds-hooks_2.0@69', 'cds-hooks_2.0@70'
 
       run do
         hook_requests = load_hook_requests

@@ -16,27 +16,31 @@ module DaVinciCRDTestKit
       id :crd_client_v221
       title 'Da Vinci CRD Client v2.2.1 Test Suite'
       description <<~DESCRIPTION
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
-        to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of systems to the
+        capabilities of a CRD client as described in [version 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
+        of the Da Vinci Coverage Requirements Discovery (CRD) Implementation Guide.
 
-        For details on the design and use of these tests, see the wiki including
-        - [Suite Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)
-          for a high-level description of the test
-          organization, including its components and limitations.
-        - [Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
-          for a step-by-step guide to execution of these
-          tests against a CRD client, including [instructions for a demonstration execution](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions#demonstration-execution)
-          against the [public reference implementation](https://crd-request-generator.davinci.hl7.org/).
+        Detailed information about this test suite can be found in the
+        [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the
+        [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki), including:
+        - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
+        - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
+          and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)
+          instructions for executing against a client system, and
+        - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#interpreting-results).
       DESCRIPTION
 
       suite_summary <<~SUMMARY
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
-        to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of client systems
+        to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
+        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
       SUMMARY
 
       links [
+        {
+          label: 'Implementation Guide',
+          url: 'https://hl7.org/fhir/us/davinci-crd/2.2.1'
+        },
         {
           label: 'Report Issue',
           url: 'https://github.com/inferno-framework/davinci-crd-test-kit/issues'
@@ -115,15 +119,15 @@ module DaVinciCRDTestKit
                    title: 'US Core Version',
                    list_options: [
                      {
-                       label: 'US Core 3.1.1 / USCDI v1',
+                       label: 'US Core 3.1.1',
                        value: CRDClientOptions::US_CORE_3
                      },
                      {
-                       label: 'US Core 6.1.0 / USCDI v3',
+                       label: 'US Core 6.1.0',
                        value: CRDClientOptions::US_CORE_6
                      },
                      {
-                       label: 'US Core 7.0.0 / USCDI v4',
+                       label: 'US Core 7.0.0',
                        value: CRDClientOptions::US_CORE_7
                      }
                    ]
@@ -132,11 +136,11 @@ module DaVinciCRDTestKit
         request.query_parameters['token']
       end
 
-      route :get, '/cds-services', CDSServicesDiscoveryHandler
-      route :get, '/prefetch-subset/cds-services', CDSServicesDiscoveryHandler
+      route :get, DISCOVERY_PATH, CDSServicesDiscoveryHandler
+      route :get, PREFETCH_DISCOVERY_PATH, CDSServicesDiscoveryHandler
 
       allow_cors APPOINTMENT_BOOK_PATH, ENCOUNTER_START_PATH, ENCOUNTER_DISCHARGE_PATH, ORDER_DISPATCH_PATH,
-                 ORDER_SELECT_PATH, ORDER_SIGN_PATH, '/cds-services'
+                 ORDER_SELECT_PATH, ORDER_SIGN_PATH, DISCOVERY_PATH
       suite_endpoint :post, APPOINTMENT_BOOK_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_START_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_DISCHARGE_PATH, HookRequestEndpoint
@@ -147,7 +151,7 @@ module DaVinciCRDTestKit
       allow_cors APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH, ENCOUNTER_START_PREFETCH_SUBSET_PATH,
                  ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH, ORDER_DISPATCH_PREFETCH_SUBSET_PATH,
                  ORDER_SELECT_PREFETCH_SUBSET_PATH, ORDER_SIGN_PREFETCH_SUBSET_PATH,
-                 '/prefetch-subset/cds-services'
+                 PREFETCH_DISCOVERY_PATH
       suite_endpoint :post, APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_START_PREFETCH_SUBSET_PATH, HookRequestEndpoint
       suite_endpoint :post, ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH, HookRequestEndpoint
@@ -165,10 +169,6 @@ module DaVinciCRDTestKit
       group do
         id :crd_v221_client_hook_invocation
         title 'Hook Invocation'
-        description %(
-          This groups checks that the system can register as a CDS Client with
-          Inferno's simulated CRD Server and make hook invocations.
-        )
 
         group from: :crd_v221_client_registration
         group from: :crd_v221_client_hooks
