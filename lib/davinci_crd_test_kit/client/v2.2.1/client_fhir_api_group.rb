@@ -8,9 +8,9 @@ module DaVinciCRDTestKit
       title 'FHIR API'
       description <<~DESCRIPTION
         Systems wishing to conform to the [CRD client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
-        role are responsible for returning data requested by the CRD Server needed to provide decision support. The Da
+        role are responsible for returning data requested by the CRD server needed to provide decision support. The Da
         Vinci CRD client FHIR API Test Group contains tests that test the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
-        of the CRD client and ensures that the CRD client can respond to CRD Server queriers. These 'server' capabilities
+        of the CRD client and ensures that the CRD client can respond to CRD server queriers. These 'server' capabilities
         are based on [US Core](https://hl7.org/fhir/us/core/STU3.1.1/).
       DESCRIPTION
       id :crd_v221_client_fhir_api

@@ -1,12 +1,12 @@
 # Da Vinci CRD Test Kit: Server Testing Instructions
 
-This document provides a step-by-step guide for using the Da Vinci CRD Server Test Suite to test
+This document provides a step-by-step guide for using the Da Vinci CRD server Test Suite to test
 a **CRD server system**, including instructions for a [demonstration execution](#demonstration-execution)
 against the public [CRD server reference implementation](https://crd.davinci.hl7.org/).
 
 ## Quick Start
 
-Inferno needs to know 4 basic pieces of information to invoke a hook on a CRD Server:
+Inferno needs to know 4 basic pieces of information to invoke a hook on a CRD server:
 - **CRD server base URL**: the root discovery endpoint where Inferno will discover hook service details.
 - **Discovery Authentication**: whether the discovery endpoint requires authentication.
 - **Signature Algorithm**: which supported signing algorithm to use - `ES384` or `RS384`.

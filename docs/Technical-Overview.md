@@ -39,7 +39,7 @@ Within the `client` and `server` actor directories, files are generally organize
 * code shared across versions lives directly within the actor directories and in other sub folders. This
   includes both shared verification logic
   as well as actor simulations, e.g., for the client suites helper modules like [tagged_request_load_helper.rb](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/tagged_request_load_helper.rb)
-  and the endpoints simulating a CRD Service in [`client/endpoints`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints).
+  and the endpoints simulating a CRD server in [`client/endpoints`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints).
 
 #### Key Client Components
 
@@ -111,7 +111,7 @@ directory includes:
   - **[`cards_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/cards_logical_model_validation.rb)**:
     Card logical models in the 2.2.1 version require some response mangling to get to work, which is handled by this module.
   - **[`requests_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/requests_logical_model_validation.rb)**: Unlike card models, request models can be used directly.
-* **Prefetch Verification Logic**: because prefetch details are defined by the CRD Service, the logical models introduced starting in CRD v2.2.1
+* **Prefetch Verification Logic**: because prefetch details are defined by the CRD server, the logical models introduced starting in CRD v2.2.1
   do not verify prefetch details provided in CRD requests. Furthermore, the requirements evolved significantly from v2.0.1, meaning that there
   are several modules assisting with prefetch verification:
   - **[`prefetch_contents_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_contents_validation.rb)**: Used to check v2.0.1 prefetch fields for validity. In that version support for prefetch is optional.

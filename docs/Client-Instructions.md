@@ -112,11 +112,11 @@ you can do so using the following steps:
 1. Select the response types Inferno should respond with under the "Response types to return
    from order-sign hook requests" input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be
-   made against Inferno's simulated CRD Server.
+   made against Inferno's simulated CRD server.
 1. Open the [reference client](https://crd-request-generator.davinci.hl7.org/) in another tab/browser.
 1. Click the gear button in the upper right to open the configuration screen and update
    the following fields:
-   - *CRD Server*: Inferno's CDS Service discovery endpoint, which will be everything before the
+   - *CRD Server*: Inferno's CDS server discovery endpoint, which will be everything before the
    last slash in the endpoint displayed in the "User Action Required" dialog,
    e.g., `https://inferno.healthit.gov/suites/custom/crd_client/cds-services`.
    - *Order Sign Rest End Point*: the location of the `order-sign` hook endpoint relative to the *CRD Server*, which will be everything after the last slash in the endpoint displayed in the

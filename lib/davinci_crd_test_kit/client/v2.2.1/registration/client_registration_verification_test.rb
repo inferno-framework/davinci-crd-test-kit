@@ -10,10 +10,10 @@ module DaVinciCRDTestKit
       title 'Verify CRD client registration information'
       description %(
         In order to register with and be able to make hook requests against Inferno's
-        simulated CRD Services, the tester must provide the `iss` (issuer) claim in
+        simulated CRD servers, the tester must provide the `iss` (issuer) claim in
         the payload of the JWT sent in the Authorization header of hook requests
         made by the client against Inferno. This information is used to
-        associate inbound requests to Inferno's simulated CRD Services with this session.
+        associate inbound requests to Inferno's simulated CRD servers with this session.
         Requests made without a JWT or with a different `iss` value will not appear in this
         session or be analyzed.
 

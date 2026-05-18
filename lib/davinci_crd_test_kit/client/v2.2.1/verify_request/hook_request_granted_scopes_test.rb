@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       description %(
         As a part of registration, CRD clients and servers agree on a set of scopes that the server needs
         to obtain all data that goes into creating hook responses. For the purposes of Inferno's simulated
-        payer CRD Service acting as a part of these tests that evaluate conformance to the CRD specification,
+        payer CRD server acting as a part of these tests that evaluate conformance to the CRD specification,
         access to all US Core resource types are required.
 
         This test verifies that the requested scopes covering the US Core data types are granted and no more.

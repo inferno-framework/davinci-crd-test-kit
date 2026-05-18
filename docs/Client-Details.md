@@ -77,10 +77,10 @@ However, the IG also acknowledges that
 - Specific CRD servers may not be authorized to access all of this data.
 
 Two mechanisms for making the data available are specified:
-- [Prefetch](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#prefetch), where the CRD Server indicates what
+- [Prefetch](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#prefetch), where the CRD server indicates what
   data it will always need as a part of discovery and the client provides this information with the hook request.
 - [FHIR Resource Access](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#fhir-resource-access), where
-  the CRD Server uses an access token provided in the hook request to make FHIR queries to get additional data.
+  the CRD server uses an access token provided in the hook request to make FHIR queries to get additional data.
 
 CRD clients must provide an access token for data access but are not required to support prefetch (though prefetch
 may become required in later versions of the CRD spec).
@@ -89,7 +89,7 @@ may become required in later versions of the CRD spec).
 
 Even though this information is not required to be available and accessible in all cases, these tests are designed
 to allow CRD clients to demonstrate that they can make the information captured in their system
-available to the CRD Servers on which they invoke hooks. Therefore,
+available to the CRD servers on which they invoke hooks. Therefore,
 - Inferno [advertizes prefetch templates](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/routes/cds-services.json)
   requesting a subset of this data that clients can provide with the hook request if they support prefetch.
   Subsequent tests will check that the prefetched data is equivalent to what can be accessed via FHIR queries.

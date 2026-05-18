@@ -1,4 +1,4 @@
-# Controlling Responses from Inferno's Simulated CRD Service
+# Controlling Responses from Inferno's Simulated CRD Server
 
 During the CRD client tests, provider systems are asked to demonstrate
 that they can handle conformant cards and system actions retured by CRD Payer Services

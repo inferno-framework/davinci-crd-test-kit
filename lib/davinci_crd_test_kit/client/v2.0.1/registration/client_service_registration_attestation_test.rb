@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       title 'Attest to the registration of the Inferno Service by the CRD client'
       description %(
         During this test, the tester will confirm that Inferno has been registered as a
-        trusted CRD Service that can access the CRD client's FHIR Server.
+        trusted CRD server that can access the CRD client's FHIR Server.
       )
 
       verifies_requirements 'cds-hooks_2.0@174'
@@ -24,9 +24,9 @@ module DaVinciCRDTestKit
         wait(
           identifier:,
           message: <<~MESSAGE
-            **Registration of Inferno as a trusted CRD Service**:
+            **Registration of Inferno as a trusted CRD server**:
 
-            I attest that Inferno has been registered as a trusted CRD Service that is allowed to access
+            I attest that Inferno has been registered as a trusted CRD server that is allowed to access
             data stored on the CRD client's FHIR Server.
 
             [Click here](#{attest_true_url}) if the above statement is **true**.

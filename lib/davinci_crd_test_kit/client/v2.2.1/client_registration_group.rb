@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       title 'Registration'
       description %(
         Before hook invocations can be made, the client tested in this session
-        must be registered with and trusted by Inferno's simulated CRD Service
+        must be registered with and trusted by Inferno's simulated CRD server
         and vice-versa. Tests in this group confirm the registration of the partner
         system on both ends.
 

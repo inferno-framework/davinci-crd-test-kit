@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         Additionally, all [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         must support elements must be demonstrated across all the returned actions.
 
-        If this test fails, adjust the [cards returned by Inferno's simulated CRD Server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+        If this test fails, adjust the [cards returned by Inferno's simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
         and/or the hook requests made by the client during the Hooks tests such that Coverage Information actions are returned
         that cover the full scope of the coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         and support for them is demonstrated.

@@ -21,8 +21,8 @@ module DaVinciCRDTestKit
         Coverage Requirements Discovery (CRD) Implementation Guide.
 
         Detailed information about this test suite can be found in the
-        [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the CRD Test Kit Wiki,
-        including:
+        [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the
+        [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki), including:
         - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
         - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
           and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)

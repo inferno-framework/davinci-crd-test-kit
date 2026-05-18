@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       id :crd_v201_hook_request_fetched_data
       title 'Minimum resource dataset was accessible during the hook invocation'
       description %(
-        Clients must make a set of data related to the request available to the CRD Server via either prefetch
+        Clients must make a set of data related to the request available to the CRD server via either prefetch
         as a part of the hook invocation or via FHIR API during server processing of the hook call. According
         to the IG, the minimal data set includes:
         - Patient

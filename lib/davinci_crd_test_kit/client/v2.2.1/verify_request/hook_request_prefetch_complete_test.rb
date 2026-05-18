@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
 
         [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
         This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format and
-        contains exactly what is requested in by the prefetch templates published by the simulated CRD Server that
+        contains exactly what is requested in by the prefetch templates published by the simulated CRD server that
         the request wasy made against. Inferno simulates two CDS services, one at `#{ClientURLs.discovery_url}`
         requiring the
         [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)

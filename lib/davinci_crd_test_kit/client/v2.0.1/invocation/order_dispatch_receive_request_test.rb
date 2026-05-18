@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       description %(
         This test waits for multiple incoming [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
         hook requests and responds to the client with the response types selected as an input. This hook is a 'primary'
-        hook, meaning that CRD Servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+        hook, meaning that CRD servers SHALL, at minimum, return a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         system action for these hooks, even if the response indicates that further information is needed or that the
         level of detail provided is insufficient to determine coverage.
 

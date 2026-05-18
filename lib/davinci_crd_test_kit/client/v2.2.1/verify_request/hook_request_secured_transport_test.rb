@@ -26,7 +26,7 @@ module DaVinciCRDTestKit
         hook_requests.each_with_index do |request, request_index|
           unless request.url.starts_with?('https')
             add_request_message('error',
-                                "Inferno's simulated CRD Service must use the https " \
+                                "Inferno's simulated CRD server must use the https " \
                                 'protocol (TLS). Run this suite on a host that uses TLS.',
                                 request_index)
           end

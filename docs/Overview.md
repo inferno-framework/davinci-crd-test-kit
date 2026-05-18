@@ -14,7 +14,7 @@ approach, scope, limitations, and guidance on how to interpret results.
 This test kit helps implementers ensure that their systems can correctly participate in
 coverage requirement discovery workflows as defined by the CRD IG. It does so by simulating
 an exchange partner for the system under test (when testing a CRD client Inferno will simulate
-a CRD Service and vice-versa) and verifying that each exchange is conformant and that
+a CRD server and vice-versa) and verifying that each exchange is conformant and that
 all exchanges in aggregate demonstrate the required capabilities.
 
 This test kit is [open source](#license) and freely available for use or
@@ -28,7 +28,7 @@ FHIR-based data exchange.
 
 The CRD Test Kit contains test suites to test the two actors defined by the CRD specification:
 - CRD clients: Clients are responsible for initiating CDS Hooks calls and consuming
-  received decision support. They are also responsible for returning data requested by the CRD Server
+  received decision support. They are also responsible for returning data requested by the CRD server
   needed to provide that decision support. This role is played by provider systems
   in which orders are placed, such as EHRs. See the [Client Details](Client-Details.md) page
   for more information.

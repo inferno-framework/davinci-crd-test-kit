@@ -8,7 +8,7 @@
 *   [Client Testing Details](Client-Details)
 *   [Client v2.0.1 Testing Instructions](Client-Instructions)
 *   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
-*   [Simulated CRD Service Responses](Controlling-Simulated-Responses)
+*   [Simulated CRD Server Responses](Controlling-Simulated-Responses)
 
 **Server Suites**
 *   [Server Testing Details](Server-Details)
