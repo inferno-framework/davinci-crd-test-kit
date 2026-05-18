@@ -106,7 +106,8 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
           .with do |request|
             JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil? &&
               JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', random_key).nil? &&
-              JSON.parse(request.body).dig('context', random_key).nil?
+              JSON.parse(request.body).dig('context', random_key).nil? &&
+              JSON.parse(request.body)[random_key].nil?
           end
           .to_return(status: 200, body: coverage_info_response.to_json)
 
@@ -131,6 +132,13 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
           end
           .to_return(status: 200, body: filtered_response.to_json)
 
+      unknown_element_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body)[random_key].present?
+          end
+          .to_return(status: 200, body: filtered_response.to_json)
+
       stub_request(:get, continuation_url).to_return(status: 200)
 
       job.perform(
@@ -142,6 +150,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
       expect(coverage_info_disabled_request).to have_been_made.once
       expect(unknown_configuration_request).to have_been_made.once
       expect(unknown_context_request).to have_been_made.once
+      expect(unknown_element_request).to have_been_made.once
     end
 
     it 'sends only one coverage-info disabled follow-up request per job' do
@@ -161,6 +170,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
       job = described_class.new
       job.instance_variable_set(:@unknown_configuration_invoked, true)
       job.instance_variable_set(:@unknown_context_invoked, true)
+      job.instance_variable_set(:@unknown_cds_hooks_element_invoked, true)
 
       job.perform(
         test_session_id, request_bodies, service_endpoint, inferno_base_url,
