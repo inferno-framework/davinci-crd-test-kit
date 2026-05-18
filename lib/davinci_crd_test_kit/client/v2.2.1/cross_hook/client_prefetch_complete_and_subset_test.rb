@@ -22,9 +22,13 @@ module DaVinciCRDTestKit
 
         The service that requests only a subset of the standard prefetch data does not request
         resources referenced from the following elements. Request made to each Inferno service
-        endpoint with one of these elements populated will demonstrate the required capability.
-          - On an appointment-book hook requests, an Appointment with a participant entry that references a Practitioner or PractitionerRole resource in its actor element
-          - On an encounter-start or encounter-discharge hook request, an Encounter with a participant entry that references a Practitioner or PractitionerRole resource in its actor element
+        endpoint with one of these elements populated with a reference to a resource not referenced
+        elsewhere will demonstrate the required capability.
+          - On an appointment-book hook requests, an Appointment with a participant entry that
+            references a Practitioner or PractitionerRole resource in its actor element
+          - On an encounter-start or encounter-discharge hook request, an Encounter with a
+            referenced Location via the `location` element or Organization via the
+            `serviceProvider` element.
           - On a order-select, order-sign, or order-dispatch hook request, one of the following order resources:
             - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner or PractitionerRole resource in its requester element, or
             - A NutritionOrder that references a Practitioner or PractitionerRole resource in its orderer element
