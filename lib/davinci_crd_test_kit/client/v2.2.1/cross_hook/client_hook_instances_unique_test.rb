@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       title 'Client does not reuse hookInstance values'
       id :crd_v221_client_hook_instances_unique
       description <<~DESCRIPTION
-        CDS Hooks requires that the `hookInstance` field of each hook
+        The CDS Hooks specification requires that the `hookInstance` field of each hook
         request be globally unique so that it can be used for tracking
         and auditing.
 

@@ -4,19 +4,20 @@ module DaVinciCRDTestKit
       title 'Client correctly interprets collections when substituting FHIRPath results in prefetch templates'
       id :crd_v221_client_fhir_path_collection_as_comma_delimited_string
       description <<~DESCRIPTION
-        CDS Hooks requires that when a Prefetch FHIRPath token resolves
-        to a collection of datatypes (e.g., resource ids), then the collection
-        gets turned into a comma-delimited string when instantiating the prefetch
-        template.
+        The CDS Hooks specification requires that when a FHIRPath token in A
+        prefetch template resolves to a collection of datatypes (e.g., resource ids),
+        then the collection gets turned into a comma-delimited string when instantiating
+        the prefetch template.
 
         During this test, Inferno will verify that during a previously-run hook test,
-        there was at least one instance of a prefetch template identified that has a
-        token Inferno expects to result in a collection with multiple unique members.
+        there was at least one instance of a prefetch template that has a
+        token which Inferno expects to result in a collection with multiple unique members.
         Note that this does not test whether the client correctly
-        handles the collection, which is checked by the Prefetch Completeness test.
+        handles the collection, which is checked by the
+        "Hook requests include the requested prefetch data" test.
 
         This test relies on the evaluation performed by the "Hook requests include the
-        requested prefetch data" test present in each hook group. One of these groups
+        requested prefetch data" test present in each hook-specific "Requests" group. One of these groups
         must have been run and resulted in a "Hook requests include the requested prefetch data"
         test that outputs "demonstrates_fhirpath_collection_as_comma_delimited_string" as true.
       DESCRIPTION

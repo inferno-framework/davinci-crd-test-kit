@@ -11,11 +11,11 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_hook_request_coverage_verification
-      title 'Hook request coverages are valid'
+      title 'Prefetched coverages are valid'
       description %(
         During this test, Inferno will verify that the issuing payer Organization id from the `payor` element
         of each hook request's prefetched coverage matches the Organization id associated with the
-        invoked simulated CRD server provided by the tester during the Registration group.
+        invoked simulated CRD server provided by the tester during the "Registration" group.
         Inferno also checks that the Organization resources conform to the
         [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
         profile.
@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
               complete prefetch CRD services. This Organization must be referenced as the
               payer on Coverages in hook requests made to services under the `#{ClientURLs.discovery_url}`
               discovery endpoint. This input is required for these tests to pass.
-              Re-run group 1.1 Registration to provide this detail.
+              Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
             optional: true,
@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
               payer on Coverages in hook requests made to services under the
               `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
               This input is required for these tests to pass.
-              Re-run group 1.1 Registration to provide this detail.
+              Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
             optional: true,

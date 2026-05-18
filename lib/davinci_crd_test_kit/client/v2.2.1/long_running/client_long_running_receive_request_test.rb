@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
             title: 'CRD JWT Issuer',
             description: %(
               Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the Registration group to set or
+              header of all requests. Run or re-run the "Registration" group to set or
               change this value.
             ),
             locked: true

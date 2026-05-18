@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that for each request the JWKS can be retrieved from the JWKS uri if
         it is present in the `jku` field within the JWT token header. Additionally, keys will be extracted and
         outputted for use in subsequent tests. If the client does not provide a uri in the `jku` field,
-        Inferno will extract keys from the raw JWKS JSON provided out of band as a part of the Registration group.
+        Inferno will extract keys from the raw JWKS JSON provided out of band as a part of the "Registration" group.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
@@ -24,9 +24,9 @@ module DaVinciCRDTestKit
             description: %(
             The client's registered JWK Set containing it's public key. Used
             only when a request was received with a JWT without the `jku` header.
-            Inferno assumes this input, provided during the Registration
+            Inferno assumes this input, provided during the "Registration"
             group, contains the raw JSON representation of a JWKS (if a URI was provided
-            it would be populated in the `jku` header). Run or re-run the Registration
+            it would be populated in the `jku` header). Run or re-run the "Registration"
             group to set or change this value.
           ),
             locked: true,

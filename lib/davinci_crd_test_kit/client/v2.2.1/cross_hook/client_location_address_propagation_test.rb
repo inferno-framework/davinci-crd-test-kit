@@ -13,12 +13,13 @@ module DaVinciCRDTestKit
         > If a Location is a fine-grained location such as a bed or room,
         > the address SHALL be propagated from the higher-level location it is part of.
 
-        During this test, Inferno will verify that for all locations provided in a prefetch and their parents (via the `partOf` element),
-        if the Location has a parent Location (`partOf`) and that parent Location's `address` element is populated,
-        then the child Location's `address` element must also be populated. The test will not verify the details of the address
-        because Inferno cannot easily determine whether a particular location is "fine-grained" so as to need
-        the same address. By requiring population, this check allows for refinement of the address in the child
-        in addition to propagation.
+        During this test, Inferno will verify that for all locations provided as a prefetched resource
+        and their parents (via the `partOf` element), if the Location has a parent Location (`partOf`) and
+        that parent Location's `address` element is populated, then the child Location's `address` element
+        must also be populated. The test will not verify the details of the address because Inferno cannot
+        easily determine whether a particular location is "fine-grained" so as to need the same address.
+        By requiring just population, this check allows for refinement of the address in the child
+        in addition to straight propagation.
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@prof-13'

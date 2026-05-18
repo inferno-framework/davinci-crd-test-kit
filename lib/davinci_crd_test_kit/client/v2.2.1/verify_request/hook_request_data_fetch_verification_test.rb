@@ -6,12 +6,12 @@ module DaVinciCRDTestKit
     class HookRequestDataFetchVerificationTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       id :crd_v221_hook_data_fetch_verification
-      title 'CRD client made additional FHIR data available during hook request processing'
+      title 'Client made additional FHIR data available during hook request processing'
       description %(
-        During this test, Inferno will verify that for at least one hook request, it was successfully
+        During this test, Inferno will verify that for at least one hook request it was successfully
         able to use the FHIR API and access token indicated in that hook request to gather additional data during
-        hook processing. This means that at least one additional data request across
-        all hook requests succeeded and returned at least one FHIR resource.
+        hook invocation. For this test to pass, at least one additional data request across
+        all hook invocations must succeed and return a FHIR resource.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-20'

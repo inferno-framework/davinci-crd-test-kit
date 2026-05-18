@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         This group checks CRD requirements that pertain across all hooks
         rather than a specific one.
 
-        These tests must be run after the tests in the Hooks group are run.
+        These tests must be run after the tests in the "Hooks" group are run.
       DESCRIPTION
 
       run_as_group

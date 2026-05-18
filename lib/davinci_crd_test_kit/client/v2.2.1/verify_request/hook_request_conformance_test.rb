@@ -12,9 +12,6 @@ module DaVinciCRDTestKit
       id :crd_v221_hook_request_conformance
       title 'Hook requests have the correct structure and contents'
       description %(
-        The CRD IG defines logical models representing requirements for the request for each hook,
-        including CDS Hooks-, CDS Hooks Library- and CRD-level requirements.
-
         During this test, Inferno will check each request body against the structural and content
         requirements for the invoked hook.
       )

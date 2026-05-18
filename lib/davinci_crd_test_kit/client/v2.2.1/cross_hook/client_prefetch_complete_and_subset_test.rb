@@ -12,7 +12,9 @@ module DaVinciCRDTestKit
         The CRD IG requires clients to be able to prefetch a standard set of resources that
         payers are expected to need to evaluate coverage requirements. They are also
         required to be able to prefetch a subset of these standard prefetch requirements
-        if a payer does not always need the complete set of standard prefetch resources.
+        if a payer requests fewer in their service discovery responses because the payer
+        does not always need the complete set of standard prefetch resources to evaluate
+        coverage.
 
         During this test, Inferno will verify that the client has demonstrated requests
         - made against both of Inferno's simulated CRD servers,
@@ -25,18 +27,18 @@ module DaVinciCRDTestKit
         resources referenced from the following elements. Request made to each Inferno service
         endpoint with one of these elements populated with a reference to a resource not referenced
         elsewhere will demonstrate the required capability.
-          - On an appointment-book hook requests, an Appointment with a participant entry that
+          - On an `appointment-book` hook request, an Appointment with a participant entry that
             references a Practitioner or PractitionerRole resource in its actor element
-          - On an encounter-start or encounter-discharge hook request, an Encounter with a
-            referenced Location via the `location` element or Organization via the
+          - On an `encounter-start` or `encounter-discharge` hook request, an Encounter with a
+            referenced Location via the `location` element or referenced Organization via the
             `serviceProvider` element.
-          - On a order-select, order-sign, or order-dispatch hook request, one of the following order resources:
-            - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner or PractitionerRole resource in its requester element, or
-            - A NutritionOrder that references a Practitioner or PractitionerRole resource in its orderer element
-            - A VisionPrescription that references a Practitioner or PractitionerRole resource in its prescriber element
+          - On an `order-select`, `order-sign`, or `order-dispatch` hook request, one of the following order resources:
+            - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner or PractitionerRole resource in its `requester` element, or
+            - A NutritionOrder that references a Practitioner or PractitionerRole resource in its `orderer` element
+            - A VisionPrescription that references a Practitioner or PractitionerRole resource in its `prescriber` element
 
         This test relies on the evaluation performed by the "Hook requests include the
-        requested prefetch data" tests present in each hook group. One of these groups must
+        requested prefetch data" tests present in each hook-specific "Requests" group. One of these groups must
         have been run and resulted in a "Hook requests include the
         requested prefetch data" test that outputs
         "demonstrates_prefetch_subset_distinct_from_complete" and

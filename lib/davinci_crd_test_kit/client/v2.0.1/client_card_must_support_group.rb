@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
         all must support elements defined in the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         must be demonstrated.
 
-        These tests must be run after the tests in the Hooks group are run.
+        These tests must be run after the tests in the "Hooks" group are run.
       DESCRIPTION
 
       run_as_group

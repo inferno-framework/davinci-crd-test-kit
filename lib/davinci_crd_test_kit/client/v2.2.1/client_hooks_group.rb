@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         * [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
         * [order-sign](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-sign)
 
-        Each hook group follows the same pattern:
+        Each hook-specific group follows the same pattern:
         1. Allow the client to make hook invocations for the tested hook, waiting until the tester indicates
            that all desired requests have been made, then
         2. Check the requests and their associated responses for conformance to CRD and CDS Hooks requirements.
@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
 
         The CRD IG does not require support for any specific hook, so all the hook-specific sub-groups are
         optional. A conformant CRD client will have implemented at least one hook and will run and pass
-        the hook groups corresponding to each hook that it implements.
+        the hook-specific groups corresponding to each hook that it implements.
       DESCRIPTION
       id :crd_v221_client_hooks
 
@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
             title: 'CRD JWT Issuer',
             description: %(
             Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-            header of all requests. Run or re-run the Registration group to set or
+            header of all requests. Run or re-run the "Registration" group to set or
             change this value.
           ),
             locked: true
