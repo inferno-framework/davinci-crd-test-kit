@@ -12,10 +12,12 @@ module DaVinciCRDTestKit
       title 'Server ignores unknown configuration information'
       id :crd_v221_unknown_configuration
       description %(
-        This test checks follow-up hook requests made with a random
-        configuration key set to `true` after prior successful hook requests
-        returned coverage-info content to verify that unknown configuration
-        values are ignored.
+        If a request resulted in a successful response with a coverage
+        information system action, a follow-up request is made with a random
+        configuration key set to `true`. This test verifes that this follow-up
+        request also resulted in a successful response with a coverage
+        information system action to verify that unknown configuration values
+        are ignored.
       )
 
       def primary_hook?
@@ -52,13 +54,17 @@ module DaVinciCRDTestKit
 
           response_body = parsed_body(request.response_body)
           unless response_body.is_a?(Hash)
-            add_message('error', 'Unknown configuration server response was not valid JSON.')
+            add_message('error', 'Server response to a request with an unknown configuration value was not valid JSON.')
             next
           end
 
           next if coverage_info_response?(response_body)
 
-          add_message('error', 'Request with unknown configuration did not receive a coverage information response.')
+          add_message(
+            'error',
+            'Server response to a request with an unknown configuration value did not contain ' \
+            'a coverage information system action.'
+          )
         end
 
         assert_no_error_messages(

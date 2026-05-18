@@ -107,7 +107,9 @@ RSpec.describe DaVinciCRDTestKit::V221::UnknownCDSHooksElementsTest do
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to match(/unknown CDS Hooks element were not valid/)
-    expect(entity_result_messages.map(&:message).join(' ')).to match(/did not receive a coverage information response/)
+    expect(
+      entity_result_messages.map(&:message).join(' ')
+    ).to match(/did not contain a coverage information system action/)
   end
 
   it 'skips if no unknown cds hooks element follow-up request was made for primary hooks' do

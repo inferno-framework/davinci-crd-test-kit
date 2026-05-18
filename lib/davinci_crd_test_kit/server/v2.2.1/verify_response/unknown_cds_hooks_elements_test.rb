@@ -12,10 +12,12 @@ module DaVinciCRDTestKit
       title 'Server ignores unknown CDS Hooks elements'
       id :crd_v221_unknown_cds_hooks_elements
       description %(
-        This test checks follow-up hook requests made with a random CDS Hooks
-        element set to a random value after prior successful hook requests
-        returned coverage-info content to verify that servers ignore unknown CDS
-        Hooks elements.
+        If a request resulted in a successful response with a coverage
+        information system action, a follow-up request is made with an element
+        with a random key and value added to the CDS hooks request. This test
+        verifes that this follow-up request also resulted in a successful
+        response with a coverage information system action to verify that
+        unknown CDS Hooks elements are ignored.
       )
 
       def primary_hook?
@@ -52,7 +54,7 @@ module DaVinciCRDTestKit
 
           response_body = parsed_body(request.response_body)
           unless response_body.is_a?(Hash)
-            add_message('error', 'Unknown CDS Hooks element server response was not valid JSON.')
+            add_message('error', 'Server response to a request with an unknown CDS Hooks element was not valid JSON.')
             next
           end
 
@@ -60,12 +62,13 @@ module DaVinciCRDTestKit
 
           add_message(
             'error',
-            'Request with unknown CDS Hooks element did not receive a coverage information response.'
+            'Server response to a request with an unknown CDS Hooks element did not contain ' \
+            'a coverage information system action.'
           )
         end
 
         assert_no_error_messages(
-          'Responses to requests with unknown CDS Hooks element were not valid. Check messages for details.'
+          'Responses to requests with an unknown CDS Hooks element were not valid. Check messages for details.'
         )
       end
     end

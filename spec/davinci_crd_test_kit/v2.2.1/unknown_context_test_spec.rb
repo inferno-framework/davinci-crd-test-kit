@@ -107,7 +107,9 @@ RSpec.describe DaVinciCRDTestKit::V221::UnknownContextTest do
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to match(/unknown context were not valid/)
-    expect(entity_result_messages.map(&:message).join(' ')).to match(/did not receive a coverage information response/)
+    expect(
+      entity_result_messages.map(&:message).join(' ')
+    ).to match(/did not contain a coverage information system action/)
   end
 
   it 'skips if no unknown context follow-up request was made for primary hooks' do
