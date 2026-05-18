@@ -7,10 +7,8 @@ module DaVinciCRDTestKit
       title 'Attest to the registration of the Inferno Services by the CRD Client'
       description %(
         Inferno simulates two CRD Services which can be discovered at the following endpoints:
-        - Complete Prefetch Service Discovery Endpoint:
-          #{Inferno::Application['base_url']}/custom/crd_client_v221/cds-services
-        - Subset Prefetch Service Discovery Endpoint:
-          #{Inferno::Application['base_url']}/custom/crd_client_v221/prefetch-subset/cds-services
+        - Complete Prefetch Service Discovery Endpoint: #{ClientURLs.discovery_url}
+        - Subset Prefetch Service Discovery Endpoint: #{ClientURLs.prefetch_subset_discovery_url}
 
         During this test, the tester will confirm that these two endpoints
         have been registered as trusted CRD Services that can access the CRD Client's FHIR Server
@@ -30,21 +28,23 @@ module DaVinciCRDTestKit
             description: %(
               The FHIR Organization id associated with Inferno's simulated
               complete prefetch CRD services. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services under the `cds-services`
-              discovery endpoint.
+              payer on Coverages in hook requests made to services under the
+              `#{ClientURLs.discovery_url}` discovery endpoint.
+              This input is required for these tests to pass.
             ),
             type: 'text',
-            optional: false
+            optional: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
               subset prefetch CRD services. This Organization must be referenced
-              payer on Coverages in hook requests made to services under the `prefetch-subset/cds-services`
-              discovery endpoint.
+              payer on Coverages in hook requests made to services under the
+              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
+              This input is required for these tests to pass.
             ),
             type: 'text',
-            optional: false
+            optional: true
       output :attest_true_url
       output :attest_false_url
 
@@ -81,14 +81,12 @@ module DaVinciCRDTestKit
 
             I attest that the following Inferno endpoints have been registered as follows:
 
-            - Complete Prefetch Service Discovery Endpoint:
-              #{Inferno::Application['base_url']}/custom/crd_client_v221/cds-services
+            - Complete Prefetch Service Discovery Endpoint: #{discovery_url}
               - Has been registered with payer Organization resource with id `#{complete_prefetch_service_organization_id}`
               - Has been granted patient- or user-level read and search access scopes for
               all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
 
-            - Subset Prefetch Service Discovery Endpoint:
-              #{Inferno::Application['base_url']}/custom/crd_client_v221/prefetch-subset/cds-services
+            - Subset Prefetch Service Discovery Endpoint: #{prefetch_subset_discovery_url}
               - Has been registered with payer Organization resource with id `#{subset_prefetch_service_organization_id}`
               - Has been granted patient- or user-level read and search access scopes for
               all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).

@@ -1,12 +1,14 @@
 require_relative '../../../cross_suite/prefetch_completeness_checker'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../multi_request_message_helper'
+require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
     class HookRequestPrefetchCompleteTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+
       id :crd_v221_hook_request_prefetch_complete
       title 'Hook request contains complete prefetched data set'
       description %(
@@ -18,11 +20,12 @@ module DaVinciCRDTestKit
         for more information about how the `prefetch` formatting works.
 
         [CRD requires support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch).
-        This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format,
+        This test verifies that the incoming hook request's `prefetch` field is present in a valid JSON format and
         contains exactly what is requested in by the prefetch templates published by the simulated CRD Server that
-        the request wasy made against. Inferno simulates two CDS services, one requiring the
+        the request wasy made against. Inferno simulates two CDS services, one at `#{ClientURLs.discovery_url}`
+        requiring the
         [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
-        and the other [requesting only a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
+        and the other at `#{ClientURLs.prefetch_subset_discovery_url}` [requesting only a subset of the standard prefetch data set](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
         Clients must be able to return all data in the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
         so this test checks that exactly the requested data is present based on the request context.
       )
@@ -87,7 +90,7 @@ module DaVinciCRDTestKit
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          prefetch_target = if request.url.include?('prefetch-subset')
+          prefetch_target = if request.url.include?(PREFETCH_SUBSET_PREFIX)
                               :subset
                             else
                               :complete

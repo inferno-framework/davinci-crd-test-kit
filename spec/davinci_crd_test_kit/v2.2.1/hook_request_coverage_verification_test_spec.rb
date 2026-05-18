@@ -76,16 +76,30 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerficationTest do
       .messages
   end
 
-  it 'skips when complete_prefetch_service_organization_id is blank' do
+  it 'fails when complete_prefetch_service_organization_id is blank and complete endpoint requests are received' do
+    create_hook_request(body: { 'hookInstance' => hook_instance, 'hook' => hook_name })
     result = run(test, complete_prefetch_service_organization_id: '',
                        subset_prefetch_service_organization_id: payer_org_id)
-    expect(result.result).to eq('skip')
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to match(/No Inferno Payer Organization id configured/)
   end
 
-  it 'skips when subset_prefetch_service_organization_id is blank' do
+  it 'fails when subset_prefetch_service_organization_id is blank and subset endpoint requests are received' do
+    repo_create(
+      :request,
+      direction: 'incoming',
+      url: "https://example.com/prefetch-subset/cds-services/#{hook_name}",
+      result:,
+      test_session_id: test_session.id,
+      request_body: { 'hookInstance' => hook_instance, 'hook' => hook_name }.to_json,
+      status: 200,
+      headers: [],
+      tags: [hook_name]
+    )
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: '')
-    expect(result.result).to eq('skip')
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to match(/No Inferno Payer Organization id configured/)
   end
 
   it 'skips when no hook requests received' do

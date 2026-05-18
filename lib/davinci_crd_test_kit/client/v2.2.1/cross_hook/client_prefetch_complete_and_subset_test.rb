@@ -1,4 +1,5 @@
 require_relative '../../tagged_request_load_helper'
+require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
@@ -46,7 +47,7 @@ module DaVinciCRDTestKit
 
       run do
         subset_prefetch_requests, complete_prefetch_requests =
-          requests_to_analyze.partition { |request| request.url.include?('prefetch-subset') }
+          requests_to_analyze.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
         completeness_tests = find_completeness_tests
         check_for_demonstration(subset_prefetch_requests, completeness_tests, :subset)
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)
