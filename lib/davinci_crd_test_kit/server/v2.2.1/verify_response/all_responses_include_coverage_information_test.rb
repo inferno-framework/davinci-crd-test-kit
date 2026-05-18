@@ -31,6 +31,8 @@ module DaVinciCRDTestKit
           coverage information system action
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-16'
+
       input :invoked_hook
 
       def target_resources

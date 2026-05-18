@@ -49,13 +49,13 @@ module DaVinciCRDTestKit
         }
       ]
 
-      # requirement_sets(
-      #   {
-      #     identifier: 'hl7.fhir.us.davinci-crd_2.0.1',
-      #     title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.0.1',
-      #     actor: 'Server'
-      #   }
-      # )
+      requirement_sets(
+        {
+          identifier: 'hl7.fhir.us.davinci-crd_2.2.1',
+          title: 'Da Vinci Coverage Requirements Discovery (CRD) v2.2.1',
+          actor: 'CRD Server'
+        }
+      )
 
       input :base_url,
             title: 'CRD server base URL'

@@ -156,7 +156,10 @@ module DaVinciCRDTestKit
                    name: :order_dispatch_coverage_info
                  }
                }
-             }
+             },
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
+             ]
         test from: :crd_v221_coverage_info_system_action_validation,
              config: {
                inputs: {
@@ -164,8 +167,17 @@ module DaVinciCRDTestKit
                    name: :order_dispatch_coverage_info
                  }
                }
-             }
-        test from: :crd_v221_order_dispatch_coverage_information
+             },
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-25'
+             ]
+        test from: :crd_v221_order_dispatch_coverage_information,
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
+               'hl7.fhir.us.davinci-crd_2.2.1@hook-33',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
+             ]
+
         test from: :crd_v221_request_form_completion_response_validation,
              config: {
                inputs: {

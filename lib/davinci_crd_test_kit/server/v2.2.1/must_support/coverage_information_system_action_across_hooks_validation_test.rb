@@ -22,6 +22,8 @@ module DaVinciCRDTestKit
         The test will be skipped if no valid Coverage Information system actions are returned across all hooks.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-14'
+
       run do
         verify_at_least_one_test_passes(
           self.class.parent.parent.groups,

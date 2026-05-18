@@ -19,6 +19,10 @@ module DaVinciCRDTestKit
         Each card must contain the following required fields: `summary`, `indicator`, and `source`.
         The required fields must have a valid data structure.
       )
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5'
+
       input :invoked_hook
       output :valid_cards, :valid_system_actions
 
