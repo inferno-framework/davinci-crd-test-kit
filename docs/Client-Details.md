@@ -1,6 +1,6 @@
 # Client Suite Implementation Details
 
-The Da Vinci CRD Test Kit contains suites validating the conformance of Client systems
+The Da Vinci CRD Test Kit contains suites validating the conformance of client systems
 to two versions of the HL7® FHIR® Da Vinci Coverage Requirements Discovery Implementation Guide:
 - [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
 - [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
@@ -44,7 +44,7 @@ in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-cr
 
 ### Simulated CDS Services in the CRD Client v2.0.1 Suite
 
-The CRD v2.0.1 Client suite provides basic CDS services for
+The Da Vinci CRD Client v2.0.1 Test Suite provides basic CDS services for
 [the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html).
 The discovery endpoint is located at `custom/crd_client/cds-services` under the root Inferno deployment
 address, e.g., `https://inferno.healthit.gov/suites/custom/crd_client/cds-services` for the publicly
@@ -57,7 +57,7 @@ behavior when invoked by tested clients.
 
 ##### CRD and CDS Hooks requirements around data availablity and access
 
-The CRD IG requires that Clients make data beyond the details provided in the hook request body available
+The CRD IG requires that clients make data beyond the details provided in the hook request body available
 to servers so that payers can use it as a part of coverage determination. The IG lists the [minimum that
 payers need to make available](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#additional-data-retrieval):
 
@@ -72,8 +72,8 @@ payers need to make available](https://hl7.org/fhir/us/davinci-crd/STU2/foundati
 - Associated Device (if any)
 
 However, the IG also acknowledges that
-- CRD Servers may not always need all of this information in all circumstances.
-- CRD Clients may not have all of this information, e.g., the performing practitioner may not be known at order time.
+- CRD servers may not always need all of this information in all circumstances.
+- CRD clients may not have all of this information, e.g., the performing practitioner may not be known at order time.
 - Specific CRD servers may not be authorized to access all of this data.
 
 Two mechanisms for making the data available are specified:
@@ -82,13 +82,13 @@ Two mechanisms for making the data available are specified:
 - [FHIR Resource Access](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#fhir-resource-access), where
   the CRD Server uses an access token provided in the hook request to make FHIR queries to get additional data.
 
-CRD Clients must provide an access token for data access but are not required to support prefetch (though prefetch
+CRD clients must provide an access token for data access but are not required to support prefetch (though prefetch
 may become required in later versions of the CRD spec).
 
 ##### Inferno simulated services behavior for data availability and access
 
 Even though this information is not required to be available and accessible in all cases, these tests are designed
-to allow CRD Clients to demonstrate that they can make the information captured in their system
+to allow CRD clients to demonstrate that they can make the information captured in their system
 available to the CRD Servers on which they invoke hooks. Therefore,
 - Inferno [advertizes prefetch templates](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/routes/cds-services.json)
   requesting a subset of this data that clients can provide with the hook request if they support prefetch.
@@ -101,8 +101,8 @@ available to the CRD Servers on which they invoke hooks. Therefore,
 ##### Fetch interactions
 
 Inferno performs individual reads for each resource identified. While this involves additional requests, support
-for these read interactions is required by the CRD Client capability statement and the US Core Server Capability
-Statement that it builds on. In practice clients may support and payers may use more efficient queries that
+for these read interactions is required by the CRD Client CapabilityStatement and the US Core Server CapabilityStatement
+that it builds on. In practice clients may support and payers may use more efficient queries that
 are not tested by Inferno.
 
 The one exception is `Coverages`, which are obtained via the same search advertized in
@@ -121,10 +121,10 @@ Non-literal references will be ignored.
 
 #### CDS Hooks Responses
 
-CRD Client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+THe CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
 that meet each of the [CRD Card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
 However, these simple cards may not support the target client in demonstrating the full CRD
-capabilities of its system. The CRD Client test suite also allows testers to 
+capabilities of its system. The CRD client test suite also allows testers to 
 [provide a template for the responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
 for Inferno to provide back, including directives that determine details of the actual responses
 based on the request. This way, testers can configure the responses to match the patients, orders,
@@ -143,7 +143,7 @@ registered as a client using details provided within the suite at time of execut
 
 ### Simulated CDS Services in the CRD Client v2.2.1 Suite
 
-The CRD v2.2.1 Client suite provides basic CDS services for
+The Da Vinci CRD Client v2.2.1 Test Suite provides basic CDS services for
 [the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html).
 While it mostly follows the same approach as [the simulation in the v2.0.1 suite](#simulated-cds-services-in-the-crd-client-v201-suite),
 there are are several key differences described here.
@@ -153,7 +153,7 @@ there are are several key differences described here.
 In the 2.2.1 version of the CRD IG, clients are [required to support prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
 and to be able to provide the complete minimal data set via this mechanism. Inferno therefore assumes
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
-during a hook invocation. However, Clients are still required to allow servers to access data via FHIR
+during a hook invocation. However, clients are still required to allow servers to access data via FHIR
 APIs. Inferno will request during a hook invocation FHIR resources outside the standard prefetch data
 set that it needs to validate other requirements, including
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.

@@ -28,7 +28,7 @@ module DaVinciCRDTestKit
               complete prefetch CRD services. This Organization must be referenced as the
               payer on Coverages in hook requests made to services under the `#{ClientURLs.discovery_url}`
               discovery endpoint. This input is required for these tests to pass.
-              Re-run group 1.1 "Client Registration" to provide this detail.
+              Re-run group 1.1 Registration to provide this detail.
             ),
             type: 'text',
             optional: true,
@@ -41,7 +41,7 @@ module DaVinciCRDTestKit
               payer on Coverages in hook requests made to services under the
               `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
               This input is required for these tests to pass.
-              Re-run group 1.1 "Client Registration" to provide this detail.
+              Re-run group 1.1 Registration to provide this detail.
             ),
             type: 'text',
             optional: true,

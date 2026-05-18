@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       description %(
         As stated in the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#http-request), a CDS service request's
         `prefetch` field is an optional field that contains key/value pairs of FHIR queries that the service is
-        requesting the CDS Client to perform and provide on each service call. The key is a string that describes
+        requesting the CDS client to perform and provide on each service call. The key is a string that describes
         the type of data being requested and the value is a string representing the FHIR query.
         See [Prefetch Template](https://cds-hooks.hl7.org/2.0#prefetch-template)
         for more information about how the `prefetch` formatting works.

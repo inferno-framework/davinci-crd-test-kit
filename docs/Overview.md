@@ -13,7 +13,7 @@ approach, scope, limitations, and guidance on how to interpret results.
 
 This test kit helps implementers ensure that their systems can correctly participate in
 coverage requirement discovery workflows as defined by the CRD IG. It does so by simulating
-an exchange partner for the system under test (when testing a CRD Client Inferno will simulate
+an exchange partner for the system under test (when testing a CRD client Inferno will simulate
 a CRD Service and vice-versa) and verifying that each exchange is conformant and that
 all exchanges in aggregate demonstrate the required capabilities.
 
@@ -27,12 +27,12 @@ FHIR-based data exchange.
 ## Test Kit Structure
 
 The CRD Test Kit contains test suites to test the two actors defined by the CRD specification:
-- CRD Clients: Clients are responsible for initiating CDS Hooks calls and consuming
+- CRD clients: Clients are responsible for initiating CDS Hooks calls and consuming
   received decision support. They are also responsible for returning data requested by the CRD Server
   needed to provide that decision support. This role is played by provider systems
   in which orders are placed, such as EHRs. See the [Client Details](Client-Details.md) page
   for more information.
-- CRD Servers: Servers are responsible for responding to CDS Hooks calls and responding with appropriate
+- CRD servers: Servers are responsible for responding to CDS Hooks calls and responding with appropriate
   decision support, which may involve using FHIR requests to gather more data from
   the client. See the [Server Details](Server-Details.md) page for more information.
 
@@ -96,6 +96,6 @@ solely constitute full CRD IG conformance. Systems should also meet requirements
 attestation or other means.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client v2.0.1 Instructions](Client-Instructions.md)
-* [Client v2.2.1 Instructions](Client-Instructions-v2.2.1.md)
-* [Server Instructions](Server-Instructions.md)
+* [Client v2.0.1 Suite Testing Instructions](Client-Instructions.md)
+* [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1.md)
+* [Server Suite Testing Instructions](Server-Instructions.md)

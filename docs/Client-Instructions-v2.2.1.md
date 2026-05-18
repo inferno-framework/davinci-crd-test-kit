@@ -1,6 +1,6 @@
-# Da Vinci CRD Test Kit: Client v2.2.1 Testing Instructions
+# Da Vinci CRD Client v2.2.1 Test Suite Testing Instructions
 
-This document provides a step-by-step guide for using the Da Vinci CRD v2.2.1 Client Test Suite to test
+This document provides a step-by-step guide for using the Da Vinci CRD Client v2.2.1 Test Suite to test
 a **CRD client system**, including instructions for a [demonstration execution](#demonstration-execution)
 against the public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
 
@@ -8,7 +8,7 @@ against the public [CRD client reference implementation](https://crd-request-gen
 
 ### Minimum Requirements
 
-To run against the CRD Client v2.2.1 suite, a CRD Client implementation must at minimum
+To run against the Da Vinci CRD Client v2.2.1 Test Suite, a CRD client implementation must at minimum
 - Be configured to make CRD hook requests to one of the suite's
   [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
 - [Authenticate](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients) each hook request
@@ -17,7 +17,7 @@ To run against the CRD Client v2.2.1 suite, a CRD Client implementation must at 
 ### Passing Requirements
 
 Addition configuration and information is needed to demonstrate conformance to all tested requirements.
-In order to pass all tests in the suite, a CRD Client implementation must
+In order to pass all tests in the suite, a CRD client implementation must
 - Be configured to make CRD hook requests to both suite's
   [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
   Inferno will use requests to both endpoints to verify the client's ability to satisfy
@@ -61,8 +61,8 @@ you will need the following:
 
 Once you have that information, follow these steps:
 
-1. Create a Da Vinci CRD Client Suite v2.2.1 session using your chosen version of US Core.
-1. Select the "1.1 Client Registration" group from the list at the left and and click
+1. Create a Da Vinci CRD Client v2.2.1 Test Suite session using your chosen version of US Core.
+1. Select the "1.1 Registration" group from the list at the left and and click
    the "RUN TESTS" button in the upper right.
 1. Provide the information gathered above into the associated inputs. Only the
    "CRD JWT Issuer (required)" input, which will be used by Inferno to identify
@@ -146,7 +146,7 @@ may override the token and provide an appropriate token (and other details such 
 endpoints) in the "OAuth Credentials" input of the the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
 
-## Interpretting Results
+## Interpreting Results
 
 Due to [limitations of these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#test-scope-and-limitations),
 passing this test suite in its entirety [does not prove conformance to the specification](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#conformance-criteria--interpreting-results).
@@ -157,7 +157,7 @@ in the suite.
 With those caveats, a passing execution of this suite would include:
 - Passing the corresponding hook group under the 1.2 Hooks group for each hook supported.
 - Passing all other groups, including
-  - 1.1 Client Registration
+  - 1.1 Registration
   - 1.3 Cross Hook Verification
   - 1.4 Long-running Hook Request
   - 2 FHIR API
@@ -168,7 +168,7 @@ If you would like to try out the order-sign hook invocation tests against
 [the public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
 you can do so using the following steps:
 
-1. Create a Da Vinci CRD Client Suite v2.2.1 session using the default "US Core Version",
+1. Create a Da Vinci CRD Client v2.2.1 Test Suite session using the default "US Core Version",
    which will not be used.
 1. Select the *CRD Request Generator RI* option from the Preset dropdown in the upper left.
 1. Select the "1.2.6 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.

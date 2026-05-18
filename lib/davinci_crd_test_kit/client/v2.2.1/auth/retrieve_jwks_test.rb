@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       description %(
         Verify that the JWKS can be retrieved from the JWKS uri if it is present in the `jku` field within the JWT token
         header. As per the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#trusting-cds-clients), if the jku
-        header field is omitted, the CDS Client and CDS Service SHALL communicate the JWK Set out-of-band. Therefore,
+        header field is omitted, the CDS client and CDS service SHALL communicate the JWK Set out-of-band. Therefore,
         if the client does not make their keys publicly available via a uri in the `jku` field, the user must
         submit the jwk_set as an input to the test.
       )
@@ -25,7 +25,7 @@ module DaVinciCRDTestKit
             description: %(
             The client's registered JWK Set containing it's public key, either
             as a publicly accessible url containing the JWKS, or the raw JWKS.
-            Run or re-run the **Client Registration** group to set or
+            Run or re-run the **Registration** group to set or
             change this value. Used if the `jku` header is not found in the auth token jwt.
           ),
             locked: true,
@@ -36,7 +36,7 @@ module DaVinciCRDTestKit
         auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
         skip_if cds_jwk_set.blank? && cds_jwk_set_inpput_needed?(auth_token_headers),
-                "JWK Set must be inputted if Client's JWK Set is not available"
+                "JWK Set must be inputted if the client's JWK Set is not available"
 
         crd_jwks_keys_json = []
         auth_token_headers.each_with_index do |token_header, index|

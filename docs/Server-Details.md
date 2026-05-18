@@ -36,7 +36,7 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 ### Trusting Inferno's CDS Client
 
 As specified in the [CDS Hooks Spec](https://cds-hooks.hl7.org/2.0/#trusting-cds-clients),
-each time a CDS Client transmits a request to a CDS Service which requires authentication,
+each time a CDS client transmits a request to a CDS Service which requires authentication,
 the request MUST include an Authorization header presenting the JWT as a “Bearer” token:
 `Authorization:  Bearer {{JWT}}`
 

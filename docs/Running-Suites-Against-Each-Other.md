@@ -6,7 +6,7 @@ instructions can be used to do so.
 
 ## v2.0.1
 
-1. Start a "Da Vinci CRD Client v2.0.1 Test Suite" session.
+1. Start a Da Vinci CRD Client v2.0.1 Test Suite session.
 1. Choose the "Run Against the CRD Server Suite" preset from the drop down in the upper left.
 1. Run group 1.1 Client Registration. It should pass.
 1. In another tab, start a "Da Vinci CRD Server v2.0.1 Test Suite" session.
@@ -24,7 +24,7 @@ instructions can be used to do so.
    1. A second "User Action Required" dialog will appear asking you to attest that the returned
       responses were displayed. Choose your response based on the results of the response
       evaluation in the server tests.
-1. Run Client group 1.3 Card Must Support and Server group 3.7 Required Card Response
+1. Run client group 1.3 Card Must Support and Server group 3.7 Required Card Response
    Validation to complete the server tests.
 
 Notes:
@@ -40,13 +40,13 @@ Notes:
 Running the v2.2.1 suites against each other requires 2 server sessions, one connecting to each
 of the v2.2.1 service endpoints ([complete prefetch]() and [subset prefetch]()).
 
-1. Start a "Da Vinci CRD Client v2.2.1 Test Suite" session using any version of US Core / USCDI
+1. Start a Da Vinci CRD Client v2.2.1 Test Suite session using any version of US Core / USCDI
 1. Apply preset "Run against the CRD Server Suite"
-1. Run client group 1.1 Client Registration
-1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session in a new tab that will connect to the "complete prefetch" endpoints
+1. Run client group 1.1 Registration
+1. Create a Da Vinci CRD Server v2.2.1 Test Suite session in a new tab that will connect to the "complete prefetch" endpoints
 1. Apply preset "Run against the CRD Client Suite"
 1. Run server group 1 Discovery
-1. Create a second "Da Vinci CRD Server v2.2.1 Test Suite" session in a new tab that will connect to the "subset prefetch" endpoints
+1. Create a second Da Vinci CRD Server v2.2.1 Test Suite session in a new tab that will connect to the "subset prefetch" endpoints
 1. Apply preset "Run Against the CRD Client Suite's Prefetch Subset Services"
 1. Run server group 1 Discovery
 1. Follow the following procedure for each of the hook groups:
@@ -71,12 +71,12 @@ Some tests will fail, including
      when the input dialog is open.
    - Update the "Require acknowledgement of completed hook requests?" input to have the "Continue on user acknowledgement"
      option selected.
-2. Once a "User Action Required" dialog appears, run Client group 2 FHIR API. This will run for a while.
+2. Once a "User Action Required" dialog appears, run client group 2 FHIR API. This will run for a while.
 3. Once complete, return to the server session and click the link to complete the tests.
 
 Some tests will fail, including:
 - Client test 2.1.1.01 requiring TLS will fail when executed in a local system.
-- Client test 2.1.2.01 will fail because the CRD Client simulation in the Server suite does not automatically update the Bundle with
+- Client test 2.1.2.01 will fail because the CRD client simulation in the Server suite does not automatically update the Bundle with
   resource updates in `systemActions`.
 - The server tests will fail as expected because no responses were sent by the client suite.
 

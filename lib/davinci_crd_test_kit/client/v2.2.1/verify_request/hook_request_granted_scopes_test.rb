@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       id :crd_v221_hook_request_granted_scopes
       title 'Hook requests grant the requested scopes'
       description %(
-        As a part of registration, CRD Clients and Services agree on a set of scopes that the Service needs
+        As a part of registration, CRD clients and servers agree on a set of scopes that the server needs
         to obtain all data that goes into creating hook responses. For the purposes of Inferno's simulated
         payer CRD Service acting as a part of these tests that evaluate conformance to the CRD specification,
         access to all US Core resource types are required.

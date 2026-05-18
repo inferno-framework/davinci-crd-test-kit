@@ -4,14 +4,14 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_service_registration_attestation
-      title 'Attest to the registration of the Inferno Services by the CRD Client'
+      title 'Attest to the registration of the Inferno Services by the CRD client'
       description %(
         Inferno simulates two CRD Services which can be discovered at the following endpoints:
         - Complete Prefetch Service Discovery Endpoint: #{ClientURLs.discovery_url}
         - Subset Prefetch Service Discovery Endpoint: #{ClientURLs.prefetch_subset_discovery_url}
 
         During this test, the tester will confirm that these two endpoints
-        have been registered as trusted CRD Services that can access the CRD Client's FHIR Server
+        have been registered as trusted CRD Services that can access the CRD client's FHIR Server
         and that they have each been
         - Associated with a particular payer organization (used to check that the
           hook requests are sent by the client system to the appropriate payers based on

@@ -13,14 +13,14 @@ module DaVinciCRDTestKit
     class ClientFHIRAPIGroup < Inferno::TestGroup
       title 'FHIR API'
       description <<~DESCRIPTION
-        Systems wishing to conform to the [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
-        role are responsible for returning data requested by the CRD Server needed to provide decision support. The Da
-        Vinci CRD Client FHIR API Test Group contains tests that test the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
-        of the CRD Client and ensures that the CRD Client can respond to CRD Server queriers. These 'server' capabilities
+        Systems wishing to conform to the [CRD client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
+        role are responsible for returning data requested by the CRD server needed to provide decision support. The Da
+        Vinci CRD client FHIR API Test Group contains tests that test the ['server' capabilities](https://hl7.org/fhir/us/davinci-crd/CapabilityStatement-crd-client.html#resourcesSummary1)
+        of the CRD client and ensures that the CRD client can respond to CRD server queriers. These 'server' capabilities
         are based on [US Core](https://hl7.org/fhir/us/core/STU3.1.1/). This test kit does not test the base US Core
-        capabilities. In addition to the U.S. Core expectations, the CRD Client SHALL support all 'SHOULD' `read` and
+        capabilities. In addition to the U.S. Core expectations, the CRD client SHALL support all 'SHOULD' `read` and
         `search` capabilities listed for resources referenced in supported hooks and order types if it does not support
-        returning the associated resources as part of CDS Hooks pre-fetch. The CRD Client SHALL also support `update`
+        returning the associated resources as part of CDS Hooks pre-fetch. The CRD client SHALL also support `update`
         functionality for all resources listed where the client allows invoking hooks based on the resource.
 
         This test group contains two main groups of tests:
@@ -75,9 +75,9 @@ module DaVinciCRDTestKit
               the CRD Implementation Guide imposes the following rule about TLS:
 
               As per the [CDS Hook specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
-              communications between CRD Clients and CRD Servers SHALL
+              communications between CRD clients and CRD servers SHALL
               use TLS. Mutual TLS is not required by this specification but is permitted. CRD Servers and
-              CRD Clients SHOULD enforce a minimum version and other TLS configuration requirements based
+              CRD clients SHOULD enforce a minimum version and other TLS configuration requirements based
               on HRex rules for PHI exchange.
 
               This test verifies that the FHIR server is using TLS 1.2 or higher.
@@ -105,9 +105,9 @@ module DaVinciCRDTestKit
               the CRD Implementation Guide imposes the following rule about TLS:
 
               As per the [CDS Hook specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
-              communications between CRD Clients and CRD Servers SHALL
+              communications between CRD clients and CRD Servers SHALL
               use TLS. Mutual TLS is not required by this specification but is permitted. CRD Servers and
-              CRD Clients SHOULD enforce a minimum version and other TLS configuration requirements based
+              CRD clients SHOULD enforce a minimum version and other TLS configuration requirements based
               on HRex rules for PHI exchange.
 
               This test verifies that the FHIR server is using TLS 1.2 or higher.
@@ -149,7 +149,7 @@ module DaVinciCRDTestKit
         title 'FHIR RESTful Capabilities'
         description %(
           This test group contains groups of tests for each CRD resource profile and ensures the
-          [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
+          [CRD client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
           supports the appropriate FHIR operations required on each resource. For each resource, Inferno will
           perform the required FHIR operations, and then it will validate any resources that are returned as a result of
           these FHIR operations.

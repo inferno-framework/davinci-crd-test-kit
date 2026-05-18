@@ -1,6 +1,6 @@
 # Controlling Responses from Inferno's Simulated CRD Service
 
-During the CRD Client tests, provider systems are asked to demonstrate
+During the CRD client tests, provider systems are asked to demonstrate
 that they can handle conformant cards and system actions retured by CRD Payer Services
 and allow users to see and take actions based on these returned details.
 However, provider systems are not expected to be able to handle all conformant
@@ -78,7 +78,7 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   a draft self-pay coverage for the patient indicated in the hook request (`context.patientId`).
 - **[Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application)**:
   Inferno's [static launch SMART application card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/launch_smart_app.json)
-  points to the launch url for the CRD Client test suite. 
+  points to the launch url for the CRD client test suite. 
 
 ## Tester-directed Custom Responses
 

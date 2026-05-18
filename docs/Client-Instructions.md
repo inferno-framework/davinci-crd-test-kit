@@ -1,4 +1,4 @@
-# Da Vinci CRD Test Kit: Client v2.0.1 Testing Instructions
+# Da Vinci CRD Client v2.0.1 Test Suite Testing Instructions
 
 This document provides a step-by-step guide for using the Da Vinci CRD Client v2.0.1 Test Suite to test
 a **CRD client system**, including instructions for a [demonstration execution](#demonstration-execution)
@@ -9,7 +9,7 @@ against a public [CRD client reference implementation](https://crd-request-gener
 To execute a simple set of tests targeting a single hook using Inferno's mocked response,
 follow these steps:
 
-1. Create a Da Vinci CRD Client Suite v2.0.1 session using the default "SMART App Launch Version",
+1. Create a Da Vinci CRD Client v2.0.1 Test Suite session using the default "SMART App Launch Version",
    which will not be used.
 1. Select the "1.1 Client Registration" group from the list at the left and and click
    the "RUN TESTS" button in the upper right.
@@ -72,7 +72,7 @@ Group "2 FHIR API" focuses on the FHIR API of the tested client outside of the c
 invocation. It focuses on API requirements that go beyond the base US Core API requirements that
 are included in CRD STU 2. 
 
-When starting the CRD Client Suite session, choose the appropriate version of the SMART
+When starting the CRD client suite session, choose the appropriate version of the SMART
 specification in the "SMART App Launch Version" suite option.
 
 Running the tests require 4 types of inputs:
@@ -105,7 +105,7 @@ If you would like to try out the order-sign hook invocation tests against
 [the public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
 you can do so using the following steps:
 
-1. Create a Da Vinci CRD Client Suite v2.0.1 session using the default "SMART App Launch Version",
+1. Create a Da Vinci CRD Client v2.0.1 Test Suite session using the default "SMART App Launch Version",
    which will not be used.
 1. Select the *CRD Request Generator RI* option from the Preset dropdown in the upper left.
 1. Select the "1.2.6 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.

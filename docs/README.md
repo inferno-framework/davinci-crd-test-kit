@@ -4,7 +4,7 @@ The **Da Vinci Coverage Requirements Discovery (CRD) Test Kit** is a testing too
 that is designed to help implementers validate systems against the 
 HL7® FHIR® [Da Vinci Coverage Requirements Discovery Implementation
 Guide](https://hl7.org/fhir/us/davinci-crd/). Currently, it includes
-suites that verify the behavior of CRD Clients and CRD Servers
+suites that verify the behavior of CRD clients and CRD servers
 against the following versions of the CRD IG
 - [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
 - [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
@@ -17,20 +17,23 @@ to this test kit.
 *   **[Getting Started](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
 *   **[Test Kit Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 
-### Using the CRD Client Test Suite
+### Using the Da Vinci CRD Client Test Suites
 *   **[Client Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)**: Description of the client tests.
-*   **[Client Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)**: Step-by-step guide for testing client systems, including demonstration executions.
+*   **Client Testing Instructions**: Step-by-step guide for testing client systems, including demonstration executions for both
+    the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
+    and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
 *   **[Controlling Simulated CRD Service Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD Service during client testing.
 
-### Using the CRD Server Test Suite 
+### Using the Da Vinci CRD Server Test Suites 
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.
 *   **[Server Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)**: Step-by-step guide for testing server systems, including demonstration executions.
 
 ## Contributing to this Test Kit
 
 *   **[Technical Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Running-Suites-Against-Each-Other)**: Step-by-step guide for using the Client and Server suites to demonstrate the test execution without a separate CRD implementation, which can be useful
-for learning as well as debugging.
+*   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Running-Suites-Against-Each-Other)**:
+    Step-by-step guide for using the client and server suites to demonstrate the test execution without a separate CRD
+    implementation, which can be useful for learning as well as debugging.
 
 ## Reference Documents
 

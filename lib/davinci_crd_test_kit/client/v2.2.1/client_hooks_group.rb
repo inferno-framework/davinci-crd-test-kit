@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
         CRD IG and the [CDS hooks spec](https://cds-hooks.hl7.org/2.0/).
 
         Each hook group tests the following:
-        * If the CRD Client can invoke the specific hook service request
+        * If the CRD client can invoke the specific hook service request
         * If the incoming hook request is properly authorized with a JWT Bearer token according to the [CDS Hooks authorization requirements](https://cds-hooks.hl7.org/2.0/#trusting-cds-clients)
         * If the incoming hook request contains valid required fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
         * If the incoming hook request contains valid optional fields listed in the [CDS Hooks HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1)
@@ -45,7 +45,7 @@ module DaVinciCRDTestKit
             title: 'CRD JWT Issuer',
             description: %(
             Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-            header of all requests. Run or re-run the **Client Registration** group to set or
+            header of all requests. Run or re-run the **Registration** group to set or
             change this value.
           ),
             locked: true

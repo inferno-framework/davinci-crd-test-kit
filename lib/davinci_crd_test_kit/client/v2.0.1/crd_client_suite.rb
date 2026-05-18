@@ -115,7 +115,7 @@ module DaVinciCRDTestKit
         id :crd_v201_client_hook_invocation
         title 'Hook Invocation'
         description %(
-          This groups checks that the system can register as a CDS Client with
+          This group checks that the system can register as a CDS client with
           Inferno's simulated CRD Server and make hook invocations.
         )
 

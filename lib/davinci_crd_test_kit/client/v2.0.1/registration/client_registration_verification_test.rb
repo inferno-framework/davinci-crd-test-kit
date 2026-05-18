@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       id :crd_v201_client_registration_verification
       title 'Verify CRD Client Registration'
       description %(
-        During this test, Inferno will verify that the CRD Client registration details
+        During this test, Inferno will verify that the CRD client registration details
         provided are conformant.
       )
 

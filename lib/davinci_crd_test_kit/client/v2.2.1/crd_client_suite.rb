@@ -16,27 +16,31 @@ module DaVinciCRDTestKit
       id :crd_client_v221
       title 'Da Vinci CRD Client v2.2.1 Test Suite'
       description <<~DESCRIPTION
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
-        to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
+        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of client systems
+        to [version 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1) of the Da Vinci
+        Coverage Requirements Discovery (CRD) Implementation Guide.
 
         Detailed information about this test suite can be found in the
-        [Client section of the CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details),
+        [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the CRD Test Kit Wiki,
         including:
         - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
         - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
           and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)
-          instructions for executing against a client system], and
-        - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#interpretting-results).
+          instructions for executing against a client system, and
+        - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#interpreting-results).
       DESCRIPTION
 
       suite_summary <<~SUMMARY
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
+        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of client systems
         to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
         Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
       SUMMARY
 
       links [
+        {
+          label: 'Implementation Guide',
+          url: 'https://hl7.org/fhir/us/davinci-crd/2.2.1'
+        },
         {
           label: 'Report Issue',
           url: 'https://github.com/inferno-framework/davinci-crd-test-kit/issues'
@@ -165,10 +169,6 @@ module DaVinciCRDTestKit
       group do
         id :crd_v221_client_hook_invocation
         title 'Hook Invocation'
-        description %(
-          This groups checks that the system can register as a CDS Client with
-          Inferno's simulated CRD Server and make hook invocations.
-        )
 
         group from: :crd_v221_client_registration
         group from: :crd_v221_client_hooks

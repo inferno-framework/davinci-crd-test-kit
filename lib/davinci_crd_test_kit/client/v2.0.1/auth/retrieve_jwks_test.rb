@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       description %(
         Verify that the JWKS can be retrieved from the JWKS uri if it is present in the `jku` field within the JWT token
         header. As per the [CDS hooks specification](https://cds-hooks.hl7.org/2.0#trusting-cds-clients), if the jku
-        header field is omitted, the CDS Client and CDS Service SHALL communicate the JWK Set out-of-band. Therefore,
+        header field is omitted, the CDS client and CDS service SHALL communicate the JWK Set out-of-band. Therefore,
         if the client does not make their keys publicly available via a uri in the `jku` field, the user must
         submit the jwk_set as an input to the test.
       )
@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
             jwks = JSON.parse(response[:body])
           else
             skip_if cds_jwk_set.blank?,
-                    %(#{request_number}JWK Set must be inputted if Client's JWK Set is not available via a URL
+                    %(#{request_number}JWK Set must be inputted if the client's JWK Set is not available via a URL
                   identified by the jku header field)
 
             jwks = JSON.parse(cds_jwk_set)

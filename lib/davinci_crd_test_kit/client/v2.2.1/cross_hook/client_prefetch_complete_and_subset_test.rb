@@ -53,7 +53,7 @@ module DaVinciCRDTestKit
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)
 
         skip_if error_messages?,
-                'Client did not demonstrate both complete and subset prefetch capability. See Messages for details.'
+                'The client did not demonstrate both complete and subset prefetch capability. See Messages for details.'
       end
 
       def find_completeness_tests

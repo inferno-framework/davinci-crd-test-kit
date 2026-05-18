@@ -82,10 +82,10 @@ Within the `client` and `server` actor directories, files are generally organize
   used to verify the (g)(10) test kit behavior at least as fast as the Inferno Reference Server itself.
 - [**JSON Web Key Set hosting**](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/server/endpoints):
   Within the `server/endpoints` directory are several files that handle the publication of a jwks that the Inferno's simulated CRD
-  Client will use to identify itself and sign JWTs on hook invocations made as a part of the server tests.
+  client will use to identify itself and sign JWTs on hook invocations made as a part of the server tests.
 - [**Hook invocation job**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/jobs/invoke_hook.rb):
   In order to support the simulated FHIR server based on a Bundle in a session input and make it active during hook invocations made by
-  Inferno's simulated CRD Client, these hook invocations must be made during a wait test. Invocation tests spawn instances of this job
+  Inferno's simulated CRD client, these hook invocations must be made during a wait test. Invocation tests spawn instances of this job
   which runs and performs the hook invocations while Inferno is waiting. The job either triggers the continuation of the tests once
   complete or waits for tester input depending on the inputs provided by the tester.
 - [**`server_hook_helper.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/server_hook_helper.rb):

@@ -1,6 +1,6 @@
 {
   "summary": "Create/Update Coverage Information Card",
-  "detail": "This is a Create/Update Coverage Information Card which is sent when the CRD server is aware of additional coverage that is relevant to the current/proposed activity or has updates/corrections to make to the information held by the CRD Client",
+  "detail": "This is a Create/Update Coverage Information Card which is sent when the CRD server is aware of additional coverage that is relevant to the current/proposed activity or has updates/corrections to make to the information held by the CRD client",
   "indicator": "info",
   "source": {
     "label": "Inferno",

@@ -7,10 +7,26 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_registration_verification
-      title 'Verify CRD Client Registration'
+      title 'Verify CRD client registration information'
       description %(
-        During this test, Inferno will verify that the CRD Client registration details
-        provided are conformant.
+        In order to register with and be able to make hook requests against Inferno's
+        simulated CRD Services, the tester must provide the `iss` (issuer) claim in
+        the payload of the JWT sent in the Authorization header of hook requests
+        made by the client against Inferno. This information is used to
+        associate inbound requests to Inferno's simulated CRD Services with this session.
+        Requests made without a JWT or with a different `iss` value will not appear in this
+        session or be analyzed.
+
+        Inferno also requires some additional information to verify conformant client behavior.
+        This information is not needed to execute the tests, but the tests will not completely
+        pass without them:
+        - A JSON Web Key Set (JWKS) containing the key used to sign the JWT sent in the Authorization
+          header for use in signature validation. It can be provided either as a URL where it is
+          publicly hosted or the raw JWKS as JSON.
+        - A FHIR Organization id associated with each of Inferno's two simulated CRD services,
+          one at `#{ClientURLs.discovery_url}` requesting the [complete standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
+          and the other at `#{ClientURLs.prefetch_subset_discovery_url}` requesting a subset of that data set.
+          This is used to verify that the prefetch coverage is liked to the correct payer.
       )
 
       input :cds_jwt_iss,
