@@ -78,7 +78,7 @@ module DaVinciCRDTestKit
               ]
             }
       input :order_sign_custom_response_template,
-            title: 'Custom response for order-sign hook requests',
+            title: 'Custom response template for order-sign hook requests',
             description: %(
               A JSON string may be provided here to replace the normal response
               from the hook request endpoint

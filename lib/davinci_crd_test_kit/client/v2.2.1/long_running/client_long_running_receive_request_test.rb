@@ -21,17 +21,17 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the "Registration" group to set or
-              change this value.
+              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
       input :long_running_pause_time,
             title: 'Long-running Request Pause Time',
             description: %(
-              Time in seconds to wait before returning a response to a hook request
-              made during this time. Must be at least 5 seconds which is the minimum
-              threshold for a long-running response as defined by CRD.
+              Time in seconds to wait before returning a response to a hook invocation
+              made when testing a long-running request. Must be at least 5 seconds,
+              which is the minimum threshold for a long-running response as defined by CRD.
             ),
             default: '5'
 

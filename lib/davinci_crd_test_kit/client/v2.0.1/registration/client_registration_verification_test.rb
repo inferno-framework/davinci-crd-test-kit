@@ -28,7 +28,8 @@ module DaVinciCRDTestKit
             description: %(
               The CRD client's JWK Set containing it's public key. May be either
               a publicly accessible url containing the JWKS, or the raw JWKS.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             optional: true
 

@@ -20,9 +20,9 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-1'
 
       input_instructions %(
-        Details on how and what to access the client's FHIR server are expected to come in
+        The location of and an access token for the client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
-        the latest hook request made during this session:
+        the body of the latest hook invocation made during this session:
         - The URL of the CRD client FHIR server from the `fhirServer` field.
         - The OAuth Access Token from the `fhirAuthorization.access_token` field.
 

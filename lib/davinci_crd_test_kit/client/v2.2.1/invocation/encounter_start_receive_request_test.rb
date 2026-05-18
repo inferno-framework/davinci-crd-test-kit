@@ -25,16 +25,18 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the "Registration" group to set or
-              change this value.
+              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
       input :encounter_start_selected_response_types,
             title: 'Response types to return from encounter-start hook requests',
             description: %(
-              Select the cards/action response types that the Inferno hook request endpoints will return. The default
-              response type that will be returned for this hook is the `Instructions` card type.
+              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+              when responding to hook invocations. If no types are selected, Inferno will mock and return
+              an [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
+              response for this secondary hook.
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -68,10 +70,13 @@ module DaVinciCRDTestKit
               ]
             }
       input :encounter_start_custom_response_template,
-            title: 'Custom response for encounter-start hook requests',
+            title: 'Custom response template for encounter-start hook requests',
             description: %(
-              A JSON string may be provided here to replace the normal response
-              from the hook request endpoint
+              To control the responses of Inferno's simulated CRD server, provide
+              a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+              in JSON form for Inferno to use when responding to hook invocations.
+              If this input is populated, the corresponding **Response types to return**
+              input will be ignored.
             ),
             type: 'textarea',
             optional: true

@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         level of detail provided is insufficient to determine coverage.
 
         For more details on how Inferno's simulated CDS Service behave during hook invocation see the
-        [simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
+        [simulated CRD server(https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
         documentation.
       )
       config options: { accepts_multiple_requests: true }
@@ -70,7 +70,7 @@ module DaVinciCRDTestKit
               ]
             }
       input :appointment_book_custom_response_template,
-            title: 'Custom response for appointment-book hook requests',
+            title: 'Custom response template for appointment-book hook requests',
             description: %(
               A JSON string may be provided here to replace the normal response
               from the hook request endpoint

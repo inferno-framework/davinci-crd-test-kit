@@ -101,7 +101,7 @@ group as described in [Quick Start](#quick-start).
 
 ### Customizing Responses
 
-The "Custom response for [hook name] hook requests" input can be used to customize the hook
+The "Custom response template for [hook name] hook requests" input can be used to customize the hook
 responses to better fit the configuration of the tested client system. When this input is populated,
 the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)

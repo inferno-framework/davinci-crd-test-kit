@@ -23,7 +23,7 @@ module DaVinciCRDTestKit
         - A JSON Web Key Set (JWKS) containing the key used to sign the JWT sent in the Authorization
           header for use in signature validation. It can be provided either as a URL where it is
           publicly hosted (preferred) or the raw JWKS as JSON.
-        - A FHIR Organization id associated with each of Inferno's two simulated CRD services,
+        - A FHIR Organization id associated with each of Inferno's two simulated CRD servers,
           one at `#{ClientURLs.discovery_url}` requesting the [complete standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
           and the other at `#{ClientURLs.prefetch_subset_discovery_url}` requesting a subset of that data set.
           These are used to verify that the prefetched coverage is linked to the correct payer for the invoked
@@ -38,8 +38,9 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              The `iss` claim of the JWT in the Authorization header sent by the CRD client under test on
-              all CRD requests. This value will be used to associate incoming requests with this test
+              Value of the `iss` claim that will be sent in the JWT used to authorize the client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              This value will be used to associate incoming requests with this test
               session and any requests that use a different `iss` value will not be recognized.
             ),
             type: 'text'
@@ -49,17 +50,19 @@ module DaVinciCRDTestKit
             description: %(
               The CRD client's JWK Set containing it's public key. May be either
               a publicly accessible url containing the JWKS, or the raw JWKS.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             optional: true
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD services. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services under the
+              complete prefetch CRD server. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services described by the
               `#{ClientURLs.discovery_url}` discovery endpoint.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             type: 'text',
             optional: true
@@ -67,10 +70,11 @@ module DaVinciCRDTestKit
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD services. This Organization must be referenced
-              payer on Coverages in hook requests made to services under the
+              subset prefetch CRD server. This Organization must be referenced
+              payer on Coverages in hook requests made to services described by the
               `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
             ),
             type: 'text',
             optional: true

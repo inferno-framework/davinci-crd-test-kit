@@ -27,9 +27,10 @@ module DaVinciCRDTestKit
             title: 'Complete Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD services. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services under the `#{ClientURLs.discovery_url}`
-              discovery endpoint. This input is required for these tests to pass.
+              complete prefetch CRD server. This Organization must be referenced as the
+              payer on Coverages in hook requests made to services described by the `#{ClientURLs.discovery_url}`
+              discovery endpoint. The client suite may be run without this input, but it is required
+              for the tests to pass.
               Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
@@ -39,10 +40,11 @@ module DaVinciCRDTestKit
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD services. This Organization must be referenced
-              payer on Coverages in hook requests made to services under the
+              subset prefetch CRD server. This Organization must be referenced
+              payer on Coverages in hook requests made to services described by the
               `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              This input is required for these tests to pass.
+              The client suite may be run without this input, but it is required
+              for the tests to pass.
               Re-run the "Registration" group to provide this detail.
             ),
             type: 'text',
