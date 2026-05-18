@@ -16,7 +16,7 @@
     :url: covered
   - :id: Extension.extension:pa-needed
     :path: extension
-    :url: pa-needed  
+    :url: pa-needed
   - :id: Extension.extension:doc-needed
     :path: extension
     :url: doc-needed

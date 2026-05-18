@@ -24,7 +24,9 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-14'
 
       def metadata
-        @metadata ||= YAML.load_file(File.join(__dir__, 'coverage-information_stu221_metadata.yml'))
+        @metadata ||= YAML.load_file(
+          File.join(__dir__, '..', '..', '..', 'cross_suite', 'coverage-information_stu221_metadata.yml')
+        )
       end
 
       class MustSupportMetadataHolder
