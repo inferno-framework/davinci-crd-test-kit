@@ -9,25 +9,25 @@ against a public [CRD client reference implementation](https://crd-request-gener
 To execute a simple set of tests targeting a single hook using Inferno's mocked response,
 follow these steps:
 
-1. Create a Da Vinci CRD Client v2.0.1 Test Suite session using the default "SMART App Launch Version",
+1. Create a "Da Vinci CRD Client v2.0.1 Test Suite" session using the default "SMART App Launch Version",
    which will not be used.
 1. Select the "1.1 Client Registration" group from the list at the left and and click
    the "RUN TESTS" button in the upper right.
-1. Provide the "CRD JWT Issuer (required)" input, which will be used by Inferno to identify
+1. Provide the **CRD JWT Issuer** input, which will be used by Inferno to identify
    CDS Hook invocation requests coming from the client under test. You can also provide
-   the "CRD JSON Web Key Set (JWKS)" as a URL or raw key set, which is required for Inferno
+   the **CRD JSON Web Key Set (JWKS)** input as a URL or raw key set, which is required for Inferno
    to perform complete JWT verification, but is not required for execution.
 1. Click the "SUBMIT" button to verify the registration details. You can continue even if the
    tests fail, e.g., because no JWKS was provided.
 1. Select the sub-group under "1.2 Hooks" that corresponds to a hook implemented by the
    tested client and click the "RUN TESTS" button in the upper right.
-1. Select the response types Inferno should respond with under the "Response types to return
-   from [hook name] hook requests" input (the options depend on which hook was chosen).
+1. Select the response types Inferno should respond with under the **Response types to return
+   from [hook name] hook requests** input (the options depend on which hook was chosen).
 1. Click the "SUBMIT" button and a "User Action Required" dialog will be appear asking for
    hook invocations to be made against the Inferno's simulated service endpoint.
 1. Make one or more hook invocations of the target hook against Inferno's simulated service
    endpoint, including in the request a JWT with the `iss` field equal to the value provided
-   in the "CRD JWT Issuer (required)" input. If you make a request with a different `iss`
+   in the **CRD JWT Issuer** input. If you make a request with a different `iss`
    value, Inferno will not be able to link the request to the test session and will not
    respond or analyze the request.
 1. Once all requests have been made, click the link in the "User Action Required" dialog
