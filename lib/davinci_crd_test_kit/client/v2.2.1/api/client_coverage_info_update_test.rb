@@ -10,11 +10,11 @@ module DaVinciCRDTestKit
       title "Client's FHIR server stores updates from coverage-information responses"
       id :crd_v221_client_coverage_info_update
       description <<~DESCRIPTION
-        This test verifies that when the client receives a [coverage-information response type](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
+        This test verifies that when the client receives a [Coverage Information response type](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
         it stores the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         and makes it available when accessing the associated resource.
 
-        During this test, Inferno will find all [coverage-information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
+        During this test, Inferno will find all [Coverage Information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
         attempt to read the updated FHIR resource from the client's FHIR server, and verify
         that the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         in the response is now present in the returned resource. When comparing the
@@ -28,9 +28,9 @@ module DaVinciCRDTestKit
         to expose FHIR read APIs for all request resource types, so resource types for which
         the client's CapabilityStatement does not indicate read interaction support will be omitted.
         Additionally, Inferno will not check complex cases where determining the expected
-        stored extensions is difficult. For example, when there are multiple coverage-information
+        stored extensions is difficult. For example, when there are multiple Coverage Information
         responses for a single resource or multiple coverage-information extensions in a
-        single coverage-information response. Implementers are still responsible for storing updates
+        single Coverage Information response. Implementers are still responsible for storing updates
         in these cases. To pass this test at least one target resource that Inferno can access must be found.
         The stored [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         must be correct for all resources checked by Inferno.

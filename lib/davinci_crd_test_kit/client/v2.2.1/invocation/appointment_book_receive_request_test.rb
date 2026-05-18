@@ -81,6 +81,31 @@ module DaVinciCRDTestKit
             optional: true
       output :continuation_url
 
+      def configured_response_details
+        if appointment_book_custom_response_template.present?
+          # rubocop:disable Layout/LineLength
+          'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
+            'from the **Custom response template for appointment-book hook requests** input ' \
+            'against the incoming request to create a response.'
+          # rubocop:enable Layout/LineLength
+
+        else
+          # rubocop:disable Layout/LineLength
+          'When responding, Inferno will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
+            'the following response types using the incoming request: ' \
+            "\n            - #{selected_response_types_string}"
+          # rubocop:enable Layout/LineLength
+        end
+      end
+
+      def selected_response_types_string
+        if appointment_book_selected_response_types.present?
+          appointment_book_selected_response_types.join("\n            - ")
+        else
+          'Coverage Information' # primary hook default
+        end
+      end
+
       run do
         identifier = cds_jwt_iss
         continuation_url = "#{resume_pass_url}?token=#{identifier}"
@@ -89,16 +114,21 @@ module DaVinciCRDTestKit
         wait(
           identifier:,
           message: %(
-            **Appointment Book CDS Service Test**:
+            **Invoke the `appointment-book` hook**:
 
-            Invoke the appointment-book hook and send requests to:
+            Invoke the appointment-book hook by sending requests to
+            one or both of the two Inferno simulated CRD servers:
 
-            `#{appointment_book_url}`
+            - Complete Prefetch: `#{appointment_book_url}`
+            - Subset Prefetch: `#{appointment_book_prefetch_subset_url}`
 
-            Inferno will process the requests and return CDS cards if successful.
+            For Inferno to recognize these requests and associate them with this session,
+            the authentication JWT sent as a Bearer token in the Authorization header
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
-            [Click here](#{continuation_url}) when you have finished
-            submitting requests.
+            #{configured_response_details}
+
+            [Click here](#{continuation_url}) when you have finished submitting requests.
           )
         )
       end

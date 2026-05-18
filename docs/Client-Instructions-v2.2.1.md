@@ -193,7 +193,7 @@ you can do so using the following steps:
 1. Back in Inferno, click the link in the "User Action Required" dialog to continue the tests. A second
    "User Action Required" dialog will appear asking for confirmation that the returned cards were
    displayed properly. Click the appropriate link based on your interactions with the client in the
-   previous step. NOTE: the client currently will not display the "coverage-information" systemAction.
+   previous step.
 1. The Inferno tests will complete. NOTE: many tests are expected to fail as this reference implementation
    has not been updated to use the v2.2.1 version.
 

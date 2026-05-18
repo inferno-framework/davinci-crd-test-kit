@@ -49,7 +49,7 @@ module DaVinciCRDTestKit
             for #{long_running_pause_time.to_i} seconds, and returned a response.
 
             Users must have the option to continue
-            their workflow before the response returns. Testers will be asked to
+            their workflow before Inferno's response is returned. Testers will be asked to
             attest that this was demonstrated in the next test.
           )
         )

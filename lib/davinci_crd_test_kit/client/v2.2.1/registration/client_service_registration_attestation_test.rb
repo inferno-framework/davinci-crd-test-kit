@@ -81,17 +81,20 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Registration of Inferno as a trusted CRD server**:
 
-            I attest that the following Inferno endpoints have been registered as follows:
+            I attest that the following Inferno CRD servers have been registered as trusted
+            within the client system:
 
-            - Complete Prefetch Service Discovery Endpoint: #{discovery_url}
-              - Has been registered with payer Organization resource with id `#{complete_prefetch_service_organization_id}`
-              - Has been granted patient- or user-level read and search access scopes for
-              all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
+            - Complete Prefetch Service Discovery Endpoint: `#{discovery_url}`
+              - Services on this CRD server will be invoked for patients with a primary coverage issued by the payer
+                represented by the Organization resource with id `#{complete_prefetch_service_organization_id}`.
+              - The CRD server has been granted patient- or user-level read and search access scopes for
+                all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
 
-            - Subset Prefetch Service Discovery Endpoint: #{prefetch_subset_discovery_url}
-              - Has been registered with payer Organization resource with id `#{subset_prefetch_service_organization_id}`
-              - Has been granted patient- or user-level read and search access scopes for
-              all US Core #{us_core_version} resource types (`#{us_core_version_resource_types}`).
+            - Subset Prefetch Service Discovery Endpoint: `#{prefetch_subset_discovery_url}`
+              - Services on this CRD server will be invoked for patients with a primary coverage issued by the payer
+                represented by the Organization resource with id `#{subset_prefetch_service_organization_id}`.
+              - The CRD server has been granted patient- or user-level read and search access scopes for
+                all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
 
             [Click here](#{attest_true_url}) if the above statement is **true**.
 

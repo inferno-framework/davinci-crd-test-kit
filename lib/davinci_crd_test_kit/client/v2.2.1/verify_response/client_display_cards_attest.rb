@@ -56,8 +56,10 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Card Display Attestation**:
 
-            I attest that the following CDS response types returned were processed by the
-            client system and displayed to the user:
+            I attest that the following CRD response types returned by Inferno's simulated
+            CRD servers were processed by the client system and displayed or otherwise made
+            available to users of the client system in an appopriate way that allows for
+            consideration and action if warranted:
 
             #{format_responded_response_types}
 

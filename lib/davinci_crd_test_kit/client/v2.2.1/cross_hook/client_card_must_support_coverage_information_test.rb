@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include CardsIdentification
       include TaggedRequestLoadHelper
 
-      title 'Client supports the coverage-information response type'
+      title 'Client supports the Coverage Information response type'
       id :crd_v221_client_card_must_support_coverage_information
       description <<~DESCRIPTION
         During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
