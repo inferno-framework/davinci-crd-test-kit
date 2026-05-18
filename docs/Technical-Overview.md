@@ -63,7 +63,7 @@ Within the `client` and `server` actor directories, files are generally organize
   Inferno [suite option](https://inferno-framework.github.io/docs/advanced-test-features/test-configuration.html#suite-options)
   constants used across all client suites.
 - [**`tagged_request_load_helper.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/tagged_request_load_helper.rb):
-  A utility module design to help load request messages tagged by the simulated CDS Services endpoints. Many tests load these
+  A utility module design to help load request messages tagged by the simulated CRD server endpoints. Many tests load these
   requests to evaluate them and their responses so this module reduces code duplication significantly. It contains options
   for loading requests related to a specific hook or all hooks.
 - [**`multi_request_message_helper.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/multi_request_message_helper.rb):

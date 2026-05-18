@@ -40,9 +40,9 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 and response objects may also be checked using the validator against defined logical models
 in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)).
 
-## CDS Services Simulation
+## CRD Server Simulation
 
-### Simulated CDS Services in the CRD Client v2.0.1 Suite
+### Simulated CRD Server in the CRD Client v2.0.1 Suite
 
 The Da Vinci CRD Client v2.0.1 Test Suite provides basic CDS services for
 [the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html).
@@ -141,7 +141,7 @@ In order to access the client's FHIR API, Inferno will need to be a
 [trusted service](https://cds-hooks.hl7.org/STU2/#trusting-cds-services)
 registered as a client using details provided within the suite at time of execution.
 
-### Simulated CDS Services in the CRD Client v2.2.1 Suite
+### Simulated CRD Server in the CRD Client v2.2.1 Suite
 
 The Da Vinci CRD Client v2.2.1 Test Suite provides basic CDS services for
 [the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html).

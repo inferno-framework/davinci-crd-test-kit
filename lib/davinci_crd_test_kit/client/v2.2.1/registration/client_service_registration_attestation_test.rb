@@ -4,7 +4,7 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_service_registration_attestation
-      title 'Attest to the registration of the Inferno Services by the CRD client'
+      title 'Attest to the registration of the Inferno CRD servers by the CRD client'
       description %(
         Inferno simulates two CRD servers which can be discovered at the following endpoints:
         - Complete Prefetch Service Discovery Endpoint: #{ClientURLs.discovery_url}

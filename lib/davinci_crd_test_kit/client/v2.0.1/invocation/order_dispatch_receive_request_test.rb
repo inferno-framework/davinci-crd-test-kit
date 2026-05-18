@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         level of detail provided is insufficient to determine coverage.
 
         For more details on how Inferno's simulated CDS Service behave during hook invocation see the
-        [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+        [simulated CRD server(https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
         documentation.
       )
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@205',

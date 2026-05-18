@@ -19,14 +19,15 @@ module DaVinciCRDTestKit
 
         Inferno also requires some additional information to verify conformant client behavior.
         This information is not needed to execute the tests, but the tests will not completely
-        pass without them:
+        pass without it:
         - A JSON Web Key Set (JWKS) containing the key used to sign the JWT sent in the Authorization
           header for use in signature validation. It can be provided either as a URL where it is
-          publicly hosted or the raw JWKS as JSON.
+          publicly hosted (preferred) or the raw JWKS as JSON.
         - A FHIR Organization id associated with each of Inferno's two simulated CRD services,
           one at `#{ClientURLs.discovery_url}` requesting the [complete standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
           and the other at `#{ClientURLs.prefetch_subset_discovery_url}` requesting a subset of that data set.
-          This is used to verify that the prefetch coverage is liked to the correct payer.
+          This is used to verify that the prefetch coverage is linked to the correct payer for the invoked
+          service.
       )
 
       input :cds_jwt_iss,

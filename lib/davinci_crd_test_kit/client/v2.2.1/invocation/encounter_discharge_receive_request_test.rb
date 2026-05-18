@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
         hook requests and responds to the client with the response types selected as an input.
 
         For more details on how Inferno's simulated CDS Service behave during hook invocation see the
-        [Simulated CDS Services](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#cds-services)
+        [simulated CRD server(https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
         documentation.
       )
       # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@197', 'hl7.fhir.us.davinci-crd_2.0.1@243',
