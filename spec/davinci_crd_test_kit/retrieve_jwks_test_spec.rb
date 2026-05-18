@@ -84,7 +84,7 @@ RSpec.describe DaVinciCRDTestKit::V201::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header_no_jku.to_json])
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match("JWK Set must be inputted if Client's JWK Set is not available")
+    expect(result.result_message).to match("JWK Set must be inputted if the client's JWK Set is not available")
   end
 
   it 'fails if it receives non 200 response' do
