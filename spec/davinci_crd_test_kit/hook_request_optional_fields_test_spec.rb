@@ -231,7 +231,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Request 1: Hook request field prefetch is not of type Hash/)
+      expect(entity_result_message.message).to match(/Request 1: Hook request field `prefetch` is not of type Hash/)
     end
 
     it 'fails if an optional field is defined but empty (hash)' do
