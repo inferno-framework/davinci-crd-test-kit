@@ -180,6 +180,9 @@ module DaVinciCRDTestKit
         test from: :crd_v221_all_responses_include_coverage_information,
              verifies_requirements: [
                'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
+               # This requirement has a typo. It says 'order-select' but it
+               # should be 'order-sign'.
+               # https://jira.hl7.org/browse/FHIR-56985
                'hl7.fhir.us.davinci-crd_2.2.1@hook-39',
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
