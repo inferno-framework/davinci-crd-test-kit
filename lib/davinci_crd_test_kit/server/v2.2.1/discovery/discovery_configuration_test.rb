@@ -14,6 +14,11 @@ module DaVinciCRDTestKit
         expected to return cards, so they are ignored in this test.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-4',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-5',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-7',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-8'
+
       input :cds_services
       input :crd_discovery_service_ignore_list,
             optional: true
