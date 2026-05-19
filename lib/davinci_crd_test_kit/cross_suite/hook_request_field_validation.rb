@@ -212,7 +212,7 @@ module DaVinciCRDTestKit
     def structure_definition_map_v221
       {
         'Practitioner' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.2.1',
-        'PractitionerRole' => 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole|3.1.1',
+        'PractitionerRole' => 'http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/hrex-practitionerrole|1.2.0',
         'Patient' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient|2.2.1',
         'Encounter' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter|2.2.1',
         'Appointment' => 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order|2.2.1',

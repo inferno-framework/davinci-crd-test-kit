@@ -167,6 +167,9 @@ module DaVinciCRDTestKit
       end
     end
 
+    # NOTE: for simplicity and to avoid duplication of checks, this looks for
+    # a particular patient reference from the context.patientId,
+    # the profile of which will be verified during prefetch profile checking
     def resolved_participant_patient_slice_issue?(issue, appointment, request_body)
       return false unless issue.message.match(/Slice 'Appointment.participant:Patient': a matching slice is required, but not found/) # rubocop:disable Layout/LineLength
 
@@ -250,9 +253,10 @@ module DaVinciCRDTestKit
                       "is not #{allowed_types_error_suffix}.")
           is_local_reference = false
         end
-        unless id.match(/[A-Za-z0-9\-\.]{1,64}/)
+        unless id.match(/\A[A-Za-z0-9\-\.]{1,64}\z/)
           add_message('error',
-                      "#{error_prefix} local reference id '#{id}' does not meet FHIR id data type requirements.")
+                      "#{error_prefix} local reference id '#{id}' does not meet " \
+                      '[FHIR id data type](https://hl7.org/fhir/R4/datatypes.html#id) requirements.')
           is_local_reference = false
         end
       else

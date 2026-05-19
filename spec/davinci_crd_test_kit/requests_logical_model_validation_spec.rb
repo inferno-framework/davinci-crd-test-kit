@@ -221,6 +221,15 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
       expect(module_instance.messages.first[:message]).to include('FHIR id data type')
     end
 
+    it 'returns false and adds an error when the id contains a mix of valid and invalid characters' do
+      result = module_instance.send(:local_reference?, 'Practitioner/abc@@@', 'prefix',
+                                    allowed_resource_types: %w[Practitioner])
+
+      expect(result).to be false
+      expect(module_instance.messages.first[:message]).to include("'abc@@@'")
+      expect(module_instance.messages.first[:message]).to include('FHIR id data type')
+    end
+
     it 'returns true when no allowed list is given and the resource type is a valid FHIR type' do
       result = module_instance.send(:local_reference?, 'Patient/example', 'prefix')
 
