@@ -17,6 +17,8 @@ module DaVinciCRDTestKit
         without any configuration options.
       DESCRIPTION
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-15'
+
       CONFIGURATION_KEY = 'davinci-crd.configuration'.freeze
 
       run do
