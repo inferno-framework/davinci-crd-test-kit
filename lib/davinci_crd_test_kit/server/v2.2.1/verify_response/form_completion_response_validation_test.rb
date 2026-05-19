@@ -29,7 +29,11 @@ module DaVinciCRDTestKit
 
         - **Validating:**
           If any Request Form Completion cards or system actions are found, the test proceeds to validate them.
-          Each `Task` resource is validated against the [CRD Questionnaire Task profile](http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire).
+          Each `Task` resource is validated against the [CRD Questionnaire Task
+          profile](http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-taskquestionnaire).
+          Additionally, if any actions for the creation of a `Questionnaire` are
+          found, the test verifies that they include the
+          `davinci-crd.if-none-exist` extension.
 
         If no Request Form Completion cards or system actions are received, the test is skipped.
       )
@@ -59,6 +63,16 @@ module DaVinciCRDTestKit
             end
           end
         end
+
+        questionnaire_create_actions =
+          parsed_actions.select { |action| create_questionnaire_action_response_type?(action) } +
+          form_completion_cards
+            .flat_map { |card| card['suggestions'] }
+            .flat_map { |suggestion| suggestion['actions'] }
+            .compact
+            .select { |action| create_questionnaire_action_response_type?(action) }
+
+        questionnaire_create_actions.each { |action| questionnaire_creation_check(action) }
 
         no_error_validation('Some Request Form Completion received are not valid.')
       end
