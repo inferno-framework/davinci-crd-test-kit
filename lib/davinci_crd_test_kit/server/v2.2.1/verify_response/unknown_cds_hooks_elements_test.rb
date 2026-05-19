@@ -20,6 +20,8 @@ module DaVinciCRDTestKit
         unknown CDS Hooks elements are ignored.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-33'
+
       def primary_hook?
         ['appointment-book', 'order-sign', 'order-dispatch'].include? tested_hook_name
       end
