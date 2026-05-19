@@ -169,4 +169,18 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     expect(result.result_message).to eq('Ignore list excludes all CDS Services from validation.')
     expect(session_data_repo.load(test_session_id: test_session.id, name: 'appointment_book_service_ids')).to be_nil
   end
+
+  it 'skips if no services advertise prefetch support' do
+    service1 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.1', '2.2'] })
+    service2 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.2'] })
+
+    service1.delete 'prefetch'
+    service2.delete 'prefetch'
+
+    cds_services = { 'services' => [service1, service2] }.to_json
+
+    result = run(runnable, cds_services:)
+
+    expect(result.result).to eq('skip'), result.result_message
+  end
 end
