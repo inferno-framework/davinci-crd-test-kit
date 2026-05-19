@@ -50,10 +50,10 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
 1. Apply preset "Run Against the CRD Client Suite's Prefetch Subset Services"
 1. Run server group "1 Discovery"
 1. Follow the following procedure for each of the hook groups:
-  1. In the client session, run group "1.2.x <hook name>".
-  1. When a "User Action Required" dialog appears, switch to the "complete prefetch" server session and run group "3.x <hook name>"
-  1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
-  1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
+   1. In the client session, run group "1.2.x <hook name>".
+   1. When a "User Action Required" dialog appears, switch to the "complete prefetch" server session and run group "3.x <hook name>"
+   1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
+   1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 1. Run client group "1.3 Cross Hook".
 1. Run server group "3.7 Required Card Response Validation" in both server sessions.
 

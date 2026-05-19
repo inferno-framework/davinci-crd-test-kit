@@ -74,7 +74,13 @@ module DaVinciCRDTestKit
         title 'Requests'
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
-                                'hl7.fhir.us.davinci-crd_2.2.1@hook-35')
+                                'hl7.fhir.us.davinci-crd_2.2.1@hook-35',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-3',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-6',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-9',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-10',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-11',
+                                'hl7.fhir.us.davinci-crd_2.2.1@prof-12')
         end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles

@@ -11,13 +11,18 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
     {
       hook: hook_name,
       fhirServer: fhir_server,
-      fhirAuthorization: { access_token: }
+      fhirAuthorization: { access_token: },
+      context: {
+        userId: 'Practitioner/example',
+        patientId: 'example',
+        draftOrders: { resourceType: 'Bundle', entry: [] }
+      }
     }.to_json
   end
 
   before do
-    # Set the configuration options that the test expects
     test.config(options: { hook_name: })
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
   end
 
   it 'skips if no requests are found' do

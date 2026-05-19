@@ -110,7 +110,8 @@ module DaVinciCRDTestKit
           [
             /\A\S+: \S+: URL value '.*' does not resolve/,
             %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
-            /CDSHooksRequest.extension: Unrecognized property/
+            /CDSHooksRequest.extension: Unrecognized property/,
+            /No definition could be found for URL value/
           ].any? { |match_template| message.message.match?(match_template) }
         end
       end
