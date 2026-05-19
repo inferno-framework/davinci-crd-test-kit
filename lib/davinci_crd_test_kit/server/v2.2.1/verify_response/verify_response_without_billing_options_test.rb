@@ -16,6 +16,8 @@ module DaVinciCRDTestKit
         without any billing-options extensions.
       DESCRIPTION
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@billopt-2'
+
       BILLING_OPTIONS_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options'.freeze
 
       run do
