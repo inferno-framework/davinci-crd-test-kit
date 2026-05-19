@@ -27,15 +27,20 @@ module DaVinciCRDTestKit
         field of each request body conforms to the appropriate CRD profile.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-21'
-
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-21', 'hl7.fhir.us.davinci-crd_2.2.1@prof-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@prof-4', 'hl7.fhir.us.davinci-crd_2.2.1@prof-5',
+                            'hl7.fhir.us.davinci-crd_2.2.1@prof-6', 'hl7.fhir.us.davinci-crd_2.2.1@prof-7',
+                            'hl7.fhir.us.davinci-crd_2.2.1@prof-8', 'hl7.fhir.us.davinci-crd_2.2.1@prof-9',
+                            'hl7.fhir.us.davinci-crd_2.2.1@prof-10', 'hl7.fhir.us.davinci-crd_2.2.1@prof-11',
+                            'hl7.fhir.us.davinci-crd_2.2.1@prof-12'
       run do
         hook_requests = load_hook_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         hook_requests.each_with_index do |request, request_index|
-          hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
+          hook_request = parse_json_request_entity(request.request_body, 'Request body',
+                                                   request_index)
           next unless hook_request.present?
           next unless hook_request.key?('prefetch')
 
