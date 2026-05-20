@@ -33,8 +33,7 @@ module DaVinciCRDTestKit
         The test will be skipped if the server hosts no CRD CDS services.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-1',
-                            'hl7.fhir.us.davinci-crd_2.2.1@found-24'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-1'
 
       input :cds_services
       input :crd_discovery_service_ignore_list,
@@ -116,10 +115,6 @@ module DaVinciCRDTestKit
                  "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains invalid " \
                  "version strings: #{invalid_versions.join(', ')}"
         end
-
-        prefetch_supported = services_for_crd_validation.any? { |service| service['prefetch'].present? }
-
-        skip_if !prefetch_supported, 'No CRD services advertised prefetch support'
       end
     end
   end
