@@ -174,7 +174,7 @@ module DaVinciCRDTestKit
         test from: :crd_v221_all_responses_include_coverage_information,
              verifies_requirements: [
                'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
-               'hl7.fhir.us.davinci-crd_2.2.1@hook-28',
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-28',
                'hl7.fhir.us.davinci-crd_2.2.1@hook-26',
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
