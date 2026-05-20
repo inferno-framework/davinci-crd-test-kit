@@ -151,4 +151,19 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
 
     expect(result.result).to eq('pass'), result.result_message
   end
+
+  it 'fails if the coverage-info configuration option is not type boolean' do
+    config_option = valid_config_option
+    config_option['type'] = 'integer'
+
+    cds_services['services'].first['extension'] =
+      {
+        'davinci-crd.configuration-options' => [config_option]
+      }
+
+    result = run(runnable, cds_services: cds_services.to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(first_error_message.message).to match(/is not of type boolean/)
+  end
 end

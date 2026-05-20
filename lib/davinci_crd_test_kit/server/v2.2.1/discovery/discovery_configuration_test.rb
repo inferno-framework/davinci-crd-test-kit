@@ -14,6 +14,11 @@ module DaVinciCRDTestKit
         expected to return cards, so they are ignored in this test.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-4',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-5',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-7',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-8'
+
       input :cds_services
       input :crd_discovery_service_ignore_list,
             optional: true
@@ -124,12 +129,21 @@ module DaVinciCRDTestKit
         end
 
         primary_hook_services.each do |service|
-          coverage_info_config_found =
-            service.dig('extension', 'davinci-crd.configuration-options')&.any? do |config_option|
+          coverage_info_config =
+            service.dig('extension', 'davinci-crd.configuration-options')&.find do |config_option|
               config_option['code'] == 'coverage-info'
             end
 
-          next if coverage_info_config_found
+          if coverage_info_config.present?
+            if coverage_info_config['type'] != 'boolean'
+              add_message(
+                'error',
+                "Service `#{service['id']}` `coverage-info` configuration option is not of type boolean"
+              )
+            end
+
+            next
+          end
 
           add_message(
             'error',

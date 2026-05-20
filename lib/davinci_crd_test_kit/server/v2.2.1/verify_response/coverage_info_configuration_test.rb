@@ -21,6 +21,9 @@ module DaVinciCRDTestKit
         coverage-information/form-completion system actions.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-14',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-28'
+
       def coverage_info_message(cards, actions)
         card_summaries = cards.map { |card| card['summary'] }.compact
         action_descriptions = actions.map { |action| action['description'] }.compact
