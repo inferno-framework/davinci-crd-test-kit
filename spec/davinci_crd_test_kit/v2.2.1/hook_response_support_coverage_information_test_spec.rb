@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::V221::ClientHookRequestSupportCoverageInformationTest do
+RSpec.describe DaVinciCRDTestKit::V221::ClientHookResponseSupportCoverageInformationTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:runnable) { described_class }
 

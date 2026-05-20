@@ -11,9 +11,9 @@ require_relative 'verify_request/hook_request_granted_scopes_test'
 require_relative 'verify_request/hook_request_secured_transport_test'
 require_relative 'verify_request/hook_request_coverage_verification_test'
 require_relative 'verify_request/hook_request_data_fetch_verification_test'
-require_relative 'verify_request/hook_request_support_coverage_information_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
+require_relative 'verify_response/hook_response_support_coverage_information_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -85,10 +85,6 @@ module DaVinciCRDTestKit
         test from: :crd_v221_hook_data_fetch_verification
         test from: :crd_v221_hook_request_granted_scopes
         test from: :crd_v221_hook_request_secured_transport
-        test from: :crd_v221_client_hook_request_support_coverage_information do
-          title 'Client supports the Coverage Information response type on the appointment-book hook'
-          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-26'
-        end
       end
 
       group do
@@ -96,6 +92,10 @@ module DaVinciCRDTestKit
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test
+        test from: :crd_v221_client_hook_response_support_coverage_information do
+          title 'Client supports the Coverage Information response type on the appointment-book hook'
+          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-26'
+        end
       end
     end
   end

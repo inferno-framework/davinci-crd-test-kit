@@ -3,12 +3,12 @@ require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
-    class ClientHookRequestSupportCoverageInformationTest < Inferno::Test
+    class ClientHookResponseSupportCoverageInformationTest < Inferno::Test
       include CardsIdentification
       include TaggedRequestLoadHelper
 
       title 'Client supports the Coverage Information response type on this hook'
-      id :crd_v221_client_hook_request_support_coverage_information
+      id :crd_v221_client_hook_response_support_coverage_information
       description <<~DESCRIPTION
         During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
         response type. At least one hook invocation performed during this group must have returned a Coverage Information action.
