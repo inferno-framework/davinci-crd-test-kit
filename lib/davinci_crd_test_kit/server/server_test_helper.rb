@@ -1,3 +1,5 @@
+require_relative '../cross_suite/tags'
+
 module DaVinciCRDTestKit
   module ServerTestHelper
     def parse_json(input)
@@ -5,9 +7,9 @@ module DaVinciCRDTestKit
       JSON.parse(input)
     end
 
-    def verify_at_least_one_test_passes(test_groups, id_pattern, error_message, id_exclude_pattern = nil)
+    def verify_at_least_one_test_passes(test_groups, id_pattern, error_message, id_exclude_pattern = nil) # rubocop:disable Metrics/CyclomaticComplexity
       runnables = test_groups.map do |group|
-        next unless group.title.include?('-') # all hook group names have hyphens
+        next if ALL_HOOK_TAGS.none? { |hook_name| group.title.include?(hook_name) }
 
         group.groups[2].tests.find do |test| # response verification subgroup
           test.id.include?(id_pattern) && (!id_exclude_pattern || !test.id.include?(id_exclude_pattern))

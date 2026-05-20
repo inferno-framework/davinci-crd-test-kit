@@ -16,6 +16,15 @@ module DaVinciCRDTestKit
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
 
+  ALL_HOOK_TAGS = [
+    APPOINTMENT_BOOK_TAG,
+    ENCOUNTER_START_TAG,
+    ENCOUNTER_DISCHARGE_TAG,
+    ORDER_DISPATCH_TAG,
+    ORDER_SELECT_TAG,
+    ORDER_SIGN_TAG
+  ].freeze
+
   module TagMethods
     def hook_instance_tag(hook_instance)
       "#{HOOK_INSTANCE_TAG_PREFIX}#{hook_instance}"
