@@ -12,7 +12,11 @@ module DaVinciCRDTestKit
     ].freeze
 
     def card_required_fields
-      { 'summary' => String, 'indicator' => String, 'source' => Hash }
+      {
+        'uuid' => String,
+        'summary' => String,
+        'source' => Hash
+      }
     end
 
     def source_required_fields
@@ -25,9 +29,10 @@ module DaVinciCRDTestKit
 
     def card_optional_fields
       {
-        'uuid' => String,
         'detail' => String,
+        'indicator' => String,
         'suggestions' => Array,
+        'selectionBehavior' => String,
         'overrideReasons' => Array,
         'links' => Array
       }

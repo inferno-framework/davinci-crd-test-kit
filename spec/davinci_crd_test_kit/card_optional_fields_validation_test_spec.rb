@@ -35,22 +35,22 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if an optional field is not of the correct type' do
-    valid_cards.first['uuid'] = 2
+    valid_cards.first['detail'] = 2
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
 
     msg = entity_result_messages.find { |m| m.type == 'error' }
-    expect(msg.message).to match(/`uuid` is not of type/)
+    expect(msg.message).to match(/`detail` is not of type/)
   end
 
   it 'fails if field is of correcty type but empty' do
-    valid_cards.first['uuid'] = ''
+    valid_cards.first['detail'] = ''
     valid_cards.first['links'] = []
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
 
     msg = entity_result_messages.map(&:message).join(' ')
-    expect(msg).to match(/`uuid` should not be an empty String/)
+    expect(msg).to match(/`detail` should not be an empty String/)
     expect(msg).to match(/`links` should not be an empty Array/)
   end
 

@@ -1,6 +1,7 @@
 {
   "cards": [
     {
+      "uuid": "157069f7-363b-4538-9bdd-95dcf6b705b9",
       "summary": "Appointment Book Instructions Card",
       "detail": "This is an Instructions card containing textual guidance to display to the user making the decisions.",
       "indicator": "info",
@@ -15,6 +16,7 @@
       }
     },
     {
+      "uuid": "a98c4870-523a-4dc5-b722-adba7ca198a9",
       "summary": "Appointment Book External Reference Card",
       "detail": "This is an External Reference Card containing one or more links to external web pages, PDFs, or other resources that provide relevant coverage information.",
       "indicator": "info",

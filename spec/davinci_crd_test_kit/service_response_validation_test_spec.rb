@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
   let(:valid_response_body_json) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end
-  let(:card_required_fields) { ['summary', 'indicator', 'source'] }
+  let(:card_required_fields) { ['uuid', 'summary', 'source'] }
   let(:body) { JSON.parse(valid_response_body_json) }
 
   def create_service_request(body: nil, status: 200, headers: nil)

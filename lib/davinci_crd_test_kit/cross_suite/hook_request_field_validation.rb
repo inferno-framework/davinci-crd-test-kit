@@ -327,7 +327,7 @@ module DaVinciCRDTestKit
         add_message('error', "#{description} field `#{field_name}` #{error_msg}: #{description} `#{object}`.")
       end
 
-      return unless value.blank?
+      return if value.present?
 
       error_msg = "#{description} field `#{field_name}` should not be an empty #{type}: #{description} `#{object}`."
       add_message('error', error_msg)
