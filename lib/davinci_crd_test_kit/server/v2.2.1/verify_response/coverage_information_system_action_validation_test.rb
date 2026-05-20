@@ -1,11 +1,17 @@
 require_relative '../../server_hook_request_validation'
 require_relative '../../server_test_helper'
+require_relative '../../server_hook_helper'
+require_relative 'hook_request_resource_resolution'
 
 module DaVinciCRDTestKit
   module V221
     class CoverageInformationSystemActionValidationTest < Inferno::Test
       include DaVinciCRDTestKit::ServerHookRequestValidation
       include DaVinciCRDTestKit::ServerTestHelper
+      include DaVinciCRDTestKit::ServerHookHelper
+      include HookRequestResourceResolution
+
+      COVERAGE_INFO_EXT_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'.freeze
 
       title 'All Coverage Information system actions received are valid'
       id :crd_v221_coverage_info_system_action_validation
@@ -14,6 +20,8 @@ module DaVinciCRDTestKit
         system actions received. It verifies the following for each action:
         - The action type is `update`.
         - The resource within the action conforms its respective FHIR profile.
+        - The resource does not change any data elements other than adding or modifying
+          the `coverage-information` extension.
 
         Additionally, the test examines the `coverage-info` extensions within the resource to ensure that:
         - Entries referencing differing coverage have distinct `coverage-assertion-ids` and `satisfied-pa-ids`
@@ -23,11 +31,13 @@ module DaVinciCRDTestKit
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-32',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-37',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-47',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-48',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-52'
 
       input :coverage_info
+      input :mock_ehr_bundle, optional: true
 
       def find_extension_value(extension, url, *properties)
         found_extension = extension.extension.find { |ext| ext.url == url }
@@ -42,7 +52,7 @@ module DaVinciCRDTestKit
 
       def extract_and_group_coverage_info(resource)
         resource.extension.each_with_object({}) do |extension, grouped_extensions|
-          next unless extension.url == 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
+          next unless extension.url == COVERAGE_INFO_EXT_URL
 
           coverage_key = find_extension_value(extension, 'coverage', 'valueReference', 'reference')
           grouped_extensions[coverage_key] ||= []
@@ -93,6 +103,52 @@ module DaVinciCRDTestKit
         "#{resource_ref}: extensions referencing differing coverage SHALL have distinct #{id_name}."
       end
 
+      def normalize_value(value)
+        case value
+        when Hash
+          value.transform_values { |child| normalize_value(child) }
+        when Array
+          value.map { |child| normalize_value(child) }.sort_by(&:to_json)
+        else
+          value
+        end
+      end
+
+      def strip_coverage_info_extensions(resource_hash)
+        normalized_hash = resource_hash.deep_dup
+        return normalized_hash unless normalized_hash['extension'].is_a?(Array)
+
+        normalized_hash['extension'] = normalized_hash['extension'].reject do |extension|
+          extension['url'] == COVERAGE_INFO_EXT_URL
+        end
+        normalized_hash.delete('extension') if normalized_hash['extension'].empty?
+        normalized_hash
+      end
+
+      def verify_only_coverage_info_changed(action)
+        request = matching_request_for_action(action)
+        source_resource = find_action_source_resource(action, request)
+        updated_resource_hash = action['resource']
+        resource_ref = "#{updated_resource_hash['resourceType']}/#{updated_resource_hash['id']}"
+        unless source_resource
+          messages << {
+            type: 'warning',
+            message: 'Inferno could not resolve the original source resource for Coverage Information systemAction ' \
+                     "targeting #{resource_ref}, so it could not verify that only coverage-information extensions " \
+                     'were changed.'
+          }
+          return
+        end
+
+        source_resource_hash = source_resource.to_hash
+
+        source_without_coverage_info = normalize_value(strip_coverage_info_extensions(source_resource_hash))
+        updated_without_coverage_info = normalize_value(strip_coverage_info_extensions(updated_resource_hash))
+
+        assert source_without_coverage_info == updated_without_coverage_info,
+               "#{resource_ref}: resource content changed outside the coverage-information extension."
+      end
+
       def coverage_info_system_action_check(coverage_info_system_action)
         type = coverage_info_system_action['type']
         assert type, '`type` field is missing.'
@@ -104,9 +160,11 @@ module DaVinciCRDTestKit
 
         grouped_coverage_info = extract_and_group_coverage_info(resource)
         multiple_extensions_conformance_check(grouped_coverage_info, resource)
+        verify_only_coverage_info_changed(coverage_info_system_action)
       end
 
       run do
+        load_tagged_requests(tested_hook_name)
         parsed_coverage_info = parse_json(coverage_info)
         error_messages = []
         parsed_coverage_info.each do |action|
