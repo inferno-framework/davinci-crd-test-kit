@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
       id :crd_v221_client_card_must_support_coverage_information
       description <<~DESCRIPTION
         During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
-        action type. At least one hook invocation performed during this session must have returned a Coverage Information action.
+        response type for this hook. At least one hook invocation received during this group must have returned a Coverage Information action.
         Additionally, all [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
         must support elements must be demonstrated across all the returned actions.
 
@@ -52,7 +52,7 @@ module DaVinciCRDTestKit
         sorted_cards = sorted_cards_from_requests(loaded_requests)
 
         assert sorted_cards['actions'][COVERAGE_INFORMATION_RESPONSE_TYPE].present?,
-               'Coverage Information action support not demonstrated.'
+               'Support for the Coverage Information response type not demonstrated.'
 
         coverage_information_extensions = extract_coverage_information_extensions(sorted_cards)
         assert_must_support_elements_present(coverage_information_extensions, COVERAGE_INFO_EXT_URL,
