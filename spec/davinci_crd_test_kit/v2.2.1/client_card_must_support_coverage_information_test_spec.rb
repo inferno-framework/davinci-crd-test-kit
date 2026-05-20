@@ -52,7 +52,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCardMustSupportCoverageInformation
 
       result = run(runnable)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Coverage Information action support not demonstrated./)
+      expect(result.result_message).to match(/Support for the Coverage Information response type not demonstrated/)
     end
 
     it 'fails when some must support elements are missing' do

@@ -13,6 +13,7 @@ require_relative 'verify_request/hook_request_coverage_verification_test'
 require_relative 'verify_request/hook_request_data_fetch_verification_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
+require_relative 'verify_response/hook_response_support_coverage_information_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -96,6 +97,10 @@ module DaVinciCRDTestKit
 
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_card_display_attest_test
+        test from: :crd_v221_client_hook_response_support_coverage_information do
+          title 'Client supports the Coverage Information response type on the order-sign hook'
+          verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-39'
+        end
       end
     end
   end
