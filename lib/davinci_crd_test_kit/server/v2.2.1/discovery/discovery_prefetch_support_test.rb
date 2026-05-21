@@ -8,8 +8,9 @@ module DaVinciCRDTestKit
       title 'Server demonstrates ability to request the CDS Client perform prefetch queries'
       id :crd_v221_discovery_prefetch_support
       description %(
-       This test verifies that at least one advertised CRD service contains a
-       prefetch query.
+        This test expects the server to demonstrate support for prefetch queries
+        by providing a prefetch query in at least one of the advertised service
+        in the discovery response.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-24'
