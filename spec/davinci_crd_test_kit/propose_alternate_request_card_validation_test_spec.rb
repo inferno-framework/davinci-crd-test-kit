@@ -10,7 +10,9 @@ RSpec.describe DaVinciCRDTestKit::V201::ProposeAlternateRequestCardValidationTes
     json = File.read(File.join(__dir__, '..', 'fixtures', 'valid_cards.json'))
     JSON.parse(json)
   end
-  let(:cards_with_suggestions) { valid_cards.filter { |card| card['suggestions'].present? } }
+  let(:cards_with_suggestions) do
+    valid_cards.select { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
+  end
 
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])

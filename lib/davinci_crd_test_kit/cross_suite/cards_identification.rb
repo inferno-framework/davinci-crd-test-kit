@@ -163,7 +163,7 @@ module DaVinciCRDTestKit
 
     def form_completion_card_response_type?(card)
       card['suggestions']&.all? do |suggestion|
-        suggestion['actions'].one? { |action| form_completion_action_response_type?(action) }
+        suggestion['actions']&.one? { |action| form_completion_action_response_type?(action) }
       end
     end
 
@@ -185,7 +185,11 @@ module DaVinciCRDTestKit
     end
 
     def launch_smart_app_response_type?(card)
-      card['links']&.all? { |link| link['type'] == 'smart' }
+      links = card['links']
+      return false if links.blank?
+      return false if card['suggestions'].blank?
+
+      links.all? { |link| link['type'] == 'smart' }
     end
 
     def propose_alternative_request_response_type?(

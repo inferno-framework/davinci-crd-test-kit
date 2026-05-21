@@ -89,32 +89,58 @@ module DaVinciCRDTestKit
       end
     end
 
-    def card_links_check(card)
+    def card_links_check(card) # rubocop:disable Metrics/CyclomaticComplexity
       return unless card['links'].is_a?(Array) && card['links'].present?
 
       card['links'].each do |link|
         link_required_fields.each do |field, type|
           validate_presence_and_type(link, field, type, 'Link')
         end
+      end
 
-        card_link_type_check(card, link)
+      if card['links'].all? { |link| link['type'] == 'absolute' }
+        external_reference_card_check(card)
+      elsif card['links'].all? { |link| link['type'] == 'smart' }
+        smart_app_card_check(card)
+      else
+        add_message(
+          'error',
+          "All links must either be `absolute` or `smart` in card: #{card}"
+        )
       end
     end
 
-    def card_link_type_check(card, link)
-      return unless link['type']
-
-      unless ['absolute', 'smart'].include?(link['type'])
-        add_message('error',
-                    "`Link.type` must be `absolute` or `smart`. Got `#{link['type']}`: `#{link}`. In Card `#{card}`")
-        return
+    def external_reference_card_check(card)
+      if card['suggestions'].present?
+        add_message(
+          'error',
+          "Cards with `absolute` links must not contain suggestions. In card `#{card}`"
+        )
       end
 
-      return unless link['type'] == 'absolute' && link['appContext'].present?
+      card['links'].each do |link|
+        next if link['appContext'].blank?
 
-      msg = '`appContext` field should only be valued if the link type is smart and is not valid for absolute links: ' \
-            "`#{link}`. In Card `#{card}`"
-      add_message('error', msg)
+        add_message(
+          'error',
+          '`appContext` field must not be present if the link type is absolute: ' \
+          "`#{link}`. In Card `#{card}`"
+        )
+      end
+    end
+
+    def smart_app_card_check(card)
+      if card['suggestions'].blank?
+        add_message(
+          'error',
+          "Cards with `smart` links must contain at least one suggestion. In card `#{card}`"
+        )
+      elsif card['suggestions'].any? { |suggestion| suggestion['actions'].present? }
+        add_message(
+          'error',
+          "Cards with `smart` links must not contain any suggestion actions. In card `#{card}`"
+        )
+      end
     end
 
     def card_suggestions_check(card)

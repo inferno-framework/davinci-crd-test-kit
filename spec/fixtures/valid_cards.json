@@ -36,6 +36,12 @@
         "display": "Guideline"
       }
     },
+    "selectionBehavior": "any",
+    "suggestions": [
+      {
+        "label": "Launch a SMART app"
+      }
+    ],
     "links": [
       {
         "label": "Opioid XYZ-assessment",
