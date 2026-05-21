@@ -21,7 +21,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryPrefetchSupportTest do
       .messages
   end
 
-  it 'succeeds when all services contain a valid davinci-crd.version extension' do
+  it 'succeeds when a service contains a prefetch query' do
     service1 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.1', '2.2'] })
     service2 = cds_service.merge('extension' => { 'davinci-crd.version' => ['2.2'] })
 
