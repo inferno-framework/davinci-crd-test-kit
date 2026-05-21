@@ -160,6 +160,24 @@ module DaVinciCRDTestKit
       end
     end
 
+    def additional_orders_check(card)
+      if card['links'].present?
+        add_message(
+          'error',
+          "Additional Orders cards must not contain links. In card: `#{card}`"
+        )
+      end
+
+      card['suggestions'].each do |suggestion|
+        next unless suggestion['actions']&.any? { |action| action['resourceId'].present? }
+
+        add_message(
+          'error',
+          "Additional Orders actions must not contain resourceId. In card: `#{card}`"
+        )
+      end
+    end
+
     def card_suggestions_check(card)
       return unless card['suggestions'].is_a?(Array) && card['suggestions'].present?
 

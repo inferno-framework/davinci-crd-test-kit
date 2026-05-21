@@ -109,7 +109,9 @@ module DaVinciCRDTestKit
       request_body
     end
 
-    def additional_orders_response_type?(card, expected_resource_types: ADDITIONAL_ORDERS_EXPECTED_RESOURCE_TYPES)
+    def additional_orders_response_type?(card, expected_resource_types: ADDITIONAL_ORDERS_EXPECTED_RESOURCE_TYPES) # rubocop:disable Metrics/CyclomaticComplexity
+      return false if card['suggestions'].blank?
+
       card['suggestions']&.all? do |suggestion|
         actions = suggestion['actions']
         actions&.all? do |action|
