@@ -56,11 +56,27 @@ module DaVinciCRDTestKit
 
         if form_completion_cards.present?
           form_completion_cards.each do |card|
-            card['suggestions'].each do |suggestion|
-              actions_check(suggestion['actions']&.select do |action|
-                              form_completion_action_response_type?(action)
-                            end, ig_version: 'v221')
+            actions =
+              card['suggestions']
+                .flat_map { |suggestion| suggestion['actions'] }
+                .compact
+                .select { |action| form_completion_action_response_type? action }
+
+            actions_check(actions, ig_version: 'v221')
+
+            if actions.any? { |action| action['resourceId'].present? }
+              add_message(
+                'error',
+                "Form Completion actions must not contain resourceId. See card `#{card}`"
+              )
             end
+
+            next if card['links'].blank?
+
+            add_message(
+              'error',
+              "Form Completion response must not contain links. See card `#{card}`"
+            )
           end
         end
 
