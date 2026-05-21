@@ -40,9 +40,16 @@ module DaVinciCRDTestKit
           card['suggestions'].each do |suggestion|
             actions_check(suggestion['actions'], parsed_contexts, ig_version: 'v221')
           end
+
+          next if card['links'].blank?
+
+          add_message(
+            'error',
+            "Propose Alternate Request response must not contain links. See card `#{card}`"
+          )
         end
 
-        no_error_validation('Some Proposed Alternate Request cards are not valid.')
+        no_error_validation('Some Propose Alternate Request cards are not valid.')
       end
     end
   end
