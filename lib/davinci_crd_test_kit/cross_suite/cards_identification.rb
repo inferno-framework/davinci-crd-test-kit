@@ -30,6 +30,11 @@ module DaVinciCRDTestKit
       VisionPrescription
     ].freeze
 
+    COVERAGE_INFO_EXPECTED_RESOURCE_TYPES = %w[
+      Appointment CommunicationRequest DeviceRequest Encounter MedicationRequest
+      NutritionOrder ServiceRequest VisionPrescription
+    ].freeze
+
     def identify_card_type(card) # rubocop:disable Metrics/CyclomaticComplexity
       return nil if card['type'].present? # action, not a card
       return ADDITIONAL_ORDERS_RESPONSE_TYPE if additional_orders_response_type?(card)
@@ -118,14 +123,14 @@ module DaVinciCRDTestKit
     def coverage_information_response_type?(action)
       return false unless action.respond_to?(:[])
 
-      extensions =
-        if action['resource'].respond_to?(:extension)
-          action['resource'].extension
-        else
-          action.dig('resource', 'extension')
-        end
+      resource = action['resource']&.to_hash
+      return false unless COVERAGE_INFO_EXPECTED_RESOURCE_TYPES.include? resource&.dig('resourceType')
 
-      extensions&.any? { |extension| extension_url(extension) == COVERAGE_INFO_EXT_URL }
+      unless resource&.dig('extension')&.any? { |extension| extension_url(extension) == COVERAGE_INFO_EXT_URL }
+        return false
+      end
+
+      true
     end
 
     def extension_url(extension)
