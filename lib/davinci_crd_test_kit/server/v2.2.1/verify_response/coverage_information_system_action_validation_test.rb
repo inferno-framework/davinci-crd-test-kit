@@ -154,6 +154,13 @@ module DaVinciCRDTestKit
         assert type, '`type` field is missing.'
         assert type == 'update', "`type` must be `update`, but was `#{type}`"
 
+        if coverage_info_system_action['resourceId'].present?
+          add_message(
+            'error',
+            'Coverage Information actions must not contain resourceId.'
+          )
+        end
+
         resource = FHIR.from_contents(coverage_info_system_action['resource'].to_json)
         profile_url = structure_definition_map('v221')[resource.resourceType]
         assert_valid_resource(resource:, profile_url:)
