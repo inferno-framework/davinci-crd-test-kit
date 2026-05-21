@@ -187,8 +187,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
   describe '#apply_hook_configuration' do
     let(:endpoint) { described_class.allocate }
-    let(:coverage_info_card) { { 'summary' => 'Coverage', 'source' => { 'type' => 'coverage-info' } } }
-    let(:coverage_info_topic_card) do
+    let(:coverage_info_card) do
       { 'summary' => 'Coverage topic', 'source' => { 'topic' => { 'code' => 'coverage-info' } } }
     end
     let(:guideline_card) { { 'summary' => 'Guideline', 'source' => { 'topic' => { 'code' => 'guideline' } } } }
@@ -228,7 +227,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       response_body = {
-        'cards' => [coverage_info_card, coverage_info_topic_card, guideline_card],
+        'cards' => [coverage_info_card, guideline_card],
         'systemActions' => [coverage_info_action, form_completion_action, other_action]
       }
 

@@ -60,8 +60,7 @@ module DaVinciCRDTestKit
     def coverage_info_card_type?(card)
       return false unless card.respond_to?(:dig)
 
-      card.dig('source', 'type') == COVERAGE_INFO_CONFIGURATION_CODE ||
-        card.dig('source', 'topic', 'code') == COVERAGE_INFO_CONFIGURATION_CODE
+      card.dig('source', 'topic', 'code') == COVERAGE_INFO_CONFIGURATION_CODE
     end
 
     def coverage_info_system_action_type?(action)
@@ -120,7 +119,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def coverage_information_response_type?(action)
+    def coverage_information_response_type?(action) # rubocop:disable Metrics/CyclomaticComplexity
       return false unless action.respond_to?(:[])
 
       resource = action['resource']&.to_hash

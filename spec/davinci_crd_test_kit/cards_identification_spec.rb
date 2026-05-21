@@ -388,7 +388,6 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
 
   describe 'when identifying coverage-info configuration response content' do
     it 'identifies coverage-info cards by source type or source topic code' do
-      expect(module_instance.coverage_info_card_type?({ 'source' => { 'type' => 'coverage-info' } })).to be(true)
       expect(module_instance.coverage_info_card_type?(instructions_card_template)).to be(true)
       expect(module_instance.coverage_info_card_type?(external_reference_template)).to be(false)
     end
