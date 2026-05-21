@@ -154,7 +154,11 @@ module DaVinciCRDTestKit
     end
 
     def external_reference_response_type?(card)
-      card['links']&.all? { |link| link['type'] == 'absolute' }
+      links = card['links']
+      return false if links.blank?
+      return false if card['suggestions'].present?
+
+      links.all? { |link| link['type'] == 'absolute' }
     end
 
     def form_completion_card_response_type?(card)
