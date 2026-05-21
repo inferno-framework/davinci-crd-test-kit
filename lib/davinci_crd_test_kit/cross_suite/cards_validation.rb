@@ -13,9 +13,16 @@ module DaVinciCRDTestKit
 
     def card_required_fields
       {
-        'uuid' => String,
-        'summary' => String,
-        'source' => Hash
+        'v221' => {
+          'uuid' => String,
+          'summary' => String,
+          'source' => Hash
+        },
+        'v201' => {
+          'indicator' => String,
+          'summary' => String,
+          'source' => Hash
+        }
       }
     end
 
@@ -29,12 +36,22 @@ module DaVinciCRDTestKit
 
     def card_optional_fields
       {
-        'detail' => String,
-        'indicator' => String,
-        'suggestions' => Array,
-        'selectionBehavior' => String,
-        'overrideReasons' => Array,
-        'links' => Array
+        'v221' => {
+          'detail' => String,
+          'indicator' => String,
+          'suggestions' => Array,
+          'selectionBehavior' => String,
+          'overrideReasons' => Array,
+          'links' => Array
+        },
+        'v201' => {
+          'detail' => String,
+          'uuid' => String,
+          'suggestions' => Array,
+          'selectionBehavior' => String,
+          'overrideReasons' => Array,
+          'links' => Array
+        }
       }
     end
 
@@ -46,9 +63,9 @@ module DaVinciCRDTestKit
       { 'label' => String, 'type' => String, 'url' => 'URL' }
     end
 
-    def valid_card_with_optionals?(card)
+    def valid_card_with_optionals?(card, version)
       current_error_count = messages.count { |msg| msg[:type] == 'error' }
-      card_optional_fields.each do |field, type|
+      card_optional_fields[version].each do |field, type|
         next unless card[field]
 
         validate_presence_and_type(card, field, type, 'Card', required: false)
@@ -207,10 +224,10 @@ module DaVinciCRDTestKit
       add_message('error', msg)
     end
 
-    def cards_check(cards)
+    def cards_check(cards, version = 'v221')
       cards.each do |card|
         current_error_count = messages.count { |msg| msg[:type] == 'error' }
-        card_required_fields.each do |field, type|
+        card_required_fields[version].each do |field, type|
           validate_presence_and_type(card, field, type, 'Card')
         end
 
@@ -226,7 +243,7 @@ module DaVinciCRDTestKit
       "Server response #{index}"
     end
 
-    def perform_cards_validation(cards, response_has_system_actions, response_index = 0)
+    def perform_cards_validation(cards, response_has_system_actions, version, response_index)
       unless cards
         add_message('error', "#{response_label(response_index + 1)} did not have the `cards` field.")
         return
@@ -239,31 +256,13 @@ module DaVinciCRDTestKit
         assert cards.present? || response_has_system_actions,
                "#{response_label(response_index + 1)} has no decision support."
       end
-      cards_check(cards)
+      cards_check(cards, version)
     end
 
     def all_requests
       @all_requests ||= HOOKS.each_with_object([]) do |hook, reqs|
         load_tagged_requests(hook)
         reqs.concat(requests)
-      end
-    end
-
-    def extract_all_valid_cards_from_hooks_responses
-      all_requests.keep_if { |request| request.status == 200 }
-      all_requests.each_with_index do |request, index|
-        service_response = JSON.parse(request.response_body)
-        perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, index)
-      rescue JSON::ParserError
-        add_message('error', "Invalid JSON: #{response_label(index + 1).downcase} is not valid JSON.")
-      end
-    end
-
-    def extract_valid_cards_with_links_from_hooks_responses
-      extract_all_valid_cards_from_hooks_responses
-
-      valid_cards.each do |card|
-        valid_cards_with_links << card if valid_card_with_optionals?(card) && card['links']
       end
     end
   end

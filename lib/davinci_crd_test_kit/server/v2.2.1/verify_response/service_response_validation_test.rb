@@ -72,7 +72,7 @@ module DaVinciCRDTestKit
 
         successful_requests.each_with_index do |request, index|
           service_response = JSON.parse(request.response_body)
-          perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, index)
+          perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, 'v221', index)
 
           perform_system_actions_validation(service_response['systemActions'], index)
 

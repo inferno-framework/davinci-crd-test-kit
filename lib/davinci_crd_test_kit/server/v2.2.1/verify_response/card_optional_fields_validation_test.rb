@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
       run do
         parsed_cards = parse_json(valid_cards)
         parsed_cards.each do |card|
-          if valid_card_with_optionals?(card)
+          if valid_card_with_optionals?(card, 'v221')
             cards_with_links << card if card['links']
             cards_with_suggestions << card if card['suggestions']
           end
