@@ -79,4 +79,5 @@ Some tests will fail, including:
 - Client test 2.1.2.01 will fail because the CRD client simulation in the Server suite does not automatically update the Bundle with
   resource updates in `systemActions`.
 - The server tests will fail as expected because no responses were sent by the client suite.
+- Client tests validating that the hook requests conform to the logical model will fail because the server suite sends requests with unexpected fields to verify that the server ignores them.
 
