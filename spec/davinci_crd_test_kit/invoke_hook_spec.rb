@@ -95,26 +95,62 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
       expect(hook_request).to have_been_made.once
     end
 
-    it 'sends one follow-up request with coverage-info disabled when coverage-info content is returned' do
-      original_request = stub_request(:post, service_endpoint)
-        .with do |request|
-          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil?
-        end
-        .to_return(status: 200, body: coverage_info_response.to_json)
-      coverage_info_disabled_request = stub_request(:post, service_endpoint)
-        .with do |request|
-          JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
-        end
-        .to_return(status: 200, body: filtered_response.to_json)
+    it 'sends follow-up requests when coverage-info content is returned' do
+      job = described_class.new
+
+      random_key = 'RANDOM_KEY'
+      allow(job).to receive(:random_key).and_return(random_key)
+
+      original_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info').nil? &&
+              JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', random_key).nil? &&
+              JSON.parse(request.body).dig('context', random_key).nil? &&
+              JSON.parse(request.body)[random_key].nil?
+          end
+          .to_return(status: 200, body: coverage_info_response.to_json)
+
+      coverage_info_disabled_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', 'coverage-info') == false
+          end
+          .to_return(status: 200, body: filtered_response.to_json)
+
+      unknown_configuration_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body).dig('extension', 'davinci-crd.configuration', random_key) == true
+          end
+          .to_return(status: 200, body: filtered_response.to_json)
+
+      unknown_context_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body).dig('context', random_key).present?
+          end
+          .to_return(status: 200, body: filtered_response.to_json)
+
+      unknown_element_request =
+        stub_request(:post, service_endpoint)
+          .with do |request|
+            JSON.parse(request.body)[random_key].present?
+          end
+          .to_return(status: 200, body: filtered_response.to_json)
+
       stub_request(:get, continuation_url).to_return(status: 200)
 
-      described_class.new.perform(
+      job.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
         nil, encryption_method, invoked_hook, continuation_url, failure_url, false, true
       )
 
       expect(original_request).to have_been_made.once
       expect(coverage_info_disabled_request).to have_been_made.once
+      expect(unknown_configuration_request).to have_been_made.once
+      expect(unknown_context_request).to have_been_made.once
+      expect(unknown_element_request).to have_been_made.once
     end
 
     it 'sends only one coverage-info disabled follow-up request per job' do
@@ -131,7 +167,12 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
         .to_return(status: 200, body: filtered_response.to_json)
       stub_request(:get, continuation_url).to_return(status: 200)
 
-      described_class.new.perform(
+      job = described_class.new
+      job.instance_variable_set(:@unknown_configuration_invoked, true)
+      job.instance_variable_set(:@unknown_context_invoked, true)
+      job.instance_variable_set(:@unknown_cds_hooks_element_invoked, true)
+
+      job.perform(
         test_session_id, request_bodies, service_endpoint, inferno_base_url,
         nil, encryption_method, invoked_hook, continuation_url, failure_url, false, true
       )

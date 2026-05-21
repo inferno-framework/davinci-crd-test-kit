@@ -13,6 +13,9 @@ require_relative 'verify_response/additional_orders_validation_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/create_or_update_coverage_info_response_validation_test'
 require_relative 'verify_response/coverage_info_configuration_test'
+require_relative 'verify_response/unknown_configuration_test'
+require_relative 'verify_response/unknown_context_test'
+require_relative 'verify_response/unknown_cds_hooks_elements_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -207,6 +210,9 @@ module DaVinciCRDTestKit
                }
              }
         test from: :crd_v221_coverage_info_configuration
+        test from: :crd_v221_unknown_configuration
+        test from: :crd_v221_unknown_context
+        test from: :crd_v221_unknown_cds_hooks_elements
       end
     end
   end

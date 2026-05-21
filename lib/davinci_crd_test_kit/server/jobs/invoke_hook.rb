@@ -41,7 +41,11 @@ module DaVinciCRDTestKit
           request_body = prepare_hook_request(request)
           response = send_hook_invocation(request_body.to_json)
           send_coverage_info_configuration_invocation(request_body, response)
+          send_unknown_configuration_invocation(request_body, response)
+          send_unknown_context_invocation(request_body, response)
+          send_unknown_cds_hooks_element_invocation(request_body, response)
         end
+
         return unless test_waiting?
 
         # end the wait to continue the tests
@@ -126,6 +130,67 @@ module DaVinciCRDTestKit
         disable_coverage_info_configuration!(configured_request_body)
         send_hook_invocation(configured_request_body.to_json, [COVERAGE_INFO_DISABLED_TAG])
         @coverage_info_configuration_invoked = true
+      end
+
+      def send_unknown_configuration_invocation(request_body, response)
+        return if @unknown_configuration_invoked
+        return unless response.status == 200
+        return unless coverage_info_response?(parsed_response_body(response))
+        return unless test_waiting?
+
+        request_body = JSON.parse(request_body.to_json)
+        prepare_hook_request(request_body)
+        add_unknown_configuration(request_body)
+        send_hook_invocation(request_body.to_json, [UNKNOWN_CONFIGURATION_TAG])
+
+        @unknown_configuration_invoked = true
+      end
+
+      def send_unknown_context_invocation(request_body, response)
+        return if @unknown_context_invoked
+        return unless response.status == 200
+        return unless coverage_info_response?(parsed_response_body(response))
+        return unless test_waiting?
+
+        request_body = JSON.parse(request_body.to_json)
+        prepare_hook_request(request_body)
+        add_unknown_context(request_body)
+        send_hook_invocation(request_body.to_json, [UNKNOWN_CONTEXT_TAG])
+
+        @unknown_context_invoked = true
+      end
+
+      def send_unknown_cds_hooks_element_invocation(request_body, response)
+        return if @unknown_cds_hooks_element_invoked
+        return unless response.status == 200
+        return unless coverage_info_response?(parsed_response_body(response))
+        return unless test_waiting?
+
+        request_body = JSON.parse(request_body.to_json)
+        prepare_hook_request(request_body)
+        add_unknown_element(request_body)
+        send_hook_invocation(request_body.to_json, [UNKNOWN_ELEMENT_TAG])
+
+        @unknown_cds_hooks_element_invoked = true
+      end
+
+      def random_key
+        ('a'..'z').to_a.sample(16).join
+      end
+
+      def add_unknown_configuration(request_body)
+        request_body['extension'] ||= {}
+        request_body['extension']['davinci-crd.configuration'] ||= {}
+        request_body['extension']['davinci-crd.configuration'][random_key] = true
+      end
+
+      def add_unknown_context(request_body)
+        request_body['context'] ||= {}
+        request_body['context'][random_key] ||= random_key
+      end
+
+      def add_unknown_element(request_body)
+        request_body[random_key] ||= random_key
       end
 
       def parsed_response_body(response)
