@@ -1,6 +1,7 @@
 require_relative '../../server_test_helper'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -8,6 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid External Reference cards received'
       id :crd_v221_external_reference_card_validation
@@ -29,8 +31,15 @@ module DaVinciCRDTestKit
         parsed_cards = parse_json(valid_cards_with_links)
         external_reference_cards = parsed_cards.select { |card| external_reference_response_type?(card) }
 
-        assert external_reference_cards.present?,
-               "#{tested_hook_name} hook response did not contain an External Reference card."
+        skip_if external_reference_cards.blank?,
+                "#{tested_hook_name} hook response does not contain any External Reference cards."
+
+        external_reference_cards.each do |card|
+          external_reference_card_check(card)
+        end
+
+        assert messages.blank?,
+               'Not all External Reference cards were valid. See messages for more information.'
       end
     end
   end

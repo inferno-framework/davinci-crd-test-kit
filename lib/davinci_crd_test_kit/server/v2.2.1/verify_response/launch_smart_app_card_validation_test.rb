@@ -1,6 +1,7 @@
 require_relative '../../server_test_helper'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -8,6 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerTestHelper
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Launch SMART Application cards received'
       id :crd_v221_launch_smart_app_card_validation
@@ -29,10 +31,17 @@ module DaVinciCRDTestKit
 
       run do
         parsed_cards = parse_json(valid_cards_with_links)
-        external_reference_cards = parsed_cards.select { |card| launch_smart_app_response_type?(card) }
+        launch_smart_app_cards = parsed_cards.select { |card| launch_smart_app_response_type?(card) }
 
-        skip_if external_reference_cards.blank?,
+        skip_if launch_smart_app_cards.blank?,
                 "#{tested_hook_name} hook response does not contain any Launch SMART App cards."
+
+        launch_smart_app_cards.each do |card|
+          smart_app_card_check(card)
+        end
+
+        assert messages.blank?,
+               'Not all Launch SMART App cards were valid. See messages for more information.'
       end
     end
   end

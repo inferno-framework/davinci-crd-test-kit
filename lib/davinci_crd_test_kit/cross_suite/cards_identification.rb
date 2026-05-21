@@ -156,7 +156,6 @@ module DaVinciCRDTestKit
     def external_reference_response_type?(card)
       links = card['links']
       return false if links.blank?
-      return false if card['suggestions'].present?
 
       links.all? { |link| link['type'] == 'absolute' }
     end
@@ -187,7 +186,6 @@ module DaVinciCRDTestKit
     def launch_smart_app_response_type?(card)
       links = card['links']
       return false if links.blank?
-      return false if card['suggestions'].blank?
 
       links.all? { |link| link['type'] == 'smart' }
     end
