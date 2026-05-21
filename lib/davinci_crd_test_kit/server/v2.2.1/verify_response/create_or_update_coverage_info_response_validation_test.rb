@@ -59,6 +59,20 @@ module DaVinciCRDTestKit
             actions_check(card['suggestions'].first['actions'].select do |action|
                             create_or_update_coverage_action_response_type?(action)
                           end, ig_version: 'v221')
+
+            if card['suggestions'].first['actions'].any? { |action| action['resourceId'].present? }
+              add_message(
+                'error',
+                "Update Coverage Records actions must not contain resourceId. See card `#{card}`"
+              )
+            end
+
+            next if card['links'].blank?
+
+            add_message(
+              'error',
+              "Update Coverage Records response must not contain links. See card `#{card}`"
+            )
           end
         end
 
