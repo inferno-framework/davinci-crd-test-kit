@@ -40,7 +40,12 @@ module DaVinciCRDTestKit
     end
 
     def hook_request_context_check(context, hook_name, ig_version: 'v201')
-      required_fields = context_required_fields_by_hook[hook_name]
+      required_fields =
+        if hook_name == 'order-dispatch'
+          context_required_order_dispatch_fields[ig_version]
+        else
+          context_required_fields_by_hook[hook_name]
+        end
       required_fields.each do |field, type|
         validate_presence_and_type(context, field, type,
                                    "#{request_number}#{hook_name} request context")
@@ -147,16 +152,28 @@ module DaVinciCRDTestKit
         'encounter-start' => common_context_fields.merge('encounterId' => String),
         'encounter-discharge' => common_context_fields.merge('encounterId' => String),
         'order-select' => common_context_fields.merge('selections' => Array, 'draftOrders' => Hash),
-        'order-dispatch' => { 'patientId' => String, 'order' => String, 'performer' => String },
         'order-sign' => common_context_fields.merge('draftOrders' => Hash)
       }.freeze
+    end
+
+    def context_required_order_dispatch_fields
+      {
+        'v201' => { 'patientId' => String, 'order' => String, 'performer' => String },
+        'v221' => { 'patientId' => String, 'dispatchedOrders' => Array, 'performer' => String }
+      }
+    end
+
+    def context_optional_order_dispatch_fields
+      {
+        'v201' => { 'task' => Hash },
+        'v221' => { 'fulfillmentTasks' => Array }
+      }
     end
 
     def context_optional_fields_by_hook
       {
         'appointment-book' => { 'encounterId' => String },
         'order-select' => { 'encounterId' => String },
-        'order-dispatch' => { 'task' => Hash },
         'order-sign' => { 'encounterId' => String }
       }.freeze
     end
@@ -556,7 +573,12 @@ module DaVinciCRDTestKit
     end
 
     def context_validate_optional_fields(hook_context, hook_name, ig_version: 'v201')
-      hook_optional_context_fields = context_optional_fields_by_hook[hook_name]
+      hook_optional_context_fields =
+        if hook_name == 'order-dispatch'
+          context_optional_order_dispatch_fields[ig_version]
+        else
+          context_optional_fields_by_hook[hook_name]
+        end
       return if hook_optional_context_fields.blank?
 
       hook_optional_context_fields.each do |field, type|
