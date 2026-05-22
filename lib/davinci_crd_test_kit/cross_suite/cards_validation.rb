@@ -160,13 +160,29 @@ module DaVinciCRDTestKit
       end
     end
 
-    def additional_orders_check(card)
+    def no_links_check(card, card_type)
       return unless card['links'].present?
 
       add_message(
         'error',
-        "Additional Orders cards must not contain links. In card: `#{card}`"
+        "#{card_type} response must not contain links. In card: `#{card}`"
       )
+    end
+
+    def additional_orders_check(card)
+      no_links_check(card, 'Additional Orders')
+    end
+
+    def create_or_update_coverage_check(card)
+      no_links_check(card, 'Update Coverage Records')
+    end
+
+    def form_completion_check(card)
+      no_links_check(card, 'Form Completion')
+    end
+
+    def propose_alternate_request_check(card)
+      no_links_check(card, 'Propose Alternate Request')
     end
 
     def card_suggestions_check(card)

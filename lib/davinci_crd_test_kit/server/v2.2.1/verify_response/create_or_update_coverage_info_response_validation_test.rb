@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Create or Update Coverage Information cards or system actions received'
       id :crd_v221_create_or_update_coverage_info_response_validation
@@ -60,12 +62,7 @@ module DaVinciCRDTestKit
                             create_or_update_coverage_action_response_type?(action)
                           end, ig_version: 'v221')
 
-            next if card['links'].blank?
-
-            add_message(
-              'error',
-              "Update Coverage Records response must not contain links. See card `#{card}`"
-            )
+            create_or_update_coverage_check(card)
           end
         end
 

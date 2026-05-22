@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Request Form Completion cards or system actions received'
       id :crd_v221_request_form_completion_response_validation
@@ -64,12 +66,7 @@ module DaVinciCRDTestKit
 
             actions_check(actions, ig_version: 'v221')
 
-            next if card['links'].blank?
-
-            add_message(
-              'error',
-              "Form Completion response must not contain links. See card `#{card}`"
-            )
+            form_completion_check(card)
           end
         end
 
