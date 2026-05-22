@@ -61,7 +61,12 @@ module DaVinciCRDTestKit
             title: 'CRD server base URL'
 
       fhir_resource_validator do
-        igs('hl7.fhir.us.davinci-crd#2.2.1')
+        igs(
+          'hl7.fhir.us.davinci-crd#2.2.1',
+          'hl7.fhir.us.core#3.1.1',
+          'hl7.fhir.us.core#6.1.0',
+          'hl7.fhir.us.core#7.0.0'
+        )
 
         # exclude_message do |message|
         #   # extension definition issue present in 2.0.1 but corrected in later versions
