@@ -18,13 +18,23 @@ module DaVinciCRDTestKit
         'http://hl7.org/fhir/us/core/StructureDefinition/us-core-jurisdiction',
         'http://hl7.org/fhir/us/core/StructureDefinition/us-core-sex',
         'http://hl7.org/fhir/us/core/StructureDefinition/us-core-tribal-affiliation',
-        'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication-adherence'
+        'http://hl7.org/fhir/us/core/StructureDefinition/us-core-medication-adherence',
+        'http://hl7.org/fhir/StructureDefinition/condition-assertedDate'
       ].freeze
 
       CRD_EXTENSION_URLS = [
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information',
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options',
-        'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category'
+        'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category',
+        'http://hl7.org/fhir/StructureDefinition/codeOptions',
+        'http://hl7.org/fhir/StructureDefinition/alternate-reference',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.requestedPeriod',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.requestedPerformer',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.performer',
+        'http://hl7.org/fhir/StructureDefinition/request-doNotPerform',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.input.value',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.output.value'
       ].freeze
 
       HREX_EXTENSION_URLS = [
@@ -74,6 +84,7 @@ module DaVinciCRDTestKit
             .flat_map { |resource| custom_extensions(resource) }
             .uniq
             .map { |extension| "\n- `#{extension}`" }
+            .join
 
         skip 'No requests were made without custom extensions. The following custom extensions were found: ' \
              "#{custom_extensions_string}"
