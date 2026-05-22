@@ -64,13 +64,6 @@ module DaVinciCRDTestKit
 
             actions_check(actions, ig_version: 'v221')
 
-            if actions.any? { |action| action['resourceId'].present? }
-              add_message(
-                'error',
-                "Form Completion actions must not contain resourceId. See card `#{card}`"
-              )
-            end
-
             next if card['links'].blank?
 
             add_message(

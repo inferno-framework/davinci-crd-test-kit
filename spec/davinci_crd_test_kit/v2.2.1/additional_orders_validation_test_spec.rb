@@ -36,7 +36,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AdditionalOrdersValidationTest do
     result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json)
     expect(result.result).to eq('fail'), result.result_message
     expect(result.result_message).to match(/Additional Order cards are not valid/)
-    expect(entity_result_message.message).to match(/must not contain resourceId/)
+    expect(entity_result_message.message).to match(/`resourceId` should not be populated/)
   end
 
   it 'skips if no additional orders as companions card present' do
