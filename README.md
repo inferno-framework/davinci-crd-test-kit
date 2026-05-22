@@ -1,7 +1,9 @@
 # Da Vinci Coverage Requirements Discovery (CRD) Test Kit
 
-The **Da Vinci Coverage Requirements Discovery (CRD) STU 2.0.1 Test Kit** validates the 
-conformance of systems to the [CRD STU 2.0.1 FHIR IG](https://hl7.org/fhir/us/davinci-crd/STU2/index.html).
+The **Da Vinci Coverage Requirements Discovery (CRD) Test Kit** validates the
+conformance of systems to multiple versions of the CRD FHIR IG, including
+[CRD STU 2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/index.html) and
+[CRD STU 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1).
 For additional details on the tests, including their scope, limitations, and status, see the 
 [Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview)
 on the [wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
@@ -18,8 +20,10 @@ Instructions](#local-installation-instructions) section below for more
 information.
 
 Detailed step-by-step instructions for running the tests can be found in our execution guides:
-- [Client Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
-- [Server Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
+- [Client v2.0.1 Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
+- [Client v2.2.1 Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
+- [Server v2.0.1 Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
+- [Server v2.2.1 Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1)
 
 Additional information is provided in the [Da Vinci CRD Test Kit documentation](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/).
 

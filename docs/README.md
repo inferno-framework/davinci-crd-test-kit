@@ -26,7 +26,9 @@ to this test kit.
 
 ### Using the Da Vinci CRD Server Test Suites 
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.
-*   **[Server Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)**: Step-by-step guide for testing server systems, including demonstration executions.
+*   **Server Testing Instructions**: Step-by-step guide for testing server systems, including demonstration executions for both
+    the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
+    and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1)
 
 ## Contributing to this Test Kit
 
@@ -37,8 +39,12 @@ to this test kit.
 
 ## Reference Documents
 
-*   **[CRD Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx)**: Spreadsheet detailing the interpretation of CRD IG requirements for this test kit.
-*   **[CDS Hooks Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx)**: Spreadsheet detailing the interpretation of CDS Hooks specification requirements for this test kit.
+*   **CRD Requirements Spreadsheets**: Spreadsheets detailing the interpretation of CRD IG requirements for this test kit:
+    [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.0.1_requirements.xlsx)
+    and [v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/hl7.fhir.us.davinci-crd_2.2.1_requirements.xlsx).
+*   **CDS Hooks Requirements Spreadsheets**: Spreadsheets detailing the interpretation of CDS Hooks specification requirements for this test kit:
+    [v2.0 for CRD v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx)
+    and [v3.0.0-ballot for CRD v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_3.0.0-ballot_requirements.xlsx).
 *   **[CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)**: Spreadsheet detailing the interpretation of hook definnition requirements for this test kit.
 
 ## Support

@@ -103,4 +103,5 @@ attestation or other means.
 For specific testing prerequisites and detailed test descriptions, refer to:
 * [Client v2.0.1 Suite Testing Instructions](Client-Instructions.md)
 * [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1.md)
-* [Server Suite Testing Instructions](Server-Instructions.md)
+* [Server v2.0.1 Suite Testing Instructions](Server-Instructions.md)
+* [Server v2.2.1 Suite Testing Instructions](Server-Instructions-v2.2.1.md)
