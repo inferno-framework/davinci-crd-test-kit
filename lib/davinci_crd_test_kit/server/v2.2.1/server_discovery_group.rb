@@ -2,6 +2,7 @@ require 'tls_test_kit'
 require_relative 'discovery/discovery_configuration_test'
 require_relative 'discovery/discovery_endpoint_test'
 require_relative 'discovery/discovery_services_validation_test'
+require_relative 'discovery/discovery_prefetch_support_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -62,6 +63,7 @@ module DaVinciCRDTestKit
       test from: :crd_v221_discovery_endpoint_test
       test from: :crd_v221_discovery_services_validation
       test from: :crd_v221_discovery_configuration
+      test from: :crd_v221_discovery_prefetch_support
     end
   end
 end
