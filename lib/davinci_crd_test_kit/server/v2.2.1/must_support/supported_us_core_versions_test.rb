@@ -34,7 +34,7 @@ module DaVinciCRDTestKit
       ).freeze
 
       run do
-        ALL_HOOK_TAGS.flat_map { |hook_tag| load_tagged_requests(hook_tag) }
+        ALL_HOOK_TAGS.each { |hook_tag| load_tagged_requests(hook_tag) }
         skip_if requests.empty?, 'No requests were made in a previous test as expected.'
 
         successful_requests = requests.select { |request| request.status == 200 }
