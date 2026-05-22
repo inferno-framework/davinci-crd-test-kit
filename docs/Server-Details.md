@@ -113,5 +113,7 @@ General limitations across all server versions include:
 - Hook configuration is not tested.
 
 ### Additional v2.2.1 Server Suite Limitations
-
-- TODO
+*Note: this is not an exhaustive set of limitations; this section will be updated soon.*
+- The server suite is not configured to validate responses using FHIR logical models, and
+  instead uses custom logic within the tests.  Future versions may leverage the logical
+  models provided by CRD to standardize the validation of this content.

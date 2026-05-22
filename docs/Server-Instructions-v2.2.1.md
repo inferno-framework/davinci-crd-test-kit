@@ -1,6 +1,6 @@
 # Da Vinci CRD Server v2.2.1 Test Suite Testing Instructions
 
-- TODO: Update for v2.2.1. This is a copy from 2.0
+*Note: This section has not been updated to fully document updates made in v2.2.1; it will be updated soon*
 
 This document provides a step-by-step guide for using the Da Vinci CRD Server v2.2.1 Test Suite to test
 a **CRD server system**, including instructions for a [demonstration execution](#demonstration-execution)
