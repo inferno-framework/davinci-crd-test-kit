@@ -20,8 +20,10 @@ module DaVinciCRDTestKit
         The required fields must have a valid data structure.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13'
 
       input :invoked_hook
       output :valid_cards, :valid_system_actions

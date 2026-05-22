@@ -37,6 +37,9 @@ module DaVinciCRDTestKit
         The test will skip if no Additional Orders cards are found.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-58'
+
       optional
       input :valid_cards_with_suggestions
 
