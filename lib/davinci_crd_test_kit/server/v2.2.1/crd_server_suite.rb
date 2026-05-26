@@ -14,27 +14,31 @@ module DaVinciCRDTestKit
       id :crd_server_v221
       title 'Da Vinci CRD Server v2.2.1 Test Suite'
       description <<~DESCRIPTION
-        The Da Vinci CRD Server Test Suite tests the conformance of server systems
-        to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        The Da Vinci CRD Server v2.2.1 Test Suite tests the conformance of systems to the
+        capabilities of a CRD server as described in [version 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
+        of the Da Vinci Coverage Requirements Discovery (CRD) Implementation Guide.
 
-        For details on the design and use of these tests, see the wiki including
-        - [Suite Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)
-          for a high-level description of the test
-          organization, including its components and limitations.
-        - [Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
-          for a step-by-step guide to execution of these
-          tests against a CRD client, including [instructions for a demonstration execution](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions#demonstration-execution)
-          against the [public reference implementation](https://crd.davinci.hl7.org/).
+        Detailed information about this test suite can be found in the
+        [server section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details) of the
+        [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki), including:
+        - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1#pre-execution-setup-and-required-information),
+        - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1#quick-start)
+          and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1#additional-testing-options)
+          instructions for executing against a server system, and
+        - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1#interpreting-results).
       DESCRIPTION
 
       suite_summary <<~SUMMARY
-        The Da Vinci CRD Server Test Suite tests the conformance of server systems
-        to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
-        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
+        The Da Vinci CRD Server v2.2.1 Test Suite tests the conformance of server systems
+        to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
+        Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
       SUMMARY
 
       links [
+        {
+          label: 'Implementation Guide',
+          url: 'https://hl7.org/fhir/us/davinci-crd/2.2.1'
+        },
         {
           label: 'Report Issue',
           url: 'https://github.com/inferno-framework/davinci-crd-test-kit/issues'

@@ -56,7 +56,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: example_client_url, encounter_start_selected_response_types:)
+    result = run(test, cds_jwt_iss: example_client_url, encounter_start_response_approach: 'mocked',
+                       encounter_start_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -80,7 +81,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, encounter_start_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, encounter_start_response_approach: 'mocked',
+              encounter_start_selected_response_types:)
 
     body['prefetch'] = { 'coverage' => crd_coverage, 'encounter' => crd_encounter }
     header('Authorization', "Bearer #{token}")
@@ -126,7 +128,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, encounter_start_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, encounter_start_response_approach: 'mocked',
+              encounter_start_selected_response_types:)
 
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
@@ -160,7 +163,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', encounter_start_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', encounter_start_response_approach: 'mocked',
+                       encounter_start_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -184,7 +188,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', encounter_start_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', encounter_start_response_approach: 'mocked',
+                       encounter_start_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -209,7 +214,8 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, encounter_start_selected_response_types: [])
+    run(test, cds_jwt_iss: example_client_url, encounter_start_response_approach: 'mocked',
+              encounter_start_selected_response_types: [])
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -241,6 +247,7 @@ RSpec.describe DaVinciCRDTestKit::V201::EncounterStartReceiveRequestTest, :reque
     )
 
     run(test, cds_jwt_iss: example_client_url,
+              encounter_start_response_approach: 'mocked',
               encounter_start_selected_response_types: encounter_start_selected_response_types +
     ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app'])
 

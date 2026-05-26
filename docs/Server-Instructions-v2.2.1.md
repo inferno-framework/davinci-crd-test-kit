@@ -1,6 +1,8 @@
-# Da Vinci CRD Server v2.0.1 Test Suite Testing Instructions
+# Da Vinci CRD Server v2.2.1 Test Suite Testing Instructions
 
-This document provides a step-by-step guide for using the Da Vinci CRD Server v2.0.1 Test Suite to test
+*Note: This section has not been updated to fully document updates made in v2.2.1; it will be updated soon*
+
+This document provides a step-by-step guide for using the Da Vinci CRD Server v2.2.1 Test Suite to test
 a **CRD server system**, including instructions for a [demonstration execution](#demonstration-execution)
 against the public [CRD server reference implementation](https://crd.davinci.hl7.org/).
 
@@ -15,7 +17,7 @@ Once those details are available, test execution can start.
 
 To execute a simple set of tests targeting a single hook follow these steps:
 
-1. Create a "Da Vinci CRD Server v2.0.1 Test Suite" session.
+1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session.
 1. Select group "1 Discovery" from the list at the left and click the "RUN TESTS" button
    in the upper right.
 1. In the inputs, provide the details gathered above and click the "SUBMIT" button. Inferno
@@ -53,7 +55,7 @@ If you would like to try out the order-sign hook invocation tests against
 [the public CRD reference server](https://crd.davinci.hl7.org/),
 you can do so using the following steps:
 
-1. Create a "Da Vinci CRD Server v2.0.1 Test Suite" session.
+1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session.
 1. Select the *CRD Server RI* option from the Preset dropdown in the upper left.
 1. Click the "RUN ALL TESTS" button in the upper right and click "SUBMIT"
 1. Inferno will perform several hook invocations and complete the test run. Note that all

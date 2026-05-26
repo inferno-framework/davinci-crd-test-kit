@@ -30,6 +30,26 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      input :order_dispatch_response_approach,
+            title: 'Response generation approach for order-dispatch',
+            description: %(
+              Determines how Inferno will generate response for order-dispatch
+              hook invocations.
+            ),
+            type: 'radio',
+            default: 'mocked',
+            options: {
+              list_options: [
+                {
+                  label: 'Create simple mocks based on selected response types',
+                  value: 'mocked'
+                },
+                {
+                  label: 'Generate responses based on a tester-provided template',
+                  value: 'custom'
+                }
+              ]
+            }
       input :order_dispatch_selected_response_types,
             title: 'Response types to return from order-dispatch hook requests',
             description: %(
@@ -76,22 +96,21 @@ module DaVinciCRDTestKit
                   value: 'companions_prerequisites'
                 }
               ]
-            }
+            },
+            enable_when: { input_name: 'order_dispatch_response_approach', value: 'mocked' }
       input :order_dispatch_custom_response_template,
             title: 'Custom response template for order-dispatch hook requests',
             description: %(
-              To control the responses of Inferno's simulated CRD server, provide
-              a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
               in JSON form for Inferno to use when responding to hook invocations.
-              If this input is populated, the corresponding **Response types to return**
-              input will be ignored.
             ),
             type: 'textarea',
-            optional: true
+            optional: true,
+            enable_when: { input_name: 'order_dispatch_response_approach', value: 'custom' }
       output :continuation_url
 
       def configured_response_details
-        if order_dispatch_custom_response_template.present?
+        if order_dispatch_response_approach == 'custom'
           # rubocop:disable Layout/LineLength
           'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
             'from the **Custom response template for order-dispatch hook requests** input ' \
