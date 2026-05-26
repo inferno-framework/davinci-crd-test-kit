@@ -1,8 +1,9 @@
-plugins: rubocop-rspec
+plugins: 
+  - rubocop-rspec
 
 require:
   - rubocop-rake
-
+  
 AllCops:
   NewCops: enable
   SuggestExtensions: false
@@ -83,4 +84,13 @@ RSpec/SpecFilePathFormat:
   Enabled: false
 
 Gemspec/RequireMFA:
+  Enabled: false
+
+Style/SelectByKind:
+  Enabled: false
+
+Style/SelectByRange:
+  Enabled: false
+
+Style/SelectByRegexp:
   Enabled: false
