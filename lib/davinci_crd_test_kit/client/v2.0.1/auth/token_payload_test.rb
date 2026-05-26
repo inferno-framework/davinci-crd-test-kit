@@ -5,6 +5,7 @@ module DaVinciCRDTestKit
     class TokenPayloadTest < Inferno::Test
       include ClientHookRequestValidation
       include ClientURLs
+
       id :crd_v201_token_payload
       title 'Authorization token payload has required claims and a valid signature'
       description %(

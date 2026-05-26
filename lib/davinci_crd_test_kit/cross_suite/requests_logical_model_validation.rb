@@ -1,6 +1,18 @@
 module DaVinciCRDTestKit
   module RequestsLogicalModelValidation
     CRD_CDS_HOOK_REQUEST_MODEL_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksRequest'.freeze
+    USER_ID_ALLOWED_RESOURCE_TYPES = [
+      'Practitioner', 'PractitionerRole', 'Patient', 'RelatedPerson'
+    ].freeze
+
+    PERFORMER_ALLOWED_RESOURCE_TYPES = [
+      'Practitioner', 'PractitionerRole'
+    ].freeze
+
+    ORDERS_ALLOWED_RESOURCE_TYPES = [
+      'CommunicationRequest', 'DeviceRequest', 'MedicationRequest',
+      'NutritionOrder', 'ServiceRequest', 'VisionPrescription'
+    ].freeze
 
     def validate_request_against_logical_model(request_body, request_index, ig_version)
       if ig_version == '2.2.1'
@@ -56,7 +68,7 @@ module DaVinciCRDTestKit
     def check_context_resource_profiles(request_body, request_index, ig_version)
       case request_body['hook']
       when 'order-sign', 'order-select'
-        check_draft_orders_profiles(request_body, request_index, ig_version)
+        draft_orders_conform_to_profiles?(request_body, request_index, ig_version)
       when 'order-dispatch'
         request_body.dig('context', 'fulfillmentTasks')&.each_with_index do |task, index|
           resource = FHIR.from_contents(task.to_json)
@@ -71,7 +83,7 @@ module DaVinciCRDTestKit
       nil # no resource to validate - error found elsewhere
     end
 
-    def check_draft_orders_profiles(request_body, request_index, ig_version)
+    def draft_orders_conform_to_profiles?(request_body, request_index, ig_version)
       resource = FHIR.from_contents(request_body.dig('context', 'draftOrders')&.to_json)
       resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-request|#{ig_version}",
                          message_prefix: "(Request #{request_index + 1}) context.draftOrders - ")
@@ -186,19 +198,6 @@ module DaVinciCRDTestKit
     # Context relative reference checks
     # -------------------------------------------------------------------------
 
-    USER_ID_ALLOWED_RESOURCE_TYPES = [
-      'Practitioner', 'PractitionerRole', 'Patient', 'RelatedPerson'
-    ].freeze
-
-    PERFORMER_ALLOWED_RESOURCE_TYPES = [
-      'Practitioner', 'PractitionerRole'
-    ].freeze
-
-    ORDERS_ALLOWED_RESOURCE_TYPES = [
-      'CommunicationRequest', 'DeviceRequest', 'MedicationRequest',
-      'NutritionOrder', 'ServiceRequest', 'VisionPrescription'
-    ].freeze
-
     # verify that context fields required to contain local references (resourceType/id)
     # do contain them and that the resourceType is in the list of expected types.
     def check_relative_references(request_body, request_index)
@@ -253,7 +252,7 @@ module DaVinciCRDTestKit
                       "is not #{allowed_types_error_suffix}.")
           is_local_reference = false
         end
-        unless id.match(/\A[A-Za-z0-9\-\.]{1,64}\z/)
+        unless id.match(/\A[A-Za-z0-9\-.]{1,64}\z/)
           add_message('error',
                       "#{error_prefix} local reference id '#{id}' does not meet " \
                       '[FHIR id data type](https://hl7.org/fhir/R4/datatypes.html#id) requirements.')

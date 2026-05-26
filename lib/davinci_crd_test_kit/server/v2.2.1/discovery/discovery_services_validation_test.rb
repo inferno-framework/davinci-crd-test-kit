@@ -108,7 +108,7 @@ module DaVinciCRDTestKit
                  "#{non_string_values.join(', ')}"
 
           invalid_versions =
-            service['extension'][EXTENSION_KEY] # rubocop:disable Style/SelectByRegexp
+            service['extension'][EXTENSION_KEY]
               .reject { |version| version.match?(/\A[1-9]\d*\.\d+\Z/) }
 
           assert invalid_versions.blank?,

@@ -4,6 +4,7 @@ module DaVinciCRDTestKit
   module V201
     class DecodeAuthTokenTest < Inferno::Test
       include ClientHookRequestValidation
+
       id :crd_v201_decode_auth_token
       title 'Bearer token can be decoded'
       description %(

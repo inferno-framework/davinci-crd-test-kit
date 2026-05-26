@@ -5,6 +5,7 @@ require_relative 'jobs/invoke_hook'
 module DaVinciCRDTestKit
   class ServerAbstractInvokeHookTest < Inferno::Test
     include ServerHookHelper
+
     # must include the corresponding server_urls class when using in a suite
 
     title 'Invoke Hook'

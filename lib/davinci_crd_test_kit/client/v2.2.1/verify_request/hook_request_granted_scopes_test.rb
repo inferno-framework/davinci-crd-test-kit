@@ -7,6 +7,7 @@ module DaVinciCRDTestKit
     class HookRequestGrantedScopesTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+
       id :crd_v221_hook_request_granted_scopes
       title 'Hook requests grant the requested scopes'
       description %(

@@ -1,7 +1,9 @@
-require:
-  - rubocop-rake
+plugins: 
   - rubocop-rspec
 
+require:
+  - rubocop-rake
+  
 AllCops:
   NewCops: enable
   SuggestExtensions: false
@@ -18,6 +20,9 @@ Layout/MultilineMethodCallIndentation:
 
 Style/Documentation:
   Enabled: false
+
+Style/SafeNavigationChainLength:
+  Max: 3
 
 Style/FrozenStringLiteralComment:
   Enabled: false
@@ -79,4 +84,13 @@ RSpec/SpecFilePathFormat:
   Enabled: false
 
 Gemspec/RequireMFA:
+  Enabled: false
+
+Style/SelectByKind:
+  Enabled: false
+
+Style/SelectByRange:
+  Enabled: false
+
+Style/SelectByRegexp:
   Enabled: false

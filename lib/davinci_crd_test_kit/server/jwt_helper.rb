@@ -6,17 +6,6 @@ module DaVinciCRDTestKit
       new(...).signed_jwt
     end
 
-    def self.decode_jwt(token, jwks_hash, kid = nil)
-      jwks = JWT::JWK::Set.new(jwks_hash)
-      jwks.filter! { |key| key[:use] == 'sig' }
-      algorithms = jwks.map { |key| key[:alg] }.compact.uniq
-      begin
-        JWT.decode(token, kid, true, algorithms:, jwks:)
-      rescue StandardError => e
-        raise Inferno::Exceptions::AssertionException, e.message
-      end
-    end
-
     attr_reader :aud, :encryption_method, :exp, :iat, :iss, :jku, :jti, :kid
 
     def initialize(
