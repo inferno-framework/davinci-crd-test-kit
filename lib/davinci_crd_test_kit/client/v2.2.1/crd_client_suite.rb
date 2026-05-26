@@ -9,6 +9,9 @@ require_relative 'client_urls'
 require_relative '../crd_client_options'
 require_relative '../endpoints/hook_request_endpoint'
 require_relative '../../ext/inferno_core/runnable'
+require 'us_core_test_kit/generated/v3.1.1/us_core_test_suite'
+require 'us_core_test_kit/generated/v6.1.0/us_core_test_suite'
+require 'us_core_test_kit/generated/v7.0.0/us_core_test_suite'
 
 module DaVinciCRDTestKit
   module V221
@@ -103,7 +106,23 @@ module DaVinciCRDTestKit
                             'cds-hooks_3.0.0-ballot@208', # use of CORS endpoints defined in the suite
                             'hl7.fhir.us.davinci-crd_2.2.1@impl-3' # suite verifies system interactions
 
-      fhir_resource_validator do
+      CRD_MESSAGE_FILTERS = [
+        /\A\S+: \S+: URL value '.*' does not resolve/,
+        %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
+        /CDSHooksRequest.extension: Unrecognized property/,
+        /No definition could be found for URL value/
+      ].freeze
+
+      US_CORE_3_MESSAGE_FILTERS = CRD_MESSAGE_FILTERS +
+                                  USCoreTestKit::USCoreV311::USCoreTestSuite::VALIDATION_MESSAGE_FILTERS
+
+      US_CORE_6_MESSAGE_FILTERS = CRD_MESSAGE_FILTERS +
+                                  USCoreTestKit::USCoreV610::USCoreTestSuite::VALIDATION_MESSAGE_FILTERS
+
+      US_CORE_7_MESSAGE_FILTERS = CRD_MESSAGE_FILTERS +
+                                  USCoreTestKit::USCoreV700::USCoreTestSuite::VALIDATION_MESSAGE_FILTERS
+
+      fhir_resource_validator required_suite_options: { us_core_version: CRDClientOptions::US_CORE_3 } do
         igs('hl7.fhir.us.davinci-crd#2.2.1')
 
         validation_context do
@@ -111,12 +130,35 @@ module DaVinciCRDTestKit
         end
 
         exclude_message do |message|
-          [
-            /\A\S+: \S+: URL value '.*' does not resolve/,
-            %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
-            /CDSHooksRequest.extension: Unrecognized property/,
-            /No definition could be found for URL value/
-          ].any? { |match_template| message.message.match?(match_template) }
+          US_CORE_3_MESSAGE_FILTERS.any? { |match_template| message.message.match?(match_template) }
+        end
+      end
+
+      fhir_resource_validator required_suite_options: { us_core_version: CRDClientOptions::US_CORE_6 } do
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
+
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+        end
+
+        exclude_message do |message|
+          US_CORE_6_MESSAGE_FILTERS.any? do |match_template|
+            message.message.match?(match_template)
+          end
+        end
+      end
+
+      fhir_resource_validator required_suite_options: { us_core_version: CRDClientOptions::US_CORE_7 } do
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
+
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+        end
+
+        exclude_message do |message|
+          US_CORE_7_MESSAGE_FILTERS.any? do |match_template|
+            message.message.match?(match_template)
+          end
         end
       end
 
