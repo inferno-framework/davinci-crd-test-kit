@@ -105,7 +105,7 @@ module DaVinciCRDTestKit
       output :continuation_url
 
       def configured_response_details
-        if encounter_discharge_custom_response_template.present?
+        if encounter_discharge_response_approach == 'custom'
           # rubocop:disable Layout/LineLength
           'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
             'from the **Custom response template for encounter-discharge hook requests** input ' \

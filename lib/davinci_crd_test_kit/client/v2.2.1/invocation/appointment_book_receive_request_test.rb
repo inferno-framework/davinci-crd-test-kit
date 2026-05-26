@@ -104,7 +104,7 @@ module DaVinciCRDTestKit
       output :continuation_url
 
       def configured_response_details
-        if appointment_book_custom_response_template.present?
+        if appointment_book_response_approach == 'custom'
           # rubocop:disable Layout/LineLength
           'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
             'from the **Custom response template for appointment-book hook requests** input ' \
