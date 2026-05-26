@@ -209,7 +209,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       instructions_card_template['extension'] =
         { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       response_template = { cards: [instructions_card_template] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -235,7 +236,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       system_action_template_delete_with_tokens['extension'] =
         { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
       response_template = { cards: [], systemActions: [system_action_template_delete_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -257,7 +259,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
 
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: 'not json')
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: 'not json')
 
       body['prefetch'] = { 'coverage' => crd_coverage }
       header('Authorization', "Bearer #{token}")
@@ -282,7 +285,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       instructions_card_template['uuid'] = 'to be replaced'
       response_template = { cards: [instructions_card_template] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -337,7 +341,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(ServiceRequest).exists()' }
       }
       response_template = { cards: [suggestions_card_template] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -377,7 +382,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       system_action_template_static['extension'] =
         { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       response_template = { cards: [instructions_card_template], systemActions: [system_action_template_static] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -407,7 +413,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       suggestions_card_template['extension'] =
         { 'com.inferno.inclusionCriteria': 'default' }
       response_template = { cards: [instructions_card_template, suggestions_card_template] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -440,7 +447,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         { 'com.inferno.inclusionCriteria': 'default' }
 
       response_template = { cards: [instructions_card_template, suggestions_card_template] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -474,7 +482,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()'
         }
       response_template = { cards: [instructions_card_template], systemActions: [system_action_template_static] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -502,7 +511,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       )
 
       response_template = { cards: [], systemActions: [system_action_template_delete_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -536,7 +546,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       response_template = { cards: [],
                             systemActions: [system_action_template_delete_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -575,7 +586,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource' }
       response_template = { cards: [],
                             systemActions: [system_action_template_delete_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -645,6 +657,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       }
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
@@ -726,6 +739,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       }
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
@@ -780,7 +794,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       response_template = { cards: [],
                             systemActions: [system_action_template_update_extension_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -835,7 +850,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       response_template = { cards: [],
                             systemActions: [system_action_template_update_extension_with_tokens] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -891,7 +907,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
                             systemActions: [sytem_action_update_coverage_information_no_defaults,
                                             sytem_action_update_coverage_information_default_empty,
                                             sytem_action_update_coverage_information_default_missing] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)
@@ -956,7 +973,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes cards when the extension is not present' do
         response_template = { cards: [instructions_card_template] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -968,7 +986,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           'com.inferno.includeForServices': 'cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -982,7 +1001,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [instructions_card_template] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -995,7 +1015,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
             'prefetch-subset/cds-services/order-sign-subset, cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -1007,7 +1028,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           'com.inferno.includeForServices': 'cds-services/order-sign-service'
         }
         response_template = { cards: [], systemActions: [system_action_template_static] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -1021,7 +1043,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [], systemActions: [system_action_template_static] }
-        run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
@@ -1050,7 +1073,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
             'extension' => { 'com.inferno.includeForServices' => 'prefetch-subset/cds-services/order-sign-subset' }
           )
           response_template = { cards: [complete_card, subset_card] }
-          run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+          run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                    order_sign_custom_response_template: response_template.to_json)
           header('Authorization', "Bearer #{token}")
           post_json(subset_server_endpoint, body)
           expect(last_response).to be_ok
@@ -1094,7 +1118,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       response_template = { cards: [],
                             systemActions: [sytem_action_update_coverage_information_default_missing] }
-      run(test, cds_jwt_iss: example_client_url, order_sign_custom_response_template: response_template.to_json)
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: response_template.to_json)
 
       header('Authorization', "Bearer #{token}")
       post_json(server_endpoint, body)

@@ -56,7 +56,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: example_client_url, appointment_book_selected_response_types:)
+    result = run(test, cds_jwt_iss: example_client_url, appointment_book_response_approach: 'mocked',
+                       appointment_book_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -79,7 +80,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, appointment_book_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, appointment_book_response_approach: 'mocked',
+              appointment_book_selected_response_types:)
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -120,7 +122,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, appointment_book_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, appointment_book_response_approach: 'mocked',
+              appointment_book_selected_response_types:)
 
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
@@ -154,7 +157,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', appointment_book_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', appointment_book_response_approach: 'mocked',
+                       appointment_book_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -178,7 +182,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', appointment_book_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', appointment_book_response_approach: 'mocked',
+                       appointment_book_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -203,7 +208,8 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, appointment_book_selected_response_types: [])
+    run(test, cds_jwt_iss: example_client_url, appointment_book_response_approach: 'mocked',
+              appointment_book_selected_response_types: [])
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -238,6 +244,7 @@ RSpec.describe DaVinciCRDTestKit::V201::AppointmentBookReceiveRequestTest, :requ
     )
 
     run(test, cds_jwt_iss: example_client_url,
+              appointment_book_response_approach: 'mocked',
               appointment_book_selected_response_types: appointment_book_selected_response_types +
     ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app'])
 

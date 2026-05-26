@@ -56,7 +56,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: example_client_url, order_dispatch_selected_response_types:)
+    result = run(test, cds_jwt_iss: example_client_url, order_dispatch_response_approach: 'mocked',
+                       order_dispatch_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -80,7 +81,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, order_dispatch_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, order_dispatch_response_approach: 'mocked',
+              order_dispatch_selected_response_types:)
 
     body['prefetch'] = { 'coverage' => crd_coverage, 'order' => crd_order }
     header('Authorization', "Bearer #{token}")
@@ -126,7 +128,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, order_dispatch_selected_response_types:)
+    run(test, cds_jwt_iss: example_client_url, order_dispatch_response_approach: 'mocked',
+              order_dispatch_selected_response_types:)
 
     header('Authorization', "Bearer #{token}")
     post_json(server_endpoint, body)
@@ -159,7 +162,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', order_dispatch_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', order_dispatch_response_approach: 'mocked',
+                       order_dispatch_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -183,7 +187,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'example.com', order_dispatch_selected_response_types:)
+    result = run(test, cds_jwt_iss: 'example.com', order_dispatch_response_approach: 'mocked',
+                       order_dispatch_selected_response_types:)
 
     expect(result.result).to eq('wait')
 
@@ -215,7 +220,8 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, order_dispatch_selected_response_types: [])
+    run(test, cds_jwt_iss: example_client_url, order_dispatch_response_approach: 'mocked',
+              order_dispatch_selected_response_types: [])
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -257,6 +263,7 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
     )
 
     run(test, cds_jwt_iss: example_client_url,
+              order_dispatch_response_approach: 'mocked',
               order_dispatch_selected_response_types: order_dispatch_selected_response_types +
               ['request_form_completion', 'create_update_coverage_info', 'launch_smart_app',
                'propose_alternate_request', 'companions_prerequisites'])

@@ -101,6 +101,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: instructions_card_template.to_json)
 
       header('Authorization', "Bearer #{token}")
@@ -124,6 +125,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: instructions_card_template.to_json)
 
       order_sign_hook_request['hook'] = 'not_a_hook'
@@ -146,6 +148,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: instructions_card_template.to_json)
 
       order_sign_hook_request['hook'] = 'appointment-book'
@@ -168,6 +171,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: instructions_card_template.to_json)
 
       appointment_book_request = order_sign_hook_request.merge('hook' => 'appointment-book')
@@ -255,6 +259,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       hook_instance = order_sign_hook_request['hookInstance']
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
       header('Authorization', "Bearer #{token}")
@@ -299,6 +304,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         header('Authorization', "Bearer #{token}")
@@ -324,6 +330,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         hook_instance = order_sign_hook_request['hookInstance']
@@ -384,6 +391,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         header('Authorization', "Bearer #{token}")
@@ -418,6 +426,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         request_with_v201_extension = order_sign_hook_request.merge(
@@ -449,6 +458,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         header('Authorization', "Bearer #{token}")
@@ -466,6 +476,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         order_sign_hook_request['hook'] = 'appointment-book'
@@ -488,6 +499,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         )
 
         run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
         hook_instance = order_sign_hook_request['hookInstance']
@@ -520,6 +532,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       )
 
       run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
 
       request_with_v221_extension = order_sign_hook_request.merge(
