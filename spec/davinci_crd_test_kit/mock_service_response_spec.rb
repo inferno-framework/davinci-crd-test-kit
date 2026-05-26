@@ -56,6 +56,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       rb = body
       Class.new do
         include DaVinciCRDTestKit::MockServiceResponse
+
         define_method(:ig_version) { 'v201' }
         define_method(:selected_response_types) { @selected_response_types ||= types.dup }
         define_method(:request_body) { @request_body ||= rb }
@@ -221,6 +222,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       rb = body
       Class.new do
         include DaVinciCRDTestKit::MockServiceResponse
+
         define_method(:ig_version) { 'v221' }
         define_method(:selected_response_types) { @selected_response_types ||= types.dup }
         define_method(:request_body) { @request_body ||= rb }

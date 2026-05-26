@@ -25,7 +25,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def action_resource_type_check(action, expected_resource_types)
+    def action_resource_type_check(action, expected_resource_types) # rubocop:disable Naming/PredicateMethod
       resource_type = if ['create', 'update'].include?(action['type'])
                         FHIR.from_contents(action['resource'].to_json)&.resourceType
                       else

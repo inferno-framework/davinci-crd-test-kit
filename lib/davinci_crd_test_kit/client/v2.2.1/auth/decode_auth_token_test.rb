@@ -6,6 +6,7 @@ module DaVinciCRDTestKit
     class DecodeAuthTokenTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+
       id :crd_v221_decode_auth_token
       title 'Bearer tokens can be decoded'
       description %(

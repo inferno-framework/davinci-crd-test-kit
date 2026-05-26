@@ -5,6 +5,7 @@ module DaVinciCRDTestKit
   module V221
     class HookRequestDataFetchVerificationTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+
       id :crd_v221_hook_data_fetch_verification
       title 'Client made additional FHIR data available during hook request processing'
       description %(

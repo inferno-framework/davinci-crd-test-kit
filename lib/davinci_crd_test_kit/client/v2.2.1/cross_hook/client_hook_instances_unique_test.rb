@@ -7,6 +7,7 @@ module DaVinciCRDTestKit
     class ClientHookInstancesUniqueTest < Inferno::Test
       include TaggedRequestLoadHelper
       include MultiRequestMessageHelper
+
       title 'Client does not reuse hookInstance values'
       id :crd_v221_client_hook_instances_unique
       description <<~DESCRIPTION

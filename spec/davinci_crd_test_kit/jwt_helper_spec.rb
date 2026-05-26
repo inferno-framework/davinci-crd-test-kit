@@ -7,7 +7,10 @@ RSpec.describe DaVinciCRDTestKit::JwtHelper do
 
   def build_and_decode_jwt(encryption_method, kid = nil)
     jwt = described_class.build(aud:, encryption_method:, iss: cds_jwt_iss, jku:, kid:)
-    described_class.decode_jwt(jwt, jwks_hash, kid)
+    jwks = JWT::JWK::Set.new(jwks_hash)
+    jwks.filter! { |key| key[:use] == 'sig' }
+    algorithms = jwks.map { |key| key[:alg] }.compact.uniq
+    JWT.decode(jwt, nil, true, algorithms:, jwks:)
   end
 
   describe '#build' do

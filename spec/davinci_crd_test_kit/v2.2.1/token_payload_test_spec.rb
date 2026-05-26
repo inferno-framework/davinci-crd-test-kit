@@ -179,7 +179,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
         encryption_method: 'RS384'
       )
 
-      payload, header = jwt_helper.decode_jwt(token, jwks_hash)
+      payload, header = JWT.decode(token, nil, false)
       token_invalid_key = JWT.encode payload, OpenSSL::PKey::RSA.new(2048), 'RS384', header
 
       result = run(test, auth_tokens: [token_invalid_key], auth_tokens_jwk_json: [jwk.to_json],

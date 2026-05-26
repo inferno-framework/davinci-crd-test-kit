@@ -102,7 +102,7 @@ module DaVinciCRDTestKit
                  "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is not of type Array"
           assert service['extension'][EXTENSION_KEY].present?,
                  "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension is empty"
-          non_string_values = service['extension'][EXTENSION_KEY].reject { |value| value.is_a? String }
+          non_string_values = service['extension'][EXTENSION_KEY].grep_v(String)
           assert non_string_values.blank?,
                  "Service `#{service['id']}`: `#{EXTENSION_KEY}` extension contains non-string values: " \
                  "#{non_string_values.join(', ')}"

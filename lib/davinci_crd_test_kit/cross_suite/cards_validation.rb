@@ -232,7 +232,7 @@ module DaVinciCRDTestKit
       extract_all_valid_cards_from_hooks_responses
 
       valid_cards.each do |card|
-        valid_cards_with_links << card if valid_card_with_optionals?(card) && (card['links'])
+        valid_cards_with_links << card if valid_card_with_optionals?(card) && card['links']
       end
     end
   end

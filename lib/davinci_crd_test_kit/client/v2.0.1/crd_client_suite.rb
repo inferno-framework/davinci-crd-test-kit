@@ -72,6 +72,10 @@ module DaVinciCRDTestKit
       fhir_resource_validator do
         igs('hl7.fhir.us.davinci-crd#2.0.1')
 
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+        end
+
         exclude_message do |message|
           message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
         end

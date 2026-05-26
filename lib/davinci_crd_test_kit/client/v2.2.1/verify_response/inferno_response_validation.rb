@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
 
       def response_label(index = nil)
         response_type = (custom_response_template.present? ? 'Custom built' : 'Mocked')
-        "#{response_type} response#{index.present? ? " #{index}" : ''}"
+        "#{response_type} response#{" #{index}" if index.present?}"
       end
 
       def validate_card_summaries(cards)

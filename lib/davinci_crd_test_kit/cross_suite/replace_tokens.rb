@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
       results = expression.split('|').map do |sub_expression|
         execute_fhirpath_on_cds_request(request, sub_expression)
       end.flatten
-      results.map { |res| res.is_a?(Array) || res.is_a?(Hash) ? nil : res }.compact.map(&:to_s).join(',')
+      results.map { |res| res.is_a?(Array) || res.is_a?(Hash) ? nil : res }.compact.join(',')
     end
   end
 end

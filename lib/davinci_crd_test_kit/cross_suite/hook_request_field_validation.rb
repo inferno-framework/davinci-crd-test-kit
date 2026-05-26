@@ -26,7 +26,7 @@ module DaVinciCRDTestKit
       add_message('error', "#{request_number}`hookInstance` field must be a globally unique UUID.")
     end
 
-    def hook_request_optional_fields_check(request_body, ig_version: 'v201') # rubocop:disable Lint/UnusedMethodArgument)
+    def hook_request_optional_fields_check(request_body, ig_version: 'v201') # rubocop:disable Lint/UnusedMethodArgument
       hook_request_optional_fields_check_type(request_body)
 
       defined_fields = hook_required_fields.keys + hook_optional_fields.keys
@@ -665,7 +665,6 @@ module DaVinciCRDTestKit
 
     def validate_prefetch_resource(received_resource, advertised_prefetch_key, context_field_resource_type,
                                    context_field_id, ig_version: 'v201')
-
       return unless prefetch_resource_type_correct?(received_resource, context_field_resource_type,
                                                     "#{request_number}`#{advertised_prefetch_key}` - ")
 

@@ -204,7 +204,7 @@ module DaVinciCRDTestKit
     end
 
     def add_coverage_cards?
-      (['coverage_information', 'create_update_coverage_info'].any? { |x| selected_response_types.include?(x) }) ||
+      ['coverage_information', 'create_update_coverage_info'].any? { |x| selected_response_types.include?(x) } ||
         coverage_information_required?
     end
 
