@@ -16,7 +16,7 @@ To run against the Da Vinci CRD Client v2.2.1 Test Suite, a CRD client implement
 
 ### Passing Requirements
 
-Addition configuration and information is needed to demonstrate conformance to all tested requirements.
+Additional configuration and information is needed to demonstrate conformance to all tested requirements.
 In order to pass all tests in the suite, a CRD client implementation must
 - Be configured to make CRD hook requests to both suite's
   [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
@@ -24,7 +24,7 @@ In order to pass all tests in the suite, a CRD client implementation must
   both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25).
 - Associate each of these endpoints with a FHIR Organization id representing the payer
   that provides the insurance coverage and is responsible for determining coverage requirements.
-  Inferno will uses this information to verify that Hook calls are made against the
+  Inferno will use this information to verify that Hook calls are made against the
   [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformancedetails.html#ci-c-dev-26).
 - Sign JWTs sent as a part of hook request authentication and provide the JSON Web Key Set (JWKS)
   containing the key used for the signature, either as a URL where it is publicly hosted or the
@@ -119,7 +119,7 @@ Re-run these tests to re-evaluate after making additional requests with adjusted
 (see [Customizing Responses](#customizing-responses)) so that the requisite support is
 demonstrated.
 
-### Long-running Hook Requets
+### Long-running Hook Requests
 
 Run group "1.4 Long-running Hook Request" to test that users can continue their workflow during long-running
 responses. Inferno will pause for a specified number of seconds (at least 5) before responding to a hook
