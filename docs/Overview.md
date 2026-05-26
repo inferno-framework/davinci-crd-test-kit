@@ -85,6 +85,7 @@ issues, please consult the following resources:
   - CDS Hooks Requirements Spreadsheets
     - [v2.0 for CRD v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_2.0_requirements.xlsx)
     - [v3.0.0-ballot for CRD v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks_3.0.0-ballot_requirements.xlsx)
+    - Note: Although the CRD v2.2.1 [CDS Hooks background section](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/background.html#cds-hooks) references "CDS Hooks 2.0", the IG declares and links to CDS Hooks 3.0.0-ballot; this test kit treats CDS Hooks 3.0.0-ballot as the applicable reference for CRD v2.2.1.
   - [CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)
 - [CRD Test Kit GitHub Issues page](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
 
