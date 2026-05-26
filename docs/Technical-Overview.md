@@ -53,7 +53,7 @@ Within the `client` and `server` actor directories, files are generally organize
     later use during evaluation.
   - [*`gather_response_generation_data.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/gather_response_generation_data.rb):
     Used by `hook_request_endpoint.rb` to make FHIR requests against the invoking client's FHIR APIs. The scope of these requests is
-    different for [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations) and [v2.2.0](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval).
+    different for [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations) and [v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval).
   - [*`mock_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mock_service_response.rb):
     Used by *hook_request_endpoint.rb* to create simple mocked hook responses based on types selected when running the tests. Templates
     for the responses live in the [`mocked_card_responses` subdirectory](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses)

@@ -12,7 +12,8 @@
 
 **Server Suites**
 *   [Server Testing Details](Server-Details)
-*   [Server Testing Instructions](Server-Instructions)
+*   [Server v2.0.1 Testing Instructions](Server-Instructions)
+*   [Server v2.2.1 Testing Instructions](Server-Instructions-v2.2.1)
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)

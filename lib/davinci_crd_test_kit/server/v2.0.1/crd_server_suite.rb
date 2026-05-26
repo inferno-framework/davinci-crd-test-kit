@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
           organization, including its components and limitations.
         - [Testing Instructions](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
           for a step-by-step guide to execution of these
-          tests against a CRD client, including [instructions for a demonstration execution](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions#demonstration-execution)
+          tests against a CRD server, including [instructions for a demonstration execution](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions#demonstration-execution)
           against the [public reference implementation](https://crd.davinci.hl7.org/).
       DESCRIPTION
 

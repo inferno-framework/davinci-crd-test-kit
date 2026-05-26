@@ -1,63 +1,96 @@
 # Server Suite Implementation Details
 
-The Da Vinci CRD Server Suite validates the conformance of server systems 
-to the STU 2 version of the HL7® FHIR® 
-[Da Vinci Coverage Requirements Discovery Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/).
+The Da Vinci CRD Test Kit contains suites validating the conformance of server systems
+to two versions of the HL7® FHIR® Da Vinci Coverage Requirements Discovery Implementation Guide:
+- [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
+- [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
 
-These tests are a **DRAFT** intended to allow CRD server implementers to perform 
-preliminary checks of their servers against CRD IG requirements and [provide 
-feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues) 
-on the tests. Future versions of these tests may validate other 
+These tests are a **DRAFT** intended to allow CRD server implementers to perform
+preliminary checks of their servers against CRD IG requirements and [provide
+feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues)
+on the tests. Future versions of these tests may validate other
 requirements and may change the test validation logic.
 
 ## Technical Implementation
 
-In this test suite, Inferno simulates a CRD client system and will make CDS Hooks
-invocations against the tested CRD server system. Over the course of these requests,
-Inferno will seek to observe conformant handling of invocations for supported
-[CRD hooks](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html) and
-the demonstration of cards and actions conforming to the supported
-[CRD card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
+In these suites, Inferno simulates a CRD client system and makes CDS Hooks invocations
+against the tested CRD server system. Over the course of these requests, Inferno seeks
+to observe conformant handling of invocations for supported CRD hooks
+([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html),
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)) and the
+demonstration of cards and actions conforming to the supported CRD response types
+([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html)).
 
-This suite contains three groups of tests:
-1. The *Discovery* group validates a CRD server's discovery response.
-2. The *Demonstrate A Hook Response* group validates that the server
-    can respond to a single hook invocation and return conformant cards.
-3. The *Hooks* group makes one or more CDS Hooks calls for each hook
-    type that the tester provides request bodies for. It then validates that the
-    responses are conformant and cover the full range of cards as
-    required by the hook type.
+The server suites each contain three top-level groups:
+1. The "Discovery" group validates a CRD server's discovery response.
+1. The "Demonstrate A Hook Response" group validates that the server can respond
+   to a single hook invocation and return conformant cards and actions.
+1. The "Hook Tests" group makes one or more CDS Hooks calls for each hook type
+   that the tester provides request bodies for. It then validates that the responses
+   are conformant and cover the response behavior required by the hook type.
 
-All requests and responses will be checked for conformance to the CRD
-IG and CDS Hooks requirements individually and used in aggregate to determine whether
-required features and functionality are present. HL7® FHIR® resources are 
-validated with the Java validator using `tx.fhir.org` as the terminology server.
+All requests and responses are checked for conformance to the targeted CRD IG and
+CDS Hooks requirements individually and used in aggregate to determine whether
+required features and functionality are present. HL7® FHIR® resources are validated
+with the Java validator using `tx.fhir.org` as the terminology server. CDS Hooks
+request and response objects may also be checked using the validator against defined
+logical models in versions that support them, such as
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models).
 
 ### Trusting Inferno's CDS Client
 
 As specified in the [CDS Hooks Spec](https://cds-hooks.hl7.org/2.0/#trusting-cds-clients),
 each time a CDS client transmits a request to a CDS Service which requires authentication,
-the request MUST include an Authorization header presenting the JWT as a “Bearer” token:
-`Authorization:  Bearer {{JWT}}`
+the request MUST include an Authorization header presenting the JWT as a Bearer token:
+`Authorization: Bearer {{JWT}}`
 
 Inferno self-issues the JWT for each CDS Service call and details on the issuer and the JWKS
-are provided during suite execution. They will follow the following pattern:
+are provided during suite execution. They follow these patterns:
 
-- **ISS**: `<inferno base>/custom/crd_server`
-- **JWK Set Url**: `<inferno base>/custom/crd_server/jwks.json`
+| Suite | ISS | JWK Set URL |
+| --- | --- | --- |
+| v2.0.1 | `<inferno base>/custom/crd_server` | `<inferno base>/custom/crd_server/jwks.json` |
+| v2.2.1 | `<inferno base>/custom/crd_server_v221` | `<inferno base>/custom/crd_server_v221/jwks.json` |
 
-Inferno base is the address of the Inferno deployment, such as `https://inferno.healthit.gov/suites`
-for the publicly hosted deployment of this test kit.
+Inferno base is the address of the Inferno deployment, such as
+`https://inferno.healthit.gov/suites` for the publicly hosted deployment of this test kit.
 
 ### CDS Hooks Requests
 
-Because the business logic that determines the details of responses
-Is outside of the CRD specification and will vary between implementers, testers
-are required to provide the requests that Inferno will make to the tested server.
-This way, testers do not need to configure Inferno-specific details, but instead
-tell Inferno what details to send that will allow the server to demonstrate its
-full CRD capabilities. Inferno will check that the requests provided are
+Because the business logic that determines the details of responses is outside of the CRD
+specification and will vary between implementers, testers are required to provide the requests
+that Inferno will make to the tested server. This way, testers do not need to configure
+Inferno-specific details, but instead tell Inferno what details to send that will allow the
+server to demonstrate its full CRD capabilities. Inferno checks that the requests provided are
 conformant and systems will not pass the tests if they are not.
+
+While Inferno is making hook requests, it can also expose a simulated FHIR API backed by the
+resources in the **Mock EHR Data** input. This lets a tested CRD server retrieve additional
+information from Inferno's simulated CRD client during hook processing.
+
+### CRD Server v2.0.1 Suite
+
+The Da Vinci CRD Server v2.0.1 Test Suite targets
+[CRD STU 2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2). It validates discovery,
+basic hook invocation behavior, request structure, response card/action structure,
+and support for CRD response types that can be demonstrated through tester-supplied
+hook request bodies.
+
+### CRD Server v2.2.1 Suite
+
+The Da Vinci CRD Server v2.2.1 Test Suite targets
+[CRD v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1). It follows the same overall
+workflow as the v2.0.1 suite and adds checks for v2.2.1-specific behavior including:
+- CRD version declarations in discovery through the `davinci-crd.version` extension.
+- Configuration option declarations in discovery, including `coverage-info` options for primary hooks:
+  `appointment-book`, `order-sign`, and `order-dispatch`.
+- Required Coverage Information system actions for primary hooks when the request resource does not
+  already contain a coverage-information extension.
+- Handling of the `coverage-info=false` configuration option when advertised as supported.
+- Tolerance of unknown configuration values, unknown context values, and unknown CDS Hooks fields.
+- Demonstration of coverage-information extension must support elements across the test session.
+- Demonstration that the billing-options extension is not required for the server to respond.
 
 ## Testing Limitations
 
@@ -66,12 +99,21 @@ types to support. These tests try to provide testers with an opportunity to
 exercise as much of their systems as they wish and validate that the exercised
 behaviors are correct. However, not all areas of the IG are exercised.
 
-Specific limitations include:
+General limitations across all server versions include:
 - Inferno is unable to determine what requests will result in specific kinds
-  of responses from the server under test (e.g., what will result in
-  Instructions being returned vs. Coverage Information). As a result, the
-  tester must supply the request bodies that will cause the system under test
-  to return the desired response types.
-- The ability of a CRD server to request additional FHIR resources is not
-  tested.
+  of responses from the server under test, such as Instructions or Coverage Information.
+  As a result, the tester must supply the request bodies that will cause the system under
+  test to return the desired response types.
+- Inferno's simulated FHIR API is limited to the resources supplied in the **Mock EHR Data**
+  input and does not model all behavior of a production EHR FHIR server.
+- The ability of a CRD server to request additional FHIR resources is not exhaustively tested.
+
+### Additional v2.0.1 Server Suite Limitations
+
 - Hook configuration is not tested.
+
+### Additional v2.2.1 Server Suite Limitations
+*Note: this is not an exhaustive set of limitations; this section will be updated soon.*
+- The server suite is not configured to validate responses using FHIR logical models, and
+  instead uses custom logic within the tests.  Future versions may leverage the logical
+  models provided by CRD to standardize the validation of this content.
