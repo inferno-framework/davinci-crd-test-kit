@@ -29,6 +29,26 @@ module DaVinciCRDTestKit
               change this value.
             ),
             locked: true
+      input :encounter_start_response_approach,
+            title: 'Response generation approach for encounter-start',
+            description: %(
+              Determines how Inferno will generate response for encounter-start
+              hook invocations.
+            ),
+            type: 'radio',
+            default: 'mocked',
+            options: {
+              list_options: [
+                {
+                  label: 'Create simple mocks based on selected response types',
+                  value: 'mocked'
+                },
+                {
+                  label: 'Generate responses based on a tester-provided template',
+                  value: 'custom'
+                }
+              ]
+            }
       input :encounter_start_selected_response_types,
             title: 'Response types to return from encounter-start hook requests',
             description: %(
@@ -65,7 +85,8 @@ module DaVinciCRDTestKit
                   value: 'launch_smart_app'
                 }
               ]
-            }
+            },
+            enable_when: { input_name: 'encounter_start_response_approach', value: 'mocked' }
       input :encounter_start_custom_response_template,
             title: 'Custom response template for encounter-start hook requests',
             description: %(
@@ -73,7 +94,8 @@ module DaVinciCRDTestKit
               from the hook request endpoint
             ),
             type: 'textarea',
-            optional: true
+            optional: true,
+            enable_when: { input_name: 'encounter_start_response_approach', value: 'custom' }
       output :continuation_url
 
       run do

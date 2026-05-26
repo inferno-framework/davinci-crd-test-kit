@@ -30,6 +30,26 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      input :order_select_response_approach,
+            title: 'Response generation approach for order-select',
+            description: %(
+              Determines how Inferno will generate response for order-select
+              hook invocations.
+            ),
+            type: 'radio',
+            default: 'mocked',
+            options: {
+              list_options: [
+                {
+                  label: 'Create simple mocks based on selected response types',
+                  value: 'mocked'
+                },
+                {
+                  label: 'Generate responses based on a tester-provided template',
+                  value: 'custom'
+                }
+              ]
+            }
       input :order_select_selected_response_types,
             title: 'Response types to return from order-select hook requests',
             description: %(
@@ -76,7 +96,8 @@ module DaVinciCRDTestKit
                   value: 'companions_prerequisites'
                 }
               ]
-            }
+            },
+            enable_when: { input_name: 'order_select_response_approach', value: 'mocked' }
       input :order_select_custom_response_template,
             title: 'Custom response template for order-select hook requests',
             description: %(
@@ -87,7 +108,8 @@ module DaVinciCRDTestKit
               input will be ignored.
             ),
             type: 'textarea',
-            optional: true
+            optional: true,
+            enable_when: { input_name: 'order_select_response_approach', value: 'custom' }
       output :continuation_url
 
       def configured_response_details

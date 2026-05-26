@@ -32,6 +32,26 @@ module DaVinciCRDTestKit
               change this value.
             ),
             locked: true
+      input :order_sign_response_approach,
+            title: 'Response generation approach for order-sign',
+            description: %(
+              Determines how Inferno will generate response for order-sign
+              hook invocations.
+            ),
+            type: 'radio',
+            default: 'mocked',
+            options: {
+              list_options: [
+                {
+                  label: 'Create simple mocks based on selected response types',
+                  value: 'mocked'
+                },
+                {
+                  label: 'Generate responses based on a tester-provided template',
+                  value: 'custom'
+                }
+              ]
+            }
       input :order_sign_selected_response_types,
             title: 'Response types to return from order-sign hook requests',
             description: %(
@@ -76,7 +96,8 @@ module DaVinciCRDTestKit
                   value: 'companions_prerequisites'
                 }
               ]
-            }
+            },
+            enable_when: { input_name: 'order_sign_response_approach', value: 'mocked' }
       input :order_sign_custom_response_template,
             title: 'Custom response template for order-sign hook requests',
             description: %(
@@ -84,7 +105,8 @@ module DaVinciCRDTestKit
               from the hook request endpoint
             ),
             type: 'textarea',
-            optional: true
+            optional: true,
+            enable_when: { input_name: 'order_sign_response_approach', value: 'custom' }
       output :continuation_url
 
       run do

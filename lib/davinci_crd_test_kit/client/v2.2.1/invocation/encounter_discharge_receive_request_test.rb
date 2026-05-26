@@ -30,6 +30,26 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      input :encounter_discharge_response_approach,
+            title: 'Response generation approach for encounter-discharge',
+            description: %(
+              Determines how Inferno will generate response for encounter-discharge
+              hook invocations.
+            ),
+            type: 'radio',
+            default: 'mocked',
+            options: {
+              list_options: [
+                {
+                  label: 'Create simple mocks based on selected response types',
+                  value: 'mocked'
+                },
+                {
+                  label: 'Generate responses based on a tester-provided template',
+                  value: 'custom'
+                }
+              ]
+            }
       input :encounter_discharge_selected_response_types,
             title: 'Response types to return from encounter-discharge hook requests',
             description: %(
@@ -68,7 +88,8 @@ module DaVinciCRDTestKit
                   value: 'launch_smart_app'
                 }
               ]
-            }
+            },
+            enable_when: { input_name: 'encounter_discharge_response_approach', value: 'mocked' }
       input :encounter_discharge_custom_response_template,
             title: 'Custom response template for encounter-discharge hook requests',
             description: %(
@@ -79,7 +100,8 @@ module DaVinciCRDTestKit
               input will be ignored.
             ),
             type: 'textarea',
-            optional: true
+            optional: true,
+            enable_when: { input_name: 'encounter_discharge_response_approach', value: 'custom' }
       output :continuation_url
 
       def configured_response_details

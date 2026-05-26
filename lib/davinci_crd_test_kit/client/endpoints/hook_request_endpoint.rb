@@ -119,8 +119,14 @@ module DaVinciCRDTestKit
       response.format = :json
     end
 
+    def response_approach
+      JSON.parse(result.input_json)
+        .find { |input| input['name'].ends_with?('_response_approach') }
+        &.dig('value')
+    end
+
     def hook_response
-      if custom_response_template.present?
+      if response_approach == 'custom'
         build_custom_hook_response
       else
         build_mock_hook_response
