@@ -17,7 +17,14 @@ module DaVinciCRDTestKit
     end
 
     def parsed_user_input
-      JSON.parse(custom_response_template)
+      if custom_response_template.blank?
+        error_response('No custom template provided for custom Inferno CRD response',
+                       code: 500,
+                       outcome_code: 'processing')
+        nil
+      else
+        JSON.parse(custom_response_template)
+      end
     rescue JSON::ParserError
       error_response('Invalid template provided for custom Inferno CRD response: invalid JSON',
                      code: 500,
