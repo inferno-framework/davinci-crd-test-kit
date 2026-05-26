@@ -93,11 +93,8 @@ module DaVinciCRDTestKit
       input :encounter_discharge_custom_response_template,
             title: 'Custom response template for encounter-discharge hook requests',
             description: %(
-              To control the responses of Inferno's simulated CRD server, provide
-              a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
               in JSON form for Inferno to use when responding to hook invocations.
-              If this input is populated, the corresponding **Response types to return**
-              input will be ignored.
             ),
             type: 'textarea',
             optional: true,

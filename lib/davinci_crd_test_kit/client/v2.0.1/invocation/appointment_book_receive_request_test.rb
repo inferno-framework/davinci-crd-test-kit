@@ -55,8 +55,10 @@ module DaVinciCRDTestKit
       input :appointment_book_selected_response_types,
             title: 'Response types to return from appointment-book hook requests',
             description: %(
-              Select the cards/action response types that the Inferno hook request endpoints will return. The default
-              response type that will be returned for this hook is the `Coverage Information` card type.
+              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+              when responding to hook invocations. If no types are selected, Inferno will mock and return
+              a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+              response for this primary hook.
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -93,8 +95,8 @@ module DaVinciCRDTestKit
       input :appointment_book_custom_response_template,
             title: 'Custom response template for appointment-book hook requests',
             description: %(
-              A JSON string may be provided here to replace the normal response
-              from the hook request endpoint
+              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+              in JSON form for Inferno to use when responding to hook invocations.
             ),
             type: 'textarea',
             optional: true,
