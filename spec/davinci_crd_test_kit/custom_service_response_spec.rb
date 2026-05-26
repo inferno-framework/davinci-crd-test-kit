@@ -249,6 +249,28 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         .to match(/FHIRPath service error while generating custom response/)
     end
 
+    it 'returns a 500 error when no template is provided' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom')
+
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, body)
+
+      expect(last_response).to be_server_error
+      parsed_body = JSON.parse(last_response.body)
+      expect(parsed_body['resourceType']).to eq('OperationOutcome')
+      expect(parsed_body['issue'].first['details']['text'])
+        .to match(/No custom template provided for custom Inferno CRD response/)
+    end
+
     it 'returns 400 when bad json specified in the input' do
       allow(test).to receive(:suite).and_return(suite)
 
