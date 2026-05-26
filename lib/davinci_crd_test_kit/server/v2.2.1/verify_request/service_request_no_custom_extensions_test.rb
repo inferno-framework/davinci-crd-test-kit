@@ -34,7 +34,8 @@ module DaVinciCRDTestKit
         'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.performer',
         'http://hl7.org/fhir/StructureDefinition/request-doNotPerform',
         'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.input.value',
-        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.output.value'
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.output.value',
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-Task.statusReason'
       ].freeze
 
       HREX_EXTENSION_URLS = [
