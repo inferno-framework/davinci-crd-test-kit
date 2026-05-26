@@ -195,6 +195,7 @@ module DaVinciCRDTestKit
 
     def process_suggestion(card, suggestion)
       validate_presence_and_type(suggestion, 'label', String, 'Suggestion')
+      validate_presence_and_type(suggestion, 'uuid', String, 'Suggestion')
       return unless suggestion['actions']
 
       validate_and_process_actions(card, suggestion)
