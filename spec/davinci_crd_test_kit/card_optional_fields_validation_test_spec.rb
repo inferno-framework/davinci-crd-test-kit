@@ -8,7 +8,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
   let(:link_required_fields) { ['label', 'type', 'url'] }
   let(:override_reasons_required_fields) { ['code', 'system', 'display'] }
-  let(:suggestions_required_fields) { ['label'] }
+  let(:suggestions_required_fields) { ['label', 'uuid'] }
   let(:actions_required_fields) { ['type', 'description'] }
 
   def entity_result_messages
