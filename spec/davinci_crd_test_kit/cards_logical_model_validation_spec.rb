@@ -1,23 +1,34 @@
 require_relative '../../lib/davinci_crd_test_kit/cross_suite/cards_logical_model_validation'
 
+MockValidationIssue = Struct.new(:message, :severity, :filtered, keyword_init: true)
+
 RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
   let(:module_instance) do
     Class.new do
       include DaVinciCRDTestKit::CardsLogicalModelValidation
 
-      attr_reader :messages, :conforms_calls
+      attr_reader :messages, :conforms_calls, :resource_is_valid_calls
+      attr_writer :injected_validation_issues
 
       def initialize
         @messages = []
         @conforms_calls = []
+        @resource_is_valid_calls = []
+        @injected_validation_issues = []
       end
 
       def add_message(type, message)
         @messages << { type:, message: }
       end
 
-      def conforms_to_logical_model?(object, url, message_prefix: '')
-        @conforms_calls << { object:, url:, message_prefix: }
+      def conforms_to_logical_model?(object, url, validator_response_details: nil, **kwargs)
+        @conforms_calls << { object:, url:, **kwargs }
+        validator_response_details&.concat(@injected_validation_issues)
+        true
+      end
+
+      def resource_is_valid?(resource:, message_prefix: '')
+        @resource_is_valid_calls << { resource:, message_prefix: }
         true
       end
 
@@ -66,8 +77,6 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       expect(call[:object]).to eq('cards' => [external_reference_card])
       expect(call[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-externalReference')
-      expect(call[:message_prefix]).to include('Server response 1 card 1')
-      expect(call[:message_prefix]).to include('external_reference')
     end
 
     it 'uses the additional orders logical model for additional-orders cards' do
@@ -121,6 +130,45 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       expect(module_instance.messages).to include(
         hash_including(type: 'warning', message: a_string_including('could not be categorized'))
       )
+    end
+
+    context 'when validation returns a Questionnaire type error for a form completion card' do
+      let(:questionnaire_error_message) do
+        "CDSHooksResponse.cards[0].suggestions[0].actions[0].resource: The type 'Questionnaire' is not valid - must be Task"
+      end
+      let(:other_error_message) { 'Some other validation error' }
+
+      before do
+        module_instance.injected_validation_issues = [
+          MockValidationIssue.new(message: questionnaire_error_message, severity: 'error', filtered: false),
+          MockValidationIssue.new(message: other_error_message, severity: 'warning', filtered: false)
+        ]
+      end
+
+      it 'filters out the matched Questionnaire type error and does not add it as a message' do
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including("The type 'Questionnaire' is not valid"))
+        )
+      end
+
+      it 'calls resource_is_valid? on the Questionnaire resource at the referenced path' do
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+
+        expect(module_instance.resource_is_valid_calls.length).to eq(1)
+        call = module_instance.resource_is_valid_calls.first
+        expect(call[:resource].resourceType).to eq('Questionnaire')
+        expect(call[:message_prefix]).to include('suggestions[0].actions[0].resource')
+      end
+
+      it 'does not filter out other validation errors' do
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including(other_error_message))
+        )
+      end
     end
   end
 

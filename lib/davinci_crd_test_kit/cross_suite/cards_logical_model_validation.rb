@@ -67,8 +67,16 @@ module DaVinciCRDTestKit
         profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
       end
 
+      validation_issues = []
       conforms_to_logical_model?({ 'cards' => [card] }, logical_model_url(profile_name),
-                                 message_prefix: "#{label} (#{card_type || 'uncategorized'}): ")
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+
+      error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
+      filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, error_prefix).each do |issue|
+        next if issue.filtered
+
+        add_message(issue.severity, "#{error_prefix}#{issue.message}")
+      end
     end
 
     def validate_system_action_against_logical_model(action, response_index, action_index)
@@ -93,6 +101,45 @@ module DaVinciCRDTestKit
 
     def logical_model_entity_label(response_index, entity_index, kind)
       "Server response #{response_index + 1} #{kind} #{entity_index + 1}"
+    end
+
+    # -------------------------------------------------------------------------
+    # Validator Filtering and Manual Checks Depending on the Card Type
+    # -------------------------------------------------------------------------
+
+    def filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, error_prefix)
+      case card_type
+      when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
+        filter_and_manually_check_form_completion_errors(card, validation_issues, error_prefix)
+      else
+        validation_issues
+      end
+    end
+
+    def filter_and_manually_check_form_completion_errors(card, validation_issues, error_prefix)
+      validation_issues.reject do |issue|
+        if issue.message.match?(/The type 'Questionnaire' is not valid - must be Task/)
+          check_questionnaire_actions(card, issue.message, error_prefix)
+          true
+        else
+          false
+        end
+      end
+    end
+
+    def check_questionnaire_actions(card, error_message, error_prefix)
+      extracted_indexes =
+        error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
+      suggestion_index = extracted_indexes[1].to_i
+      action_index = extracted_indexes[2].to_i
+
+      message_prefix = "#{error_prefix}suggestions[#{suggestion_index}].actions[#{action_index}].resource "
+      resource = FHIR.from_contents(card['suggestions'][suggestion_index]['actions'][action_index]['resource'].to_json)
+      resource_is_valid?(resource:, message_prefix:) # no questionnaire profile applied per CRD
+
+      return if resource.id.present?
+
+      add_message('error', "#{message_prefix}Questionnaire must have an id.")
     end
   end
 end
