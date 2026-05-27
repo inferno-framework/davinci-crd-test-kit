@@ -2,9 +2,9 @@ module DaVinciCRDTestKit
   module ProfilesAndResourceTypes
     def structure_definition_map(ig_version)
       case ig_version
-      when 'v221'
+      when 'v221', '2.2.1'
         structure_definition_map_v221
-      when 'v201'
+      when 'v201', '2.0.1'
         structure_definition_map_v201
       end
     end

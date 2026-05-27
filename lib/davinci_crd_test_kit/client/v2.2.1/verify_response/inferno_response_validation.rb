@@ -62,7 +62,7 @@ module DaVinciCRDTestKit
                                                  response_hash['systemActions'],
                                                  request_hash,
                                                  index,
-                                                 'v221')
+                                                 '2.2.1')
         rescue JSON::ParserError
           next
         end

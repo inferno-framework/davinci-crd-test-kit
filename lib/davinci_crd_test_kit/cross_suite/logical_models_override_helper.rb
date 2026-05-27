@@ -16,6 +16,25 @@ module DaVinciCRDTestKit
     # Check resource conformance outside the logical models
     # -------------------------------------------------------------------------
 
+    def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_version)
+      resource = FHIR.from_contents(resource_hash.to_json)
+      unless resource.present?
+        add_message('error', "#{error_prefix}resource is not FHIR.")
+        return
+      end
+      case resource
+      when FHIR::Appointment
+        check_appointment_conformance(resource, request_body, error_prefix, ig_version)
+      when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
+           FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription, FHIR::Encounter
+        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
+      else
+        add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' is not allowed as a target " \
+                             'for a coverage-information action.')
+      end
+    end
+
     def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_version)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
@@ -25,7 +44,8 @@ module DaVinciCRDTestKit
       case resource
       when FHIR::Appointment
         check_appointment_conformance(resource, request_body, error_prefix, ig_version)
-      when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest, FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription
+      when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
+           FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription
         profile_url = structure_definition_map(ig_version)[resource.resourceType]
         resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
       else

@@ -49,7 +49,7 @@ module DaVinciCRDTestKit
       return unless system_actions.is_a?(Array)
 
       system_actions.each_with_index do |action, action_index|
-        validate_system_action_against_logical_model(action, response_index, action_index)
+        validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_version)
       end
     end
 
@@ -77,13 +77,13 @@ module DaVinciCRDTestKit
       filtered_issues = filter_and_manually_check_card_specific_errors(card, validation_issues, card_type,
                                                                        request_body, error_prefix, ig_version)
       filtered_issues.each do |issue|
-        next if issue.filtered
+        next if issue.filtered || logical_model_extension_issue?(issue)
 
         add_message(issue.severity, "#{error_prefix}#{issue.message}")
       end
     end
 
-    def validate_system_action_against_logical_model(action, response_index, action_index)
+    def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_version)
       label = logical_model_entity_label(response_index, action_index, 'systemAction')
       unless action.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -99,8 +99,18 @@ module DaVinciCRDTestKit
         profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
       end
 
+      validation_issues = []
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
-                                 message_prefix: "#{label} (#{action_type || 'uncategorized'}): ")
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+
+      error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
+      filtered_issues = filter_and_manually_check_action_specific_errors(action, validation_issues, action_type,
+                                                                         request_body, error_prefix, ig_version)
+      filtered_issues.each do |issue|
+        next if issue.filtered || logical_model_extension_issue?(issue)
+
+        add_message(issue.severity, "#{error_prefix}#{issue.message}")
+      end
     end
 
     def logical_model_entity_label(response_index, entity_index, kind)
@@ -111,19 +121,32 @@ module DaVinciCRDTestKit
     # Validator Filtering and Manual Checks Depending on the Card Type
     # -------------------------------------------------------------------------
 
+    def logical_model_extension_issue?(issue)
+      issue.message.match(/\.extension: Unrecognized property/).present?
+    end
+
     def filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
                                                        ig_version)
       case card_type
       when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         filter_and_manually_check_form_completion_errors(card, validation_issues, error_prefix)
-      when DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
-        filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
       when DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
         filter_and_manually_check_propose_alternative_errors(card, validation_issues, request_body,
                                                              error_prefix, ig_version)
       when DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
         filter_and_manually_check_additional_orders_errors(card, validation_issues, request_body,
                                                            error_prefix, ig_version)
+      else
+        validation_issues
+      end
+    end
+
+    def filter_and_manually_check_action_specific_errors(action, validation_issues, action_type, request_body,
+                                                         error_prefix, ig_version)
+      case action_type
+      when DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
+        filter_and_manually_check_coverage_information_errors(action, validation_issues, request_body,
+                                                              error_prefix, ig_version)
       else
         validation_issues
       end
@@ -155,19 +178,8 @@ module DaVinciCRDTestKit
       add_message('error', "#{message_prefix}Questionnaire must have an id.")
     end
 
-    def filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
-      if card['suggestions'].present?
-        add_message('error', "#{error_prefix}CDSHooksResponse.cards.suggestions not allowed for the Launch " \
-                             'SMART App response type.')
-      end
-
-      validation_issues.reject do |issue|
-        issue.message.match?(/CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0/)
-      end
-    end
-
-    def filter_and_manually_check_propose_alternative_errors(card, validation_issues, request_body, error_prefix,
-                                                             ig_version)
+    def filter_and_manually_check_propose_alternative_errors(card, validation_issues, request_body,
+                                                             error_prefix, ig_version)
       no_resource_issues = manually_check_action_resources_for_order_profile_conformance(card,
                                                                                          validation_issues,
                                                                                          request_body,
@@ -178,8 +190,8 @@ module DaVinciCRDTestKit
       end
     end
 
-    def filter_and_manually_check_additional_orders_errors(card, validation_issues, request_body, error_prefix,
-                                                           ig_version)
+    def filter_and_manually_check_additional_orders_errors(card, validation_issues, request_body,
+                                                           error_prefix, ig_version)
       manually_check_action_resources_for_order_profile_conformance(card,
                                                                     validation_issues,
                                                                     request_body,
@@ -187,8 +199,8 @@ module DaVinciCRDTestKit
                                                                     ig_version)
     end
 
-    def manually_check_action_resources_for_order_profile_conformance(card, validation_issues, request_body, error_prefix,
-                                                                      ig_version)
+    def manually_check_action_resources_for_order_profile_conformance(card, validation_issues, request_body,
+                                                                      error_prefix, ig_version)
       if card['suggestions'].present?
         card['suggestions'].each_with_index do |suggestion, suggestion_index|
           next unless suggestion['actions'].present?
@@ -208,6 +220,18 @@ module DaVinciCRDTestKit
       return unless action['resource'].present?
 
       check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_version)
+    end
+
+    def filter_and_manually_check_coverage_information_errors(action, validation_issues, request_body,
+                                                              error_prefix, ig_version)
+      if action['resource'].present?
+        check_resource_conformance_to_order_or_encounter_profile(action['resource'], request_body,
+                                                                 error_prefix, ig_version)
+      end
+
+      validation_issues.filter do |issue|
+        issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
+      end
     end
   end
 end

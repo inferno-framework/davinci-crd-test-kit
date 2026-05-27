@@ -37,6 +37,11 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
       end
 
+      def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix,
+                                                                   ig_version)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
+      end
+
       def scratch
         @scratch ||= {}
       end
@@ -159,69 +164,18 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       )
     end
 
-    context 'when validating launch SMART app cards' do
-      let(:min_suggestions_error) do
-        MockValidationIssue.new(
-          message: 'CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0',
-          severity: 'error',
-          filtered: false
-        )
-      end
-      let(:other_error) { MockValidationIssue.new(message: 'Some other error', severity: 'warning', filtered: false) }
+    it 'filters out extension unrecognized property issues regardless of card type' do
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_version)
 
-      it 'filters out the minimum required suggestions validator error' do
-        module_instance.injected_validation_issues = [min_suggestions_error]
-        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
-
-        expect(module_instance.messages).to_not include(
-          hash_including(message: a_string_including('minimum required = 1'))
-        )
-      end
-
-      it 'does not filter out other validation errors' do
-        module_instance.injected_validation_issues = [min_suggestions_error, other_error]
-        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
-
-        expect(module_instance.messages).to include(
-          hash_including(message: a_string_including('Some other error'))
-        )
-      end
-
-      context 'when the card has no suggestions' do
-        it 'does not add an error about suggestions being disallowed' do
-          module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
-
-          expect(module_instance.messages).to_not include(
-            hash_including(message: a_string_including('suggestions not allowed'))
-          )
-        end
-      end
-
-      context 'when the card has suggestions' do
-        let(:card_with_suggestions) do
-          non_matching_action = { 'type' => 'update', 'description' => 'x',
-                                  'resource' => { 'resourceType' => 'Patient' } }
-          launch_smart_app_card.merge('suggestions' => [{ 'label' => 'a suggestion',
-                                                          'actions' => [non_matching_action] }])
-        end
-
-        it 'adds an error that suggestions are not allowed for the launch SMART app response type' do
-          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, request_body, 0, ig_version)
-
-          expect(module_instance.messages).to include(
-            hash_including(type: 'error', message: a_string_including('suggestions not allowed'))
-          )
-        end
-
-        it 'still filters out the minimum required suggestions error' do
-          module_instance.injected_validation_issues = [min_suggestions_error]
-          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, request_body, 0, ig_version)
-
-          expect(module_instance.messages).to_not include(
-            hash_including(message: a_string_including('minimum required = 1'))
-          )
-        end
-      end
+      expect(module_instance.messages).to_not include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
     end
 
     context 'when validation returns a Questionnaire type error for a form completion card' do
@@ -278,7 +232,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'checks conformance of action resources against order profiles' do
         module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
 
-        expect(module_instance.resource_conformance_calls).not_to be_empty
+        expect(module_instance.resource_conformance_calls).to_not be_empty
         call = module_instance.resource_conformance_calls.first
         expect(call[:resource_hash]['resourceType']).to eq('ServiceRequest')
         expect(call[:ig_version]).to eq(ig_version)
@@ -319,19 +273,18 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
   describe '#validate_system_action_against_logical_model' do
     it 'wraps the action in a CDS Hooks response and uses the coverageInformation logical model' do
-      module_instance.validate_system_action_against_logical_model(coverage_information_action, 2, 1)
+      module_instance.validate_system_action_against_logical_model(coverage_information_action, 2, request_body, 1,
+                                                                   ig_version)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       call = module_instance.conforms_calls.first
       expect(call[:object]).to eq('systemActions' => [coverage_information_action])
       expect(call[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-coverageInformation')
-      expect(call[:message_prefix]).to include('Server response 3 systemAction 2')
-      expect(call[:message_prefix]).to include('coverage_information')
     end
 
     it 'records an error and skips validation when a system action is not a JSON object' do
-      module_instance.validate_system_action_against_logical_model('not an action', 0, 0)
+      module_instance.validate_system_action_against_logical_model('not an action', 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls).to be_empty
       expect(module_instance.messages).to include(
@@ -343,7 +296,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       unknown_action = { 'type' => 'update', 'description' => 'x',
                          'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
 
-      module_instance.validate_system_action_against_logical_model(unknown_action, 0, 0)
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       expect(module_instance.conforms_calls.first[:url])
@@ -351,6 +304,71 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       expect(module_instance.messages).to include(
         hash_including(type: 'warning', message: a_string_including('could not be categorized'))
       )
+    end
+
+    it 'filters out extension unrecognized property issues regardless of action type' do
+      unknown_action = { 'type' => 'update', 'description' => 'x',
+                         'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.systemActions[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_version)
+
+      expect(module_instance.messages).to_not include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
+    context 'when validating coverage information actions' do
+      let(:resource_path_error) do
+        MockValidationIssue.new(
+          message: 'CDSHooksResponse.systemActions[0].resource/ServiceRequest/some.error',
+          severity: 'error',
+          filtered: false,
+          location: nil
+        )
+      end
+      let(:non_resource_error) do
+        MockValidationIssue.new(
+          message: 'Some top-level validation error',
+          severity: 'warning',
+          filtered: false,
+          location: nil
+        )
+      end
+
+      it 'calls check_resource_conformance_to_order_or_encounter_profile when the action has a resource' do
+        module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.resource_conformance_calls).to_not be_empty
+        call = module_instance.resource_conformance_calls.first
+        expect(call[:resource_hash]['resourceType']).to eq('ServiceRequest')
+        expect(call[:ig_version]).to eq(ig_version)
+      end
+
+      it 'reports validation issues whose message matches the system action resource path pattern' do
+        module_instance.injected_validation_issues = [resource_path_error]
+        module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('resource/ServiceRequest/'))
+        )
+      end
+
+      it 'filters out validation issues that do not match the resource path pattern' do
+        module_instance.injected_validation_issues = [non_resource_error]
+        module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including('Some top-level validation error'))
+        )
+      end
     end
   end
 
@@ -374,7 +392,9 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     end
 
     it 'handles missing cards and systemActions gracefully' do
-      expect { module_instance.perform_cards_logical_model_validation(nil, nil, request_body, 0, ig_version) }.to_not raise_error
+      expect do
+        module_instance.perform_cards_logical_model_validation(nil, nil, request_body, 0, ig_version)
+      end.to_not raise_error
       expect(module_instance.conforms_calls).to be_empty
     end
   end
