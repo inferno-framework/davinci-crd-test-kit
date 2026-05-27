@@ -45,23 +45,11 @@ group as described in [Quick Start](#quick-start).
 ### Cross-hook Requirements
 
 Once groups associated with all supported hooks have been run, execute group
-"3.7 Required Card Response Validation" to confirm that cross-hook requirements
+"3.7 Cross-Hook Response Validation" to confirm that cross-hook requirements
 have been met. These tests use the requests made during other groups so cannot be run
 before they have been run.
 
 ## Demonstration Execution
 
-If you would like to try out the order-sign hook invocation tests against
-[the public CRD reference server](https://crd.davinci.hl7.org/),
-you can do so using the following steps:
-
-1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session.
-1. Select the *CRD Server RI* option from the Preset dropdown in the upper left.
-1. Click the "RUN ALL TESTS" button in the upper right and click "SUBMIT"
-1. Inferno will perform several hook invocations and complete the test run. Note that all
-   tests may not pass.
-
-## Inferno Client vs Server Execution
-
-For another way to demonstrate test execution, see the instructions for
+To demonstrate test execution, see the instructions for
 [running the Inferno client and server suites against each other](Running-Suites-Against-Each-Other).
