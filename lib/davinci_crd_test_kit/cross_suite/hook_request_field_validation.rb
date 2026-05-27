@@ -1,5 +1,11 @@
+require_relative 'requests_logical_model_validation'
+require_relative '../server/server_base_urls'
+
 module DaVinciCRDTestKit
   module HookRequestFieldValidation
+    include RequestsLogicalModelValidation
+    include ServerBaseURLs
+
     def json_parse(json)
       JSON.parse(json)
     rescue JSON::ParserError
@@ -421,7 +427,7 @@ module DaVinciCRDTestKit
       true
     end
 
-    def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil, ig_version: 'v201')
+    def bundle_entries_check(context, context_field_name, bundle, resource_types, status = nil, ig_version: 'v201') # rubocop:disable Metrics/CyclomaticComplexity
       bundle.entry.each do |entry|
         resource_id = entry.resource.id
         next unless resource_id.blank?
@@ -441,7 +447,11 @@ module DaVinciCRDTestKit
       status_check(context, context_field_name, status, target_resources)
 
       target_resources.each do |resource|
-        resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
+        if resource.resourceType == 'Appointment' && ig_version == 'v221'
+          check_appointment_conformance(resource, { 'context' => context, 'fhirServer' => fhir_url }, '', '2.2.1')
+        else
+          resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
+        end
       end
     end
 

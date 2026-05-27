@@ -19,6 +19,10 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
       .first
   end
 
+  before do
+    allow_any_instance_of(described_class).to receive(:inferno_base_url).and_return('http://example.com/inferno')
+  end
+
   context 'when appointment-book hook' do
     let(:context) do
       json = File.read(File.join(__dir__, '..', 'fixtures', 'appointment_book_hook_request.json'))
@@ -37,7 +41,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
         context_dup.delete(field)
 
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
-        expect(result.result).to eq('fail')
+        expect(result.result).to eq('fail'), result.result_message
         expect(entity_result_message.message).to match(/does not contain required field `#{field}`/)
       end
     end

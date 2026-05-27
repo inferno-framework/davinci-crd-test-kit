@@ -25,7 +25,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
   end
 
   before do
-    allow_any_instance_of(runnable).to receive(:assert_valid_resource).and_return(true)
+    allow_any_instance_of(runnable).to receive(:resource_is_valid?).and_return(true)
   end
 
   def entity_result_message

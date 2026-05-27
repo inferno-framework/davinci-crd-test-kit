@@ -76,7 +76,14 @@ module DaVinciCRDTestKit
           snomedCT '731000124108' # explicit snomedCT expansion parameter
         end
 
-        # exclude_message do |message|
+        exclude_message do |message|
+          message.message.match?(
+            /Appointment\.participant\[.*]: This element does not match any known slice defined in the profile/
+          ) ||
+            message.message.match?(
+              /Slice 'Appointment.participant:\w+': a matching slice is required, but not found/
+            )
+        end
         #   # extension definition issue present in 2.0.1 but corrected in later versions
         #   message.message.match?(%r{The extension http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information is not allowed to be used at this point \(allowed = e:QuestionnaireResponse, e:Encounter, e:NutritionOrder, e:CommunicationRequest, e:DeviceRequest, e:ServiceRequest, e:MedicationRequest; this element is \[Appointment\]\)}) # rubocop:disable Layout/LineLength
         # end
