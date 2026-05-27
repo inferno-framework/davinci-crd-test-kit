@@ -132,6 +132,71 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       )
     end
 
+    context 'when validating launch SMART app cards' do
+      let(:min_suggestions_error) do
+        MockValidationIssue.new(
+          message: 'CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0',
+          severity: 'error',
+          filtered: false
+        )
+      end
+      let(:other_error) { MockValidationIssue.new(message: 'Some other error', severity: 'warning', filtered: false) }
+
+      it 'filters out the minimum required suggestions validator error' do
+        module_instance.injected_validation_issues = [min_suggestions_error]
+        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including('minimum required = 1'))
+        )
+      end
+
+      it 'does not filter out other validation errors' do
+        module_instance.injected_validation_issues = [min_suggestions_error, other_error]
+        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('Some other error'))
+        )
+      end
+
+      context 'when the card has no suggestions' do
+        it 'does not add an error about suggestions being disallowed' do
+          module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+
+          expect(module_instance.messages).to_not include(
+            hash_including(message: a_string_including('suggestions not allowed'))
+          )
+        end
+      end
+
+      context 'when the card has suggestions' do
+        let(:card_with_suggestions) do
+          non_matching_action = { 'type' => 'update', 'description' => 'x',
+                                  'resource' => { 'resourceType' => 'Patient' } }
+          launch_smart_app_card.merge('suggestions' => [{ 'label' => 'a suggestion',
+                                                          'actions' => [non_matching_action] }])
+        end
+
+        it 'adds an error that suggestions are not allowed for the launch SMART app response type' do
+          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, 0)
+
+          expect(module_instance.messages).to include(
+            hash_including(type: 'error', message: a_string_including('suggestions not allowed'))
+          )
+        end
+
+        it 'still filters out the minimum required suggestions error' do
+          module_instance.injected_validation_issues = [min_suggestions_error]
+          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, 0)
+
+          expect(module_instance.messages).to_not include(
+            hash_including(message: a_string_including('minimum required = 1'))
+          )
+        end
+      end
+    end
+
     context 'when validation returns a Questionnaire type error for a form completion card' do
       let(:questionnaire_error_message) do
         "CDSHooksResponse.cards[0].suggestions[0].actions[0].resource: The type 'Questionnaire' is not valid - must be Task"

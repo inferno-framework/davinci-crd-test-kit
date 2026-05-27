@@ -111,6 +111,8 @@ module DaVinciCRDTestKit
       case card_type
       when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         filter_and_manually_check_form_completion_errors(card, validation_issues, error_prefix)
+      when DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
+        filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
       else
         validation_issues
       end
@@ -124,6 +126,17 @@ module DaVinciCRDTestKit
         else
           false
         end
+      end
+    end
+
+    def filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
+      if card['suggestions'].present?
+        add_message('error', "#{error_prefix}CDSHooksResponse.cards.suggestions not allowed for the Launch " \
+                             'SMART App response type.')
+      end
+
+      validation_issues.reject do |issue|
+        issue.message.match?(/CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0/)
       end
     end
 
