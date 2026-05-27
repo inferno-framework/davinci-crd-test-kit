@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
 
       tokens_to_replace = string.scan(/\{\{([^}]+)\}\}/).flatten
       replacements = tokens_to_replace.each_with_object({}) do |expression, dictionary|
-        next if dictionary[expression].present?
+        next if dictionary["{{#{expression}}}"].present?
 
         dictionary["{{#{expression}}}"] = calculate_expression_value(request, expression)
       end
