@@ -11,6 +11,12 @@
       "display": "Coverage Information"
     }
   },
+  "selectionBehavior": "any",
+  "suggestions": [
+    {
+      "label": "Inferno placeholder suggestion"
+    }
+  ],
   "links": [
     {
       "label": "Inferno",

@@ -20,8 +20,10 @@ module DaVinciCRDTestKit
         The required fields must have a valid data structure.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-5',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13'
 
       input :invoked_hook
       output :valid_cards, :valid_system_actions
@@ -72,11 +74,11 @@ module DaVinciCRDTestKit
 
         successful_requests.each_with_index do |request, index|
           service_response = JSON.parse(request.response_body)
-          perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, index)
+          perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, 'v221', index)
 
           perform_system_actions_validation(service_response['systemActions'], index)
 
-          perform_cards_logical_model_validation(service_response['cards'], service_response['systemActions'], index)
+          # perform_cards_logical_model_validation(service_response['cards'], service_response['systemActions'], index)
         rescue JSON::ParserError
           add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end

@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
   let(:valid_response_body_json) do
     File.read(File.join(__dir__, '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end
-  let(:card_required_fields) { ['summary', 'indicator', 'source'] }
+  let(:card_required_fields) { ['indicator', 'summary', 'source'] }
   let(:body) { JSON.parse(valid_response_body_json) }
 
   def create_service_request(body: nil, status: 200, headers: nil)
@@ -41,7 +41,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
     it 'passes if response body contains valid cards and system actions' do
       mock_server(body: valid_response_body_json, hook:)
       result = run(runnable, invoked_hook: hook)
-      expect(result.result).to eq('pass')
+      expect(result.result).to eq('pass'), result.result_message
     end
 
     it 'fails if system actions is missing from the response' do

@@ -93,6 +93,13 @@ module DaVinciCRDTestKit
       resource = FHIR.from_contents(action['resource'].to_json)
       resource_is_valid?(resource:, profile_url: structure_definition_map(ig_version)[resource.resourceType])
 
+      if action['resourceId'].present?
+        add_message(
+          'error',
+          "`resourceId` should not be populated for create and update actions. In Action `#{action}`"
+        )
+      end
+
       return unless action['type'] == 'update' && contexts
 
       ref = "#{resource.resourceType}/#{resource.id}"

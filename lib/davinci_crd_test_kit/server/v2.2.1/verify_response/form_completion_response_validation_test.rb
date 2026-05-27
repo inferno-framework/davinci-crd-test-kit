@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Request Form Completion cards or system actions received'
       id :crd_v221_request_form_completion_response_validation
@@ -37,7 +39,9 @@ module DaVinciCRDTestKit
 
         If no Request Form Completion cards or system actions are received, the test is skipped.
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@299'
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-62',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-65'
       optional
       input :valid_cards_with_suggestions, :valid_system_actions
 
@@ -56,11 +60,15 @@ module DaVinciCRDTestKit
 
         if form_completion_cards.present?
           form_completion_cards.each do |card|
-            card['suggestions'].each do |suggestion|
-              actions_check(suggestion['actions']&.select do |action|
-                              form_completion_action_response_type?(action)
-                            end, ig_version: 'v221')
-            end
+            actions =
+              card['suggestions']
+                .flat_map { |suggestion| suggestion['actions'] }
+                .compact
+                .select { |action| form_completion_action_response_type? action }
+
+            actions_check(actions, ig_version: 'v221')
+
+            form_completion_check(card)
           end
         end
 

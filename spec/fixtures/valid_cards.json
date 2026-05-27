@@ -36,6 +36,13 @@
         "display": "Guideline"
       }
     },
+    "selectionBehavior": "any",
+    "suggestions": [
+      {
+        "label": "Launch a SMART app",
+        "uuid": "35cfff5a-762b-4c23-bd61-4ea995a4f948"
+      }
+    ],
     "links": [
       {
         "label": "Opioid XYZ-assessment",
@@ -90,6 +97,7 @@
     "suggestions": [
       {
         "label": "Change to lower price name brand (selected name brand not covered)",
+        "uuid": "28e3ec8f-425c-4cd9-80c2-40fd564066e8",
         "actions": [
           {
             "type": "delete",
@@ -316,6 +324,7 @@
     "suggestions": [
       {
         "label": "Add monthly AST test for 1st 3 months",
+        "uuid": "b83f6b4c-3dc5-4386-9033-5f68aa2a57bc",
         "actions": [
           {
             "type": "create",
@@ -393,6 +402,7 @@
     "suggestions": [
       {
         "label": "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
+        "uuid": "9c02a2fe-cadb-48a4-9c1e-247f1adddc23",
         "actions": [
           {
             "type": "create",

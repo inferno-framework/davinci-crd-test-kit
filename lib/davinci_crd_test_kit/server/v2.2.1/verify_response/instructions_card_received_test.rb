@@ -17,6 +17,8 @@ module DaVinciCRDTestKit
         - Checking for the presence of a valid card that does not contain the `links` field and the `suggestions` field.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-24'
+
       input :valid_cards
       optional
 

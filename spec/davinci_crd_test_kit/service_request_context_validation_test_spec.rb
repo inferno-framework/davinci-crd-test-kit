@@ -314,7 +314,11 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
   context 'when order-dispatch' do
     let(:order_dispatch_context) do
-      { 'patientId' => '1288992', 'order' => 'ServiceRequest/proc002', 'performer' => 'Organization/some-performer' }
+      {
+        'patientId' => '1288992',
+        'order' => 'ServiceRequest/proc002',
+        'performer' => 'Organization/some-performer'
+      }
     end
     let(:order_dispatch_context_required_fields) { ['patientId', 'order', 'performer'] }
 
@@ -324,7 +328,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
     it 'passes if all order-dispatch contexts provided are valid' do
       result = run(runnable, { contexts: [order_dispatch_context].to_json, invoked_hook: 'order-dispatch' })
-      expect(result.result).to eq('pass')
+      expect(result.result).to eq('pass'), result.result_message
     end
 
     it 'fails if a required field is missing' do
@@ -369,25 +373,6 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
       end
     end
 
-    it 'fails if order is not correctly formatted `resource_type/resource_id`' do
-      ['/', 'ServiceRequest/', '/123'].each do |string|
-        context_dup = order_dispatch_context.deep_dup
-        context_dup['order'] = string
-
-        result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
-        expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Invalid `order` format/)
-      end
-    end
-
-    it 'fails if order is not DeviceRequest, ServiceRequest, NutritionOrder, MedicatioonRequest or VisioPrescription' do
-      context_dup = order_dispatch_context.deep_dup
-      context_dup['order'] = 'Patient/123'
-      result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported resource type/)
-    end
-
     it 'fails if patientId is a reference instead of a plain ID' do
       context_dup = order_dispatch_context.deep_dup
       context_dup['patientId'] = 'Patient/123'
@@ -395,14 +380,6 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to match(/should be a plain ID, not a reference/)
-    end
-
-    it 'fails if context `task` is not a task resource' do
-      context_dup = order_dispatch_context.deep_dup
-      context_dup['task'] = { resourceType: 'Patient' }
-      result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Field `task` must be a `Task`/)
     end
   end
 

@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Propose Alternate Request cards received'
       id :crd_v221_propose_alternate_request_card_validation
@@ -22,7 +24,8 @@ module DaVinciCRDTestKit
       )
       optional
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-55'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-55',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-56'
 
       input :valid_cards_with_suggestions, :contexts
 
@@ -40,9 +43,11 @@ module DaVinciCRDTestKit
           card['suggestions'].each do |suggestion|
             actions_check(suggestion['actions'], parsed_contexts, ig_version: 'v221')
           end
+
+          propose_alternate_request_check(card)
         end
 
-        no_error_validation('Some Proposed Alternate Request cards are not valid.')
+        no_error_validation('Some Propose Alternate Request cards are not valid.')
       end
     end
   end

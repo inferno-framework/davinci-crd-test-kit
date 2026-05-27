@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Additional Orders as companions/prerequisites cards received'
       id :crd_v221_additional_orders_card_validation
@@ -35,6 +37,9 @@ module DaVinciCRDTestKit
         The test will skip if no Additional Orders cards are found.
       )
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-58'
+
       optional
       input :valid_cards_with_suggestions
 
@@ -50,9 +55,11 @@ module DaVinciCRDTestKit
           card['suggestions'].each do |suggestion|
             actions_check(suggestion['actions'], ig_version: 'v221')
           end
+
+          additional_orders_check(card)
         end
 
-        no_error_validation('Some companions/prerequisites Additional Order cards are not valid.')
+        no_error_validation('Some Additional Order cards are not valid. See messages for more information.')
       end
     end
   end

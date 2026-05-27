@@ -30,6 +30,11 @@ module DaVinciCRDTestKit
       VisionPrescription
     ].freeze
 
+    COVERAGE_INFO_EXPECTED_RESOURCE_TYPES = %w[
+      Appointment CommunicationRequest DeviceRequest Encounter MedicationRequest
+      NutritionOrder ServiceRequest VisionPrescription
+    ].freeze
+
     def identify_card_type(card) # rubocop:disable Metrics/CyclomaticComplexity
       return nil if card['type'].present? # action, not a card
       return ADDITIONAL_ORDERS_RESPONSE_TYPE if additional_orders_response_type?(card)
@@ -55,8 +60,7 @@ module DaVinciCRDTestKit
     def coverage_info_card_type?(card)
       return false unless card.respond_to?(:dig)
 
-      card.dig('source', 'type') == COVERAGE_INFO_CONFIGURATION_CODE ||
-        card.dig('source', 'topic', 'code') == COVERAGE_INFO_CONFIGURATION_CODE
+      card.dig('source', 'topic', 'code') == COVERAGE_INFO_CONFIGURATION_CODE
     end
 
     def coverage_info_system_action_type?(action)
@@ -106,7 +110,9 @@ module DaVinciCRDTestKit
     end
 
     def additional_orders_response_type?(card, expected_resource_types: ADDITIONAL_ORDERS_EXPECTED_RESOURCE_TYPES)
-      card['suggestions']&.all? do |suggestion|
+      return false if card['suggestions'].blank?
+
+      card['suggestions'].all? do |suggestion|
         actions = suggestion['actions']
         actions&.all? do |action|
           action['type'] == 'create' &&
@@ -115,17 +121,17 @@ module DaVinciCRDTestKit
       end
     end
 
-    def coverage_information_response_type?(action)
+    def coverage_information_response_type?(action) # rubocop:disable Metrics/CyclomaticComplexity
       return false unless action.respond_to?(:[])
 
-      extensions =
-        if action['resource'].respond_to?(:extension)
-          action['resource'].extension
-        else
-          action.dig('resource', 'extension')
-        end
+      resource = action['resource']&.to_hash
+      return false unless COVERAGE_INFO_EXPECTED_RESOURCE_TYPES.include? resource&.dig('resourceType')
 
-      extensions&.any? { |extension| extension_url(extension) == COVERAGE_INFO_EXT_URL }
+      unless resource&.dig('extension')&.any? { |extension| extension_url(extension) == COVERAGE_INFO_EXT_URL }
+        return false
+      end
+
+      true
     end
 
     def extension_url(extension)
@@ -150,12 +156,15 @@ module DaVinciCRDTestKit
     end
 
     def external_reference_response_type?(card)
-      card['links']&.all? { |link| link['type'] == 'absolute' }
+      links = card['links']
+      return false if links.blank?
+
+      links.all? { |link| link['type'] == 'absolute' }
     end
 
     def form_completion_card_response_type?(card)
       card['suggestions']&.all? do |suggestion|
-        suggestion['actions'].one? { |action| form_completion_action_response_type?(action) }
+        suggestion['actions']&.one? { |action| form_completion_action_response_type?(action) }
       end
     end
 
@@ -177,7 +186,10 @@ module DaVinciCRDTestKit
     end
 
     def launch_smart_app_response_type?(card)
-      card['links']&.all? { |link| link['type'] == 'smart' }
+      links = card['links']
+      return false if links.blank?
+
+      links.all? { |link| link['type'] == 'smart' }
     end
 
     def propose_alternative_request_response_type?(

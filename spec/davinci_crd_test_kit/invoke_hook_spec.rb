@@ -22,7 +22,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
         {
           summary: 'Coverage information',
           indicator: 'info',
-          source: { type: DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_CONFIGURATION_CODE }
+          source: { topic: { code: DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_CONFIGURATION_CODE } }
         }
       ]
     }

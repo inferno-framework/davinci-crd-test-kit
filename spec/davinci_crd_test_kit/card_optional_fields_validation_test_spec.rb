@@ -8,7 +8,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
   let(:link_required_fields) { ['label', 'type', 'url'] }
   let(:override_reasons_required_fields) { ['code', 'system', 'display'] }
-  let(:suggestions_required_fields) { ['label'] }
+  let(:suggestions_required_fields) { ['label', 'uuid'] }
   let(:actions_required_fields) { ['type', 'description'] }
 
   def entity_result_messages
@@ -35,22 +35,22 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if an optional field is not of the correct type' do
-    valid_cards.first['uuid'] = 2
+    valid_cards.first['detail'] = 2
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
 
     msg = entity_result_messages.find { |m| m.type == 'error' }
-    expect(msg.message).to match(/`uuid` is not of type/)
+    expect(msg.message).to match(/`detail` is not of type/)
   end
 
   it 'fails if field is of correcty type but empty' do
-    valid_cards.first['uuid'] = ''
+    valid_cards.first['detail'] = ''
     valid_cards.first['links'] = []
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
 
     msg = entity_result_messages.map(&:message).join(' ')
-    expect(msg).to match(/`uuid` should not be an empty String/)
+    expect(msg).to match(/`detail` should not be an empty String/)
     expect(msg).to match(/`links` should not be an empty Array/)
   end
 
@@ -88,7 +88,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
     msg = entity_result_messages.filter { |m| m.type == 'error' }.map(&:message).join(' ')
-    expect(msg).to match(/`Link.type` must be `absolute` or `smart`/)
+    expect(msg).to match(/All links must either be `absolute` or `smart`/)
   end
 
   it 'fails if Card.link.appContext is present for absolute link' do
@@ -98,7 +98,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
     result = run(runnable, valid_cards: valid_cards.to_json)
     expect(result.result).to eq('fail')
     msg = entity_result_messages.filter { |m| m.type == 'error' }.map(&:message).join(' ')
-    expect(msg).to match(/`appContext` field should only be valued if the link type is smart/)
+    expect(msg).to match(/`appContext` field must not be present if the link type is absolute/)
   end
 
   it 'fails if a required field is missing from Card.overrideReasons' do
@@ -160,7 +160,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   it 'fails if a required field is missing from Suggestion action' do
     actions_required_fields.each do |field|
       dup_cards = valid_cards.deep_dup
-      cards_with_suggestions = dup_cards.find { |card| card['suggestions'].present? }
+      cards_with_suggestions =
+        dup_cards
+          .find { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
       actions = cards_with_suggestions['suggestions'].first['actions']
 
       actions.first.delete(field)
@@ -175,7 +177,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   it 'fails if Suggestion action required field is a wrong type' do
     actions_required_fields.each do |field|
       dup_cards = valid_cards.deep_dup
-      cards_with_suggestions = dup_cards.find { |card| card['suggestions'].present? }
+      cards_with_suggestions =
+        dup_cards
+          .find { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
       actions = cards_with_suggestions['suggestions'].first['actions']
 
       actions.first[field] = 123
@@ -210,7 +214,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails Action.type is not an allowed value' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     actions = cards_with_suggestions['suggestions'].first['actions']
 
     actions.first['type'] = 'example'
@@ -222,7 +228,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if a create action does not have a resource field' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     create_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'create' }
     create_action.delete('resource')
 
@@ -234,7 +242,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if a create action resource is not a FHIR resource' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     create_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'create' }
     create_action['resource'] = 'example'
 
@@ -246,7 +256,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if a delete action does not have a resourceId field' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
     delete_action.delete('resourceId')
 
@@ -258,7 +270,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if a delete action resourceId is not a string' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
     delete_action['resourceId'] = ['example']
 
@@ -270,7 +284,9 @@ RSpec.describe DaVinciCRDTestKit::V201::CardOptionalFieldsValidationTest do
   end
 
   it 'fails if a delete action resourceId item is not a relative reference' do
-    cards_with_suggestions = valid_cards.find { |card| card['suggestions'].present? }
+    cards_with_suggestions =
+      valid_cards
+        .find  { |card| card['suggestions']&.any? { |suggestion| suggestion['actions'].present? } }
     delete_action = cards_with_suggestions['suggestions'].first['actions'].find { |action| action['type'] == 'delete' }
     delete_action['resourceId'] = 'example'
 

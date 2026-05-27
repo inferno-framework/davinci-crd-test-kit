@@ -2,6 +2,7 @@ require_relative '../../server_test_helper'
 require_relative '../../../cross_suite/suggestion_actions_validation'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/cards_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::SuggestionActionsValidation
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include DaVinciCRDTestKit::CardsValidation
 
       title 'Valid Create or Update Coverage Information cards or system actions received'
       id :crd_v221_create_or_update_coverage_info_response_validation
@@ -31,7 +33,9 @@ module DaVinciCRDTestKit
 
         If no Create or Update Coverage Information cards or system actions are received, the test is skipped.
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@306'
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-71'
+
       optional
       input :valid_cards_with_suggestions, :valid_system_actions
 
@@ -59,6 +63,8 @@ module DaVinciCRDTestKit
             actions_check(card['suggestions'].first['actions'].select do |action|
                             create_or_update_coverage_action_response_type?(action)
                           end, ig_version: 'v221')
+
+            create_or_update_coverage_check(card)
           end
         end
 

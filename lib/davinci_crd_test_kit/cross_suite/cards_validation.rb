@@ -12,7 +12,18 @@ module DaVinciCRDTestKit
     ].freeze
 
     def card_required_fields
-      { 'summary' => String, 'indicator' => String, 'source' => Hash }
+      {
+        'v221' => {
+          'uuid' => String,
+          'summary' => String,
+          'source' => Hash
+        },
+        'v201' => {
+          'indicator' => String,
+          'summary' => String,
+          'source' => Hash
+        }
+      }
     end
 
     def source_required_fields
@@ -25,11 +36,22 @@ module DaVinciCRDTestKit
 
     def card_optional_fields
       {
-        'uuid' => String,
-        'detail' => String,
-        'suggestions' => Array,
-        'overrideReasons' => Array,
-        'links' => Array
+        'v221' => {
+          'detail' => String,
+          'indicator' => String,
+          'suggestions' => Array,
+          'selectionBehavior' => String,
+          'overrideReasons' => Array,
+          'links' => Array
+        },
+        'v201' => {
+          'detail' => String,
+          'uuid' => String,
+          'suggestions' => Array,
+          'selectionBehavior' => String,
+          'overrideReasons' => Array,
+          'links' => Array
+        }
       }
     end
 
@@ -41,9 +63,9 @@ module DaVinciCRDTestKit
       { 'label' => String, 'type' => String, 'url' => 'URL' }
     end
 
-    def valid_card_with_optionals?(card)
+    def valid_card_with_optionals?(card, version)
       current_error_count = messages.count { |msg| msg[:type] == 'error' }
-      card_optional_fields.each do |field, type|
+      card_optional_fields[version].each do |field, type|
         next unless card[field]
 
         validate_presence_and_type(card, field, type, 'Card', required: false)
@@ -84,32 +106,83 @@ module DaVinciCRDTestKit
       end
     end
 
-    def card_links_check(card)
+    def card_links_check(card) # rubocop:disable Metrics/CyclomaticComplexity
       return unless card['links'].is_a?(Array) && card['links'].present?
 
       card['links'].each do |link|
         link_required_fields.each do |field, type|
           validate_presence_and_type(link, field, type, 'Link')
         end
+      end
 
-        card_link_type_check(card, link)
+      if card['links'].all? { |link| link['type'] == 'absolute' }
+        external_reference_card_check(card)
+      elsif card['links'].all? { |link| link['type'] == 'smart' }
+        smart_app_card_check(card)
+      else
+        add_message(
+          'error',
+          "All links must either be `absolute` or `smart` in card: #{card}"
+        )
       end
     end
 
-    def card_link_type_check(card, link)
-      return unless link['type']
-
-      unless ['absolute', 'smart'].include?(link['type'])
-        add_message('error',
-                    "`Link.type` must be `absolute` or `smart`. Got `#{link['type']}`: `#{link}`. In Card `#{card}`")
-        return
+    def external_reference_card_check(card)
+      if card['suggestions'].present?
+        add_message(
+          'error',
+          "Cards with `absolute` links must not contain suggestions. In card `#{card}`"
+        )
       end
 
-      return unless link['type'] == 'absolute' && link['appContext'].present?
+      card['links'].each do |link|
+        next if link['appContext'].blank?
 
-      msg = '`appContext` field should only be valued if the link type is smart and is not valid for absolute links: ' \
-            "`#{link}`. In Card `#{card}`"
-      add_message('error', msg)
+        add_message(
+          'error',
+          '`appContext` field must not be present if the link type is absolute: ' \
+          "`#{link}`. In Card `#{card}`"
+        )
+      end
+    end
+
+    def smart_app_card_check(card)
+      if card['suggestions'].blank?
+        add_message(
+          'error',
+          "Cards with `smart` links must contain at least one suggestion. In card `#{card}`"
+        )
+      elsif card['suggestions'].any? { |suggestion| suggestion['actions'].present? }
+        add_message(
+          'error',
+          "Cards with `smart` links must not contain any suggestion actions. In card `#{card}`"
+        )
+      end
+    end
+
+    def no_links_check(card, card_type)
+      return unless card['links'].present?
+
+      add_message(
+        'error',
+        "#{card_type} response must not contain links. In card: `#{card}`"
+      )
+    end
+
+    def additional_orders_check(card)
+      no_links_check(card, 'Additional Orders')
+    end
+
+    def create_or_update_coverage_check(card)
+      no_links_check(card, 'Update Coverage Records')
+    end
+
+    def form_completion_check(card)
+      no_links_check(card, 'Form Completion')
+    end
+
+    def propose_alternate_request_check(card)
+      no_links_check(card, 'Propose Alternate Request')
     end
 
     def card_suggestions_check(card)
@@ -122,6 +195,7 @@ module DaVinciCRDTestKit
 
     def process_suggestion(card, suggestion)
       validate_presence_and_type(suggestion, 'label', String, 'Suggestion')
+      validate_presence_and_type(suggestion, 'uuid', String, 'Suggestion')
       return unless suggestion['actions']
 
       validate_and_process_actions(card, suggestion)
@@ -176,10 +250,10 @@ module DaVinciCRDTestKit
       add_message('error', msg)
     end
 
-    def cards_check(cards)
+    def cards_check(cards, version = 'v221')
       cards.each do |card|
         current_error_count = messages.count { |msg| msg[:type] == 'error' }
-        card_required_fields.each do |field, type|
+        card_required_fields[version].each do |field, type|
           validate_presence_and_type(card, field, type, 'Card')
         end
 
@@ -195,7 +269,7 @@ module DaVinciCRDTestKit
       "Server response #{index}"
     end
 
-    def perform_cards_validation(cards, response_has_system_actions, response_index = 0)
+    def perform_cards_validation(cards, response_has_system_actions, version, response_index)
       unless cards
         add_message('error', "#{response_label(response_index + 1)} did not have the `cards` field.")
         return
@@ -208,31 +282,13 @@ module DaVinciCRDTestKit
         assert cards.present? || response_has_system_actions,
                "#{response_label(response_index + 1)} has no decision support."
       end
-      cards_check(cards)
+      cards_check(cards, version)
     end
 
     def all_requests
       @all_requests ||= HOOKS.each_with_object([]) do |hook, reqs|
         load_tagged_requests(hook)
         reqs.concat(requests)
-      end
-    end
-
-    def extract_all_valid_cards_from_hooks_responses
-      all_requests.keep_if { |request| request.status == 200 }
-      all_requests.each_with_index do |request, index|
-        service_response = JSON.parse(request.response_body)
-        perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, index)
-      rescue JSON::ParserError
-        add_message('error', "Invalid JSON: #{response_label(index + 1).downcase} is not valid JSON.")
-      end
-    end
-
-    def extract_valid_cards_with_links_from_hooks_responses
-      extract_all_valid_cards_from_hooks_responses
-
-      valid_cards.each do |card|
-        valid_cards_with_links << card if valid_card_with_optionals?(card) && card['links']
       end
     end
   end
