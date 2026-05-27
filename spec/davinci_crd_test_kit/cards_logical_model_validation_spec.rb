@@ -212,7 +212,8 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
     context 'when validation returns a Questionnaire type error for a form completion card' do
       let(:questionnaire_error_message) do
-        "CDSHooksResponse.cards[0].suggestions[0].actions[0].resource: The type 'Questionnaire' is not valid - must be Task"
+        "CDSHooksResponse.cards[0].suggestions[0].actions[0].resource: The type 'Questionnaire' " \
+          'is not valid - must be Task'
       end
       let(:other_error_message) { 'Some other validation error' }
 

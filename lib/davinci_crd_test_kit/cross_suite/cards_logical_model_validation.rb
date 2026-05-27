@@ -76,11 +76,7 @@ module DaVinciCRDTestKit
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = filter_and_manually_check_card_specific_errors(card, validation_issues, card_type,
                                                                        request_body, error_prefix, ig_version)
-      filtered_issues.each do |issue|
-        next if issue.filtered || logical_model_extension_issue?(issue)
-
-        add_message(issue.severity, "#{error_prefix}#{issue.message}")
-      end
+      add_filtered_messages(filtered_issues, error_prefix)
     end
 
     def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_version)
@@ -111,7 +107,11 @@ module DaVinciCRDTestKit
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = filter_and_manually_check_action_specific_errors(action, validation_issues, action_type,
                                                                          request_body, error_prefix, ig_version)
-      filtered_issues.each do |issue|
+      add_filtered_messages(filtered_issues, error_prefix)
+    end
+
+    def add_filtered_messages(issues, error_prefix)
+      issues.each do |issue|
         next if issue.filtered || logical_model_extension_issue?(issue)
 
         add_message(issue.severity, "#{error_prefix}#{issue.message}")
