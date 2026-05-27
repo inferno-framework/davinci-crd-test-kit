@@ -126,13 +126,13 @@ module DaVinciCRDTestKit
 
       hook_display = requested_hook.split('-').map(&:capitalize).join(' ')
       card_response['cards']&.tap(&:compact!)&.each do |card|
-        update_card(card, hook_display)
+        update_one_card_info(card, hook_display)
       end
       card_response['systemActions']&.compact!
       card_response
     end
 
-    def update_card(card, hook_display)
+    def update_one_card_info(card, hook_display)
       card['summary'].prepend("#{hook_display} ")
       card['uuid'] = SecureRandom.uuid
       card['suggestions']&.each { |suggestion| suggestion['uuid'] = SecureRandom.uuid if suggestion['uuid'].present? }
