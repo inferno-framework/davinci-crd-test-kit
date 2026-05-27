@@ -162,6 +162,10 @@ module DaVinciCRDTestKit
       resource.entry.first.resource
     end
 
+    def patient_coverage
+      @patient_coverage ||= get_patient_coverage
+    end
+
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetched_coverage =  extract_prefetched_coverage(request_body['prefetch'])
       if prefetched_coverage.present?
@@ -247,14 +251,13 @@ module DaVinciCRDTestKit
       return unless add_coverage_cards?
 
       system_actions = []
-      coverage = get_patient_coverage
-      if coverage.present?
+      if patient_coverage.present?
         if selected_response_types.include?('coverage_information') || coverage_information_required?
-          system_actions = create_coverage_extension_system_actions(coverage.id)
+          system_actions = create_coverage_extension_system_actions(patient_coverage.id)
         end
 
         if selected_response_types.include?('create_update_coverage_info')
-          coverage_card = create_or_update_coverage(coverage)
+          coverage_card = create_or_update_coverage(patient_coverage)
           cards.append(coverage_card) if coverage_card.present?
         end
       end
@@ -433,6 +436,13 @@ module DaVinciCRDTestKit
       return if context.nil?
 
       request_form_completion_card = load_json_file('request_form_completion.json')
+      form_completion_questionnaire_action = request_form_completion_card['suggestions'][0]['actions'].find do |action|
+        action['resource']['resourceType'] == 'Questionnaire'
+      end
+      target_fhir_server = request_body['fhirServer'].present? ? request_body['fhirServer'].chomp('/') : ''
+      form_completion_questionnaire_action['extension']['davinci-crd.if-none-exist']
+        .gsub!('<target_fhir_server>', target_fhir_server)
+
       form_completion_task = request_form_completion_card['suggestions'][0]['actions'].find do |action|
         action['resource']['resourceType'] == 'Task'
       end['resource']
@@ -440,7 +450,20 @@ module DaVinciCRDTestKit
       form_completion_task['for']['reference'] = "Patient/#{context['patientId']}"
       form_completion_task['authoredOn'] = current_time.strftime('%Y-%m-%d')
       form_completion_task['input'].delete_at(1) if ig_version == 'v221'
+      form_completion_task['id'] = SecureRandom.uuid
+      payer_reference = payer_reference_from_coverage
+      if payer_reference.present?
+        form_completion_task['requester']['reference'] = payer_reference
+      else
+        form_completion_task.delete('requester')
+      end
       request_form_completion_card
+    end
+
+    def payer_reference_from_coverage
+      if patient_coverage.present? && patient_coverage.payor.present? && patient_coverage.payor.first.reference.present?
+        patient_coverage.payor.first.reference
+      end
     end
 
     def update_service_request(service_request)
