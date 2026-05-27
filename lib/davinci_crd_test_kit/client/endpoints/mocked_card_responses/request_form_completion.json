@@ -15,6 +15,7 @@
   "suggestions": [
     {
       "label": "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
+      "uuid": "5abc166b-c50f-4df4-bdc1-2b0b62cb9e55",
       "actions": [
         {
           "type": "create",

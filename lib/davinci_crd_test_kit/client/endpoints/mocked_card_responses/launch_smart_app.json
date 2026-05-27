@@ -11,6 +11,12 @@
       "display": "Coverage Information"
     }
   },
+  "suggestions": [
+    {
+      "label": "Inferno placeholder suggestion",
+      "uuid": "5abc166b-c50f-4df4-bdb1-2b0b62cb8e55"
+    }
+  ],
   "selectionBehavior": "any",
   "links": [
     {
