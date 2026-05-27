@@ -322,13 +322,23 @@ module DaVinciCRDTestKit
 
     def find_one_prefetched_order_dispatch_order(order_reference)
       resource_type, id = order_reference.split('/')
-      prefetch_key = "#{resource_type[0].downcase}#{resource_type[1..]}s"
-      return unless request_body['prefetch'].present? && request_body['prefetch'][prefetch_key].present?
+      return unless request_body['prefetch'].present?
 
-      prefetch_bundle = FHIR.from_contents(request_body['prefetch'][prefetch_key].to_json)
-      prefetch_bundle.entry.find do |entry|
-        entry.resource.present? && entry.resource.resourceType == resource_type && entry.resource.id == id
+      request_body['prefetch'].each_value do |prefetch_value|
+        entry = find_entry_in_prefetch_bundle(prefetch_value, resource_type, id)
+        return entry if entry.present?
       end
+
+      nil
+    end
+
+    def find_entry_in_prefetch_bundle(prefetch_value, resource_type, id)
+      return unless prefetch_value.is_a?(Hash)
+
+      bundle = FHIR.from_contents(prefetch_value.to_json)
+      return unless bundle.is_a?(FHIR::Bundle)
+
+      bundle.entry.find { |e| e.resource.present? && e.resource.resourceType == resource_type && e.resource.id == id }
     end
 
     def create_system_actions(resource, coverage_id)
