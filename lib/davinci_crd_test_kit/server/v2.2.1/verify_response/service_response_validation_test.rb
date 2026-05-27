@@ -9,12 +9,13 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsLogicalModelValidation
       include DaVinciCRDTestKit::ServerHookHelper
 
-      title 'All service responses contain valid cards and optional systemActions'
+      title 'All service responses contain valid cards and systemActions'
       id :crd_v221_service_response_validation
       description %(
-        As per the [CDS Hooks spec section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response),
-        a successful server's response to a service request must be a JSON object containing a `cards` array.
-        It must also contain a `systemActions` array for `appointment-book` and `order-sign` hook.
+        As per the [CDS Hooks spec section on CDS Service
+        Response](https://cds-hooks.hl7.org/2.0/#cds-service-response), a
+        successful server's response to a service request must be a JSON object
+        containing a `cards` array and optionally a `systemActions` array.
 
         Each card must contain the following required fields: `summary`, `indicator`, and `source`.
         The required fields must have a valid data structure.
@@ -23,7 +24,14 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-5',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13'
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-18',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-19',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-22',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-24',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-56',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-62'
 
       input :invoked_hook
       output :valid_cards, :valid_system_actions
