@@ -1,8 +1,10 @@
 require_relative 'cards_identification'
+require_relative 'logical_models_override_helper'
 
 module DaVinciCRDTestKit
   module CardsLogicalModelValidation
     include DaVinciCRDTestKit::CardsIdentification
+    include LogicalModelsOverrideHelper
 
     CRD_LOGICAL_MODEL_BASE = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition'.freeze
     CRD_RESPONSE_BASE_LOGICAL_MODEL = 'CRDHooksResponseBase'.freeze
@@ -37,10 +39,10 @@ module DaVinciCRDTestKit
       "#{CRD_LOGICAL_MODEL_BASE}/#{profile_name}"
     end
 
-    def perform_cards_logical_model_validation(cards, system_actions, response_index = 0)
+    def perform_cards_logical_model_validation(cards, system_actions, request_body, response_index, ig_version)
       if cards.is_a?(Array)
         cards.each_with_index do |card, card_index|
-          validate_card_against_logical_model(card, response_index, card_index)
+          validate_card_against_logical_model(card, response_index, request_body, card_index, ig_version)
         end
       end
 
@@ -51,7 +53,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def validate_card_against_logical_model(card, response_index, card_index)
+    def validate_card_against_logical_model(card, response_index, request_body, card_index, ig_version)
       label = logical_model_entity_label(response_index, card_index, 'card')
       unless card.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -72,7 +74,9 @@ module DaVinciCRDTestKit
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
-      filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, error_prefix).each do |issue|
+      filtered_issues = filter_and_manually_check_card_specific_errors(card, validation_issues, card_type,
+                                                                       request_body, error_prefix, ig_version)
+      filtered_issues.each do |issue|
         next if issue.filtered
 
         add_message(issue.severity, "#{error_prefix}#{issue.message}")
@@ -107,12 +111,19 @@ module DaVinciCRDTestKit
     # Validator Filtering and Manual Checks Depending on the Card Type
     # -------------------------------------------------------------------------
 
-    def filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, error_prefix)
+    def filter_and_manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
+                                                       ig_version)
       case card_type
       when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         filter_and_manually_check_form_completion_errors(card, validation_issues, error_prefix)
       when DaVinciCRDTestKit::CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
         filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
+      when DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
+        filter_and_manually_check_propose_alternative_errors(card, validation_issues, request_body,
+                                                             error_prefix, ig_version)
+      when DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
+        filter_and_manually_check_additional_orders_errors(card, validation_issues, request_body,
+                                                           error_prefix, ig_version)
       else
         validation_issues
       end
@@ -129,6 +140,21 @@ module DaVinciCRDTestKit
       end
     end
 
+    def check_questionnaire_actions(card, error_message, error_prefix)
+      extracted_indexes =
+        error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
+      suggestion_index = extracted_indexes[1].to_i
+      action_index = extracted_indexes[2].to_i
+
+      message_prefix = "#{error_prefix} Suggestion #{suggestion_index + 1} Actions #{action_index + 1} - "
+      resource = FHIR.from_contents(card['suggestions'][suggestion_index]['actions'][action_index]['resource'].to_json)
+      resource_is_valid?(resource:, message_prefix:) # no questionnaire profile applied per CRD
+
+      return if resource.id.present?
+
+      add_message('error', "#{message_prefix}Questionnaire must have an id.")
+    end
+
     def filter_and_manually_check_launch_smart_app_errors(card, validation_issues, error_prefix)
       if card['suggestions'].present?
         add_message('error', "#{error_prefix}CDSHooksResponse.cards.suggestions not allowed for the Launch " \
@@ -140,19 +166,48 @@ module DaVinciCRDTestKit
       end
     end
 
-    def check_questionnaire_actions(card, error_message, error_prefix)
-      extracted_indexes =
-        error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
-      suggestion_index = extracted_indexes[1].to_i
-      action_index = extracted_indexes[2].to_i
+    def filter_and_manually_check_propose_alternative_errors(card, validation_issues, request_body, error_prefix,
+                                                             ig_version)
+      no_resource_issues = manually_check_action_resources_for_order_profile_conformance(card,
+                                                                                         validation_issues,
+                                                                                         request_body,
+                                                                                         error_prefix,
+                                                                                         ig_version)
+      no_resource_issues.reject do |issue|
+        issue.message.match?(/but is fixed to 'create' in the profile/)
+      end
+    end
 
-      message_prefix = "#{error_prefix}suggestions[#{suggestion_index}].actions[#{action_index}].resource "
-      resource = FHIR.from_contents(card['suggestions'][suggestion_index]['actions'][action_index]['resource'].to_json)
-      resource_is_valid?(resource:, message_prefix:) # no questionnaire profile applied per CRD
+    def filter_and_manually_check_additional_orders_errors(card, validation_issues, request_body, error_prefix,
+                                                           ig_version)
+      manually_check_action_resources_for_order_profile_conformance(card,
+                                                                    validation_issues,
+                                                                    request_body,
+                                                                    error_prefix,
+                                                                    ig_version)
+    end
 
-      return if resource.id.present?
+    def manually_check_action_resources_for_order_profile_conformance(card, validation_issues, request_body, error_prefix,
+                                                                      ig_version)
+      if card['suggestions'].present?
+        card['suggestions'].each_with_index do |suggestion, suggestion_index|
+          next unless suggestion['actions'].present?
 
-      add_message('error', "#{message_prefix}Questionnaire must have an id.")
+          suggestion['actions'].each_with_index do |action, action_index|
+            action_error_prefix = "#{error_prefix}Suggestion #{suggestion_index + 1}, Action #{action_index + 1} - "
+            check_action_target(action, request_body, action_error_prefix, ig_version)
+          end
+        end
+      end
+
+      reject_filtered_and_resource_issues(validation_issues)
+    end
+
+    def check_action_target(action, request_body, error_prefix, ig_version)
+      local_reference?(action['resourceId'], error_prefix) if action['resourceId'].present?
+      return unless action['resource'].present?
+
+      check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_version)
     end
   end
 end

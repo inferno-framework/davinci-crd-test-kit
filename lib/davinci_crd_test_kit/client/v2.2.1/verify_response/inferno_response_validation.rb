@@ -52,12 +52,17 @@ module DaVinciCRDTestKit
         entity_validated = false
         requests.each_with_index do |request, index|
           response_hash = JSON.parse(request.response_body)
+          request_hash = JSON.parse(request.request_body)
 
           next unless response_hash['cards'].present? || response_hash['systemActions'].present?
 
           entity_validated = true
           validate_card_summaries(response_hash['cards'])
-          perform_cards_logical_model_validation(response_hash['cards'], response_hash['systemActions'], index)
+          perform_cards_logical_model_validation(response_hash['cards'],
+                                                 response_hash['systemActions'],
+                                                 request_hash,
+                                                 index,
+                                                 'v221')
         rescue JSON::ParserError
           next
         end

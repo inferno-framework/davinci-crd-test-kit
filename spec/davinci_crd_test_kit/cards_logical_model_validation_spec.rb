@@ -1,19 +1,20 @@
 require_relative '../../lib/davinci_crd_test_kit/cross_suite/cards_logical_model_validation'
 
-MockValidationIssue = Struct.new(:message, :severity, :filtered, keyword_init: true)
+MockValidationIssue = Struct.new(:message, :severity, :filtered, :location, keyword_init: true)
 
 RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
   let(:module_instance) do
     Class.new do
       include DaVinciCRDTestKit::CardsLogicalModelValidation
 
-      attr_reader :messages, :conforms_calls, :resource_is_valid_calls
+      attr_reader :messages, :conforms_calls, :resource_is_valid_calls, :resource_conformance_calls
       attr_writer :injected_validation_issues
 
       def initialize
         @messages = []
         @conforms_calls = []
         @resource_is_valid_calls = []
+        @resource_conformance_calls = []
         @injected_validation_issues = []
       end
 
@@ -32,6 +33,10 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         true
       end
 
+      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_version)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
+      end
+
       def scratch
         @scratch ||= {}
       end
@@ -42,6 +47,28 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
   let(:instructions_card) { load_mock('instructions.json') }
   let(:launch_smart_app_card) { load_mock('launch_smart_app.json') }
   let(:form_completion_card) { load_mock('request_form_completion.json') }
+  let(:propose_alternate_request_card) do
+    {
+      'summary' => 'Propose Alternate Request Card',
+      'indicator' => 'info',
+      'source' => { 'label' => 'Inferno' },
+      'selectionBehavior' => 'any',
+      'suggestions' => [
+        {
+          'label' => 'Replace order with alternate',
+          'actions' => [
+            {
+              'type' => 'update',
+              'description' => 'Replace existing order',
+              'resource' => { 'resourceType' => 'ServiceRequest', 'id' => 'existing-order' }
+            }
+          ]
+        }
+      ]
+    }
+  end
+  let(:request_body) { { 'context' => { 'patientId' => 'p1' }, 'fhirServer' => 'http://example.com/fhir' } }
+  let(:ig_version) { '2.2.1' }
   let(:coverage_information_action) do
     JSON.parse(<<~JSON)
       {
@@ -70,7 +97,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
   describe '#validate_card_against_logical_model' do
     it 'wraps an external reference card in a CDS Hooks response and validates it against the logical model' do
-      module_instance.validate_card_against_logical_model(external_reference_card, 0, 0)
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       call = module_instance.conforms_calls.first
@@ -80,35 +107,35 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     end
 
     it 'uses the additional orders logical model for additional-orders cards' do
-      module_instance.validate_card_against_logical_model(additional_orders_card, 0, 0)
+      module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-additionalOrders')
     end
 
     it 'uses the instructions logical model for instructions cards' do
-      module_instance.validate_card_against_logical_model(instructions_card, 0, 0)
+      module_instance.validate_card_against_logical_model(instructions_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-instructions')
     end
 
     it 'uses the launchSMART logical model for launch SMART app cards' do
-      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-launchSMART')
     end
 
     it 'uses the formCompletion logical model for form completion cards' do
-      module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+      module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-formCompletion')
     end
 
     it 'records an error and skips validation when a card is not a JSON object' do
-      module_instance.validate_card_against_logical_model('not a card', 0, 0)
+      module_instance.validate_card_against_logical_model('not a card', 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls).to be_empty
       expect(module_instance.messages).to include(
@@ -122,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         'links' => [{ 'type' => 'smart' }, { 'type' => 'absolute' }]
       }
 
-      module_instance.validate_card_against_logical_model(unknown_card, 0, 0)
+      module_instance.validate_card_against_logical_model(unknown_card, 0, request_body, 0, ig_version)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       expect(module_instance.conforms_calls.first[:url])
@@ -144,7 +171,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'filters out the minimum required suggestions validator error' do
         module_instance.injected_validation_issues = [min_suggestions_error]
-        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including('minimum required = 1'))
@@ -153,7 +180,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'does not filter out other validation errors' do
         module_instance.injected_validation_issues = [min_suggestions_error, other_error]
-        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+        module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('Some other error'))
@@ -162,7 +189,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       context 'when the card has no suggestions' do
         it 'does not add an error about suggestions being disallowed' do
-          module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, 0)
+          module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
 
           expect(module_instance.messages).to_not include(
             hash_including(message: a_string_including('suggestions not allowed'))
@@ -179,7 +206,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         end
 
         it 'adds an error that suggestions are not allowed for the launch SMART app response type' do
-          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, 0)
+          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, request_body, 0, ig_version)
 
           expect(module_instance.messages).to include(
             hash_including(type: 'error', message: a_string_including('suggestions not allowed'))
@@ -188,7 +215,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
         it 'still filters out the minimum required suggestions error' do
           module_instance.injected_validation_issues = [min_suggestions_error]
-          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, 0)
+          module_instance.validate_card_against_logical_model(card_with_suggestions, 0, request_body, 0, ig_version)
 
           expect(module_instance.messages).to_not include(
             hash_including(message: a_string_including('minimum required = 1'))
@@ -211,7 +238,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'filters out the matched Questionnaire type error and does not add it as a message' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including("The type 'Questionnaire' is not valid"))
@@ -219,19 +246,72 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'calls resource_is_valid? on the Questionnaire resource at the referenced path' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
 
         expect(module_instance.resource_is_valid_calls.length).to eq(1)
         call = module_instance.resource_is_valid_calls.first
         expect(call[:resource].resourceType).to eq('Questionnaire')
-        expect(call[:message_prefix]).to include('suggestions[0].actions[0].resource')
+        expect(call[:message_prefix]).to include('Suggestion 1 Actions 1')
       end
 
       it 'does not filter out other validation errors' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, 0)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including(other_error_message))
+        )
+      end
+    end
+
+    context 'when validating additional orders cards' do
+      let(:other_error) { MockValidationIssue.new(message: 'Some other error', severity: 'warning', filtered: false) }
+
+      it 'does not filter out validation errors' do
+        module_instance.injected_validation_issues = [other_error]
+        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('Some other error'))
+        )
+      end
+
+      it 'checks conformance of action resources against order profiles' do
+        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
+
+        expect(module_instance.resource_conformance_calls).not_to be_empty
+        call = module_instance.resource_conformance_calls.first
+        expect(call[:resource_hash]['resourceType']).to eq('ServiceRequest')
+        expect(call[:ig_version]).to eq(ig_version)
+      end
+    end
+
+    context 'when validating propose alternative cards' do
+      let(:create_fixed_error) do
+        MockValidationIssue.new(
+          message: "This element has a value of 'update' but is fixed to 'create' in the profile",
+          severity: 'error',
+          filtered: false
+        )
+      end
+      let(:other_error) { MockValidationIssue.new(message: 'Some other error', severity: 'warning', filtered: false) }
+
+      it 'filters out the fixed-to-create validator error' do
+        module_instance.injected_validation_issues = [create_fixed_error]
+        module_instance.validate_card_against_logical_model(propose_alternate_request_card, 0, request_body, 0,
+                                                            ig_version)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including("fixed to 'create'"))
+        )
+      end
+
+      it 'does not filter out other validation errors' do
+        module_instance.injected_validation_issues = [create_fixed_error, other_error]
+        module_instance.validate_card_against_logical_model(propose_alternate_request_card, 0, request_body, 0,
+                                                            ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('Some other error'))
         )
       end
     end
@@ -279,7 +359,9 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       module_instance.perform_cards_logical_model_validation(
         [external_reference_card, instructions_card],
         [coverage_information_action],
-        0
+        request_body,
+        0,
+        ig_version
       )
 
       expect(module_instance.conforms_calls.length).to eq(3)
@@ -292,7 +374,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     end
 
     it 'handles missing cards and systemActions gracefully' do
-      expect { module_instance.perform_cards_logical_model_validation(nil, nil, 0) }.to_not raise_error
+      expect { module_instance.perform_cards_logical_model_validation(nil, nil, request_body, 0, ig_version) }.to_not raise_error
       expect(module_instance.conforms_calls).to be_empty
     end
   end
