@@ -470,7 +470,8 @@ module DaVinciCRDTestKit
       return if context.nil?
 
       service_request['subject']['reference'] = "Patient/#{context['patientId']}"
-      service_request['requester']['reference'] = context['userId']
+      service_request['requester']['reference'] =
+        requested_hook == 'order-dispatch' && ig_version == 'v221' ? context['performer'] : context['userId']
       service_request['authoredOn'] = current_time.strftime('%Y-%m-%d')
     end
 

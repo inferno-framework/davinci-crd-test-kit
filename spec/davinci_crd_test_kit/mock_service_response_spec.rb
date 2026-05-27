@@ -253,6 +253,19 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(service_request['requester']['reference']).to eq('Practitioner/example')
     end
 
+    it 'companions_prerequisites card uses performer as requester for order-dispatch v221' do
+      order_dispatch_body = JSON.parse(File.read(
+        File.join(__dir__, '..', '..', 'execution_scripts', 'prefetch',
+                  'order-dispatch-request_complete-prefetch.json')
+      )).deep_merge('context' => { 'performer' => 'Practitioner/the-performer' })
+      creator = make_v221_creator(types: ['companions_prerequisites'], body: order_dispatch_body,
+                                  hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG)
+      response = creator.build_mock_hook_response
+      service_request = response.dig('cards', 0, 'suggestions', 0, 'actions', 0, 'resource')
+      expect(service_request['subject']['reference']).to eq('Patient/forprefetch')
+      expect(service_request['requester']['reference']).to eq('Practitioner/the-performer')
+    end
+
     it 'propose_alternate_request appends delete and create actions for order-sign' do
       creator = make_v221_creator(types: ['propose_alternate_request'], body: order_sign_request_with_coverage)
       response = creator.build_mock_hook_response
