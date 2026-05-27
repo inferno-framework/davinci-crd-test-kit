@@ -16,6 +16,34 @@ module DaVinciCRDTestKit
     # Check resource conformance outside the logical models
     # -------------------------------------------------------------------------
 
+    def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_version)
+      resource = FHIR.from_contents(resource_hash.to_json)
+      unless resource.present?
+        add_message('error', "#{error_prefix}resource is not FHIR.")
+        return
+      end
+      if resource.is_a?(FHIR::Coverage)
+        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
+      else
+        add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Coverage'.")
+      end
+    end
+
+    def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_version)
+      resource = FHIR.from_contents(resource_hash.to_json)
+      unless resource.present?
+        add_message('error', "#{error_prefix}resource is not FHIR.")
+        return
+      end
+      if resource.is_a?(FHIR::Task)
+        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
+      else
+        add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Task'.")
+      end
+    end
+
     def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_version)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?

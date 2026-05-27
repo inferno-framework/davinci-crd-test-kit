@@ -98,6 +98,11 @@ module DaVinciCRDTestKit
                     'validating against the base CRD response logical model.')
         profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
       end
+      if [DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE,
+          DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE]
+          .include?(action_type)
+        profile_name = CRD_RESPONSE_BASE_LOGICAL_MODEL
+      end
 
       validation_issues = []
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
@@ -147,6 +152,12 @@ module DaVinciCRDTestKit
       when DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
         filter_and_manually_check_coverage_information_errors(action, validation_issues, request_body,
                                                               error_prefix, ig_version)
+      when DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE
+        filter_and_manually_check_update_coverage_action_errors(action, validation_issues,
+                                                                error_prefix, ig_version)
+      when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
+        filter_and_manually_check_form_completion_action_errors(action, validation_issues,
+                                                                error_prefix, ig_version)
       else
         validation_issues
       end
@@ -227,6 +238,36 @@ module DaVinciCRDTestKit
       if action['resource'].present?
         check_resource_conformance_to_order_or_encounter_profile(action['resource'], request_body,
                                                                  error_prefix, ig_version)
+      end
+
+      validation_issues.filter do |issue|
+        issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
+      end
+    end
+
+    def filter_and_manually_check_update_coverage_action_errors(action, validation_issues,
+                                                                error_prefix, ig_version)
+      unless action['type'] == 'update'
+        add_message('error', "#{error_prefix}action type must be 'update' for a coverage update action response type.")
+      end
+
+      if action['resource'].present?
+        check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_version)
+      end
+
+      validation_issues.filter do |issue|
+        issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
+      end
+    end
+
+    def filter_and_manually_check_form_completion_action_errors(action, validation_issues,
+                                                                error_prefix, ig_version)
+      unless action['type'] == 'create'
+        add_message('error', "#{error_prefix}action type must be 'create' for a form completion action response type.")
+      end
+
+      if action['resource'].present?
+        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_version)
       end
 
       validation_issues.filter do |issue|

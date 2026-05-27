@@ -7,7 +7,8 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     Class.new do
       include DaVinciCRDTestKit::CardsLogicalModelValidation
 
-      attr_reader :messages, :conforms_calls, :resource_is_valid_calls, :resource_conformance_calls
+      attr_reader :messages, :conforms_calls, :resource_is_valid_calls, :resource_conformance_calls,
+                  :coverage_profile_calls, :questionnaire_task_profile_calls
       attr_writer :injected_validation_issues
 
       def initialize
@@ -15,6 +16,8 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         @conforms_calls = []
         @resource_is_valid_calls = []
         @resource_conformance_calls = []
+        @coverage_profile_calls = []
+        @questionnaire_task_profile_calls = []
         @injected_validation_issues = []
       end
 
@@ -40,6 +43,14 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix,
                                                                    ig_version)
         @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
+      end
+
+      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_version)
+        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_version: }
+      end
+
+      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_version)
+        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_version: }
       end
 
       def scratch
@@ -90,6 +101,27 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         }
       }
     JSON
+  end
+
+  let(:coverage_update_action) do
+    {
+      'type' => 'update',
+      'description' => 'Update coverage',
+      'resource' => { 'resourceType' => 'Coverage', 'id' => 'cov1' }
+    }
+  end
+
+  let(:form_completion_task_action) do
+    {
+      'type' => 'create',
+      'description' => 'Create task',
+      'resource' => {
+        'resourceType' => 'Task',
+        'id' => 'task1',
+        'code' => { 'coding' => [{ 'code' => 'complete-questionnaire' }] },
+        'input' => [{ 'type' => { 'text' => 'questionnaire' }, 'valueCanonical' => 'http://example.org/q' }]
+      }
+    }
   end
 
   let(:mocked_card_responses_dir) do
@@ -363,6 +395,136 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'filters out validation issues that do not match the resource path pattern' do
         module_instance.injected_validation_issues = [non_resource_error]
         module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including('Some top-level validation error'))
+        )
+      end
+    end
+
+    context 'when validating create/update coverage system actions' do
+      let(:wrong_type_coverage_action) do
+        {
+          'type' => 'create',
+          'description' => 'Create coverage',
+          'resource' => { 'resourceType' => 'Coverage', 'id' => 'cov1' }
+        }
+      end
+      let(:resource_path_error) do
+        MockValidationIssue.new(
+          message: 'CDSHooksResponse.systemActions[0].resource/Coverage/some.error',
+          severity: 'error',
+          filtered: false,
+          location: nil
+        )
+      end
+      let(:non_resource_error) do
+        MockValidationIssue.new(
+          message: 'Some top-level validation error',
+          severity: 'warning',
+          filtered: false,
+          location: nil
+        )
+      end
+
+      it 'uses the base logical model URL, not the adjust-coverage model' do
+        module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.conforms_calls.first[:url])
+          .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
+      end
+
+      it 'reports an error when action type is not update' do
+        module_instance.validate_system_action_against_logical_model(wrong_type_coverage_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(type: 'error', message: a_string_including("action type must be 'update'"))
+        )
+      end
+
+      it 'calls check_resource_conformance_to_coverage_profile when the action has a resource' do
+        module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.coverage_profile_calls).to_not be_empty
+        call = module_instance.coverage_profile_calls.first
+        expect(call[:resource_hash]['resourceType']).to eq('Coverage')
+        expect(call[:ig_version]).to eq(ig_version)
+      end
+
+      it 'reports validation issues matching the resource path pattern' do
+        module_instance.injected_validation_issues = [resource_path_error]
+        module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('resource/Coverage/'))
+        )
+      end
+
+      it 'filters out validation issues not matching the resource path pattern' do
+        module_instance.injected_validation_issues = [non_resource_error]
+        module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including('Some top-level validation error'))
+        )
+      end
+    end
+
+    context 'when validating form completion system actions' do
+      let(:resource_path_error) do
+        MockValidationIssue.new(
+          message: 'CDSHooksResponse.systemActions[0].resource/Task/some.error',
+          severity: 'error',
+          filtered: false,
+          location: nil
+        )
+      end
+      let(:non_resource_error) do
+        MockValidationIssue.new(
+          message: 'Some top-level validation error',
+          severity: 'warning',
+          filtered: false,
+          location: nil
+        )
+      end
+
+      it 'uses the base logical model URL, not the form-completion model' do
+        module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.conforms_calls.first[:url])
+          .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
+      end
+
+      it 'calls check_resource_conformance_to_questionnaire_task_profile when the action has a resource' do
+        module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.questionnaire_task_profile_calls).to_not be_empty
+        call = module_instance.questionnaire_task_profile_calls.first
+        expect(call[:resource_hash]['resourceType']).to eq('Task')
+        expect(call[:ig_version]).to eq(ig_version)
+      end
+
+      it 'reports validation issues matching the resource path pattern' do
+        module_instance.injected_validation_issues = [resource_path_error]
+        module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
+                                                                     ig_version)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('resource/Task/'))
+        )
+      end
+
+      it 'filters out validation issues not matching the resource path pattern' do
+        module_instance.injected_validation_issues = [non_resource_error]
+        module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
                                                                      ig_version)
 
         expect(module_instance.messages).to_not include(
