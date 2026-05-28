@@ -40,8 +40,10 @@ module DaVinciCRDTestKit
         If no Request Form Completion cards or system actions are received, the test is skipped.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-62',
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-20',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-62',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-65'
+
       optional
       input :valid_cards_with_suggestions, :valid_system_actions
 

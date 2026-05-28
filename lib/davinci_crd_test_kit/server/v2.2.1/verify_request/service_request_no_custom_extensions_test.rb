@@ -53,7 +53,8 @@ module DaVinciCRDTestKit
         defined by US Core, CRD, or HREX it passes.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-7'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-7',
+                            'hl7.fhir.us.davinci-crd_2.2.1@hook-22'
 
       run do
         ALL_HOOK_TAGS.each do |tag|
