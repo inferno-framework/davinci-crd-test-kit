@@ -167,7 +167,7 @@ module DaVinciCRDTestKit
             if allowed_resource_types.nil?
               'a valid FHIR resource type.'
             else
-              "an one of the allowed resource types (#{allowed_resource_types.join(', ')})"
+              "one of the allowed resource types (#{allowed_resource_types.join(', ')})"
             end
 
           add_message('error',

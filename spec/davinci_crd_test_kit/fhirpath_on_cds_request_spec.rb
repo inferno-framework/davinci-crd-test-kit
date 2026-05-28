@@ -56,7 +56,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     end
 
     it 'allows whitespace around the minus operator' do
-      result = module_instance.execute_fhirpath_on_cds_request({}, ' 10 days')
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() - 10 days')
       expect(result).to eq(['2026-05-18'])
     end
   end
@@ -132,7 +132,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
 
       module_instance.execute_fhirpath_on_cds_request(hook_request, 'context.draftOrders.entry.resource.id')
 
-      expect(module_instance.instance_variable_get(:@current_fhir_base_server)).to be_nil
+      expect(module_instance.instance_variable_get(:@current_base_fhir_server)).to be_nil
     end
 
     it 'returns an empty array without calling the fhirpath service when the target hash is nil' do
