@@ -78,7 +78,7 @@ module DaVinciCRDTestKit
 
         exclude_message do |message|
           message.message.match?(
-            /Appointment\.participant\[.*]: This element does not match any known slice defined in the profile/
+            /Appointment\.participant\[.*\]: This element does not match any known slice defined in the profile/
           ) ||
             message.message.match?(
               /Slice 'Appointment.participant:\w+': a matching slice is required, but not found/
