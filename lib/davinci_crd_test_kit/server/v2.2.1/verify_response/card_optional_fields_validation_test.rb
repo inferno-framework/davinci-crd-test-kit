@@ -24,6 +24,12 @@ module DaVinciCRDTestKit
       input :valid_cards
       output :valid_cards_with_links, :valid_cards_with_suggestions
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-18',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-19',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-22'
+
       def cards_with_suggestions
         @cards_with_suggestions ||= []
       end
