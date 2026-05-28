@@ -195,6 +195,7 @@ Specific general limitations across all versions include:
   decision support. Testers should consider this requirement to be verified
   through attestation and should not represent their systems as having passed
   these tests if this requirement is not met.
+- Not all requirements are verified.
 
 ### Additional v2.0.1 Client Suite Limitations
 
@@ -203,5 +204,7 @@ Specific general limitations across all versions include:
 ### Additional v2.2.1 Client Suite Limitations
 
 - The [logical models defined in the v2.2.1 CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)
-  contain some bugs and inconsistencies. These have been reported and will be resolved in future versions of the CRD IG.
-  Work-arounds may be added to the test suite to prevent the spurious errors and cover gaps.
+  contain some bugs and inconsistencies. Known issues have been reported
+  and workarounds have been added to the test kit. If you identify an error
+  reported by Inferno that you believe is inaccurate, please report it
+  using [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).

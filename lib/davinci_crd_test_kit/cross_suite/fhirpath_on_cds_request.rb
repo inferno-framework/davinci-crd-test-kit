@@ -1,3 +1,4 @@
+require 'date'
 require 'uri'
 
 module DaVinciCRDTestKit
@@ -10,12 +11,17 @@ module DaVinciCRDTestKit
   # `resolve(target)` method must be provided, where `target` is
   module FhirpathOnCDSRequest
     SUPPORTED_POST_RESOLVE_FUNCTIONS = %w[ofType today resolve].freeze
+    TODAY_EXPRESSION_PATTERN = /\Atoday\(\)\s*(?:([+-])\s*(\d+)\s+days)?\z/
 
     # fhirpath services doesn't handle the following, which are handled manually
     # - non-fhir objects
     # - resolve()
     # - Bundle.entry.resource when resolve() appears in the remaining query (to track entry.fullUrl per entry)
+    # - standalone today() expressions (today(), today()-N, today()+N)
     def execute_fhirpath_on_cds_request(hook_request, fhirpath_query)
+      today_result = execute_today_expression(fhirpath_query)
+      return today_result if today_result
+
       cds_component, remaining_query = identify_cds_component(fhirpath_query)
       execution_targets = cds_component.present? ? get_cds_field(hook_request, cds_component) : hook_request
 
@@ -29,6 +35,22 @@ module DaVinciCRDTestKit
     end
 
     private
+
+    # -------------------------------------------------------------------------
+    # today() handling
+    # -------------------------------------------------------------------------
+
+    def execute_today_expression(fhirpath_query)
+      match = fhirpath_query.strip.match(TODAY_EXPRESSION_PATTERN)
+      return nil unless match
+
+      date = Date.today
+      if match[1]
+        days = match[2].to_i
+        date = match[1] == '+' ? date + days : date - days
+      end
+      [date.to_s]
+    end
 
     # -------------------------------------------------------------------------
     # resolve() handling

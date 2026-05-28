@@ -12,12 +12,13 @@ RSpec.describe DaVinciCRDTestKit::V221::InfernoResponseValidationTest do
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
 
-  def store_request(response_body, tags, status: 200)
+  def store_request(response_body, tags, status: 200, request_body: '{}')
     repo_create(
       :request,
       direction: 'incoming',
       test_session_id: test_session.id,
       result:,
+      request_body:,
       response_body:,
       tags:,
       status:

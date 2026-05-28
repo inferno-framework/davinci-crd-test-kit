@@ -15,6 +15,7 @@
   "suggestions": [
     {
       "label": "Add monthly physical assessment for the first 3 months",
+      "uuid": "5abc166b-c50f-4df4-bdb1-2b0b62cb9e55",
       "actions": [
         {
           "type": "create",

@@ -311,10 +311,14 @@ Notes:
 - Entries within the returned collection that are not data types (lists or objects) will be ignored.
 - If multiple entries (not including ignored and nil entries) are returned, then the results will
   be turned into a comma-delimited list for use in replacing the token.
+- Inferno supports the raw `today()` function alone as well as with addition
+  and subtraction of days, e.g., `{{today()}}`, `{{today() - 7 days}}`, and
+  `{{today() + 365 days}}`.
 - While the syntax follows CDS Hooks prefetch tokens, Inferno allows additional FHIRPath functions
   beyond the [limited set allowed by CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-tokens-containing-simpler-fhirpath)
   when they are made on FHIR resources within the CDS Hooks request. See 
   the [FHIRPath Evaluation Limitations](#fhirpath-evaluation-limitations) section for details.
+
 
 #### `coverage-information` Defaulting
 
@@ -448,6 +452,14 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
               {
                 "url": "pa-needed",
                 "valueCode": "no-auth"
+              },
+              {
+                "url": "date",
+                "valueDate": "{{today()}}"
+              },
+              {
+                "url": "expiry-date",
+                "valueCode": "{{today() + 7 days}}"
               }
             ]
           }
@@ -469,6 +481,14 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
               {
                 "url": "covered",
                 "valueCode": "not-covered"
+              },
+              {
+                "url": "date",
+                "valueDate": "{{today()}}"
+              },
+              {
+                "url": "expiry-date",
+                "valueCode": "{{today() + 7 days}}"
               }
             ]
           }
@@ -500,6 +520,14 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
               {
                 "url": "questionnaire",
                 "valueCanonical": "http://questionnaire.example.com/pa"
+              },
+              {
+                "url": "date",
+                "valueDate": "{{today()}}"
+              },
+              {
+                "url": "expiry-date",
+                "valueCode": "{{today() + 7 days}}"
               }
             ]
           }
@@ -651,6 +679,9 @@ The response contains:
   - Prescription-strength Advil: not covered (type, code, patient matched the inclusion criteria)
   - an MRI: prior auth required (type and code matched the inclusion criteria)
 
+This instantiation assumes that the request was made on `2026-01-01` for the
+purposes of the `today()` function.
+
 ```json
 {
   "cards": [
@@ -797,7 +828,11 @@ The response contains:
               },
               {
                 "url": "date",
-                "valueDate": "2025-12-30"
+                "valueDate": "2026-01-01"
+              },
+              {
+                "url": "expiry-date",
+                "valueDate": "2026-01-08"
               },
               {
                 "url": "coverage-assertion-id",
@@ -881,7 +916,11 @@ The response contains:
               },
               {
                 "url": "date",
-                "valueDate": "2025-12-30"
+                "valueDate": "2025-01-01"
+              },
+              {
+                "url": "expiry-date",
+                "valueDate": "2026-01-08"
               },
               {
                 "url": "coverage-assertion-id",
@@ -1031,6 +1070,9 @@ The response contains:
   - Prescription-strength Advil: covered (from the default `systemAction` entry)
   - an MRI: prior auth required (type and code matched the inclusion criteria)
 
+This instantiation assumes that the request was made on `2026-01-02` for the
+purposes of the `today()` function.
+
 ```json
 {
   "cards": [],
@@ -1085,7 +1127,11 @@ The response contains:
               },
               {
                 "url": "date",
-                "valueDate": "2025-12-30"
+                "valueDate": "2025-01-02"
+              },
+              {
+                "url": "expiry-date",
+                "valueDate": "2026-01-09"
               },
               {
                 "url": "coverage-assertion-id",
@@ -1169,7 +1215,11 @@ The response contains:
               },
               {
                 "url": "date",
-                "valueDate": "2025-12-30"
+                "valueDate": "2025-01-02"
+              },
+              {
+                "url": "expiry-date",
+                "valueDate": "2026-01-09"
               },
               {
                 "url": "coverage-assertion-id",
@@ -1219,7 +1269,11 @@ The response contains:
               },
               {
                 "url": "date",
-                "valueDate": "2025-12-30"
+                "valueDate": "2025-01-02"
+              },
+              {
+                "url": "expiry-date",
+                "valueDate": "2026-01-09"
               },
               {
                 "url": "coverage-assertion-id",

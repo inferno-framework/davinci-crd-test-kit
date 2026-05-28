@@ -59,7 +59,7 @@ module DaVinciCRDTestKit
       add_first_default(hook_response, 'cards') if hook_response['cards'].blank? && defaults_extension?(hook_response,
                                                                                                         'cards')
       remove_defaults_extension(hook_response, 'cards')
-      hook_response['cards'].each { |card| update_card(card) }
+      hook_response['cards']&.each { |card| update_card(card) }
     end
 
     def update_card(card)
@@ -157,7 +157,7 @@ module DaVinciCRDTestKit
 
     def filter_response(hook_response)
       filter_and_separate_defaults(hook_response, 'cards')
-      hook_response['cards'].each do |card|
+      hook_response['cards']&.each do |card|
         card['suggestions']&.each { |suggestion| filter_and_separate_defaults(suggestion, 'actions') }
       end
       filter_and_separate_defaults(hook_response, 'systemActions')

@@ -1,6 +1,7 @@
 require_relative '../../server_test_helper'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../../cross_suite/profiles_and_resource_types'
 
 module DaVinciCRDTestKit
   module V221
@@ -37,15 +38,11 @@ module DaVinciCRDTestKit
       input :invoked_hook
 
       def target_resources
-        shared_resources = [
-          'CommunicationRequest', 'DeviceRequest', 'MedicationRequest',
-          'NutritionOrder', 'ServiceRequest', 'VisionPrescription'
-        ]
         {
           'appointment-book' => ['Appointment'],
-          'order-sign' => shared_resources,
-          'order-dispatch' => shared_resources,
-          'order-select' => shared_resources,
+          'order-sign' => ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES,
+          'order-dispatch' => ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES,
+          'order-select' => ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES,
           'encounter-start' => ['Encounter'],
           'encounter-discharge' => ['Encounter']
         }[tested_hook_name]

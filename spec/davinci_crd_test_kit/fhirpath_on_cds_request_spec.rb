@@ -30,6 +30,37 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
     File.read(File.join(__dir__, '..', 'fixtures', 'Task-example-refill-task.json'))
   end
 
+  describe 'today() expressions' do
+    let(:fixed_date) { Date.new(2026, 5, 28) }
+
+    before { allow(Date).to receive(:today).and_return(fixed_date) }
+
+    it 'returns today\'s date for today()' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()')
+      expect(result).to eq(['2026-05-28'])
+    end
+
+    it 'returns a past date for today()-N days' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()-7 days')
+      expect(result).to eq(['2026-05-21'])
+    end
+
+    it 'returns a future date for today()+N days' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()+3 days')
+      expect(result).to eq(['2026-05-31'])
+    end
+
+    it 'allows whitespace around the operator' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() + 10 days')
+      expect(result).to eq(['2026-06-07'])
+    end
+
+    it 'allows whitespace around the minus operator' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() - 10 days')
+      expect(result).to eq(['2026-05-18'])
+    end
+  end
+
   describe 'for cds hook request fields' do
     it 'returns the value for a base string field' do
       results = module_instance.execute_fhirpath_on_cds_request(order_sign_request, 'hook')
@@ -101,7 +132,7 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
 
       module_instance.execute_fhirpath_on_cds_request(hook_request, 'context.draftOrders.entry.resource.id')
 
-      expect(module_instance.instance_variable_get(:@current_fhir_base_server)).to be_nil
+      expect(module_instance.instance_variable_get(:@current_base_fhir_server)).to be_nil
     end
 
     it 'returns an empty array without calling the fhirpath service when the target hash is nil' do

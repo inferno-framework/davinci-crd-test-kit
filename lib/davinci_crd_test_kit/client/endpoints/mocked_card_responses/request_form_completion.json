@@ -15,6 +15,7 @@
   "suggestions": [
     {
       "label": "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
+      "uuid": "5abc166b-c50f-4df4-bdc1-2b0b62cb9e55",
       "actions": [
         {
           "type": "create",
@@ -22,7 +23,7 @@
           "resource": {
             "resourceType": "Questionnaire",
             "id": "XYZ",
-            "url": "http://example.org/Questionnaire/XYZ",
+            "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ",
             "title": "Cancer Quality Forum Questionnaire XYZ",
             "version": "2",
             "status": "active",
@@ -35,7 +36,7 @@
                 "linkId": "1",
                 "code": [
                   {
-                    "system": "http://example.org/system/code/sections",
+                    "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/sections",
                     "code": "COMORBIDITY"
                   }
                 ],
@@ -45,7 +46,7 @@
                     "linkId": "1.1",
                     "code": [
                       {
-                        "system": "http://example.org/system/code/questions",
+                        "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/questions",
                         "code": "COMORB"
                       }
                     ],
@@ -57,7 +58,7 @@
                         "linkId": "1.1.1",
                         "code": [
                           {
-                            "system": "http://example.org/system/code/sections",
+                            "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/sections",
                             "code": "CARDIAL"
                           }
                         ],
@@ -77,7 +78,7 @@
                             "linkId": "1.1.1.1",
                             "code": [
                               {
-                                "system": "http://example.org/system/code/questions",
+                                "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/questions",
                                 "code": "COMORBCAR"
                               }
                             ],
@@ -89,7 +90,7 @@
                                 "linkId": "1.1.1.1.1",
                                 "code": [
                                   {
-                                    "system": "http://example.org/system/code/questions",
+                                    "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/questions",
                                     "code": "COMCAR00",
                                     "display": "Angina Pectoris"
                                   },
@@ -122,7 +123,7 @@
                             "linkId": "1.1.1.2",
                             "code": [
                               {
-                                "system": "http://example.org/system/code/questions",
+                                "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/questions",
                                 "code": "COMORBVAS"
                               }
                             ],
@@ -140,7 +141,7 @@
                 "linkId": "2",
                 "code": [
                   {
-                    "system": "http://example.org/system/code/sections",
+                    "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/sections",
                     "code": "HISTOPATHOLOGY"
                   }
                 ],
@@ -150,7 +151,7 @@
                     "linkId": "2.1",
                     "code": [
                       {
-                        "system": "http://example.org/system/code/sections",
+                        "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/sections",
                         "code": "ABDOMINAL"
                       }
                     ],
@@ -160,7 +161,7 @@
                         "linkId": "2.1.2",
                         "code": [
                           {
-                            "system": "http://example.org/system/code/questions",
+                            "system": "http://inferno.healthit.gov/davinci-crd-test-kit/code/questions",
                             "code": "STADPT",
                             "display": "pT category"
                           }
@@ -174,7 +175,7 @@
             ]
           },
           "extension": {
-            "davinci-crd.if-none-exist": "url=http://example.org/Questionnaire/XYZ&version=2"
+            "davinci-crd.if-none-exist": "url=<target_fhir_server>/Questionnaire?url=http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ&version=2"
           }
         },
         {
@@ -194,11 +195,11 @@
             },
             "description": "Complete XYZ form for local retention",
             "for": {
-              "reference": "http://example.org/fhir/Patient/123"
+              "reference": "Patient/<patient-id>"
             },
             "authoredOn": "2018-08-09",
             "requester": {
-              "reference": "http://example.org/fhir/Organization/payer"
+              "reference": "Organization/<payer-id>"
             },
             "input": [
               {
@@ -211,7 +212,7 @@
                     }
                   ]
                 },
-                "valueCanonical": "http://example.org/Questionnaire/XYZ"
+                "valueCanonical": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ"
               },
               {
                 "type": {
