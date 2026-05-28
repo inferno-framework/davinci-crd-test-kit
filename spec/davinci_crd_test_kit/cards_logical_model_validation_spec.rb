@@ -238,7 +238,7 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         expect(module_instance.resource_is_valid_calls.length).to eq(1)
         call = module_instance.resource_is_valid_calls.first
         expect(call[:resource].resourceType).to eq('Questionnaire')
-        expect(call[:message_prefix]).to include('Suggestion 1, Action 1')
+        expect(call[:message_prefix]).to include('suggestion 1, action 1')
       end
 
       it 'does not filter out other validation errors' do
@@ -373,7 +373,8 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
     context 'when validating coverage information actions' do
       let(:resource_path_error) do
         MockValidationIssue.new(
-          message: 'CDSHooksResponse.systemActions[0].resource/ServiceRequest/some.error',
+          message: 'CDSHooksResponse.systemActions[0].resource: ' \
+                   'Unable to find a match for the specified profile among choices',
           severity: 'error',
           filtered: false,
           location: nil
@@ -404,7 +405,7 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
                                                                      ig_semver)
 
         expect(module_instance.messages).to_not include(
-          hash_including(message: a_string_including('resource/ServiceRequest/'))
+          hash_including(message: a_string_including('Unable to find a match'))
         )
       end
 
@@ -429,7 +430,8 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       end
       let(:resource_path_error) do
         MockValidationIssue.new(
-          message: 'CDSHooksResponse.systemActions[0].resource/Coverage/some.error',
+          message: 'CDSHooksResponse.systemActions[0].resource: ' \
+                   'Unable to find a match for the specified profile among choices',
           severity: 'error',
           filtered: false,
           location: nil
@@ -477,7 +479,7 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
                                                                      ig_semver)
 
         expect(module_instance.messages).to_not include(
-          hash_including(message: a_string_including('resource/Coverage/'))
+          hash_including(message: a_string_including('Unable to find a match'))
         )
       end
 
@@ -495,7 +497,8 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
     context 'when validating form completion system actions' do
       let(:resource_path_error) do
         MockValidationIssue.new(
-          message: 'CDSHooksResponse.systemActions[0].resource/Task/some.error',
+          message: 'CDSHooksResponse.systemActions[0].resource: ' \
+                   'Unable to find a match for the specified profile among choices',
           severity: 'error',
           filtered: false,
           location: nil
@@ -534,7 +537,7 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
                                                                      ig_semver)
 
         expect(module_instance.messages).to_not include(
-          hash_including(message: a_string_including('resource/Task/'))
+          hash_including(message: a_string_including('Unable to find a match'))
         )
       end
 

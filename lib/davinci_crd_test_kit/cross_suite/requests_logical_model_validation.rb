@@ -53,6 +53,8 @@ module DaVinciCRDTestKit
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       reject_resource_issues(validation_issues).each do |issue|
+        next if issue.filtered
+
         add_message(issue.severity, "(Request #{request_index + 1}) #{issue.message}")
       end
     end
