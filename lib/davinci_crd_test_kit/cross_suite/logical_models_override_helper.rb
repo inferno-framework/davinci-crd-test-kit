@@ -17,67 +17,63 @@ module DaVinciCRDTestKit
     # -------------------------------------------------------------------------
 
     def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
-      resource = FHIR.from_contents(resource_hash.to_json)
-      unless resource.present?
-        add_message('error', "#{error_prefix}resource is not FHIR.")
-        return
-      end
-      if resource.is_a?(FHIR::Coverage)
-        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
-        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
-      else
-        add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Coverage'.")
-      end
+      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Coverage)
     end
 
     def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
-      resource = FHIR.from_contents(resource_hash.to_json)
-      unless resource.present?
-        add_message('error', "#{error_prefix}resource is not FHIR.")
-        return
-      end
-      if resource.is_a?(FHIR::Task)
-        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
-        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
-      else
-        add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Task'.")
-      end
+      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Task)
     end
 
     def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_semver)
-      resource = FHIR.from_contents(resource_hash.to_json)
-      unless resource.present?
-        add_message('error', "#{error_prefix}resource is not FHIR.")
-        return
-      end
-      case resource
-      when FHIR::Appointment
-        check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
-      when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
-           FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription, FHIR::Encounter
-        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
-        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
-      else
-        add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' is not allowed as a target " \
-                             'for a coverage-information action.')
-      end
+      check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
+                                            allowed_types: ProfilesAndResourceTypes::ORDER_OR_ENCOUNTER_RESOURCE_CLASSES,
+                                            disallowed_message: 'is not allowed as a target ' \
+                                                                'for a coverage-information action')
     end
 
     def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
+      check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
+                                            allowed_types: ProfilesAndResourceTypes::ORDER_RESOURCE_CLASSES,
+                                            disallowed_message: 'is not allowed for CRD orders')
+    end
+
+    # -------------------------------------------------------------------------
+    # Resource conformance helpers
+    # -------------------------------------------------------------------------
+
+    def parse_action_resource(resource_hash, error_prefix)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
         add_message('error', "#{error_prefix}resource is not FHIR.")
         return
       end
-      case resource
-      when FHIR::Appointment
-        check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
-      when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
-           FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription
-        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
-        resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
-      else
-        add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' is not allowed for CRD orders.")
+      yield resource
+    end
+
+    def check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, expected_class)
+      parse_action_resource(resource_hash, error_prefix) do |resource|
+        if resource.is_a?(expected_class)
+          resource_is_valid?(resource:, profile_url: structure_definition_map(ig_semver)[resource.resourceType],
+                             message_prefix: error_prefix)
+        else
+          add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' " \
+                               "expected '#{expected_class.name.split('::').last}'.")
+        end
+      end
+    end
+
+    def check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
+                                              allowed_types:, disallowed_message:)
+      parse_action_resource(resource_hash, error_prefix) do |resource|
+        case resource
+        when FHIR::Appointment
+          check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
+        when *allowed_types
+          resource_is_valid?(resource:, profile_url: structure_definition_map(ig_semver)[resource.resourceType],
+                             message_prefix: error_prefix)
+        else
+          add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' #{disallowed_message}.")
+        end
       end
     end
 

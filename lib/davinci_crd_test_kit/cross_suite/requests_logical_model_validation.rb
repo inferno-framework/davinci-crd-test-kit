@@ -13,11 +13,6 @@ module DaVinciCRDTestKit
       'Practitioner', 'PractitionerRole'
     ].freeze
 
-    ORDERS_ALLOWED_RESOURCE_TYPES = [
-      'CommunicationRequest', 'DeviceRequest', 'MedicationRequest',
-      'NutritionOrder', 'ServiceRequest', 'VisionPrescription'
-    ].freeze
-
     def validate_request_against_logical_model(request_body, request_index, ig_semver)
       if ig_semver == '2.2.1'
         check_logical_model_conformance_no_resource_checks(request_body, request_index, ig_semver)
@@ -140,7 +135,7 @@ module DaVinciCRDTestKit
         request_body['context']['dispatchedOrders'].each_with_index do |order_reference, index|
           local_reference?(order_reference,
                            "(Request #{request_index + 1}) context.dispatchedOrders entry #{index + 1}",
-                           allowed_resource_types: ORDERS_ALLOWED_RESOURCE_TYPES)
+                           allowed_resource_types: ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES)
         end
       else
         local_reference?(request_body['context']['userId'],
@@ -151,7 +146,7 @@ module DaVinciCRDTestKit
             error_prefix = "(Request #{request_index + 1}) context.selections entry #{index + 1}"
             next unless local_reference?(order_reference,
                                          error_prefix,
-                                         allowed_resource_types: ORDERS_ALLOWED_RESOURCE_TYPES)
+                                         allowed_resource_types: ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES)
 
             referenced_resource_present_in_bundle?(request_body['context']['draftOrders'], order_reference,
                                                    error_prefix, 'draftOrders')

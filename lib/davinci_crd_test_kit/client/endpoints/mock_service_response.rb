@@ -476,9 +476,7 @@ module DaVinciCRDTestKit
     end
 
     def payer_reference_from_coverage
-      if patient_coverage.present? && patient_coverage.payor.present? && patient_coverage.payor.first.reference.present?
-        patient_coverage.payor.first.reference
-      end
+      patient_coverage&.payor&.first&.reference
     end
 
     def update_service_request(service_request)

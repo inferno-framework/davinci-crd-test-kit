@@ -244,40 +244,37 @@ module DaVinciCRDTestKit
         check_resource_conformance_to_order_or_encounter_profile(action['resource'], request_body,
                                                                  error_prefix, ig_semver)
       end
-
-      validation_issues.filter do |issue|
-        issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
-      end
+      filter_system_action_resource_issues(validation_issues)
     end
 
     def filter_and_manually_check_update_coverage_action_errors(action, validation_issues,
                                                                 error_prefix, ig_semver)
-      unless action['type'] == 'update'
-        add_message('error', "#{error_prefix}action type must be 'update' for a coverage update action response type.")
-      end
-
+      check_required_action_type(action, 'update', error_prefix, 'coverage update action response type')
       if action['resource'].present?
         check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_semver)
       end
+      filter_system_action_resource_issues(validation_issues)
+    end
 
+    def filter_and_manually_check_form_completion_action_errors(action, validation_issues,
+                                                                error_prefix, ig_semver)
+      check_required_action_type(action, 'create', error_prefix, 'form completion action response type')
+      if action['resource'].present?
+        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver)
+      end
+      filter_system_action_resource_issues(validation_issues)
+    end
+
+    def filter_system_action_resource_issues(validation_issues)
       validation_issues.filter do |issue|
         issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
       end
     end
 
-    def filter_and_manually_check_form_completion_action_errors(action, validation_issues,
-                                                                error_prefix, ig_semver)
-      unless action['type'] == 'create'
-        add_message('error', "#{error_prefix}action type must be 'create' for a form completion action response type.")
-      end
+    def check_required_action_type(action, required_type, error_prefix, description)
+      return if action['type'] == required_type
 
-      if action['resource'].present?
-        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver)
-      end
-
-      validation_issues.filter do |issue|
-        issue.message.match(%r{CDSHooksResponse\.systemActions\[0\]\.resource/[A-Za-z]+/})
-      end
+      add_message('error', "#{error_prefix}action type must be '#{required_type}' for a #{description}.")
     end
   end
 end

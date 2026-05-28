@@ -1,5 +1,12 @@
 module DaVinciCRDTestKit
   module ProfilesAndResourceTypes
+    ORDER_RESOURCE_CLASSES = [
+      FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
+      FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription
+    ].freeze
+    ORDER_OR_ENCOUNTER_RESOURCE_CLASSES = (ORDER_RESOURCE_CLASSES + [FHIR::Encounter]).freeze
+    ORDER_RESOURCE_TYPES = ORDER_RESOURCE_CLASSES.map { |c| c.name.split('::').last }.freeze
+
     def structure_definition_map(ig_version)
       case ig_version
       when 'v221', '2.2.1'
