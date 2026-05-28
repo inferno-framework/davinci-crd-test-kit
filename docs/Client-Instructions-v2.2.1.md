@@ -112,7 +112,7 @@ for complete details on how to use these inputs.
 After running one or more hook groups, run group "1.3 Cross Hook" to check if the client
 has met requirements that must be demonstrated across all hook requests, but aren't required for each hook invocation.
 For example, clients must have received and attested to display support of the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
-response type including all must support elements on the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+response type including all must support elements on the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
 which Inferno must have observed during the testing.
 
 Re-run these tests to re-evaluate after making additional requests with adjusted responses
