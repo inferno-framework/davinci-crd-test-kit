@@ -250,6 +250,21 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
     end
 
+    context 'when a Questionnaire type error has an unexpected message format' do
+      it 'raises with an implementation problem message when indexes cannot be extracted' do
+        bad_format_issue = MockValidationIssue.new(
+          message: "The type 'Questionnaire' is not valid - must be Task",
+          severity: 'error',
+          filtered: false
+        )
+        module_instance.injected_validation_issues = [bad_format_issue]
+
+        expect do
+          module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+        end.to raise_error(RuntimeError, /implementation problem in the test kit/)
+      end
+    end
+
     context 'when validating additional orders cards' do
       let(:other_error) { MockValidationIssue.new(message: 'Some other error', severity: 'warning', filtered: false) }
 

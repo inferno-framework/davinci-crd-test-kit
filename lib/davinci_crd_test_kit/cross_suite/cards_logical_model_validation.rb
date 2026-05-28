@@ -177,6 +177,11 @@ module DaVinciCRDTestKit
     def check_questionnaire_actions(card, error_message, error_prefix)
       extracted_indexes =
         error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
+      unless extracted_indexes
+        raise 'Unexpected validator error message format in check_questionnaire_actions: ' \
+              "'#{error_message}'. This indicates an implementation problem in the test kit — please log a ticket."
+      end
+
       suggestion_index = extracted_indexes[1].to_i
       action_index = extracted_indexes[2].to_i
 
