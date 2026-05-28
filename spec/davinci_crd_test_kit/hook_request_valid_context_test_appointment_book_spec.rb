@@ -93,6 +93,10 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
         config(
           options: { hook_name: 'appointment-book' }
         )
+
+        def suite_id
+          'SUITE_ID'
+        end
       end
     end
 

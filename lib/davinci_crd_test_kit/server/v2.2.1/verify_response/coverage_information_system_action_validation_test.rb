@@ -156,7 +156,7 @@ module DaVinciCRDTestKit
 
         resource = FHIR.from_contents(coverage_info_system_action['resource'].to_json)
         profile_url = structure_definition_map('v221')[resource.resourceType]
-        assert_valid_resource(resource:, profile_url:)
+        resource_is_valid?(resource:, profile_url:)
 
         grouped_coverage_info = extract_and_group_coverage_info(resource)
         multiple_extensions_conformance_check(grouped_coverage_info, resource)
@@ -176,7 +176,8 @@ module DaVinciCRDTestKit
         error_messages.each do |msg|
           messages << { type: 'error', message: msg }
         end
-        assert error_messages.empty?, 'Some Coverage Info system actions are not valid.'
+
+        assert_no_error_messages 'Some Coverage Info system actions are not valid.'
       end
     end
   end
