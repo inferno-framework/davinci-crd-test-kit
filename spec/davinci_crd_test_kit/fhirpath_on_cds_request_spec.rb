@@ -40,23 +40,23 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
       expect(result).to eq(['2026-05-28'])
     end
 
-    it 'returns a past date for today()-N' do
-      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()-7')
+    it 'returns a past date for today()-N days' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()-7 days')
       expect(result).to eq(['2026-05-21'])
     end
 
-    it 'returns a future date for today()+N' do
-      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()+3')
+    it 'returns a future date for today()+N days' do
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today()+3 days')
       expect(result).to eq(['2026-05-31'])
     end
 
     it 'allows whitespace around the operator' do
-      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() + 10')
+      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() + 10 days')
       expect(result).to eq(['2026-06-07'])
     end
 
     it 'allows whitespace around the minus operator' do
-      result = module_instance.execute_fhirpath_on_cds_request({}, 'today() - 10')
+      result = module_instance.execute_fhirpath_on_cds_request({}, ' 10 days')
       expect(result).to eq(['2026-05-18'])
     end
   end

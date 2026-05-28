@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
   # `resolve(target)` method must be provided, where `target` is
   module FhirpathOnCDSRequest
     SUPPORTED_POST_RESOLVE_FUNCTIONS = %w[ofType today resolve].freeze
-    TODAY_EXPRESSION_PATTERN = /\Atoday\(\)\s*(?:([+-])\s*(\d+))?\z/
+    TODAY_EXPRESSION_PATTERN = /\Atoday\(\)\s*(?:([+-])\s*(\d+)\s+days)?\z/
 
     # fhirpath services doesn't handle the following, which are handled manually
     # - non-fhir objects
