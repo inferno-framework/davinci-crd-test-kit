@@ -177,7 +177,7 @@ module DaVinciCRDTestKit
           messages << { type: 'error', message: msg }
         end
 
-        assert error_messages.empty?, 'Some Coverage Info system actions are not valid.'
+        assert_no_error_messages 'Some Coverage Info system actions are not valid.'
       end
     end
   end
