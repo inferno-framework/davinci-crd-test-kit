@@ -16,35 +16,35 @@ module DaVinciCRDTestKit
     # Check resource conformance outside the logical models
     # -------------------------------------------------------------------------
 
-    def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_version)
+    def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
         add_message('error', "#{error_prefix}resource is not FHIR.")
         return
       end
       if resource.is_a?(FHIR::Coverage)
-        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
         resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
       else
         add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Coverage'.")
       end
     end
 
-    def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_version)
+    def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
         add_message('error', "#{error_prefix}resource is not FHIR.")
         return
       end
       if resource.is_a?(FHIR::Task)
-        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
         resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
       else
         add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' expected 'Task'.")
       end
     end
 
-    def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_version)
+    def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_semver)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
         add_message('error', "#{error_prefix}resource is not FHIR.")
@@ -52,10 +52,10 @@ module DaVinciCRDTestKit
       end
       case resource
       when FHIR::Appointment
-        check_appointment_conformance(resource, request_body, error_prefix, ig_version)
+        check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
       when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
            FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription, FHIR::Encounter
-        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
         resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
       else
         add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' is not allowed as a target " \
@@ -63,7 +63,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_version)
+    def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
       resource = FHIR.from_contents(resource_hash.to_json)
       unless resource.present?
         add_message('error', "#{error_prefix}resource is not FHIR.")
@@ -71,10 +71,10 @@ module DaVinciCRDTestKit
       end
       case resource
       when FHIR::Appointment
-        check_appointment_conformance(resource, request_body, error_prefix, ig_version)
+        check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
       when FHIR::CommunicationRequest, FHIR::DeviceRequest, FHIR::MedicationRequest,
            FHIR::NutritionOrder, FHIR::ServiceRequest, FHIR::VisionPrescription
-        profile_url = structure_definition_map(ig_version)[resource.resourceType]
+        profile_url = structure_definition_map(ig_semver)[resource.resourceType]
         resource_is_valid?(resource:, profile_url:, message_prefix: error_prefix)
       else
         add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' is not allowed for CRD orders.")
@@ -85,7 +85,7 @@ module DaVinciCRDTestKit
     # Appointment conformance (requires extra help to decide profile and check profile-based slicing)
     # -------------------------------------------------------------------------
 
-    def check_appointment_conformance(appointment, request_body, error_prefix, ig_version)
+    def check_appointment_conformance(appointment, request_body, error_prefix, ig_semver)
       target_appointment_profile =
         if appointment.basedOn.present?
           'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-with-order'
@@ -94,7 +94,7 @@ module DaVinciCRDTestKit
         end
 
       validation_issues = []
-      resource_is_valid?(resource: appointment, profile_url: "#{target_appointment_profile}|#{ig_version}",
+      resource_is_valid?(resource: appointment, profile_url: "#{target_appointment_profile}|#{ig_semver}",
                          add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       filter_and_manually_check_appointment_validation_errors(validation_issues, appointment, request_body)

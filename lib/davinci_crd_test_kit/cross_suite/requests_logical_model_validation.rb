@@ -18,15 +18,15 @@ module DaVinciCRDTestKit
       'NutritionOrder', 'ServiceRequest', 'VisionPrescription'
     ].freeze
 
-    def validate_request_against_logical_model(request_body, request_index, ig_version)
-      if ig_version == '2.2.1'
-        check_logical_model_conformance_no_resource_checks(request_body, request_index, ig_version)
+    def validate_request_against_logical_model(request_body, request_index, ig_semver)
+      if ig_semver == '2.2.1'
+        check_logical_model_conformance_no_resource_checks(request_body, request_index, ig_semver)
       else
-        conforms_to_logical_model?(request_body, "#{CRD_CDS_HOOK_REQUEST_MODEL_URL}|#{ig_version}",
+        conforms_to_logical_model?(request_body, "#{CRD_CDS_HOOK_REQUEST_MODEL_URL}|#{ig_semver}",
                                    message_prefix: "(Request #{request_index + 1}) ")
       end
 
-      perform_version_specific_additional_verification(request_body, request_index, ig_version)
+      perform_version_specific_additional_verification(request_body, request_index, ig_semver)
     end
 
     private
@@ -35,8 +35,8 @@ module DaVinciCRDTestKit
     # Additional Validation to cover areas not checked or checked incorrectly by the logical models
     # -------------------------------------------------------------------------
 
-    def perform_version_specific_additional_verification(request_body, request_index, ig_version)
-      case ig_version
+    def perform_version_specific_additional_verification(request_body, request_index, ig_semver)
+      case ig_semver
       when '2.2.1'
         perform_v221_additional_verification(request_body, request_index)
       end
@@ -52,9 +52,9 @@ module DaVinciCRDTestKit
     # Context resources profile check (not working in v2.2.1 logical models)
     # -------------------------------------------------------------------------
 
-    def check_logical_model_conformance_no_resource_checks(request_body, request_index, ig_version)
+    def check_logical_model_conformance_no_resource_checks(request_body, request_index, ig_semver)
       validation_issues = []
-      conforms_to_logical_model?(request_body, "#{CRD_CDS_HOOK_REQUEST_MODEL_URL}|#{ig_version}",
+      conforms_to_logical_model?(request_body, "#{CRD_CDS_HOOK_REQUEST_MODEL_URL}|#{ig_semver}",
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       reject_filtered_and_resource_issues(validation_issues).each do |issue|
@@ -62,27 +62,27 @@ module DaVinciCRDTestKit
       end
     end
 
-    def check_context_resource_profiles(request_body, request_index, ig_version)
+    def check_context_resource_profiles(request_body, request_index, ig_semver)
       case request_body['hook']
       when 'order-sign', 'order-select'
-        draft_orders_conform_to_profiles?(request_body, request_index, ig_version)
+        draft_orders_conform_to_profiles?(request_body, request_index, ig_semver)
       when 'order-dispatch'
         request_body.dig('context', 'fulfillmentTasks')&.each_with_index do |task, index|
           resource = FHIR.from_contents(task.to_json)
-          resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-task-dispatch|#{ig_version}",
+          resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-task-dispatch|#{ig_semver}",
                              message_prefix: "(Request #{request_index + 1}) " \
                                              "context.fulfillmentTasks entry #{index + 1} - ")
         end
       when 'appointment-book'
-        check_appointments_profiles(request_body, request_index, ig_version)
+        check_appointments_profiles(request_body, request_index, ig_semver)
       end
     rescue JSON::ParserError
       nil # no resource to validate - error found elsewhere
     end
 
-    def draft_orders_conform_to_profiles?(request_body, request_index, ig_version)
+    def draft_orders_conform_to_profiles?(request_body, request_index, ig_semver)
       resource = FHIR.from_contents(request_body.dig('context', 'draftOrders')&.to_json)
-      resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-request|#{ig_version}",
+      resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-request|#{ig_semver}",
                          message_prefix: "(Request #{request_index + 1}) context.draftOrders - ")
     end
 
@@ -90,25 +90,25 @@ module DaVinciCRDTestKit
     # Appointment conformance (requires extra help to decide profile and check profile-based slicing)
     # -------------------------------------------------------------------------
 
-    def check_appointments_profiles(request_body, request_index, ig_version)
+    def check_appointments_profiles(request_body, request_index, ig_semver)
       resource = FHIR.from_contents(request_body.dig('context', 'appointments')&.to_json)
       return unless resource.is_a?(FHIR::Bundle)
 
       check_bundle_non_entry_resource_conformance(resource,
                                                   "(Request #{request_index + 1}) context.appointments - ",
-                                                  ig_version)
+                                                  ig_semver)
 
       resource.entry.each_with_index do |entry, entry_index|
         next unless entry.resource.present? # error caught on Bundle validation
 
         error_prefix = "(Request #{request_index + 1}) context.appointments entry #{entry_index + 1} - "
-        check_appointment_conformance(entry.resource, request_body, error_prefix, ig_version)
+        check_appointment_conformance(entry.resource, request_body, error_prefix, ig_semver)
       end
     end
 
-    def check_bundle_non_entry_resource_conformance(bundle, error_prefix, ig_version)
+    def check_bundle_non_entry_resource_conformance(bundle, error_prefix, ig_semver)
       validation_issues = []
-      resource_is_valid?(resource: bundle, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-base|#{ig_version}",
+      resource_is_valid?(resource: bundle, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-base|#{ig_semver}",
                          add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       reject_entry_resource_issues(validation_issues).each do |issue|

@@ -36,21 +36,21 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         true
       end
 
-      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_version)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
+      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
       end
 
       def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix,
-                                                                   ig_version)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_version: }
+                                                                   ig_semver)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
       end
 
-      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_version)
-        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_version: }
+      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
+        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
       end
 
-      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_version)
-        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_version: }
+      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
+        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
       end
 
       def scratch
@@ -84,7 +84,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     }
   end
   let(:request_body) { { 'context' => { 'patientId' => 'p1' }, 'fhirServer' => 'http://example.com/fhir' } }
-  let(:ig_version) { '2.2.1' }
+  let(:ig_semver) { '2.2.1' }
   let(:coverage_information_action) do
     JSON.parse(<<~JSON)
       {
@@ -134,7 +134,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
   describe '#validate_card_against_logical_model' do
     it 'wraps an external reference card in a CDS Hooks response and validates it against the logical model' do
-      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       call = module_instance.conforms_calls.first
@@ -144,35 +144,35 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     end
 
     it 'uses the additional orders logical model for additional-orders cards' do
-      module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-additionalOrders')
     end
 
     it 'uses the instructions logical model for instructions cards' do
-      module_instance.validate_card_against_logical_model(instructions_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(instructions_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-instructions')
     end
 
     it 'uses the launchSMART logical model for launch SMART app cards' do
-      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-launchSMART')
     end
 
     it 'uses the formCompletion logical model for form completion cards' do
-      module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.last[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-formCompletion')
     end
 
     it 'records an error and skips validation when a card is not a JSON object' do
-      module_instance.validate_card_against_logical_model('not a card', 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model('not a card', 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls).to be_empty
       expect(module_instance.messages).to include(
@@ -186,7 +186,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         'links' => [{ 'type' => 'smart' }, { 'type' => 'absolute' }]
       }
 
-      module_instance.validate_card_against_logical_model(unknown_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(unknown_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       expect(module_instance.conforms_calls.first[:url])
@@ -203,7 +203,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         filtered: false
       )
       module_instance.injected_validation_issues = [extension_issue]
-      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_version)
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
 
       expect(module_instance.messages).to_not include(
         hash_including(message: a_string_including('Unrecognized property'))
@@ -225,7 +225,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'filters out the matched Questionnaire type error and does not add it as a message' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including("The type 'Questionnaire' is not valid"))
@@ -233,7 +233,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'calls resource_is_valid? on the Questionnaire resource at the referenced path' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver)
 
         expect(module_instance.resource_is_valid_calls.length).to eq(1)
         call = module_instance.resource_is_valid_calls.first
@@ -242,7 +242,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'does not filter out other validation errors' do
-        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including(other_error_message))
@@ -260,7 +260,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         module_instance.injected_validation_issues = [bad_format_issue]
 
         expect do
-          module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_version)
+          module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver)
         end.to raise_error(RuntimeError, /implementation problem in the test kit/)
       end
     end
@@ -270,7 +270,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'does not filter out validation errors' do
         module_instance.injected_validation_issues = [other_error]
-        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
+        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('Some other error'))
@@ -278,12 +278,12 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       end
 
       it 'checks conformance of action resources against order profiles' do
-        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_version)
+        module_instance.validate_card_against_logical_model(additional_orders_card, 0, request_body, 0, ig_semver)
 
         expect(module_instance.resource_conformance_calls).to_not be_empty
         call = module_instance.resource_conformance_calls.first
         expect(call[:resource_hash]['resourceType']).to eq('ServiceRequest')
-        expect(call[:ig_version]).to eq(ig_version)
+        expect(call[:ig_semver]).to eq(ig_semver)
       end
     end
 
@@ -300,7 +300,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'filters out the fixed-to-create validator error' do
         module_instance.injected_validation_issues = [create_fixed_error]
         module_instance.validate_card_against_logical_model(propose_alternate_request_card, 0, request_body, 0,
-                                                            ig_version)
+                                                            ig_semver)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including("fixed to 'create'"))
@@ -310,7 +310,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'does not filter out other validation errors' do
         module_instance.injected_validation_issues = [create_fixed_error, other_error]
         module_instance.validate_card_against_logical_model(propose_alternate_request_card, 0, request_body, 0,
-                                                            ig_version)
+                                                            ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('Some other error'))
@@ -322,7 +322,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
   describe '#validate_system_action_against_logical_model' do
     it 'wraps the action in a CDS Hooks response and uses the coverageInformation logical model' do
       module_instance.validate_system_action_against_logical_model(coverage_information_action, 2, request_body, 1,
-                                                                   ig_version)
+                                                                   ig_semver)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       call = module_instance.conforms_calls.first
@@ -332,7 +332,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
     end
 
     it 'records an error and skips validation when a system action is not a JSON object' do
-      module_instance.validate_system_action_against_logical_model('not an action', 0, request_body, 0, ig_version)
+      module_instance.validate_system_action_against_logical_model('not an action', 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls).to be_empty
       expect(module_instance.messages).to include(
@@ -344,7 +344,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       unknown_action = { 'type' => 'update', 'description' => 'x',
                          'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
 
-      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_version)
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver)
 
       expect(module_instance.conforms_calls.length).to eq(1)
       expect(module_instance.conforms_calls.first[:url])
@@ -363,7 +363,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         filtered: false
       )
       module_instance.injected_validation_issues = [extension_issue]
-      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_version)
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver)
 
       expect(module_instance.messages).to_not include(
         hash_including(message: a_string_including('Unrecognized property'))
@@ -390,18 +390,18 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'calls check_resource_conformance_to_order_or_encounter_profile when the action has a resource' do
         module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.resource_conformance_calls).to_not be_empty
         call = module_instance.resource_conformance_calls.first
         expect(call[:resource_hash]['resourceType']).to eq('ServiceRequest')
-        expect(call[:ig_version]).to eq(ig_version)
+        expect(call[:ig_semver]).to eq(ig_semver)
       end
 
       it 'reports validation issues whose message matches the system action resource path pattern' do
         module_instance.injected_validation_issues = [resource_path_error]
         module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('resource/ServiceRequest/'))
@@ -411,7 +411,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'filters out validation issues that do not match the resource path pattern' do
         module_instance.injected_validation_issues = [non_resource_error]
         module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including('Some top-level validation error'))
@@ -446,7 +446,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'uses the base logical model URL, not the adjust-coverage model' do
         module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.conforms_calls.first[:url])
           .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
@@ -454,7 +454,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'reports an error when action type is not update' do
         module_instance.validate_system_action_against_logical_model(wrong_type_coverage_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(type: 'error', message: a_string_including("action type must be 'update'"))
@@ -463,18 +463,18 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'calls check_resource_conformance_to_coverage_profile when the action has a resource' do
         module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.coverage_profile_calls).to_not be_empty
         call = module_instance.coverage_profile_calls.first
         expect(call[:resource_hash]['resourceType']).to eq('Coverage')
-        expect(call[:ig_version]).to eq(ig_version)
+        expect(call[:ig_semver]).to eq(ig_semver)
       end
 
       it 'reports validation issues matching the resource path pattern' do
         module_instance.injected_validation_issues = [resource_path_error]
         module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('resource/Coverage/'))
@@ -484,7 +484,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'filters out validation issues not matching the resource path pattern' do
         module_instance.injected_validation_issues = [non_resource_error]
         module_instance.validate_system_action_against_logical_model(coverage_update_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including('Some top-level validation error'))
@@ -512,7 +512,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'uses the base logical model URL, not the form-completion model' do
         module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.conforms_calls.first[:url])
           .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponseBase')
@@ -520,18 +520,18 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
       it 'calls check_resource_conformance_to_questionnaire_task_profile when the action has a resource' do
         module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.questionnaire_task_profile_calls).to_not be_empty
         call = module_instance.questionnaire_task_profile_calls.first
         expect(call[:resource_hash]['resourceType']).to eq('Task')
-        expect(call[:ig_version]).to eq(ig_version)
+        expect(call[:ig_semver]).to eq(ig_semver)
       end
 
       it 'reports validation issues matching the resource path pattern' do
         module_instance.injected_validation_issues = [resource_path_error]
         module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to include(
           hash_including(message: a_string_including('resource/Task/'))
@@ -541,7 +541,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
       it 'filters out validation issues not matching the resource path pattern' do
         module_instance.injected_validation_issues = [non_resource_error]
         module_instance.validate_system_action_against_logical_model(form_completion_task_action, 0, request_body, 0,
-                                                                     ig_version)
+                                                                     ig_semver)
 
         expect(module_instance.messages).to_not include(
           hash_including(message: a_string_including('Some top-level validation error'))
@@ -557,7 +557,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
         [coverage_information_action],
         request_body,
         0,
-        ig_version
+        ig_semver
       )
 
       expect(module_instance.conforms_calls.length).to eq(3)
@@ -571,7 +571,7 @@ RSpec.describe DaVinciCRDTestKit::CardsLogicalModelValidation do
 
     it 'handles missing cards and systemActions gracefully' do
       expect do
-        module_instance.perform_cards_logical_model_validation(nil, nil, request_body, 0, ig_version)
+        module_instance.perform_cards_logical_model_validation(nil, nil, request_body, 0, ig_semver)
       end.to_not raise_error
       expect(module_instance.conforms_calls).to be_empty
     end
