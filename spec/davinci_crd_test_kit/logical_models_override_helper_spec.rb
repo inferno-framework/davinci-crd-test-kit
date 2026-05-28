@@ -36,21 +36,13 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     JSON.parse(File.read(File.join(__dir__, '..', 'fixtures', 'appointment_book_hook_request.json')))
   end
 
-  describe '#reject_filtered_and_resource_issues' do
+  describe '#reject_resource_issues' do
     it 'keeps issues that are not filtered and have no location' do
       issue = IssueStub.new(filtered: false, location: nil, message: 'something', severity: 'error')
 
-      result = module_instance.send(:reject_filtered_and_resource_issues, [issue])
+      result = module_instance.send(:reject_resource_issues, [issue])
 
       expect(result).to eq([issue])
-    end
-
-    it 'rejects issues where filtered is true' do
-      issue = IssueStub.new(filtered: true, location: nil, message: 'something', severity: 'error')
-
-      result = module_instance.send(:reject_filtered_and_resource_issues, [issue])
-
-      expect(result).to be_empty
     end
 
     it 'rejects issues whose location contains a /*ResourceType/ path segment' do
@@ -59,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
                             message: 'something',
                             severity: 'error')
 
-      result = module_instance.send(:reject_filtered_and_resource_issues, [issue])
+      result = module_instance.send(:reject_resource_issues, [issue])
 
       expect(result).to be_empty
     end
@@ -70,7 +62,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
                             message: 'something',
                             severity: 'error')
 
-      result = module_instance.send(:reject_filtered_and_resource_issues, [issue])
+      result = module_instance.send(:reject_resource_issues, [issue])
 
       expect(result).to eq([issue])
     end
@@ -252,7 +244,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     end
   end
 
-  describe '#filter_and_manually_check_appointment_validation_errors' do
+  describe '#manually_check_appointment_validation_errors' do
     let(:request_body) do
       { 'fhirServer' => 'https://example/r4', 'context' => { 'patientId' => 'pt-1' } }
     end
@@ -300,7 +292,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     it 'keeps non-filtered issues' do
       issue = IssueStub.new(filtered: false, location: nil, message: 'something', severity: 'error')
 
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [issue], appointment_without_slices, request_body)
 
       expect(result).to eq([issue])
@@ -309,14 +301,14 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     it 'rejects filtered issues' do
       issue = IssueStub.new(filtered: true, location: nil, message: 'something', severity: 'error')
 
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [issue], appointment_without_slices, request_body)
 
       expect(result).to be_empty
     end
 
     it 'rejects the PrimaryPerformer slice error when the appointment has a PPRF participant' do
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [primary_performer_slice_error],
                                     appointment_with_performer_and_patient, request_body)
 
@@ -324,7 +316,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     end
 
     it 'keeps the PrimaryPerformer slice error when the appointment has no PPRF participant' do
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [primary_performer_slice_error],
                                     appointment_without_slices, request_body)
 
@@ -332,7 +324,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     end
 
     it 'rejects the Patient slice error when the appointment has a patient participant' do
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [patient_slice_error],
                                     appointment_with_performer_and_patient, request_body)
 
@@ -340,7 +332,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     end
 
     it 'keeps the Patient slice error when the appointment has no patient participant' do
-      result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+      result = module_instance.send(:manually_check_appointment_validation_errors,
                                     [patient_slice_error],
                                     appointment_without_slices, request_body)
 
@@ -366,7 +358,7 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
         # Issue order matches validator output: element-level errors before slice-level errors
         issues = [matched_participant_slice_issue, primary_performer_slice_error]
 
-        result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+        result = module_instance.send(:manually_check_appointment_validation_errors,
                                       issues, appointment_with_performer_and_patient, request_body)
 
         expect(result).to be_empty
@@ -375,14 +367,14 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
       it 'keeps the "does not match any known slice" issue for non-matched participant indexes' do
         issues = [unmatched_participant_slice_issue, primary_performer_slice_error]
 
-        result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+        result = module_instance.send(:manually_check_appointment_validation_errors,
                                       issues, appointment_with_performer_and_patient, request_body)
 
         expect(result).to eq([unmatched_participant_slice_issue])
       end
 
       it 'keeps the "does not match any known slice" issue when no slice is resolved' do
-        result = module_instance.send(:filter_and_manually_check_appointment_validation_errors,
+        result = module_instance.send(:manually_check_appointment_validation_errors,
                                       [matched_participant_slice_issue], appointment_without_slices, request_body)
 
         expect(result).to eq([matched_participant_slice_issue])

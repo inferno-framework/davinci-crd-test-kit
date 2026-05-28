@@ -52,7 +52,7 @@ module DaVinciCRDTestKit
       conforms_to_logical_model?(request_body, "#{CRD_CDS_HOOK_REQUEST_MODEL_URL}|#{ig_semver}",
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
-      reject_filtered_and_resource_issues(validation_issues).each do |issue|
+      reject_resource_issues(validation_issues).each do |issue|
         add_message(issue.severity, "(Request #{request_index + 1}) #{issue.message}")
       end
     end

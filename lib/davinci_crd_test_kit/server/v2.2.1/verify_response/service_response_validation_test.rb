@@ -1,12 +1,12 @@
 require_relative '../../../cross_suite/cards_validation'
-require_relative '../../../cross_suite/cards_logical_model_validation'
+require_relative '../../../cross_suite/response_logical_model_validation'
 require_relative '../../server_hook_helper'
 
 module DaVinciCRDTestKit
   module V221
     class ServiceResponseValidationTest < Inferno::Test
       include DaVinciCRDTestKit::CardsValidation
-      include DaVinciCRDTestKit::CardsLogicalModelValidation
+      include DaVinciCRDTestKit::ResponseLogicalModelValidation
       include DaVinciCRDTestKit::ServerHookHelper
 
       title 'All service responses contain valid cards and optional systemActions'
@@ -78,7 +78,7 @@ module DaVinciCRDTestKit
 
           perform_system_actions_validation(service_response['systemActions'], index)
 
-          # perform_cards_logical_model_validation(service_response['cards'], service_response['systemActions'], index)
+          # perform_response_logical_model_validation(service_response['cards'], service_response['systemActions'], index)
         rescue JSON::ParserError
           add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end

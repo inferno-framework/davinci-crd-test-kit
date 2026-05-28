@@ -6,9 +6,10 @@ module DaVinciCRDTestKit
     # Clean up messages returned from logical model validation
     # -------------------------------------------------------------------------
 
-    def reject_filtered_and_resource_issues(issues)
+    def reject_resource_issues(issues)
       issues.reject do |issue|
-        issue.filtered || issue.location&.match?(%r{/\*[A-Za-z]+/}) # looking for /*<resourceType>/
+        issue.location&.match?(%r{/\*[A-Za-z]+/}) || # looking for /*<resourceType>/
+          issue.message&.match(/.resource: Unable to find a match for the specified profile among choices/)
       end
     end
 
@@ -93,13 +94,13 @@ module DaVinciCRDTestKit
       resource_is_valid?(resource: appointment, profile_url: "#{target_appointment_profile}|#{ig_semver}",
                          add_messages_to_runnable: false, validator_response_details: validation_issues)
 
-      filter_and_manually_check_appointment_validation_errors(validation_issues, appointment, request_body)
+      manually_check_appointment_validation_errors(validation_issues, appointment, request_body)
         .each do |issue|
           add_message(issue.severity, "#{error_prefix}#{issue.message}")
         end
     end
 
-    def filter_and_manually_check_appointment_validation_errors(validation_issues, appointment, request_body)
+    def manually_check_appointment_validation_errors(validation_issues, appointment, request_body)
       @matched_participant_slice_indexes = []
       validation_issues.reverse.reject do |issue|
         issue.filtered ||
