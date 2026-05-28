@@ -14,7 +14,8 @@
   "selectionBehavior": "any",
   "suggestions": [
     {
-      "label": "Create/Update coverage information"
+      "label": "Create/Update coverage information",
+      "uuid": "5abc166b-c50f-4df4-bdb2-2b0b62cb9e55"
     }
   ]
 }

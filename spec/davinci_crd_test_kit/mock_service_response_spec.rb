@@ -253,6 +253,19 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(service_request['requester']['reference']).to eq('Practitioner/example')
     end
 
+    it 'companions_prerequisites card uses performer as requester for order-dispatch v221' do
+      order_dispatch_body = JSON.parse(File.read(
+                                         File.join(__dir__, '..', '..', 'execution_scripts', 'prefetch',
+                                                   'order-dispatch-request_complete-prefetch.json')
+                                       )).deep_merge('context' => { 'performer' => 'Practitioner/the-performer' })
+      creator = make_v221_creator(types: ['companions_prerequisites'], body: order_dispatch_body,
+                                  hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG)
+      response = creator.build_mock_hook_response
+      service_request = response.dig('cards', 0, 'suggestions', 0, 'actions', 0, 'resource')
+      expect(service_request['subject']['reference']).to eq('Patient/forprefetch')
+      expect(service_request['requester']['reference']).to eq('Practitioner/the-performer')
+    end
+
     it 'propose_alternate_request appends delete and create actions for order-sign' do
       creator = make_v221_creator(types: ['propose_alternate_request'], body: order_sign_request_with_coverage)
       response = creator.build_mock_hook_response
@@ -403,6 +416,74 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
           message: include('Coverage Information')
         )
       )
+    end
+
+    it 'form completion questionnaire if-none-exist includes the fhirServer URL' do
+      creator = make_v221_creator(types: ['request_form_completion'], body: order_sign_request_with_coverage)
+      response = creator.build_mock_hook_response
+      questionnaire_action = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Questionnaire'
+      end
+      if_none_exist = questionnaire_action.dig('extension', 'davinci-crd.if-none-exist')
+      expect(if_none_exist).to include('https://example/r4/Questionnaire')
+      expect(if_none_exist).to_not include('<target_fhir_server>')
+    end
+
+    it 'form completion questionnaire if-none-exist uses empty string when fhirServer is absent' do
+      body = { 'context' => { 'userId' => 'Practitioner/example', 'patientId' => 'example' } }
+      messages_double = instance_double(Inferno::Repositories::Messages)
+      allow(messages_double).to receive(:create)
+      allow(Inferno::Repositories::Messages).to receive(:new).and_return(messages_double)
+
+      creator = make_v221_creator(types: ['request_form_completion'], body: body)
+      response = creator.build_mock_hook_response
+      questionnaire_action = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Questionnaire'
+      end
+      if_none_exist = questionnaire_action.dig('extension', 'davinci-crd.if-none-exist')
+      expect(if_none_exist).to_not include('<target_fhir_server>')
+      expect(if_none_exist).to start_with('url=/')
+    end
+
+    it 'form completion task for reference is set from patientId' do
+      creator = make_v221_creator(types: ['request_form_completion'], body: order_sign_request_with_coverage)
+      response = creator.build_mock_hook_response
+      task = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Task'
+      end['resource']
+      expect(task['for']['reference']).to eq('Patient/example')
+    end
+
+    it 'form completion task id is a generated UUID' do
+      creator = make_v221_creator(types: ['request_form_completion'], body: order_sign_request_with_coverage)
+      response = creator.build_mock_hook_response
+      task = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Task'
+      end['resource']
+      expect(task['id']).to match(/\A[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}\z/i)
+    end
+
+    it 'form completion task requester is set from coverage payor reference' do
+      creator = make_v221_creator(types: ['request_form_completion'], body: order_sign_request_with_coverage)
+      response = creator.build_mock_hook_response
+      task = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Task'
+      end['resource']
+      expect(task['requester']['reference']).to eq('http://example.org/fhir/Organization/example-payer')
+    end
+
+    it 'form completion task requester is removed when no coverage is available' do
+      body = { 'context' => { 'userId' => 'Practitioner/example', 'patientId' => 'example' } }
+      messages_double = instance_double(Inferno::Repositories::Messages)
+      allow(messages_double).to receive(:create)
+      allow(Inferno::Repositories::Messages).to receive(:new).and_return(messages_double)
+
+      creator = make_v221_creator(types: ['request_form_completion'], body: body)
+      response = creator.build_mock_hook_response
+      task = response.dig('cards', 0, 'suggestions', 0, 'actions').find do |a|
+        a.dig('resource', 'resourceType') == 'Task'
+      end['resource']
+      expect(task).to_not have_key('requester')
     end
   end
 end

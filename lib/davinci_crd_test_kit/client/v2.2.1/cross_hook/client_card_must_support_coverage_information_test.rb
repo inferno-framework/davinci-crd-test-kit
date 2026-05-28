@@ -10,14 +10,14 @@ module DaVinciCRDTestKit
       title 'Client supports the Coverage Information response type'
       id :crd_v221_client_card_must_support_coverage_information
       description <<~DESCRIPTION
-        During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+        During this test, Inferno will verify that the client demonstrated support for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information)
         response type for this hook. At least one hook invocation received during this group must have returned a Coverage Information action.
-        Additionally, all [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+        Additionally, all [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         must support elements must be demonstrated across all the returned actions.
 
         If this test fails, adjust the [cards returned by Inferno's simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
         and/or the hook requests made by the client during the Hooks tests such that Coverage Information actions are returned
-        that cover the full scope of the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+        that cover the full scope of the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         and support for them is demonstrated.
       DESCRIPTION
 

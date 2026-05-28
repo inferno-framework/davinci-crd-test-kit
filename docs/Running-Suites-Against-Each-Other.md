@@ -40,7 +40,7 @@ Notes:
 Running the v2.2.1 suites against each other requires 2 server sessions, one connecting to each
 of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
 
-1. Start a "Da Vinci CRD Client v2.2.1 Test Suite" session using any version of US Core / USCDI
+1. Start a "Da Vinci CRD Client v2.2.1 Test Suite" session using US Core 3.1.1
 1. Apply preset "Run against the CRD Server Suite"
 1. Run client group "1.1 Registration"
 1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session in a new tab that will connect to the "complete prefetch" endpoints
@@ -58,13 +58,34 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
 1. Run server group "3.7 Required Card Response Validation" in both server sessions.
 
 Some tests will fail, including
-- Because mocked responses are used, not all coverage-info extension elements are demonstrated in client test 1.3.01. 
 - TLS tests in the client suite (1.2.x.3.08) and server suites (1.01) will fail when executed in a local system.
-- Validation of response cards in client and server suites may not pass at this time.
+- Client tests 1.2.x.3.01 validating that the hook requests structure and content will fail with errors
+  on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
+  fields to verify that the server ignores them.
+- Appointment validation in the server suite on tests 3.1.2.02 and 3.1.3.07 due to validator limitations.
+- Coverage Information Must Support in the server suite on tests 3.7.02. Coverage is demonstrated across both
+  server sessions together, but not individually.
+
+### Additional Optional Steps for Long-running Hook Request
+
+1. In the client session, run group "1.4 Long-running Hook Request" with no changes to the inputs.
+1. In the "complete prefetch" server session, run group "2 Demonstrate A Hook Response" with no
+   changes to the inputs.
+1. Note that a "User Action Required" dialog will appear in the server session with no option to
+   continue other than to cancel. This is expected because it is waiting for the client session's
+   simulated CRD server to respond. That simulated CRD server is pausing for 5 seconds before
+   responding.
+1. After 5 seconds, the "User Action Required" dialog in the server session will disappear and the
+   tests will complete.
+1. Return to the client session and a new "User Action Required" asking for an attestation that
+   the user's workflow could continue during the long-running request. Attest "true" because
+   you had the option of cancelling Inferno's tests.
+
+All tests should pass.
 
 ### Additional Optional Steps for FHIR API Testing
 
-1. In the "subset prefetch" server sessions, run group "2 Demonstrate A Hook Response", with
+1. In the "subset prefetch" server session, run group "2 Demonstrate A Hook Response", with
    the following changes to inputs:
    - Update the **Mock EHR Data** input with the contents of the [stress-test-Bundle.json](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/endpoints/mock_ehr/stress-test-Bundle.json)
      file. This contains a complete set of US Core data. NOTE: its size introduces a small amount of lag into the Inferno UI
@@ -76,8 +97,9 @@ Some tests will fail, including
 
 Some tests will fail, including:
 - Client test 2.1.1.01 requiring TLS will fail when executed in a local system.
-- Client test 2.1.2.01 will fail because the CRD client simulation in the Server suite does not automatically update the Bundle with
-  resource updates in `systemActions`.
+- Client test 2.1.2.01 will fail because the CRD client simulation in the Server suite does not
+  automatically update the Bundle with resource updates in `systemActions`.
+- Client test 2.1.11.10 will fail due to an expected conformance issue (this assumes that US Core version 3.1.1 was chosen at client session creation)
 - The server tests will fail as expected because no responses were sent by the client suite.
-- - Client tests 1.2.x.3.01 validating that the hook requests structure and content will fail with errors on the 4th and 5th requests only because the server suite purposefully sends non-conformant requests with unexpected fields to verify that the server ignores them.
+
 

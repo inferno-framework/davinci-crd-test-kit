@@ -1,12 +1,12 @@
 require_relative '../../../cross_suite/cards_validation'
-require_relative '../../../cross_suite/cards_logical_model_validation'
+require_relative '../../../cross_suite/response_logical_model_validation'
 require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V221
     class InfernoResponseValidationTest < Inferno::Test
       include CardsValidation
-      include CardsLogicalModelValidation
+      include ResponseLogicalModelValidation
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       title 'Hook responses have the correct structure and content'
@@ -52,12 +52,17 @@ module DaVinciCRDTestKit
         entity_validated = false
         requests.each_with_index do |request, index|
           response_hash = JSON.parse(request.response_body)
+          request_hash = JSON.parse(request.request_body)
 
           next unless response_hash['cards'].present? || response_hash['systemActions'].present?
 
           entity_validated = true
           validate_card_summaries(response_hash['cards'])
-          perform_cards_logical_model_validation(response_hash['cards'], response_hash['systemActions'], index)
+          perform_response_logical_model_validation(response_hash['cards'],
+                                                    response_hash['systemActions'],
+                                                    request_hash,
+                                                    index,
+                                                    '2.2.1')
         rescue JSON::ParserError
           next
         end

@@ -126,11 +126,16 @@ module DaVinciCRDTestKit
 
       hook_display = requested_hook.split('-').map(&:capitalize).join(' ')
       card_response['cards']&.tap(&:compact!)&.each do |card|
-        card['summary'].prepend("#{hook_display} ")
-        card['uuid'] = SecureRandom.uuid
+        update_one_card_info(card, hook_display)
       end
       card_response['systemActions']&.compact!
       card_response
+    end
+
+    def update_one_card_info(card, hook_display)
+      card['summary'].prepend("#{hook_display} ")
+      card['uuid'] = SecureRandom.uuid
+      card['suggestions']&.each { |suggestion| suggestion['uuid'] = SecureRandom.uuid if suggestion['uuid'].present? }
     end
 
     def resource_to_update_field_name
@@ -160,6 +165,10 @@ module DaVinciCRDTestKit
       return if resource.entry.empty?
 
       resource.entry.first.resource
+    end
+
+    def patient_coverage
+      @patient_coverage ||= get_patient_coverage
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
@@ -247,14 +256,13 @@ module DaVinciCRDTestKit
       return unless add_coverage_cards?
 
       system_actions = []
-      coverage = get_patient_coverage
-      if coverage.present?
+      if patient_coverage.present?
         if selected_response_types.include?('coverage_information') || coverage_information_required?
-          system_actions = create_coverage_extension_system_actions(coverage.id)
+          system_actions = create_coverage_extension_system_actions(patient_coverage.id)
         end
 
         if selected_response_types.include?('create_update_coverage_info')
-          coverage_card = create_or_update_coverage(coverage)
+          coverage_card = create_or_update_coverage(patient_coverage)
           cards.append(coverage_card) if coverage_card.present?
         end
       end
@@ -314,13 +322,23 @@ module DaVinciCRDTestKit
 
     def find_one_prefetched_order_dispatch_order(order_reference)
       resource_type, id = order_reference.split('/')
-      prefetch_key = "#{resource_type[0].downcase}#{resource_type[1..]}s"
-      return unless request_body['prefetch'].present? && request_body['prefetch'][prefetch_key].present?
+      return unless request_body['prefetch'].present?
 
-      prefetch_bundle = FHIR.from_contents(request_body['prefetch'][prefetch_key].to_json)
-      prefetch_bundle.entry.find do |entry|
-        entry.resource.present? && entry.resource.resourceType == resource_type && entry.resource.id == id
+      request_body['prefetch'].each_value do |prefetch_value|
+        entry = find_entry_in_prefetch_bundle(prefetch_value, resource_type, id)
+        return entry if entry.present?
       end
+
+      nil
+    end
+
+    def find_entry_in_prefetch_bundle(prefetch_value, resource_type, id)
+      return unless prefetch_value.is_a?(Hash)
+
+      bundle = FHIR.from_contents(prefetch_value.to_json)
+      return unless bundle.is_a?(FHIR::Bundle)
+
+      bundle.entry.find { |e| e.resource.present? && e.resource.resourceType == resource_type && e.resource.id == id }
     end
 
     def create_system_actions(resource, coverage_id)
@@ -433,6 +451,13 @@ module DaVinciCRDTestKit
       return if context.nil?
 
       request_form_completion_card = load_json_file('request_form_completion.json')
+      form_completion_questionnaire_action = request_form_completion_card['suggestions'][0]['actions'].find do |action|
+        action['resource']['resourceType'] == 'Questionnaire'
+      end
+      target_fhir_server = request_body['fhirServer'].present? ? request_body['fhirServer'].chomp('/') : ''
+      form_completion_questionnaire_action['extension']['davinci-crd.if-none-exist']
+        .gsub!('<target_fhir_server>', target_fhir_server)
+
       form_completion_task = request_form_completion_card['suggestions'][0]['actions'].find do |action|
         action['resource']['resourceType'] == 'Task'
       end['resource']
@@ -440,14 +465,26 @@ module DaVinciCRDTestKit
       form_completion_task['for']['reference'] = "Patient/#{context['patientId']}"
       form_completion_task['authoredOn'] = current_time.strftime('%Y-%m-%d')
       form_completion_task['input'].delete_at(1) if ig_version == 'v221'
+      form_completion_task['id'] = SecureRandom.uuid
+      payer_reference = payer_reference_from_coverage
+      if payer_reference.present?
+        form_completion_task['requester']['reference'] = payer_reference
+      else
+        form_completion_task.delete('requester')
+      end
       request_form_completion_card
+    end
+
+    def payer_reference_from_coverage
+      patient_coverage&.payor&.first&.reference
     end
 
     def update_service_request(service_request)
       return if context.nil?
 
       service_request['subject']['reference'] = "Patient/#{context['patientId']}"
-      service_request['requester']['reference'] = context['userId']
+      service_request['requester']['reference'] =
+        requested_hook == 'order-dispatch' && ig_version == 'v221' ? context['performer'] : context['userId']
       service_request['authoredOn'] = current_time.strftime('%Y-%m-%d')
     end
 
