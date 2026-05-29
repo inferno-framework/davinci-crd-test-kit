@@ -24,7 +24,7 @@ demonstration of cards and actions conforming to the supported CRD response type
 
 The server suites each contain three top-level groups:
 1. The "Discovery" group validates a CRD server's discovery response.
-1. The "Demonstrate A Hook Response" group validates that the server can respond
+1. The "Demonstrate a Hook Response" group validates that the server can respond
    to a single hook invocation and return conformant cards and actions.
 1. The "Hook Tests" group makes one or more CDS Hooks calls for each hook type
    that the tester provides request bodies for. It then validates that the responses
@@ -88,7 +88,7 @@ workflow as the v2.0.1 suite and adds checks for v2.2.1-specific behavior includ
 - Required Coverage Information system actions for primary hooks when the request resource does not
   already contain a coverage-information extension.
 - Handling of the `coverage-info=false` configuration option when advertised as supported.
-- Tolerance of unknown configuration values, unknown context values, and unknown CDS Hooks fields.
+- Tolerance of unknown `configuration` values, unknown `context` values, and unknown CDS Hooks fields.
 - Demonstration of coverage-information extension must support elements across the test session.
 - Demonstration that the billing-options extension is not required for the server to respond.
 

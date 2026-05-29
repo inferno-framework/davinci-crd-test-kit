@@ -63,13 +63,13 @@ Some tests will fail, including
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
 - Appointment validation in the server suite on tests 3.1.2.02 and 3.1.3.07 due to validator limitations.
-- Coverage Information Must Support in the server suite on tests 3.7.02. Coverage is demonstrated across both
+- "Coverage Information responses demonstrate Must Support elements" in the server suite on test 3.7.02. Coverage is demonstrated across both
   server sessions together, but not individually.
 
 ### Additional Optional Steps for Long-running Hook Request
 
 1. In the client session, run group "1.4 Long-running Hook Request" with no changes to the inputs.
-1. In the "complete prefetch" server session, run group "2 Demonstrate A Hook Response" with no
+1. In the "complete prefetch" server session, run group "2 Demonstrate a Hook Response" with no
    changes to the inputs.
 1. Note that a "User Action Required" dialog will appear in the server session with no option to
    continue other than to cancel. This is expected because it is waiting for the client session's
@@ -85,7 +85,7 @@ All tests should pass.
 
 ### Additional Optional Steps for FHIR API Testing
 
-1. In the "subset prefetch" server session, run group "2 Demonstrate A Hook Response", with
+1. In the "subset prefetch" server session, run group "2 Demonstrate a Hook Response", with
    the following changes to inputs:
    - Update the **Mock EHR Data** input with the contents of the [stress-test-Bundle.json](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/endpoints/mock_ehr/stress-test-Bundle.json)
      file. This contains a complete set of US Core data. NOTE: its size introduces a small amount of lag into the Inferno UI
@@ -101,5 +101,4 @@ Some tests will fail, including:
   automatically update the Bundle with resource updates in `systemActions`.
 - Client test 2.1.11.10 will fail due to an expected conformance issue (this assumes that US Core version 3.1.1 was chosen at client session creation)
 - The server tests will fail as expected because no responses were sent by the client suite.
-
 
