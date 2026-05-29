@@ -97,6 +97,9 @@ Key shared logic within the [`cross_suite`](https://github.com/inferno-framework
 directory includes:
 * **[`base_urls.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/base_urls.rb)**:
   defines urls used by suites for both client and server actors, such as pass and fail continuation urls displayed in wait dialogs.
+* **[`profiles_and_resource_types.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/profiles_and_resource_types.rb)**: contains constants and methods related to CRD allowed resource types and profiles used in many places
+  within the code base.
+  defines urls used by suites for both client and server actors, such as pass and fail continuation urls displayed in wait dialogs.
 * **[`cards_identification.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/cards_identification.rb)**: Defines the logic for identifying the CRD type of a CDS Hook card or system action (e.g., [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) or [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)).
 * **Manual Verification Logic**: Several files define logic for verifying the conformance of CDS Hooks requests and responses,
   including cards to CRD card profiles (e.g., [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
@@ -111,6 +114,10 @@ directory includes:
   - **[`response_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/response_logical_model_validation.rb)**:
     Card logical models in the 2.2.1 version require some response mangling to get to work, which is handled by this module.
   - **[`requests_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/requests_logical_model_validation.rb)**: Unlike card models, request models can be used directly.
+  - **[`logical_models_override_helper.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/logical_models_override_helper.rb)**: Contains helper functions designed to correctly verify conformance of CRD requests
+    and responses in situations where the logical models are incorrect, don't work correctly with the HL7 validator, or the HL7
+    validator's responses lack necessary detail. For example, CRD Appointment profile validation requires some additional help outside
+    the validator due to profile-based slicing that the validator won't evaluate without additional setup.
 * **Prefetch Verification Logic**: because prefetch details are defined by the CRD server, the logical models introduced starting in CRD v2.2.1
   do not verify prefetch details provided in CRD requests. Furthermore, the requirements evolved significantly from v2.0.1, meaning that there
   are several modules assisting with prefetch verification:
