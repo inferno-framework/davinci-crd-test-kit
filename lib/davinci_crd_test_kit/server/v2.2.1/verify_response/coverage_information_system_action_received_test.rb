@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
 
-      title 'Coverage Information system action was received'
+      title 'Server returns a Coverage Information system action'
       id :crd_v221_coverage_info_system_action_received
       description %(
         This test validates that a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)

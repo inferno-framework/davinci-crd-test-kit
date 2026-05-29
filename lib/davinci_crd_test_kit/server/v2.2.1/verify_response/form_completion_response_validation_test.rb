@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Request Form Completion cards or system actions received'
+      title 'Request Form Completion cards and system actions are valid'
       id :crd_v221_request_form_completion_response_validation
       description %(
         This test validates the Request Form Completion cards or system actions received from the CRD service,

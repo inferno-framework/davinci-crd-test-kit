@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
     class VerifyResponseWithoutBillingOptionsTest < Inferno::Test
       include DaVinciCRDTestKit::ServerHookHelper
 
-      title 'Server does not require Billing Options Extension'
+      title 'Server does not require the billing-options extension'
       id :verify_response_without_billing_options
       description <<~DESCRIPTION
         The IG states that, "CRD servers **SHALL NOT** depend on the

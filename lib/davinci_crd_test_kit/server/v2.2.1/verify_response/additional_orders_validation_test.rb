@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Additional Orders as companions/prerequisites cards received'
+      title 'Additional Orders cards are valid'
       id :crd_v221_additional_orders_card_validation
       description %(
         This test validates that an [Additional Orders as companions/prerequisites](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)
