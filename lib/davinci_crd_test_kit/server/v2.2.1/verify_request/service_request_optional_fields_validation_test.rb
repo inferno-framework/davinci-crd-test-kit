@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookRequestValidation
       include DaVinciCRDTestKit::ServerHookHelper
 
-      title 'All service requests contain optional fields'
+      title 'Service request optional fields are valid'
       id :crd_v221_service_request_optional_fields_validation
       description %(
         This optional test reviews the user-submitted CRD service requests for the presence of optional fields:

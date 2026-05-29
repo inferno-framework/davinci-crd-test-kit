@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
       run_as_group
 
       test from: :tls_version_test do
-        title 'CRD Server is secured by transport layer security'
+        title 'CRD server uses TLS 1.2 or higher'
         description <<~DESCRIPTION
           Under [Privacy, Safety, and
           Security](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/security.html),

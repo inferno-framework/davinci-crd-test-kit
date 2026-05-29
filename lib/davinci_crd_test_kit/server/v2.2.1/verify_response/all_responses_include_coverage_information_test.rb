@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
 
-      title 'All hook responses include Coverage Information system action'
+      title 'Hook responses include Coverage Information system actions'
       id :crd_v221_all_responses_include_coverage_information
       description %(
         This test validates that a [Coverage

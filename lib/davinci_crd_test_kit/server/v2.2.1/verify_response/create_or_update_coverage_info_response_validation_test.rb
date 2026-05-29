@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Create or Update Coverage Information cards or system actions received'
+      title 'Create or Update Coverage Information cards and system actions are valid'
       id :crd_v221_create_or_update_coverage_info_response_validation
       description %(
         This test validates the Create or Update Coverage Information cards or system actions received from the

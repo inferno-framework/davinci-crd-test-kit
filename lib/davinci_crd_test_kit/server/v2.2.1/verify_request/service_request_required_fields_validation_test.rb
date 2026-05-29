@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookRequestValidation
       include DaVinciCRDTestKit::ServerHookHelper
 
-      title 'All service requests contain required fields'
+      title 'Service requests contain required fields'
       id :crd_v221_service_request_required_fields_validation
       description %(
         This test validates all CRD service requests provided by the user, ensuring each includes all required fields

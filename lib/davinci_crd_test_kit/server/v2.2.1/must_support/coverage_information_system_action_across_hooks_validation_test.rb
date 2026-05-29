@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class CoverageInformationSystemActionAcrossHooksValidationTest < Inferno::Test
       include DaVinciCRDTestKit::ServerTestHelper
 
-      title 'Valid Coverage Information system actions received across all hooks'
+      title 'Coverage Information system actions are valid across all hooks'
       id :crd_v221_coverage_info_system_action_across_hooks_validation
       description %(
         This test verifies the presence of valid [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)

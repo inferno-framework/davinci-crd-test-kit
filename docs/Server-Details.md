@@ -24,9 +24,11 @@ demonstration of cards and actions conforming to the supported CRD response type
 
 The server suites each contain three top-level groups:
 1. The "Discovery" group validates a CRD server's discovery response.
-1. The "Demonstrate A Hook Response" group validates that the server can respond
-   to a single hook invocation and return conformant cards and actions.
-1. The "Hook Tests" group makes one or more CDS Hooks calls for each hook type
+1. The v2.0.1 "Demonstrate A Hook Response" group and the v2.2.1
+   "Hook Response Demonstration" group validate that the server can respond to
+   a single hook invocation and return conformant cards and actions.
+1. The v2.0.1 "Hook Tests" group and the v2.2.1 "Hooks" group make
+   one or more CDS Hooks calls for each hook type
    that the tester provides request bodies for. It then validates that the responses
    are conformant and cover the response behavior required by the hook type.
 

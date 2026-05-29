@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ResponseLogicalModelValidation
       include DaVinciCRDTestKit::ServerHookHelper
 
-      title 'All service responses contain valid cards and systemActions'
+      title 'Service responses contain valid cards and systemActions'
       id :crd_v221_service_response_validation
       description %(
         As per the [CDS Hooks spec section on CDS Service

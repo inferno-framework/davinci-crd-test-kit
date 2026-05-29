@@ -9,7 +9,7 @@ require_relative 'server_required_card_response_validation_group'
 module DaVinciCRDTestKit
   module V221
     class ServerHooksGroup < Inferno::TestGroup
-      title 'Hook Tests'
+      title 'Hooks'
       id :crd_v221_server_hooks
       description %(
         # Background
