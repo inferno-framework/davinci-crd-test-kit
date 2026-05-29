@@ -175,6 +175,65 @@ When making changes to the test kit itself, it's important to ensure the changes
     update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's
     [GitHub Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
 
+## Naming and Style Guidelines
+
+Consistency in naming and documentation helps to make the test kit and its suites clear
+and understandable to users. The maintainers of this repository strongly recommend following
+the naming and style guidelines in this section. See the "Da Vinci CRD Client v2.2.1 Test Suite"
+for an example a suite that follows these guidelines. Other suites in this test kit may not
+currently follow these guidelines.
+
+### Suite, Group, and Test Titles
+
+- **Capitalization scheme**
+  - *Suites* and *Groups*: Capitalize each word of the title of suites and groups.
+  - *Tests*: Capitalize only the first word of test titles.
+  - *Exceptions*: Formal entities from the specifications with specific capitalization schemes,
+    e.g., hook names like `appointment-book` are never capitalized and formal response types
+    defined in the CRD guide like "Coverage Information" are always capitalized.
+- Naming scheme
+  - *Suites*: For suite titles, use the form "<IG> <Actor> <Version> Test Suite",
+    e.g., "Da Vinci CRD Client v2.2.1 Test Suite".
+  - *Groups*: For group titles, use a short noun or noun phrase representing what
+    is being checked within the group, e.g., "Registration", "order-sign", or
+    "Response Handling".
+  - *Tests*: The form of test titles depends on the type of test
+    - Verification tests (most): For tests that verify behavior, use the form 
+      "<Subject> <criteria checked>", e.g., "Client made additional FHIR data available
+      during hook request processing" and "Prefetched resources conform to the required
+      CRD profiles".
+    - Interaction tests: For tests where the primary activity is an interaction, use the
+      form "<Subject> <action>", e.g., "Client invokes the order-sign hook".
+
+### References to Inferno Entiries
+
+- *Suites*, *Groups*, and *Tests*: When referencing an Inferno suite, group, or test,
+  put the name in double quotes. Optionally include the short Id as a prefix. For example,
+  the following phrases are both acceptable:
+  - group "1.1 Registration"
+  - the "Registration" group
+- *Presets*: When referencing a preset, put the name in double quotes.
+- *Inputs*: When referencing an input, **bold** the name.
+
+### Suite, Group, and Test Descriptions
+
+- *Suites*: Suite descriptions should contain brief text with references to additional
+details within this wiki. The following important details should be included or
+highlighted as available on a linked pagee:
+  - Required setup and information needed to run the tests,
+  - Instructions for execution including how to populate inputs, ideally both a
+    minimal and maximal run, and
+  - Details on interpreting the results, including what constitutes a passing session
+    and what limitations a pass result has.
+- *Groups*: Groups don't necessarily need descriptions. When present, group descriptions
+  can provide context, explain how the contained groups/tests are run, and/or
+  explain what a passing run looks like.
+- *Tests*: Tests must have a description. Test descriptions can provide additional
+  context to explain the test and how it works. They must provide a paragraph
+  explaining what the test checks (or does, for interaction tests), starting
+  with “During this test, Inferno will verify …” for verification tetss and
+  “During this test, Inferno will wait for …”
+
 ## Contribution Guidelines
 
 We welcome contributions in the form of bug reports or enhancement suggestions as well as implementations
