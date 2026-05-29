@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class DiscoveryPrefetchSupportTest < Inferno::Test
       include DaVinciCRDTestKit::ServerTestHelper
 
-      title 'Server demonstrates ability to request the CDS Client perform prefetch queries'
+      title 'Server advertises prefetch support'
       id :crd_v221_discovery_prefetch_support
       description %(
         This test expects the server to demonstrate support for prefetch queries

@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Create or Update Coverage Information cards or system actions received'
+      title 'Create or Update Coverage Information cards and system actions are valid'
       id :crd_v221_create_or_update_coverage_info_response_validation
       description %(
         This test validates the Create or Update Coverage Information cards or system actions received from the
@@ -34,8 +34,7 @@ module DaVinciCRDTestKit
         If no Create or Update Coverage Information cards or system actions are received, the test is skipped.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-69',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-71'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-71'
 
       optional
       input :valid_cards_with_suggestions, :valid_system_actions

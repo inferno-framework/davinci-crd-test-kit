@@ -22,8 +22,8 @@ To execute a simple set of tests targeting a single hook follow these steps:
    in the upper right.
 1. In the inputs, provide the details gathered above and click the "SUBMIT" button. Inferno
    will make a discovery request, analyze the details and finish execution.
-1. Select either group "2 Demonstrate A Hook Response" or the sub-group corresponding to the
-   target hook under group "3 Hook Tests". The latter option will perform more in-depth
+1. Select either group "2 Hook Response Demonstration" or the sub-group corresponding to the
+   target hook under group "3 Hooks". The latter option will perform more in-depth
    verification related to the specific hook.
 1. Click the "RUN TESTS" button in the upper right, provide the request body for Inferno
    to use for the invocation in the "Request body ..." input, and click the "SUBMIT" button.

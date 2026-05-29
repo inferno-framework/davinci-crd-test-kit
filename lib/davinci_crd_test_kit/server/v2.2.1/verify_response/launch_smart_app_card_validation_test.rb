@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Launch SMART Application cards received'
+      title 'Launch SMART Application cards are valid'
       id :crd_v221_launch_smart_app_card_validation
       description %(
         This test verifies the presence of valid Launch SMART Application cards within the list of valid cards

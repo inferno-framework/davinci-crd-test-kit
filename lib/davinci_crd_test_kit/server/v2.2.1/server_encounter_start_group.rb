@@ -46,7 +46,7 @@ module DaVinciCRDTestKit
       run_as_group
 
       group do
-        title 'Make Hook Requests'
+        title 'Interaction'
 
         test from: :crd_v221_server_invoke_hook_test,
              config: {
@@ -64,7 +64,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Requests'
+        title 'Requests'
 
         test from: :crd_v221_service_request_required_fields_validation,
              config: {
@@ -86,7 +86,7 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Responses'
+        title 'Responses'
 
         test from: :crd_v221_service_response_validation,
              config: {

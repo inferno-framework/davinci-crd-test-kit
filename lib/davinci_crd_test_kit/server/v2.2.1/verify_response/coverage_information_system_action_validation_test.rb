@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
 
       COVERAGE_INFO_EXT_URL = 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'.freeze
 
-      title 'All Coverage Information system actions received are valid'
+      title 'Coverage Information system actions are valid'
       id :crd_v221_coverage_info_system_action_validation
       description %(
         This test validates all [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)

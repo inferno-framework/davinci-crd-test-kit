@@ -55,7 +55,7 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
    1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 1. Run client group "1.3 Cross Hook".
-1. Run server group "3.7 Required Card Response Validation" in both server sessions.
+1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
 
 Some tests will fail, including
 - TLS tests in the client suite (1.2.x.3.08) and server suites (1.01) will fail when executed in a local system.
@@ -63,13 +63,13 @@ Some tests will fail, including
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
 - Appointment validation in the server suite on tests 3.1.2.02 and 3.1.3.07 due to validator limitations.
-- Coverage Information Must Support in the server suite on tests 3.7.02. Coverage is demonstrated across both
-  server sessions together, but not individually.
+- "Coverage Information responses demonstrate Must Support elements" in the server suite on tests 3.7.02.
+  Coverage is demonstrated across both server sessions together, but not individually.
 
 ### Additional Optional Steps for Long-running Hook Request
 
 1. In the client session, run group "1.4 Long-running Hook Request" with no changes to the inputs.
-1. In the "complete prefetch" server session, run group "2 Demonstrate A Hook Response" with no
+1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
    changes to the inputs.
 1. Note that a "User Action Required" dialog will appear in the server session with no option to
    continue other than to cancel. This is expected because it is waiting for the client session's
@@ -85,7 +85,7 @@ All tests should pass.
 
 ### Additional Optional Steps for FHIR API Testing
 
-1. In the "subset prefetch" server session, run group "2 Demonstrate A Hook Response", with
+1. In the "subset prefetch" server session, run group "2 Hook Response Demonstration", with
    the following changes to inputs:
    - Update the **Mock EHR Data** input with the contents of the [stress-test-Bundle.json](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/endpoints/mock_ehr/stress-test-Bundle.json)
      file. This contains a complete set of US Core data. NOTE: its size introduces a small amount of lag into the Inferno UI
@@ -101,5 +101,3 @@ Some tests will fail, including:
   automatically update the Bundle with resource updates in `systemActions`.
 - Client test 2.1.11.10 will fail due to an expected conformance issue (this assumes that US Core version 3.1.1 was chosen at client session creation)
 - The server tests will fail as expected because no responses were sent by the client suite.
-
-
