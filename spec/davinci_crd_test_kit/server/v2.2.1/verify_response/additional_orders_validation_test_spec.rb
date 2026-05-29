@@ -45,6 +45,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AdditionalOrdersValidationTest do
 
     result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json)
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(%r{does not include Additional Orders as companion/prerequisite cards})
+    expect(result.result_message).to match(/does not include Identify Additional Orders cards/)
   end
 end

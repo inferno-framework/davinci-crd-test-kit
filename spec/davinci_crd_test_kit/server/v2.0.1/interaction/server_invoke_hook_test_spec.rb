@@ -37,14 +37,14 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
       result = run(runnable, base_url:, inferno_base_url:, service_ids: '', encryption_method:,
                              service_request_bodies:, mock_ehr_bundle:)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No service id provided or discovered for the/)
+      expect(result.result_message).to match(/No service ID provided or discovered for the/)
     end
 
     it 'skips when the service_request_bodies is not provided' do
       result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                              mock_ehr_bundle:)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/Request body not provided/)
+      expect(result.result_message).to match(/Request body input was not provided/)
     end
 
     it 'fails when the request body is an invalid json' do
@@ -65,14 +65,14 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
         result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                                service_request_bodies:, mock_ehr_bundle: '')
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+        expect(result.result_message).to match(/Mock EHR Data input must be a FHIR Bundle/)
       end
 
       it 'skips when mock_ehr_bundle is not valid JSON' do
         result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                                service_request_bodies:, mock_ehr_bundle: 'not-json')
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+        expect(result.result_message).to match(/Mock EHR Data input must be a FHIR Bundle/)
       end
 
       it 'skips when mock_ehr_bundle is valid JSON but not a FHIR Bundle' do
@@ -80,7 +80,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest do
                                service_request_bodies:,
                                mock_ehr_bundle: FHIR::Patient.new(id: 'p1').to_json)
         expect(result.result).to eq('skip')
-        expect(result.result_message).to match(/mock_ehr_bundle input must be a FHIR Bundle/)
+        expect(result.result_message).to match(/Mock EHR Data input must be a FHIR Bundle/)
       end
 
       it 'proceeds past bundle validation when mock_ehr_bundle is a valid Bundle' do

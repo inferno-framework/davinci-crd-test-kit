@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
       description %(
         This test verifies the presence of valid External Reference cards within the list of valid cards
         returned by the CRD service.
-        As per the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference),
+        As per the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#external-reference-response-type),
         External Reference cards must contain links with the type set to `absolute`.
         This test checks for the presence of any External Reference cards by verifying:
         - The presence of a `links` array within each card.

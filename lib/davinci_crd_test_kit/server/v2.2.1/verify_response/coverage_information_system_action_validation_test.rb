@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
       title 'All Coverage Information system actions received are valid'
       id :crd_v221_coverage_info_system_action_validation
       description %(
-        This test validates all [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+        This test validates all [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
         system actions received. It verifies the following for each action:
         - The action type is `update`.
         - The resource within the action conforms its respective FHIR profile.
@@ -133,7 +133,7 @@ module DaVinciCRDTestKit
         unless source_resource
           messages << {
             type: 'warning',
-            message: 'Inferno could not resolve the original source resource for Coverage Information systemAction ' \
+            message: 'Inferno could not resolve the original source resource for Coverage Information system action ' \
                      "targeting #{resource_ref}, so it could not verify that only coverage-information extensions " \
                      'were changed.'
           }
@@ -170,14 +170,14 @@ module DaVinciCRDTestKit
         parsed_coverage_info.each do |action|
           coverage_info_system_action_check(action)
         rescue Inferno::Exceptions::AssertionException => e
-          error_messages << "Coverage Info system action `#{action}`: #{e.message}"
+          error_messages << "Coverage Information system action `#{action}`: #{e.message}"
         end
 
         error_messages.each do |msg|
           messages << { type: 'error', message: msg }
         end
 
-        assert_no_error_messages 'Some Coverage Info system actions are not valid.'
+        assert_no_error_messages 'Some Coverage Information system actions are not valid.'
       end
     end
   end

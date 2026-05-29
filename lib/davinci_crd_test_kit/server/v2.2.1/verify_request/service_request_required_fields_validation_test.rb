@@ -10,11 +10,14 @@ module DaVinciCRDTestKit
       title 'All service requests contain required fields'
       id :crd_v221_service_request_required_fields_validation
       description %(
-        This test validates all CRD service requests provided by the user, ensuring each includes all required fields
-        specified in the [CDS Hooks spec section on Calling a CDS Service](https://cds-hooks.hl7.org/2.0/#calling-a-cds-service):
-        `hook`, `hookInstance`, and `context`. Furthermore, the test checks for the conditional presence of the
-        `fhirServer` field if `fhirAuthorization` is included.
+        During this test, Inferno will verify that each CRD service request generated from the
+        tester-provided hook request body input for the active hook group includes the fields required by
+        the [CDS Hooks specification section on Calling a CDS Service](https://cds-hooks.hl7.org/2.0/#calling-a-cds-service).
+
+        Required fields include `hook`, `hookInstance`, and `context`. Inferno also verifies the conditional
+        presence of `fhirServer` when `fhirAuthorization` is included.
       )
+      simulation_verification
       input :invoked_hook
       output :contexts
 
@@ -33,7 +36,7 @@ module DaVinciCRDTestKit
 
         output contexts: contexts.to_json
 
-        no_error_validation('Some service requests made are not valid.')
+        no_error_validation('Some service requests are invalid.')
       end
     end
   end

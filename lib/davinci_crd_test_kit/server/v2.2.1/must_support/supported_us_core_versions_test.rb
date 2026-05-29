@@ -12,11 +12,11 @@ module DaVinciCRDTestKit
       title 'Provided resources demonstrate support for all required US Core versions'
       id :crd_v221_supported_us_core_versions
       description <<~DESCRIPTION
-        Checks whether the embedded FHIR resources provided across hook requests during this test
-        session demonstrate support for all US Core versions required by the CRD implementation
-        guide: 3.1.1, 6.1.0, and 7.0.0.
+        During this test, Inferno will verify that the embedded FHIR resources provided across hook requests
+        during this test session demonstrate support for all US Core versions required by the CRD
+        implementation guide: 3.1.1, 6.1.0, and 7.0.0.
 
-        This test does not verify exhaustive support for each US Core version. It inspects FHIR
+        Inferno does not verify exhaustive support for each US Core version. It inspects FHIR
         resources included in successful hook request `context` and `prefetch` data and verifies
         that at least one provided resource validates against a US Core profile for each required
         version.

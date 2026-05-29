@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
     description %(
         This test initiates POST request(s) to a specified CDS Service using the JSON body list provided by the user.
         As indicated in the [CDS Hooks specification section on Calling a CDS Service](https://cds-hooks.hl7.org/2.0/#calling-a-cds-service),
-        the service endpoint is constructed by appending the individual service id to the CDS Service base URL,
+        the service endpoint is constructed by appending the individual service ID to the CDS Service base URL,
         following the format `{baseUrl}/cds-services/{service.id}`. While the requests are being made,
         Inferno will enable FHIR endpoints that serve the data indicated in the Mock EHR Bundle so that the
         tested server can access additional information not provided in the hook request.
@@ -31,7 +31,7 @@ module DaVinciCRDTestKit
     input :base_url
     input :service_ids,
           description: %(
-              If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
+              If blank, Inferno will attempt to infer the service ID to use by finding a service entry in the
               Discovery response for the target hook. If it cannot be inferred, the tests will be skipped.
             ),
           optional: true
@@ -61,9 +61,9 @@ module DaVinciCRDTestKit
     input :jwks_kid,
           title: 'CDS Services JWKS kid',
           description: <<~DESCRIPTION,
-            The key ID of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint
+            The `kid` value of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint
             requiring authentication.
-            Defaults to the first JWK in the list if no kid is supplied.
+            Defaults to the first JWK in the list if no `kid` is supplied.
           DESCRIPTION
           optional: true
     input :mock_ehr_bundle,
@@ -110,19 +110,19 @@ module DaVinciCRDTestKit
         bundle_resource = nil
       end
       skip_if !bundle_resource.is_a?(FHIR::Bundle),
-              'mock_ehr_bundle input must be a FHIR Bundle resource; skipping test.'
+              'Mock EHR Data input must be a FHIR Bundle resource; skipping test.'
 
       skip_if service_request_bodies.blank?,
-              'Request body not provided, skipping test.'
+              'Request body input was not provided; skipping test.'
       assert_valid_json(service_request_bodies)
 
       payloads = [JSON.parse(service_request_bodies)].flatten
       skip_if tested_hook_name == ANY_HOOK_TAG && payloads.length != 1,
-              'The *Demonstrate a Hook Invocation* test supports only one request body.'
+              'The "Demonstrate a Hook Response" group supports only one request body.'
       invoked_hook = identify_hook(payloads)
       output(invoked_hook:)
       service_id = target_service_id(service_ids, invoked_hook)
-      skip_if service_id.blank?, "No service id provided or discovered for the #{invoked_hook} hook"
+      skip_if service_id.blank?, "No service ID provided or discovered for the #{invoked_hook} hook"
 
       service_endpoint = "#{discovery_url}/#{service_id}"
       continuation_url = "#{resume_pass_url}?token=#{test_session_id}"

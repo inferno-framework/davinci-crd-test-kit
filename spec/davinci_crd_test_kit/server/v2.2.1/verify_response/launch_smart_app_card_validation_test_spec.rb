@@ -32,7 +32,7 @@ RSpec.describe DaVinciCRDTestKit::V221::LaunchSmartAppCardValidationTest do
     end
     result = run(runnable, valid_cards_with_links: valid_cards_with_links.to_json)
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/does not contain any Launch SMART App cards/)
+    expect(result.result_message).to match(/does not contain any Launch SMART Application cards/)
   end
 
   it 'fails if the Launch SMART App card is not valid' do
@@ -43,7 +43,7 @@ RSpec.describe DaVinciCRDTestKit::V221::LaunchSmartAppCardValidationTest do
     valid_cards_with_links.first.delete('suggestions')
     result = run(runnable, valid_cards_with_links: valid_cards_with_links.to_json)
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Launch SMART App/)
+    expect(result.result_message).to match(/Not all Launch SMART Application/)
     expect(entity_result_message.message).to match(/must contain at least one suggestion/)
   end
 end

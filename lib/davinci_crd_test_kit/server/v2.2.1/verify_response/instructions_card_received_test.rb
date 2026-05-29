@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       title 'Valid Instructions cards received'
       id :crd_v221_valid_instructions_card_received
       description %(
-        This test validates that an [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
+        This test validates that an [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
         card was received. It does so by:
         - Checking for the presence of a valid card that does not contain the `links` field and the `suggestions` field.
       )

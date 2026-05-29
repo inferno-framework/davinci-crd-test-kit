@@ -6,10 +6,11 @@ module DaVinciCRDTestKit
     class CoverageInformationMustSupportTest < Inferno::Test
       include DaVinciCRDTestKit::CardsIdentification
 
-      title 'Coverage Information Must Support'
+      title 'Coverage Information responses demonstrate Must Support elements'
       id :crd_v221_coverage_information_must_support
       description <<~DESCRIPTION
-        Checks that the server demonstrated must support coverage for the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+        During this test, Inferno will verify that the server demonstrated Must Support coverage for the
+        [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
         extension across the hook responses returned during this test session.
 
         At least one hook invocation must have returned a Coverage Information system action.

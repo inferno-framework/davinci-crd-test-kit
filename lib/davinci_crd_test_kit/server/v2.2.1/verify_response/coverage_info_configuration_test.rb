@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::V221::ServerURLs
 
-      title 'Coverage information configuration option suppresses coverage-info responses'
+      title 'Coverage Information configuration option suppresses coverage-info responses'
       id :crd_v221_coverage_info_configuration
       description %(
         This test checks follow-up hook requests made with

@@ -18,29 +18,30 @@ require_relative 'verify_response/unknown_cds_hooks_elements_test'
 module DaVinciCRDTestKit
   module V221
     class ServerEncounterStartGroup < Inferno::TestGroup
+      CARDS_URL = 'https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html'.freeze
+
       title 'encounter-start'
       id :crd_v221_server_encounter_start
       description %(
         This group of tests invokes the encounter-start hook and ensures that
         the user-provided requests are valid as per the requirements described
-        in the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
-        and the [CDS Hooks specification section on encounter-start context](https://cds-hooks.hl7.org/hooks/encounter-start/2023SepSTU1Ballot/encounter-start/).
+        in the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
+        and the [CDS Hooks specification section on encounter-start context](https://cds-hooks.hl7.org/hooks/encounter-start.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
-        the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
+        the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
         and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response).
 
         This group includes tests to validate the following CRD response types:
-        - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) - optional
-        - [Create or update coverage information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)\
+        - [Coverage Information](#{CARDS_URL}#coverage-information-response-type) - optional
+        - [Update Coverage Records](#{CARDS_URL}#update-coverage-records-response-type)\
         - optional
-        - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) - optional
-        - [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) - optional
-        - [Launch SMART application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application) -
+        - [External Reference](#{CARDS_URL}#external-reference-response-type) - optional
+        - [Instructions](#{CARDS_URL}#instructions-response-type) - optional
+        - [Launch SMART Application](#{CARDS_URL}#launch-smart-application-response-type) -
         optional
-        - [Request form completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion) -
+        - [Request Form Completion](#{CARDS_URL}#request-form-completion-response-type) -
         optional
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@168', 'hl7.fhir.us.davinci-crd_2.0.1@185'
 
       config options: { hook_name: ENCOUNTER_START_TAG }
       run_as_group
@@ -53,7 +54,7 @@ module DaVinciCRDTestKit
                inputs: {
                  service_ids: {
                    name: :encounter_start_service_ids,
-                   title: 'Service id for the service that implements the `encounter-start` hook'
+                   title: 'Service ID for the service that implements the `encounter-start` hook'
                  },
                  service_request_bodies: {
                    name: :encounter_start_request_bodies,

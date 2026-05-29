@@ -12,9 +12,11 @@ module DaVinciCRDTestKit
       title 'All service requests contain valid context'
       id :crd_v221_service_request_context_validation
       description %(
-        This test verifies that all service requests `context` field is valid and contains all the
-        required fields.
+        During this test, Inferno will verify that each service request `context` field generated from the
+        tester-provided hook request body input for the active hook group is valid and contains the required
+        fields for the invoked hook.
       )
+      simulation_verification
       input :contexts, :invoked_hook
 
       run do
@@ -23,7 +25,7 @@ module DaVinciCRDTestKit
           hook_request_context_check(context, invoked_hook, ig_version: 'v221')
         end
 
-        no_error_validation('Some contexts are not valid.')
+        no_error_validation('Some `context` values are invalid.')
       end
     end
   end

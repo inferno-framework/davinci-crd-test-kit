@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       id :crd_v221_request_form_completion_response_validation
       description %(
         This test validates the Request Form Completion cards or system actions received from the CRD service,
-        as per the specifications outlined in the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion).
+        as per the specifications outlined in the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#request-form-completion-response-type).
 
         - **Checking for Presence:**
           The test begins by verifying whether any Request Form Completion cards or system actions are present.

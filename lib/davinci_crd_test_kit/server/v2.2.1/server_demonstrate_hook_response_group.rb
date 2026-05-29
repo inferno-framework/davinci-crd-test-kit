@@ -8,14 +8,14 @@ require_relative 'verify_response/service_response_validation_test'
 module DaVinciCRDTestKit
   module V221
     class ServerDemonstrateHookResponseGroup < Inferno::TestGroup
-      title 'Demonstrate A Hook Response'
+      title 'Demonstrate a Hook Response'
       id :crd_v221_server_demonstrate_hook_response
       description %(
         This group of tests allows the system to demonstrate its ability to respond to a CRD Hook invocation
         and return a valid response. Inferno will use the provided request body and will either use the provided service
         id or infer one from the hook indicated in the request and the server's discovery response.
         It ensures that the user-provided request and the server's response are both
-        valid as per the requirements described in the [CRD IG section](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html)
+        valid as per the requirements described in the [CRD IG section](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)
         and the [CDS Hooks](https://cds-hooks.hl7.org/) hook specification for the corresponding hook.
       )
 
@@ -30,9 +30,9 @@ module DaVinciCRDTestKit
                inputs: {
                  service_ids: {
                    name: :any_hook_service_ids,
-                   title: 'Service id to use for the "Demonstrate a Hook Response" test',
+                   title: 'Service ID to use for the "Demonstrate a Hook Response" test',
                    description: %(
-                  If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
+                  If blank, Inferno will attempt to infer the service ID to use by finding a service entry in the
                   Discovery response for the hook indicated in the provided request body. If it cannot be inferred,
                   the tests will be skipped.
                 )

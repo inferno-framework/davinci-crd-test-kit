@@ -47,10 +47,11 @@ module DaVinciCRDTestKit
       title 'Server does not require custom extensions'
       id :crd_v221_service_request_no_custom_extensions
       description %(
-        This test verifies that the server is capable of responding to a client
-        without the use of any custom extensions. It inspects each successful
-        hook call, and if it finds one which doesn't use any extensions not
-        defined by US Core, CRD, or HREX it passes.
+        During this test, Inferno will verify that the server is capable of responding to a client
+        without the use of any custom extensions in the tester-provided hook request bodies.
+
+        Inferno inspects each successful hook call and passes this test if it finds one that does not use
+        any extensions outside those defined by US Core, CRD, or HRex.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-7',

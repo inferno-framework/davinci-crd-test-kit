@@ -10,12 +10,16 @@ module DaVinciCRDTestKit
       title 'All service requests contain optional fields'
       id :crd_v221_service_request_optional_fields_validation
       description %(
-        This optional test reviews the user-submitted CRD service requests for the presence of optional fields:
+        During this test, Inferno will verify optional fields in the CRD service requests generated from the
+        tester-provided hook request body input for the active hook group when those fields are present.
+
+        Optional fields include:
         `fhirAuthorization` and `prefetch`.
 
-        The test will not fail if these optional fields are missing from a service request; instead, it generates an
-        informational message.
+        Inferno does not fail the test if these optional fields are missing from a service request; instead,
+        it generates an informational message.
       )
+      simulation_verification
       optional
 
       run do

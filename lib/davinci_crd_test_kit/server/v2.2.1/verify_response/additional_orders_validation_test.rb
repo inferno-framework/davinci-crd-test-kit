@@ -13,28 +13,28 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Additional Orders as companions/prerequisites cards received'
+      title 'Identify Additional Orders cards are valid'
       id :crd_v221_additional_orders_card_validation
       description %(
-        This test validates that an [Additional Orders as companions/prerequisites](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)
+        This test validates that an [Identify Additional Orders](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#identify-additional-orders-response-type)
         card was received. It does so by:
         - Filtering cards with the following criteria:
           - For each suggestion in the card's suggestions array, all actions have a type of 'create'
             and the action's resource type is one of the expected types: CommunicationRequest, Device,
             DeviceRequest, Medication, MedicationRequest, NutritionOrder, ServiceRequest, or VisionPrescription.
-        - Then, for each valid Additional Orders card retrieved, verifying that each action within the
+        - Then, for each valid Identify Additional Orders card retrieved, verifying that each action within the
         card's suggestions complies with their respective profiles as specified in the
-        [CRD IG section on Additional Orders as companions/prerequisites](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order):
-          - [crd-profile-communicationrequest](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-communicationrequest.html)
-          - [crd-profile-device](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-device.html)
-          - [crd-profile-deviceRequest](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-devicerequest.html)
+        [CRD IG section on Identify Additional Orders](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#identify-additional-orders-response-type):
+          - [crd-profile-communicationrequest](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
+          - [crd-profile-device](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-device.html)
+          - [crd-profile-deviceRequest](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-devicerequest.html)
           - [us-core-medication](http://hl7.org/fhir/us/core/STU3.1.1/StructureDefinition-us-core-medication.html)
-          - [crd-profile-medicationRequest](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-medicationrequest.html)
-          - [crd-profile-nutritionOrder](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-nutritionorder.html)
-          - [crd-profile-serviceRequest](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-servicerequest.html)
-          - [crd-profile-visionPrescription](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-visionprescription.html).
+          - [crd-profile-medicationRequest](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-medicationrequest.html)
+          - [crd-profile-nutritionOrder](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-nutritionorder.html)
+          - [crd-profile-serviceRequest](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-servicerequest.html)
+          - [crd-profile-visionPrescription](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-visionprescription.html).
 
-        The test will skip if no Additional Orders cards are found.
+        The test will skip if no Identify Additional Orders cards are found.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
@@ -49,7 +49,7 @@ module DaVinciCRDTestKit
           additional_orders_response_type?(card)
         end
         skip_if additional_orders_cards.blank?,
-                "#{tested_hook_name} hook response does not include Additional Orders as companion/prerequisite cards."
+                "#{tested_hook_name} hook response does not include Identify Additional Orders cards."
 
         additional_orders_cards.each do |card|
           card['suggestions'].each do |suggestion|

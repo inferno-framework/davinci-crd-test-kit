@@ -13,14 +13,14 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::CardsValidation
 
-      title 'Valid Create or Update Coverage Information cards or system actions received'
+      title 'Update Coverage Records cards or system actions are valid'
       id :crd_v221_create_or_update_coverage_info_response_validation
       description %(
-        This test validates the Create or Update Coverage Information cards or system actions received from the
-        CRD service, as per the specifications outlined in the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information).
+        This test validates the Update Coverage Records cards or system actions received from the
+        CRD service, as per the specifications outlined in the [Da Vinci CRD Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#update-coverage-records-response-type).
 
         - **Checking for Presence:**
-          The test first checks if any Create or Update Coverage Information cards or system actions are present in
+          The test first checks if any Update Coverage Records cards or system actions are present in
           the returned valid cards or valid system actions.
           - **For cards**: it ensures there are cards with a `suggestions` array containing a single suggestion,
           and the `actions` array of that suggestion has one `create` or `update` action for the `Coverage` resource.
@@ -28,10 +28,10 @@ module DaVinciCRDTestKit
           resource.
 
         - **Validating:**
-        If any Create or Update Coverage Information cards or system actions are found, each `Coverage` resource is
+        If any Update Coverage Records cards or system actions are found, each `Coverage` resource is
         validated against the base FHIR Coverage resource.
 
-        If no Create or Update Coverage Information cards or system actions are received, the test is skipped.
+        If no Update Coverage Records cards or system actions are received, the test is skipped.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-69',
@@ -51,7 +51,7 @@ module DaVinciCRDTestKit
           create_or_update_coverage_action_response_type?(action)
         end
 
-        skip_msg = "#{tested_hook_name} hook response does not contain any Create or Update Coverage Information " \
+        skip_msg = "#{tested_hook_name} hook response does not contain any Update Coverage Records " \
                    'cards or system actions.'
         skip_if create_or_update_coverage_info_cards.blank? && create_or_update_coverage_info_actions.blank?, skip_msg
 
@@ -69,7 +69,7 @@ module DaVinciCRDTestKit
           end
         end
 
-        no_error_validation('Some Create or Update Coverage Information received are not valid.')
+        no_error_validation('Some Update Coverage Records received are not valid.')
       end
     end
   end
