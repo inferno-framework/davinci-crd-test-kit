@@ -62,9 +62,6 @@ Some tests will fail, including
 - Client tests 1.2.x.3.01 validating that the hook requests structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
-- Appointment validation in the server suite on tests 3.1.2.02 and 3.1.3.07 due to validator limitations.
-- "Coverage Information responses demonstrate Must Support elements" in the server suite on tests 3.7.02.
-  Coverage is demonstrated across both server sessions together, but not individually.
 
 ### Additional Optional Steps for Long-running Hook Request
 
