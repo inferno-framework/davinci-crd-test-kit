@@ -6,6 +6,7 @@ require_relative 'auth/token_payload_test'
 require_relative 'verify_request/hook_request_conformance_test'
 require_relative 'verify_request/hook_request_requested_version_test'
 require_relative 'verify_request/hook_request_prefetch_profiles_test'
+require_relative 'verify_request/hook_request_no_non_ms_test'
 require_relative 'verify_request/hook_request_prefetch_complete_test'
 require_relative 'verify_request/hook_request_granted_scopes_test'
 require_relative 'verify_request/hook_request_secured_transport_test'
@@ -85,6 +86,7 @@ module DaVinciCRDTestKit
         end
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
+        test from: :crd_v221_hook_request_no_non_ms
         test from: :crd_v221_hook_request_prefetch_complete
         test from: :crd_v221_hook_request_coverage_verification
         test from: :crd_v221_hook_data_fetch_verification
