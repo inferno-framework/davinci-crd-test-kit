@@ -1,3 +1,17 @@
+# 0.14.0
+* ID-35: Enable Wiki Publication Workflow by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/40
+* ID-26: Add additional CDS request validation by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/37
+* ID-22 and ID-36: Client Prefetch Updates by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/43
+* ID-12: update crd requirements by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/35
+* ID-27: Add registration attestation by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/38
+* ID-32: Custom Response Flexibility by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/39
+* ID-23: Client Prefetch Queried Data Check by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/41
+* ID-24: CRD client data fetch check by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/42
+* ID-40: Client must support card types by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/44
+* Fix client against server preset by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/34
+* Replace ASTP with ONC by @FlexonyoPizza in https://github.com/inferno-framework/davinci-crd-test-kit/pull/51
+* Add v2.2 test suites by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/53
+
 # 0.13.0
 * FI-4182: Remove inferno@groups.mitre.org email from gemspec by @arscan in https://github.com/inferno-framework/davinci-crd-test-kit/pull/32
 * Demo Simplification for CRD Client Tests by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/29
