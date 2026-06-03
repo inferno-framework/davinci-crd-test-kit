@@ -24,6 +24,19 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
           indicator: 'info',
           source: { topic: { code: DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_CONFIGURATION_CODE } }
         }
+      ],
+      systemActions: [
+        {
+          type: 'update',
+          resource: {
+            resourceType: 'ServiceRequest',
+            extension: [
+              {
+                url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information'
+              }
+            ]
+          }
+        }
       ]
     }
   end
