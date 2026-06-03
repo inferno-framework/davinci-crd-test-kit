@@ -135,7 +135,7 @@ module DaVinciCRDTestKit
       def send_unknown_configuration_invocation(request_body, response)
         return if @unknown_configuration_invoked
         return unless response.status == 200
-        return unless coverage_info_response?(parsed_response_body(response))
+        return unless coverage_info_system_action_response?(parsed_response_body(response))
         return unless test_waiting?
 
         request_body = JSON.parse(request_body.to_json)
@@ -149,7 +149,7 @@ module DaVinciCRDTestKit
       def send_unknown_context_invocation(request_body, response)
         return if @unknown_context_invoked
         return unless response.status == 200
-        return unless coverage_info_response?(parsed_response_body(response))
+        return unless coverage_info_system_action_response?(parsed_response_body(response))
         return unless test_waiting?
 
         request_body = JSON.parse(request_body.to_json)
@@ -163,7 +163,7 @@ module DaVinciCRDTestKit
       def send_unknown_cds_hooks_element_invocation(request_body, response)
         return if @unknown_cds_hooks_element_invoked
         return unless response.status == 200
-        return unless coverage_info_response?(parsed_response_body(response))
+        return unless coverage_info_system_action_response?(parsed_response_body(response))
         return unless test_waiting?
 
         request_body = JSON.parse(request_body.to_json)

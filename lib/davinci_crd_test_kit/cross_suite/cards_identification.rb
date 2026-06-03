@@ -88,6 +88,12 @@ module DaVinciCRDTestKit
       [cards, actions]
     end
 
+    def coverage_info_system_action_response?(response_body)
+      _cards, actions = coverage_info_content(response_body)
+
+      actions.present?
+    end
+
     def coverage_info_response?(response_body)
       cards, actions = coverage_info_content(response_body)
 

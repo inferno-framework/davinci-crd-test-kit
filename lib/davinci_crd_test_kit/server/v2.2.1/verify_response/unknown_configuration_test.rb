@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          next if coverage_info_response?(response_body)
+          next if coverage_info_system_action_response?(response_body)
 
           add_message(
             'error',
