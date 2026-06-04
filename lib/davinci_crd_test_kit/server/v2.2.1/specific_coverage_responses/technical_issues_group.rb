@@ -1,0 +1,121 @@
+require_relative 'technical_issues_invoke_test'
+require_relative 'technical_issues_test'
+
+module DaVinciCRDTestKit
+  module V221
+    class TechnicalIssuesGroup < Inferno::TestGroup
+      title 'Technical Issues Group'
+      id :crd_v221_server_technical_issues_group
+      description %(
+        This group of tests allows the system to demonstrate its ability to
+        respond to a CRD Hook invocation with an `indeterminate` coverage
+        determination due to technical issues.
+
+        For these tests, the hook call will include an invalid access token, so
+        any attempts by the server to access FHIR resources will be
+        unsuccessful.
+      )
+
+      config options: { hook_name: ANY_HOOK_TAG }
+      run_as_group
+
+      group do
+        title 'Interaction'
+
+        test from: :crd_v221_server_technical_issues_invoke_hook_test,
+             config: {
+               inputs: {
+                 service_ids: {
+                   name: :technical_issues_service_ids,
+                   title: 'Service id to use for the "Technical Issues" test',
+                   description: %(
+                     If blank, Inferno will attempt to infer the service id to use
+                     by finding a service entry in the Discovery response for the
+                     hook indicated in the provided request body. If it cannot be
+                     inferred, the tests will be skipped.
+                   )
+                 },
+                 service_request_bodies: {
+                   name: :technical_issues_request_body,
+                   title: 'Request body to use for the "Technical Issues" test',
+                   description: %(
+                     Provide a single JSON request body to submit for the hook
+                     invocation. The type of hook invoked will be inferred based
+                     on the `hook` element in the request.
+                   )
+                 }
+               }
+             }
+      end
+
+      group do
+        title 'Requests'
+
+        test from: :crd_v221_service_request_required_fields_validation,
+             config: {
+               outputs: {
+                 contexts: {
+                   name: :technical_issues_contexts
+                 }
+               }
+             }
+        test from: :crd_v221_service_request_context_validation,
+             config: {
+               inputs: {
+                 contexts: {
+                   name: :technical_issues_contexts
+                 },
+                 request_body: {
+                   name: :technical_issues_request_body
+                 }
+               }
+             }
+      end
+
+      group do
+        title 'Responses'
+
+        test from: :crd_v221_service_response_validation,
+             config: {
+               outputs: {
+                 valid_cards: {
+                   name: :technical_issues_valid_cards
+                 },
+                 valid_system_actions: {
+                   name: :technical_issues_valid_system_actions
+                 }
+               }
+             }
+        test from: :crd_v221_coverage_info_system_action_received,
+             config: {
+               inputs: {
+                 valid_system_actions: {
+                   name: :technical_issues_valid_system_actions
+                 }
+               },
+               outputs: {
+                 coverage_info: {
+                   name: :technical_issues_coverage_info
+                 }
+               }
+             }
+        test from: :crd_v221_coverage_info_system_action_validation,
+             config: {
+               inputs: {
+                 coverage_info: {
+                   name: :technical_issues_coverage_info
+                 }
+               }
+             }
+        test from: :crd_v221_coverage_info_technical_issues,
+             config: {
+               inputs: {
+                 coverage_info: {
+                   name: :technical_issues_coverage_info
+                 }
+               }
+             }
+      end
+    end
+  end
+end

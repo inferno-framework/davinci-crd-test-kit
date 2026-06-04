@@ -4,6 +4,7 @@ require_relative 'server_discovery_group'
 require_relative 'server_demonstrate_hook_response_group'
 require_relative 'server_hooks_group'
 require_relative 'server_urls'
+require_relative 'specific_coverage_response_group'
 require_relative '../endpoints/mock_ehr_endpoints'
 
 module DaVinciCRDTestKit
@@ -110,6 +111,8 @@ module DaVinciCRDTestKit
       group from: :crd_v221_server_demonstrate_hook_response
 
       group from: :crd_v221_server_hooks
+
+      group from: :crd_v221_specific_coverage_responses
     end
   end
 end

@@ -117,8 +117,8 @@ module DaVinciCRDTestKit
       assert_valid_json(service_request_bodies)
 
       payloads = [JSON.parse(service_request_bodies)].flatten
-      skip_if tested_hook_name == ANY_HOOK_TAG && payloads.length != 1,
-              'The *Demonstrate a Hook Invocation* test supports only one request body.'
+      check_request_length(payloads)
+
       invoked_hook = identify_hook(payloads)
       output(invoked_hook:)
       service_id = target_service_id(service_ids, invoked_hook)
@@ -130,16 +130,34 @@ module DaVinciCRDTestKit
       failure_url = "#{resume_fail_url}?token=#{test_session_id}"
 
       acknowledge_before_continuing = manual_continuation == 'yes'
-      Inferno::Jobs.perform(DaVinciCRDTestKit::Jobs::InvokeHook, test_session_id,
-                            payloads, service_endpoint, inferno_base_url, jwks_kid, encryption_method,
-                            tested_hook_name, continuation_url, failure_url, acknowledge_before_continuing,
-                            coverage_info_configuration_supported?)
+      perform_invoke_hook_job(
+        test_session_id,
+        payloads,
+        service_endpoint,
+        inferno_base_url,
+        jwks_kid,
+        encryption_method,
+        tested_hook_name,
+        continuation_url,
+        failure_url,
+        acknowledge_before_continuing,
+        coverage_info_configuration_supported?
+      )
 
       wait(
         identifier: test_session_id,
         timeout: acknowledge_before_continuing ? 900 : 300,
         message: wait_message(acknowledge_before_continuing, continuation_url)
       )
+    end
+
+    def check_request_length(payloads)
+      skip_if tested_hook_name == ANY_HOOK_TAG && payloads.length != 1,
+              'The *Demonstrate a Hook Invocation* test supports only one request body.'
+    end
+
+    def perform_invoke_hook_job(*)
+      Inferno::Jobs.perform(DaVinciCRDTestKit::Jobs::InvokeHook, *)
     end
 
     def wait_message(acknowledge_before_continuing, continuation_url)
