@@ -11,9 +11,11 @@ module DaVinciCRDTestKit
         respond to a CRD Hook invocation with an `indeterminate` coverage
         determination due to technical issues.
 
-        For these tests, the hook call will include an invalid access token, so
-        any attempts by the server to access FHIR resources will be
-        unsuccessful.
+        For these tests, the hook call will include an invalid access token,
+        which due to the nature of Inferno's FHIR server simulation will result
+        in 500 response to FHIR requests, simulating a temporary server outage.
+        The tests then verify that a Coverage Information systemAction is
+        received with `indeterminate` coverage for `technical` reasons.
       )
 
       config options: { hook_name: ANY_HOOK_TAG }
@@ -23,6 +25,12 @@ module DaVinciCRDTestKit
         title 'Interaction'
 
         test from: :crd_v221_server_technical_issues_invoke_hook_test,
+             description: <<~DESCRIPTION,
+               This test initiates a POST request to a specified CDS Service
+               using the JSON body list provided by the user. This request is
+               generated so that requests for FHIR resources from the CDS service
+               result in 500 errors, simulating a temporary server error.
+             DESCRIPTION
              config: {
                inputs: {
                  service_ids: {
