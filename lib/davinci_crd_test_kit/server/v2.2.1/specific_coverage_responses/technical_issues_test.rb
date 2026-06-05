@@ -20,6 +20,8 @@ module DaVinciCRDTestKit
       run do
         coverage_info_actions = JSON.parse(coverage_info)
 
+        skip_if coverage_info_actions.blank?, 'No Coverage Information system actions received'
+
         coverage_info_actions.each_with_index do |action, index|
           coverage_info_extensions(action['resource']).each do |extension|
             unless indeterminate_coverage? extension
