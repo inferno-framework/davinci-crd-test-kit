@@ -4,6 +4,7 @@ require_relative 'client_encounter_start_group'
 require_relative 'client_order_dispatch_group'
 require_relative 'client_order_select_group'
 require_relative 'client_order_sign_group'
+require_relative 'client_urls'
 
 module DaVinciCRDTestKit
   module V221
@@ -28,6 +29,25 @@ module DaVinciCRDTestKit
         The CRD IG does not require support for any specific hook, so all the hook-specific sub-groups are
         optional. A conformant CRD client will have implemented at least one hook and will run and pass
         the hook-specific groups corresponding to each hook that it implements.
+
+        Inferno simulates two CRD discovery endpoints, each with service endpoints for all six CRD hooks
+        but with different service ids:
+        - Discovery endpoint for services requesting the complete [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
+          `#{ClientURLs.discovery_url}`
+          * `appointment-book` service id: `appointment-book-service`
+          * `encounter-start` service id: `encounter-start-service`
+          * `encounter-discharge` service id: `encounter-discharge-service`
+          * `order-select` service id: `order-select-service`
+          * `order-dispatch` service id: `order-dispatch-service`
+          * `order-sign` service id: `order-sign-service`
+        - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
+          `#{ClientURLs.prefetch_subset_discovery_url}`
+          * `appointment-book` service id: `appointment-book-subset`
+          * `encounter-start` service id: `encounter-start-subset`
+          * `encounter-discharge` service id: `encounter-discharge-subset`
+          * `order-select` service id: `order-select-subset`
+          * `order-dispatch` service id: `order-dispatch-subset`
+          * `order-sign` service id: `order-sign-subset`
       DESCRIPTION
       id :crd_v221_client_hooks
 

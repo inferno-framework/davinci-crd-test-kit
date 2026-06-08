@@ -24,6 +24,10 @@ module DaVinciCRDTestKit
         when the user is initiating a new encounter. The CRD IG places [additional constraints on the use
         of the encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start),
         including the profiles that resources in each request must conform to.
+
+        Inferno's simulated `encounter-start` hook endpoints are available at:
+        - Complete Prefetch: `#{ClientURLs.base_url}#{ENCOUNTER_START_PATH}`
+        - Subset Prefetch: `#{ClientURLs.base_url}#{ENCOUNTER_START_PREFETCH_SUBSET_PATH}`
       DESCRIPTION
       run_as_group
 

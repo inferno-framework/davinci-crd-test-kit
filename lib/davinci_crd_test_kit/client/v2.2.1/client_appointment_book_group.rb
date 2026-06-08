@@ -14,6 +14,7 @@ require_relative 'verify_request/hook_request_data_fetch_verification_test'
 require_relative 'verify_response/inferno_response_validation'
 require_relative 'verify_response/client_display_cards_attest'
 require_relative 'verify_response/hook_response_support_coverage_information_test'
+require_relative 'client_urls'
 
 module DaVinciCRDTestKit
   module V221
@@ -25,6 +26,10 @@ module DaVinciCRDTestKit
         the user is scheduling one or more future encounters/visits for the patient.
         The CRD IG places [additional constraints on the use of the appintment-book hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book),
         including the profiles that resources in each request must conform to.
+
+        Inferno's simulated `appointment-book` hook endpoints are available at:
+        - Complete Prefetch: `#{ClientURLs.base_url}#{APPOINTMENT_BOOK_PATH}`
+        - Subset Prefetch: `#{ClientURLs.base_url}#{APPOINTMENT_BOOK_PREFETCH_SUBSET_PATH}`
       DESCRIPTION
       run_as_group
 

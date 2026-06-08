@@ -26,6 +26,10 @@ module DaVinciCRDTestKit
         that was not tied to a specific performer. The CRD IG places [additional constraints on the use
         of the order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch),
         including the profiles that resources in each request must conform to.
+
+        Inferno's simulated `order-dispatch` hook endpoints are available at:
+        - Complete Prefetch: `#{ClientURLs.base_url}#{ORDER_DISPATCH_PATH}`
+        - Subset Prefetch: `#{ClientURLs.base_url}#{ORDER_DISPATCH_PREFETCH_SUBSET_PATH}`
       DESCRIPTION
       run_as_group
 

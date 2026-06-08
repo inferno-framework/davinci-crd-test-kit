@@ -25,6 +25,10 @@ module DaVinciCRDTestKit
         the notion of 'discharge' is relevant - typically an inpatient encounter.
         The CRD IG places [additional constraints on the use of the encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge),
         including the profiles that resources in each request must conform to.
+
+        Inferno's simulated `encounter-discharge` hook endpoints are available at:
+        - Complete Prefetch: `#{ClientURLs.base_url}#{ENCOUNTER_DISCHARGE_PATH}`
+        - Subset Prefetch: `#{ClientURLs.base_url}#{ENCOUNTER_DISCHARGE_PREFETCH_SUBSET_PATH}`
       DESCRIPTION
       run_as_group
 

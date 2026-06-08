@@ -25,6 +25,10 @@ module DaVinciCRDTestKit
         procedures, labs and other orders). The CRD IG places [additional constraints on the use
         of the order-select hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-select),
         including the profiles that resources in each request must conform to.
+
+        Inferno's simulated `order-select` hook endpoints are available at:
+        - Complete Prefetch: `#{ClientURLs.base_url}#{ORDER_SELECT_PATH}`
+        - Subset Prefetch: `#{ClientURLs.base_url}#{ORDER_SELECT_PREFETCH_SUBSET_PATH}`
       DESCRIPTION
       run_as_group
 
