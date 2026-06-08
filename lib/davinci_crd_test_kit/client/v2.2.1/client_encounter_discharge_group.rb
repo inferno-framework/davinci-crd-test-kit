@@ -30,7 +30,9 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-A'
 
-      input_order :cds_jwt_iss, :cds_jwk_set
+      input_order :encounter_discharge_response_approach,
+                  :encounter_discharge_selected_response_types,
+                  :encounter_discharge_custom_response_template
 
       config(
         inputs: {

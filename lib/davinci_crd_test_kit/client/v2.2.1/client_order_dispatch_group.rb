@@ -31,7 +31,9 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-A', 'hl7.fhir.us.davinci-crd_2.2.1@hook-2-B'
 
-      input_order :cds_jwt_iss, :cds_jwk_set
+      input_order :order_dispatch_response_approach,
+                  :order_dispatch_selected_response_types,
+                  :order_dispatch_custom_response_template
 
       config(
         inputs: {

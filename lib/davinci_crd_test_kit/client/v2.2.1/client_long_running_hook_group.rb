@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
 
       run_as_group
 
-      input_order :cds_jwt_iss
+      input_order :long_running_pause_time
 
       config(
         options: {
