@@ -2,7 +2,7 @@ module DaVinciCRDTestKit
   module V221
     class TechnicalIssuesTest < Inferno::Test
       id :crd_v221_coverage_info_technical_issues
-      title 'Coverage Information responses have indetermine coverage for technical reasons'
+      title 'Coverage Information responses have indeterminate coverage for technical reasons'
 
       description <<~DESCRIPTION
         This test verifies that the Coverage Information responses received
