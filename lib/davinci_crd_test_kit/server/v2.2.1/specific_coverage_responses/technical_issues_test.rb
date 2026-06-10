@@ -53,11 +53,11 @@ module DaVinciCRDTestKit
               "`technical` coverage reason contains no additional details in `text` field in action ##{index + 1}"
             )
           end
-
-          assert_no_error_messages(
-            'Not all coverage info extensions had `indeterminate` coverage with a reason of `technical`'
-          )
         end
+
+        assert_no_error_messages(
+          'Not all coverage info extensions had `indeterminate` coverage with a reason of `technical`'
+        )
       end
 
       def coverage_info_extensions(resource)
