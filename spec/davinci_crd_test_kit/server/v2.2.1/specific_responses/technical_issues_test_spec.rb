@@ -6,17 +6,6 @@ RSpec.describe DaVinciCRDTestKit::V221::TechnicalIssuesTest do
     json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(json)['systemActions'].first
   end
-  # let(:technical_issues_coverage_info_extension) do
-  #   coverage_info_system_action.dig('resource', 'extension', 0).deep_dup.tap do |coverage_info|
-  #     coverage_info['extension'].find { |extension| extension['url'] == 'covered' }['valueCode'] = 'indeterminate'
-  #     coverage_info['extension'].find { |extension| extension['url'] == 'reason' }['valueCode'] = 'technical'
-  #   end
-  # end
-  # let(:technical_issues_system_action) do
-  #   coverage_info_system_action.tap do |action|
-  #     action['resource']['extension'] = [technical_issues_coverage_info_extension]
-  #   end
-  # end
 
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -27,13 +16,21 @@ RSpec.describe DaVinciCRDTestKit::V221::TechnicalIssuesTest do
   end
 
   def coverage_info_system_action(covered: 'indeterminate', reason: 'technical')
+    reason_extension = {
+      text: 'TEXT Reason',
+      coding: [
+        {
+          code: reason
+        }
+      ]
+    }
     base_coverage_info_system_action.deep_dup.tap do |action|
       action['resource']['extension']
         .first['extension']
         .find { |extension| extension['url'] == 'covered' }['valueCode'] = covered
       action['resource']['extension']
         .first['extension']
-        .find { |extension| extension['url'] == 'reason' }['valueCode'] = reason
+        .find { |extension| extension['url'] == 'reason' }['valueCodeableConcept'] = reason_extension
     end
   end
 

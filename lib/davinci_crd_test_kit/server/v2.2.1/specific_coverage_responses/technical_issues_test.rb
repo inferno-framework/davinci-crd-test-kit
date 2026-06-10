@@ -34,10 +34,13 @@ module DaVinciCRDTestKit
 
             next if technical_reason? extension
 
-            value = reason_extension_value(extension)
+            value =
+              reason_extension_values(extension)
+                .map { |value| "`#{value}`" }
+                .join(', ')
             add_message(
               'error',
-              "Coverage reason should be `technical`, but found `#{value}` in action ##{index + 1}"
+              "Coverage reason should be `technical`, but found #{value} in action ##{index + 1}"
             )
           end
 
@@ -61,14 +64,15 @@ module DaVinciCRDTestKit
         coverage_extension_value(coverage_info_extension) == 'indeterminate'
       end
 
-      def reason_extension_value(coverage_info_extension)
+      def reason_extension_values(coverage_info_extension)
         coverage_info_extension['extension']
           .find { |extension| extension['url'] == 'reason' }
-          &.dig('valueCode')
+          &.dig('valueCodeableConcept', 'coding')
+          &.map { |coding| coding['code'] }
       end
 
       def technical_reason?(coverage_info_extension)
-        reason_extension_value(coverage_info_extension) == 'technical'
+        reason_extension_values(coverage_info_extension)&.include? 'technical'
       end
     end
   end
