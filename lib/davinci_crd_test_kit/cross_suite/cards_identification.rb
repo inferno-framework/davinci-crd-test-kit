@@ -89,9 +89,11 @@ module DaVinciCRDTestKit
     end
 
     def coverage_info_system_action_response?(response_body)
-      _cards, actions = coverage_info_content(response_body)
+      return false unless response_body.is_a?(Hash)
 
-      actions.present?
+      return false unless response_body['systemActions'].is_a?(Array)
+
+      response_body['systemActions'].any? { |action| coverage_information_response_type?(action) }
     end
 
     def coverage_info_response?(response_body)
@@ -129,6 +131,7 @@ module DaVinciCRDTestKit
 
     def coverage_information_response_type?(action) # rubocop:disable Metrics/CyclomaticComplexity
       return false unless action.respond_to?(:[])
+      return false unless action['type'] == 'update'
 
       resource = action['resource']&.to_hash
       return false unless COVERAGE_INFO_EXPECTED_RESOURCE_TYPES.include? resource&.dig('resourceType')
