@@ -4,7 +4,7 @@ require_relative 'technical_issues_test'
 module DaVinciCRDTestKit
   module V221
     class TechnicalIssuesGroup < Inferno::TestGroup
-      title 'Technical Issues Group'
+      title 'Technical Issues'
       id :crd_v221_server_technical_issues_group
       description %(
         This group of tests allows the system to demonstrate its ability to
