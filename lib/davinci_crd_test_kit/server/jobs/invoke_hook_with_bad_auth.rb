@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
       def prepare_hook_request(parsed_request)
         super
 
-        parsed_request['fhirAuthorization']['access_token'] = 'INVALID_TOKEN'
+        parsed_request['fhirAuthorization']['access_token'] = 'TRIGGER_500_STATUS'
         parsed_request
       end
     end
