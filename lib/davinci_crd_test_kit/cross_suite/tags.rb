@@ -15,6 +15,7 @@ module DaVinciCRDTestKit
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
+  TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze
   UNKNOWN_CONFIGURATION_TAG = 'unknown-configuration'.freeze
   UNKNOWN_CONTEXT_TAG = 'unknown-context'.freeze
   UNKNOWN_ELEMENT_TAG = 'unknown-element'.freeze

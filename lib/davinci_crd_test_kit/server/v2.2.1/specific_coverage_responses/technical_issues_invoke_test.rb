@@ -15,8 +15,7 @@ module DaVinciCRDTestKit
       end
 
       def check_request_length(payloads)
-        skip_if tested_hook_name == ANY_HOOK_TAG && payloads.length != 1,
-                'The *Technical Issues* test supports only one request body.'
+        skip_if payloads.length != 1, 'The *Technical Issues* test supports only one request body.'
       end
     end
   end

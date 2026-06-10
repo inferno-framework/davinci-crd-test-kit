@@ -36,8 +36,8 @@ module DaVinciCRDTestKit
             unless technical_reason? extension
               value =
                 reason_extension_values(extension)
-                  .map { |value| "`#{value}`" }
-                  .join(', ')
+                  &.map { |value| "`#{value}`" }
+                  &.join(', ') || 'no reason'
               add_message(
                 'error',
                 "Coverage reason should be `technical`, but found #{value} in action ##{index + 1}"

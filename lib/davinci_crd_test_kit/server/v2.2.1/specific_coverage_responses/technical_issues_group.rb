@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
         received with `indeterminate` coverage for `technical` reasons.
       )
 
-      config options: { hook_name: ANY_HOOK_TAG }
+      config options: { hook_name: TECHNICAL_ISSUES_TAG }
       run_as_group
 
       group do
