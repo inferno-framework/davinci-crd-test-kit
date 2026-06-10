@@ -15,7 +15,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TechnicalIssuesTest do
       .message
   end
 
-  def coverage_info_system_action(covered: 'indeterminate', reason: 'technical')
+  def coverage_info_system_action(covered: 'indeterminate', reason: 'technical', exclude_text: false)
     reason_extension = {
       text: 'TEXT Reason',
       coding: [
@@ -24,6 +24,8 @@ RSpec.describe DaVinciCRDTestKit::V221::TechnicalIssuesTest do
         }
       ]
     }
+    reason_extension.delete :text if exclude_text
+
     base_coverage_info_system_action.deep_dup.tap do |action|
       action['resource']['extension']
         .first['extension']
@@ -62,5 +64,14 @@ RSpec.describe DaVinciCRDTestKit::V221::TechnicalIssuesTest do
     expect(result.result_message).to match(/Not all coverage info extensions/)
 
     expect(entity_result_message).to match(/Coverage reason should be `technical`, but found `gold-card`/)
+  end
+
+  it 'fails when the coverage info extension reason has no text' do
+    result = run(runnable, coverage_info: [coverage_info_system_action(exclude_text: true)].to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/Not all coverage info extensions/)
+
+    expect(entity_result_message).to match(/contains no additional details in `text` field/)
   end
 end

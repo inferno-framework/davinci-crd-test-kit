@@ -7,7 +7,8 @@ module DaVinciCRDTestKit
       description <<~DESCRIPTION
         This test verifies that the Coverage Information responses received
         contain Coverage Information extensions with `indeterminate` coverage
-        and a `technical` reason.
+        and a `technical` reason, and additional details about the failure are
+        included in the `text` field of the reason extension.
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-43'
@@ -32,15 +33,24 @@ module DaVinciCRDTestKit
               )
             end
 
-            next if technical_reason? extension
+            unless technical_reason? extension
+              value =
+                reason_extension_values(extension)
+                  .map { |value| "`#{value}`" }
+                  .join(', ')
+              add_message(
+                'error',
+                "Coverage reason should be `technical`, but found #{value} in action ##{index + 1}"
+              )
 
-            value =
-              reason_extension_values(extension)
-                .map { |value| "`#{value}`" }
-                .join(', ')
+              next
+            end
+
+            next if technical_reason_text? extension
+
             add_message(
               'error',
-              "Coverage reason should be `technical`, but found #{value} in action ##{index + 1}"
+              "`technical` coverage reason contains no additional details in `text` field in action ##{index + 1}"
             )
           end
 
@@ -73,6 +83,13 @@ module DaVinciCRDTestKit
 
       def technical_reason?(coverage_info_extension)
         reason_extension_values(coverage_info_extension)&.include? 'technical'
+      end
+
+      def technical_reason_text?(coverage_info_extension)
+        coverage_info_extension['extension']
+          .find { |extension| extension['url'] == 'reason' }
+          &.dig('valueCodeableConcept', 'text')
+          &.present?
       end
     end
   end
