@@ -8,6 +8,7 @@ require_relative 'verify_response/card_optional_fields_validation_test'
 require_relative 'verify_response/external_reference_card_validation_test'
 require_relative 'verify_response/coverage_information_system_action_received_test'
 require_relative 'verify_response/coverage_information_system_action_validation_test'
+require_relative 'verify_response/coverage_information_card_absence_test'
 require_relative 'verify_response/coverage_info_configuration_test'
 require_relative 'verify_response/instructions_card_received_test'
 require_relative 'verify_response/form_completion_response_validation_test'
@@ -170,10 +171,7 @@ module DaVinciCRDTestKit
                    name: :appointment_book_coverage_info
                  }
                }
-             },
-             verifies_requirements: [
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-25'
-             ]
+             }
         test from: :crd_v221_all_responses_include_coverage_information,
              verifies_requirements: [
                'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
@@ -181,6 +179,7 @@ module DaVinciCRDTestKit
                'hl7.fhir.us.davinci-crd_2.2.1@hook-26',
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
+        test from: :crd_v221_coverage_information_card_absence
         test from: :crd_v221_request_form_completion_response_validation,
              config: {
                inputs: {

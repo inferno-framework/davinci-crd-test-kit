@@ -12,6 +12,7 @@ require_relative 'verify_response/propose_alternate_request_card_validation_test
 require_relative 'verify_response/additional_orders_validation_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/create_or_update_coverage_info_response_validation_test'
+require_relative 'verify_response/coverage_information_card_absence_test'
 require_relative 'verify_response/coverage_info_configuration_test'
 require_relative 'verify_response/unknown_configuration_test'
 require_relative 'verify_response/unknown_context_test'
@@ -168,6 +169,7 @@ module DaVinciCRDTestKit
                  }
                }
              }
+        test from: :crd_v221_coverage_information_card_absence
         test from: :crd_v221_propose_alternate_request_card_validation,
              config: {
                inputs: {

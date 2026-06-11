@@ -10,6 +10,7 @@ require_relative 'verify_response/launch_smart_app_card_validation_test'
 require_relative 'verify_response/instructions_card_received_test'
 require_relative 'verify_response/coverage_information_system_action_received_test'
 require_relative 'verify_response/coverage_information_system_action_validation_test'
+require_relative 'verify_response/coverage_information_card_absence_test'
 require_relative 'verify_response/coverage_info_configuration_test'
 require_relative 'verify_response/form_completion_response_validation_test'
 require_relative 'verify_response/create_or_update_coverage_info_response_validation_test'
@@ -170,10 +171,7 @@ module DaVinciCRDTestKit
                    name: :order_dispatch_coverage_info
                  }
                }
-             },
-             verifies_requirements: [
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-25'
-             ]
+             }
         test from: :crd_v221_order_dispatch_coverage_information,
              verifies_requirements: [
                'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
@@ -181,6 +179,7 @@ module DaVinciCRDTestKit
                'hl7.fhir.us.davinci-crd_2.2.1@hook-33',
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
+        test from: :crd_v221_coverage_information_card_absence
 
         test from: :crd_v221_request_form_completion_response_validation,
              config: {
