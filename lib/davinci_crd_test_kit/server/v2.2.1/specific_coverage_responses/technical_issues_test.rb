@@ -56,7 +56,8 @@ module DaVinciCRDTestKit
         end
 
         assert_no_error_messages(
-          'Not all coverage info extensions had `indeterminate` coverage with a reason of `technical`'
+          'Not all coverage info extensions had `indeterminate` coverage with a reason of `technical` ' \
+          'and details in `text`'
         )
       end
 
