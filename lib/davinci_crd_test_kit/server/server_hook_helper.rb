@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         hook_list_from_payloads = payloads.map { |body| body['hook'] }.uniq
 
         assert hook_list_from_payloads.length == 1,
-               'Could not identify the tested hook for the *Demonstrated Any Hook tests* from the request bodies.'
+               'Could not identify the tested hook from the request bodies.'
 
         hook_list_from_payloads.first
       else
