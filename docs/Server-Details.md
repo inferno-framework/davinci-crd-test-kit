@@ -22,7 +22,8 @@ demonstration of cards and actions conforming to the supported CRD response type
 ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
 [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html)).
 
-The server suites each contain three top-level groups:
+The v2.0.1 server suite contains three top-level groups, and the v2.2.1 suite
+contains four:
 1. The "Discovery" group validates a CRD server's discovery response.
 1. The v2.0.1 "Demonstrate A Hook Response" group and the v2.2.1
    "Hook Response Demonstration" group validate that the server can respond to
@@ -31,6 +32,9 @@ The server suites each contain three top-level groups:
    one or more CDS Hooks calls for each hook type
    that the tester provides request bodies for. It then validates that the responses
    are conformant and cover the response behavior required by the hook type.
+1. The v2.2.1 suite also contains a "Specific Coverage Responses" group, which
+   tests the abliity of a CRD server to provide specific types of coverage
+   information responses under particular conditions.
 
 All requests and responses are checked for conformance to the targeted CRD IG and
 CDS Hooks requirements individually and used in aggregate to determine whether
@@ -93,6 +97,8 @@ workflow as the v2.0.1 suite and adds checks for v2.2.1-specific behavior includ
 - Tolerance of unknown configuration values, unknown context values, and unknown CDS Hooks fields.
 - Demonstration of coverage-information extension must support elements across the test session.
 - Demonstration that the billing-options extension is not required for the server to respond.
+- The ability of the server to respond with specific coverage determinations
+  such as `indeterminate` under particular circumstances.
 
 ## Testing Limitations
 
