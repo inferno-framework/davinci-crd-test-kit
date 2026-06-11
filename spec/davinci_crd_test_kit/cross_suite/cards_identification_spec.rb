@@ -50,6 +50,16 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
       "resource": { "resourceType": "ServiceRequest", "id": "existingSR", "extension": [{ "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information", "valueString": "sub-extensions elided" }], "status": "details elided" }
     }')
   end
+  let(:coverage_information_card_template) do
+    {
+      'summary' => 'Invalid Coverage Information Card',
+      'source' => {
+        'topic' => {
+          'code' => 'coverage-info'
+        }
+      }
+    }
+  end
   let(:external_reference_template) do
     JSON.parse(File.read(
                  File.join(
@@ -387,8 +397,9 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
   end
 
   describe 'when identifying coverage-info configuration response content' do
-    it 'identifies coverage-info cards by source type or source topic code' do
-      expect(module_instance.coverage_info_card_type?(instructions_card_template)).to be(true)
+    it 'identifies coverage-info cards by source topic code' do
+      expect(module_instance.coverage_info_card_type?(coverage_information_card_template)).to be(true)
+      expect(module_instance.coverage_info_card_type?(instructions_card_template)).to be(false)
       expect(module_instance.coverage_info_card_type?(external_reference_template)).to be(false)
     end
 
@@ -400,11 +411,11 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
 
     it 'extracts coverage-info cards and actions from response bodies' do
       cards, actions = module_instance.coverage_info_content(
-        'cards' => [instructions_card_template, external_reference_template],
+        'cards' => [coverage_information_card_template, instructions_card_template, external_reference_template],
         'systemActions' => [coverage_information_action_template, create_coverage_action_template]
       )
 
-      expect(cards).to eq([instructions_card_template])
+      expect(cards).to eq([coverage_information_card_template])
       expect(actions).to eq([coverage_information_action_template])
       expect(module_instance.coverage_info_response?('cards' => cards, 'systemActions' => actions)).to be(true)
     end
