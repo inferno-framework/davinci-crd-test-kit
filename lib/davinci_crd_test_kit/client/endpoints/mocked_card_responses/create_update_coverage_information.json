@@ -7,8 +7,8 @@
     "url": "https://inferno.healthit.gov/",
     "topic": {
       "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
-      "code": "insurance",
-      "display": "Insurance"
+      "code": "coverage-info",
+      "display": "Coverage Information"
     }
   },
   "selectionBehavior": "any",
