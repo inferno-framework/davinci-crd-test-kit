@@ -34,6 +34,43 @@ module DaVinciCRDTestKit
           fallback_source_resource(request_body, target_type, target_id)
       end
 
+      def only_coverage_information_changed?(source_resource_hash, updated_resource_hash)
+        return true if coverage_information_extension_only_payload?(updated_resource_hash)
+
+        source_without_coverage_info = normalize_value(strip_coverage_info_extensions(source_resource_hash))
+        updated_without_coverage_info = normalize_value(strip_coverage_info_extensions(updated_resource_hash))
+
+        source_without_coverage_info == updated_without_coverage_info
+      end
+
+      def coverage_information_extension_only_payload?(resource_hash)
+        return false unless resource_hash.is_a?(Hash)
+
+        strip_coverage_info_extensions(resource_hash).keys.all? { |key| ['resourceType', 'id', 'meta'].include?(key) }
+      end
+
+      def strip_coverage_info_extensions(resource_hash)
+        normalized_hash = resource_hash.deep_dup
+        return normalized_hash unless normalized_hash['extension'].is_a?(Array)
+
+        normalized_hash['extension'] = normalized_hash['extension'].reject do |extension|
+          extension['url'] == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFO_EXT_URL
+        end
+        normalized_hash.delete('extension') if normalized_hash['extension'].empty?
+        normalized_hash
+      end
+
+      def normalize_value(value)
+        case value
+        when Hash
+          value.transform_values { |child| normalize_value(child) }
+        when Array
+          value.map { |child| normalize_value(child) }.sort_by(&:to_json)
+        else
+          value
+        end
+      end
+
       def find_appointment_book_resource(request_body, target_type, target_id)
         appointments_bundle = request_body.dig('context', 'appointments')
         find_resource_in_bundle(appointments_bundle, target_type, target_id) ||

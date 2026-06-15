@@ -1,11 +1,13 @@
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
+require_relative 'hook_request_resource_resolution'
 
 module DaVinciCRDTestKit
   module V221
     class CoverageInformationCardAbsenceTest < Inferno::Test
       include DaVinciCRDTestKit::ServerHookHelper
       include DaVinciCRDTestKit::CardsIdentification
+      include HookRequestResourceResolution
 
       title 'Hook responses do not include Coverage Information cards'
       id :crd_v221_coverage_information_card_absence
@@ -19,11 +21,32 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-25'
 
+      input :mock_ehr_bundle, optional: true
+
       def coverage_information_card_message(response_index, card)
         summary = card['summary'].present? ? "`#{card['summary']}`" : 'without a summary'
 
-        "Server response #{response_index + 1} included a Coverage Information card #{summary}. " \
-          'Coverage Information must be returned as a systemAction, not as a card.'
+        "Server response #{response_index + 1} included a card #{summary} with a suggestion action that only " \
+          'adds or modifies the coverage-information extension. Coverage Information must be returned as a ' \
+          'systemAction, not as a card.'
+      end
+
+      def coverage_information_card_response_type?(card, request)
+        Array(card['suggestions']).any? do |suggestion|
+          Array(suggestion['actions']).any? do |action|
+            coverage_information_card_action?(action, request)
+          end
+        end
+      end
+
+      def coverage_information_card_action?(action, request)
+        return false unless coverage_information_response_type?(action)
+        return false unless action['type'] == 'update'
+
+        source_resource = find_action_source_resource(action, request)
+        return coverage_information_extension_only_payload?(action['resource']) unless source_resource
+
+        only_coverage_information_changed?(source_resource.to_hash, action['resource'])
       end
 
       run do
@@ -37,7 +60,7 @@ module DaVinciCRDTestKit
           response_body = JSON.parse(request.response_body)
           cards = response_body['cards'].is_a?(Array) ? response_body['cards'] : []
 
-          cards.select { |card| coverage_info_card_type?(card) }.each do |card|
+          cards.select { |card| coverage_information_card_response_type?(card, request) }.each do |card|
             add_message('error', coverage_information_card_message(index, card))
           end
         rescue JSON::ParserError

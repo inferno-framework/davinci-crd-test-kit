@@ -22,16 +22,27 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     }
   end
 
-  let(:coverage_information_card) do
+  let(:draft_order) do
     {
-      'summary' => 'Coverage information',
-      'indicator' => 'info',
-      'source' => {
-        'label' => 'Inferno',
-        'topic' => {
-          'system' => 'http://terminology.hl7.org/CodeSystem/cdshooks-card-type',
-          'code' => 'coverage-info',
-          'display' => 'Coverage Information'
+      'resourceType' => 'ServiceRequest',
+      'id' => 'service-request-1',
+      'status' => 'draft',
+      'intent' => 'order'
+    }
+  end
+
+  let(:request_body) do
+    {
+      'hook' => 'order-sign',
+      'context' => {
+        'draftOrders' => {
+          'resourceType' => 'Bundle',
+          'type' => 'collection',
+          'entry' => [
+            {
+              'resource' => draft_order
+            }
+          ]
         }
       }
     }
@@ -55,13 +66,64 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     }
   end
 
+  let(:coverage_information_card_action) do
+    coverage_information_action.deep_dup
+  end
+
+  let(:partial_coverage_information_card_action) do
+    coverage_information_card_action.tap do |action|
+      action['resource'] = action['resource'].slice('resourceType', 'id', 'extension')
+    end
+  end
+
+  let(:coverage_information_suggestion_card) do
+    guideline_card.deep_merge(
+      'summary' => 'Apply coverage information',
+      'suggestions' => [
+        {
+          'label' => 'Apply coverage information',
+          'uuid' => '7ca7d0b4-a6e2-4bd1-814e-5223d5bfa07a',
+          'actions' => [coverage_information_card_action]
+        }
+      ]
+    )
+  end
+
+  let(:partial_coverage_information_suggestion_card) do
+    guideline_card.deep_merge(
+      'summary' => 'Apply coverage information partial update',
+      'suggestions' => [
+        {
+          'label' => 'Apply coverage information',
+          'uuid' => '89df7221-0e86-451c-9853-5e245f0d4479',
+          'actions' => [partial_coverage_information_card_action]
+        }
+      ]
+    )
+  end
+
+  let(:alternate_request_card) do
+    coverage_information_card_action['resource']['status'] = 'active'
+
+    guideline_card.deep_merge(
+      'summary' => 'Change order status',
+      'suggestions' => [
+        {
+          'label' => 'Change order status',
+          'uuid' => '1b50c0f1-e8cf-4ce1-8e20-70bd0ce3ed1b',
+          'actions' => [coverage_information_card_action]
+        }
+      ]
+    )
+  end
+
   def create_service_request(body:, status: 200)
     repo_create(
       :request,
       direction: 'outgoing',
       url: service_endpoint,
       test_session_id: test_session.id,
-      request_body: {}.to_json,
+      request_body: request_body.to_json,
       response_body: body.to_json,
       result:,
       status:,
@@ -93,10 +155,23 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     expect(result.result).to eq('pass'), result.result_message
   end
 
-  it 'fails when a successful response includes a Coverage Information card' do
+  it 'passes when a card suggestion updates the order in ways other than the coverage-information extension' do
     create_service_request(
       body: {
-        'cards' => [coverage_information_card],
+        'cards' => [alternate_request_card],
+        'systemActions' => [coverage_information_action]
+      }
+    )
+
+    result = run(runnable)
+
+    expect(result.result).to eq('pass'), result.result_message
+  end
+
+  it 'fails when a successful response includes a card suggestion that only adds coverage information' do
+    create_service_request(
+      body: {
+        'cards' => [coverage_information_suggestion_card],
         'systemActions' => [coverage_information_action]
       }
     )
@@ -105,13 +180,27 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to match(/Coverage Information cards/)
-    expect(entity_result_messages.map(&:message).join(' ')).to match(/must be returned as a systemAction/)
+    expect(entity_result_messages.map(&:message).join(' ')).to match(/suggestion action/)
   end
 
-  it 'ignores unsuccessful responses' do
+  it 'fails when a card suggestion only contains a partial coverage-information extension update' do
     create_service_request(
       body: {
-        'cards' => [coverage_information_card]
+        'cards' => [partial_coverage_information_suggestion_card],
+        'systemActions' => [coverage_information_action]
+      }
+    )
+
+    result = run(runnable)
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to match(/Coverage Information cards/)
+  end
+
+  it 'skips when all responses are unsuccessful' do
+    create_service_request(
+      body: {
+        'cards' => [coverage_information_suggestion_card]
       },
       status: 400
     )

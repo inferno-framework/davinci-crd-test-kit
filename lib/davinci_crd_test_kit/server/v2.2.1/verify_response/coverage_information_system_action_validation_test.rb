@@ -103,28 +103,6 @@ module DaVinciCRDTestKit
         "#{resource_ref}: extensions referencing differing coverage SHALL have distinct #{id_name}."
       end
 
-      def normalize_value(value)
-        case value
-        when Hash
-          value.transform_values { |child| normalize_value(child) }
-        when Array
-          value.map { |child| normalize_value(child) }.sort_by(&:to_json)
-        else
-          value
-        end
-      end
-
-      def strip_coverage_info_extensions(resource_hash)
-        normalized_hash = resource_hash.deep_dup
-        return normalized_hash unless normalized_hash['extension'].is_a?(Array)
-
-        normalized_hash['extension'] = normalized_hash['extension'].reject do |extension|
-          extension['url'] == COVERAGE_INFO_EXT_URL
-        end
-        normalized_hash.delete('extension') if normalized_hash['extension'].empty?
-        normalized_hash
-      end
-
       def verify_only_coverage_info_changed(action)
         request = matching_request_for_action(action)
         source_resource = find_action_source_resource(action, request)
@@ -140,12 +118,7 @@ module DaVinciCRDTestKit
           return
         end
 
-        source_resource_hash = source_resource.to_hash
-
-        source_without_coverage_info = normalize_value(strip_coverage_info_extensions(source_resource_hash))
-        updated_without_coverage_info = normalize_value(strip_coverage_info_extensions(updated_resource_hash))
-
-        assert source_without_coverage_info == updated_without_coverage_info,
+        assert only_coverage_information_changed?(source_resource.to_hash, updated_resource_hash),
                "#{resource_ref}: resource content changed outside the coverage-information extension."
       end
 
