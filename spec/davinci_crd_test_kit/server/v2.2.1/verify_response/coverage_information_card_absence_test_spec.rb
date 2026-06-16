@@ -79,6 +79,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
   let(:coverage_information_suggestion_card) do
     guideline_card.deep_merge(
       'summary' => 'Apply coverage information',
+      'uuid' => 'a8f8a2ff-f2bf-41de-bb99-9ee20a990cca',
       'suggestions' => [
         {
           'label' => 'Apply coverage information',
@@ -92,6 +93,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
   let(:partial_coverage_information_suggestion_card) do
     guideline_card.deep_merge(
       'summary' => 'Apply coverage information partial update',
+      'uuid' => 'be75e450-3df3-4d89-8e0b-573af74ed701',
       'suggestions' => [
         {
           'label' => 'Apply coverage information',

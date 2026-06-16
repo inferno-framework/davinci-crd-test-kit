@@ -24,9 +24,9 @@ module DaVinciCRDTestKit
       input :mock_ehr_bundle, optional: true
 
       def coverage_information_card_message(response_index, card)
-        summary = card['summary'].present? ? "`#{card['summary']}`" : 'without a summary'
+        identifier = card['uuid'].present? ? "uuid `#{card['uuid']}`" : 'no uuid'
 
-        "Server response #{response_index + 1} included a card #{summary} with a suggestion action that only " \
+        "Server response #{response_index + 1} included a card with #{identifier} and a suggestion action that only " \
           'adds or modifies the coverage-information extension. Coverage Information must be returned as a ' \
           'systemAction, not as a card.'
       end
