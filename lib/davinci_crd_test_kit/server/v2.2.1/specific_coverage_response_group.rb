@@ -1,4 +1,5 @@
 require_relative 'specific_coverage_responses/technical_issues_group'
+require_relative 'specific_coverage_responses/no_member_found_group'
 
 module DaVinciCRDTestKit
   module V221
@@ -12,6 +13,7 @@ module DaVinciCRDTestKit
       DESCRIPTION
 
       group from: :crd_v221_server_technical_issues_group
+      group from: :crd_v221_server_no_member_found_group
     end
   end
 end
