@@ -74,6 +74,7 @@ module DaVinciCRDTestKit
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
       validate_summary_length(card, label)
+      validate_suggestion_uuid_presence(card, label) unless ['v201', '2.0.1'].include? ig_semver
 
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
@@ -93,6 +94,20 @@ module DaVinciCRDTestKit
         "#{label} summary length of #{summary_length} characters is longer than " \
         'the maximum allowed of 139 characters.'
       )
+    end
+
+    def validate_suggestion_uuid_presence(card, label)
+      return unless card['suggestions'].presence.is_a? Array
+      return unless card['suggestions'].all?(Hash)
+
+      card['suggestions'].each_with_index do |suggestion, index|
+        next if suggestion['uuid'].present?
+
+        add_message(
+          'error',
+          "#{label} suggestion #{index + 1} does not contain a `uuid`"
+        )
+      end
     end
 
     def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
