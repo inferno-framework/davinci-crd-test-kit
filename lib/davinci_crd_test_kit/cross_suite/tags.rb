@@ -17,6 +17,7 @@ module DaVinciCRDTestKit
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze
   NO_MEMBER_FOUND_TAG = 'no-member-found'.freeze
+  UNRESOLVED_COVERAGE_TAG = 'unresolved-coverage'.freeze
   UNKNOWN_CONFIGURATION_TAG = 'unknown-configuration'.freeze
   UNKNOWN_CONTEXT_TAG = 'unknown-context'.freeze
   UNKNOWN_ELEMENT_TAG = 'unknown-element'.freeze
