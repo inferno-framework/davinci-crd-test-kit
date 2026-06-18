@@ -205,6 +205,14 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'adds an error if a suggestion does not contain a uuid' do
+      module_instance.validate_card_against_logical_model(propose_alternate_request_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('does not contain a `uuid`'))
+      )
+    end
+
     it 'filters out extension unrecognized property issues regardless of card type' do
       extension_issue = MockValidationIssue.new(
         message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
