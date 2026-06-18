@@ -56,12 +56,16 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 1. Run client group "1.3 Cross Hook".
 1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
+1. Run client group "1.2.6 order-sign"
+1. Run server group "4 Specific Coverage Responses"
+   1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 
 Some tests will fail, including
 - TLS tests in the client suite (1.2.x.3.08) and server suites (1.01) will fail when executed in a local system.
 - Client tests 1.2.x.3.01 validating that the hook requests structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
+- Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
 
 ### Additional Optional Steps for Long-running Hook Request
 
