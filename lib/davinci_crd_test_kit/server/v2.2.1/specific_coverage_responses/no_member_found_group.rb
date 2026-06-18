@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
         test from: :crd_v221_server_invoke_hook_single_request_test,
              title: 'Inferno invokes the selected hook to elicit unresolved member response',
              description: <<~DESCRIPTION,
-               This test initiates a POST request to a specified CDS Service using the JSON body list provided
+               This test initiates a POST request to a specified CDS Service using the JSON body provided
                by the user. The request body should represent an unrecognized member.
              DESCRIPTION
              config: {
