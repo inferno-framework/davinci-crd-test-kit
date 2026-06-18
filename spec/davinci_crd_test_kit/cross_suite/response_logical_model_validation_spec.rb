@@ -196,6 +196,15 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'adds an error if the summary is 140 characters or more' do
+      external_reference_card['summary'] = 'a' * 140
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('is longer than the maximum allowed of 139 characters'))
+      )
+    end
+
     it 'filters out extension unrecognized property issues regardless of card type' do
       extension_issue = MockValidationIssue.new(
         message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
