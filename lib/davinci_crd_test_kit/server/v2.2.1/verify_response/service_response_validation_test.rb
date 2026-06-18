@@ -77,12 +77,14 @@ module DaVinciCRDTestKit
 
         successful_requests.each_with_index do |request, index|
           service_response = JSON.parse(request.response_body)
-          perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, 'v221', index)
 
-          perform_system_actions_validation(service_response['systemActions'], index)
-
-          # perform_response_logical_model_validation(service_response['cards'], service_response['systemActions'],
-          #                                           index)
+          perform_response_logical_model_validation(
+            service_response['cards'],
+            service_response['systemActions'],
+            request.request_body,
+            index,
+            '2.2.1'
+          )
         rescue JSON::ParserError
           add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end

@@ -73,10 +73,26 @@ module DaVinciCRDTestKit
       conforms_to_logical_model?({ 'cards' => [card] }, logical_model_url(profile_name),
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
+      validate_summary_length(card, label)
+
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
                                                             request_body, error_prefix, ig_semver)
       add_messages_not_excluded(filtered_issues, error_prefix)
+    end
+
+    def validate_summary_length(card, label)
+      return unless card['summary'].is_a? String
+
+      summary_length = card['summary'].length
+
+      return if summary_length < 140
+
+      add_message(
+        'error',
+        "#{label} summary length of #{summary_length} characters is longer than " \
+        'the maximum allowed of 139 characters.'
+      )
     end
 
     def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
