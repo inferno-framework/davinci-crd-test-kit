@@ -1,10 +1,18 @@
-RSpec.describe DaVinciCRDTestKit::V221::UnresolvedCoverageTest do
+RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoReasonTest do
   let(:suite_id) { 'crd_server' }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
+  let(:expected_coverage_code) { 'not-covered' }
+  let(:other_coverage_code) { 'covered' }
+  let(:expected_reason_code) { 'no-member-found' }
+  let(:other_reason_code) { 'technical' }
   let(:base_coverage_info_system_action) do
     json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(json)['systemActions'].first
+  end
+
+  before do
+    runnable.config(options: { expected_coverage_code:, expected_reason_code: })
   end
 
   def entity_result_message
@@ -15,7 +23,7 @@ RSpec.describe DaVinciCRDTestKit::V221::UnresolvedCoverageTest do
       .message
   end
 
-  def coverage_info_system_action(covered: 'not-covered', reason: 'coverage-not-found')
+  def coverage_info_system_action(covered: expected_coverage_code, reason: expected_reason_code)
     base_coverage_info_system_action.deep_dup.tap do |action|
       action['resource']['extension']
         .first['extension']
@@ -32,14 +40,8 @@ RSpec.describe DaVinciCRDTestKit::V221::UnresolvedCoverageTest do
     end
   end
 
-  it 'passes when the coverage info extension is not-covered because coverage was not found' do
+  it 'passes when the coverage info extension has the expected coverage and reason codes' do
     result = run(runnable, coverage_info: [coverage_info_system_action].to_json)
-
-    expect(result.result).to eq('pass'), result.result_message
-  end
-
-  it 'passes when the coverage info extension is not-covered because no active coverage was found' do
-    result = run(runnable, coverage_info: [coverage_info_system_action(reason: 'no-active-coverage')].to_json)
 
     expect(result.result).to eq('pass'), result.result_message
   end
@@ -50,22 +52,23 @@ RSpec.describe DaVinciCRDTestKit::V221::UnresolvedCoverageTest do
     expect(result.result).to eq('skip'), result.result_message
   end
 
-  it 'fails when the coverage info extension coverage is not not-covered' do
-    result = run(runnable, coverage_info: [coverage_info_system_action(covered: 'covered')].to_json)
-
-    expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all coverage info extensions/)
-
-    expect(entity_result_message).to match(/Coverage should be `not-covered`, but found `covered`/)
-  end
-
-  it 'fails when the coverage info extension reason is not coverage-not-found or no-active-coverage' do
-    result = run(runnable, coverage_info: [coverage_info_system_action(reason: 'no-member-found')].to_json)
+  it 'fails when the coverage info extension coverage is not the expected coverage code' do
+    result = run(runnable, coverage_info: [coverage_info_system_action(covered: other_coverage_code)].to_json)
 
     expect(result.result).to eq('fail'), result.result_message
     expect(result.result_message).to match(/Not all coverage info extensions/)
 
     expect(entity_result_message)
-      .to match(/Coverage reason should be `coverage-not-found` or `no-active-coverage`, but found `no-member-found`/)
+      .to match(/Coverage should be `#{expected_coverage_code}`, but found `#{other_coverage_code}`/)
+  end
+
+  it 'fails when the coverage info extension reason is not the expected reason' do
+    result = run(runnable, coverage_info: [coverage_info_system_action(reason: other_reason_code)].to_json)
+
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/Not all coverage info extensions/)
+
+    expect(entity_result_message)
+      .to match(/Coverage reason should be `#{expected_reason_code}`, but found `#{other_reason_code}`/)
   end
 end
