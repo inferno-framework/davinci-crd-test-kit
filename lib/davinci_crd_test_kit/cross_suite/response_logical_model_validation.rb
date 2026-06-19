@@ -75,6 +75,7 @@ module DaVinciCRDTestKit
 
       validate_summary_length(card, label)
       validate_suggestion_uuid_presence(card, label) unless ['v201', '2.0.1'].include? ig_semver
+      validate_no_smart_suggestions(card, label) if card_type == CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
 
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
@@ -108,6 +109,18 @@ module DaVinciCRDTestKit
           "#{label} suggestion #{index + 1} does not contain a `uuid`"
         )
       end
+    end
+
+    def validate_no_smart_suggestions(card, label)
+      suggestion_count = card['suggestions']&.length || 0
+
+      return if suggestion_count.zero?
+
+      add_message(
+        'error',
+        "#{label} CDSHooksResponse.cards.suggestions: max allowed = 0, but found #{suggestion_count} " \
+        '(from http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-launchSMART|2.2.1)'
+      )
     end
 
     def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
@@ -164,14 +177,16 @@ module DaVinciCRDTestKit
     def manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
                                             ig_semver)
       case card_type
-      when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
+      when CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         manually_check_form_completion_errors(card, validation_issues, error_prefix)
-      when DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
+      when CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
         manually_check_propose_alternative_errors(card, validation_issues, request_body,
                                                   error_prefix, ig_semver)
-      when DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
+      when CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
         manually_check_additional_orders_errors(card, validation_issues, request_body,
                                                 error_prefix, ig_semver)
+      when CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
+        manually_check_launch_smart_app_errors(validation_issues)
       else
         validation_issues
       end
@@ -223,6 +238,12 @@ module DaVinciCRDTestKit
       return if resource.id.present?
 
       add_message('error', "#{message_prefix}Questionnaire must have an id.")
+    end
+
+    def manually_check_launch_smart_app_errors(validation_issues)
+      validation_issues.reject do |issue|
+        issue.message.match?(/CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0/)
+      end
     end
 
     def manually_check_propose_alternative_errors(card, validation_issues, request_body,
