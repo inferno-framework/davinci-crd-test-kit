@@ -1,6 +1,6 @@
 module DaVinciCRDTestKit
   module V221
-    # Users of this test need to set config options for expected_coverage_code and expected_reason_code
+    # Users of this test need to set config options for coverage_code, reason_code, and optionally require_reason_text
     class CoverageInfoReasonTest < Inferno::Test
       id :crd_v221_coverage_info_reason
       title 'Coverage Information responses have the expected coverage and reason codes'
@@ -23,22 +23,33 @@ module DaVinciCRDTestKit
         coverage_info_actions.each_with_index do |action, index|
           coverage_info_extensions(action['resource']).each do |extension|
             unless expected_coverage? extension
-              value = coverage_extension_value(extension)
+              coverage_code = coverage_extension_value(extension)
               add_message(
                 'error',
-                "Coverage should be `#{expected_coverage_code}`, but found `#{value}` in action ##{index + 1}"
+                "Coverage should be `#{expected_coverage_code}`, but found `#{coverage_code}` in action ##{index + 1}"
               )
             end
 
-            next if expected_reason? extension
+            unless expected_reason? extension
+              reason_code =
+                reason_extension_values(extension)
+                  &.map { |reason| "`#{reason}`" }
+                  &.join(', ') || 'no reason'
+              add_message(
+                'error',
+                "Coverage reason should be `#{expected_reason_code}`, but found #{reason_code} in action ##{index + 1}"
+              )
 
-            value =
-              reason_extension_values(extension)
-                &.map { |reason| "`#{reason}`" }
-                &.join(', ') || 'no reason'
+              next
+            end
+
+            next unless require_reason_text?
+            next if reason_text?(extension)
+
             add_message(
               'error',
-              "Coverage reason should be `#{expected_reason_code}`, but found #{value} in action ##{index + 1}"
+              "`#{expected_reason_code}` coverage reason contains no additional details in `text` field " \
+              "in action ##{index + 1}"
             )
           end
         end
@@ -74,12 +85,23 @@ module DaVinciCRDTestKit
         reason_extension_values(coverage_info_extension)&.include? expected_reason_code
       end
 
+      def reason_text?(coverage_info_extension)
+        coverage_info_extension['extension']
+          .find { |extension| extension['url'] == 'reason' }
+          &.dig('valueCodeableConcept', 'text')
+          &.present?
+      end
+
       def expected_coverage_code
         config.options[:expected_coverage_code]
       end
 
       def expected_reason_code
         config.options[:expected_reason_code]
+      end
+
+      def require_reason_text?
+        config.options[:require_reason_text] || false
       end
     end
   end

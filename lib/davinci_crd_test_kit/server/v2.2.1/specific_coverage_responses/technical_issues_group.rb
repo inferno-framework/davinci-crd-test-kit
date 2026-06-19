@@ -1,5 +1,5 @@
 require_relative 'technical_issues_invoke_test'
-require_relative 'technical_issues_test'
+require_relative 'coverage_info_reason_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -115,14 +115,28 @@ module DaVinciCRDTestKit
                  }
                }
              }
-        test from: :crd_v221_coverage_info_technical_issues,
+        test from: :crd_v221_coverage_info_reason,
+             title: 'Coverage Information responses have indeterminate coverage for technical reasons',
+             description: <<~DESCRIPTION,
+               This test verifies that the Coverage Information responses received contain Coverage Information
+               extensions with `indeterminate` coverage and a `technical` reason, and additional details about the
+               failure are included in the `text` field of the reason extension.
+             DESCRIPTION
              config: {
                inputs: {
                  coverage_info: {
                    name: :technical_issues_coverage_info
                  }
+               },
+               options: {
+                 expected_coverage_code: 'indeterminate',
+                 expected_reason_code: 'technical',
+                 require_reason_text: true
                }
-             }
+             },
+             verifies_requirements: [
+               'hl7.fhir.us.davinci-crd_2.2.1@resp-43'
+             ]
       end
     end
   end
