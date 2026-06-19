@@ -213,6 +213,45 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'filters out no suggestion errors for smart app launch cards' do
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to_not(
+        include(
+          hash_including(message: a_string_including('CDSHooksResponse.cards.suggestions'))
+        )
+      )
+    end
+
+    it 'adds an error for smart app launch cards with suggestions' do
+      launch_smart_app_card['suggestions'] = [
+        {
+          'label' => 'Replace order with alternate',
+          'actions' => [
+            {
+              'type' => 'update',
+              'description' => 'Replace existing order',
+              'resource' => { 'resourceType' => 'ServiceRequest', 'id' => 'existing-order' }
+            }
+          ]
+        }
+      ]
+
+      module_instance.validate_card_against_logical_model(launch_smart_app_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to(
+        include(
+          hash_including(message: a_string_including('CDSHooksResponse.cards.suggestions'))
+        )
+      )
+    end
+
     it 'filters out extension unrecognized property issues regardless of card type' do
       extension_issue = MockValidationIssue.new(
         message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
