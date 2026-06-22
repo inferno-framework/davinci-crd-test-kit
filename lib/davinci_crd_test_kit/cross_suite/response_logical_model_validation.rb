@@ -253,6 +253,18 @@ module DaVinciCRDTestKit
                                                                                          request_body,
                                                                                          error_prefix,
                                                                                          ig_semver)
+
+      no_resource_issues.each do |issue|
+        next unless issue.message.match?(/Constraint failed: crd-respar-1/)
+
+        new_message =
+          "#{issue.message}. In some cases [additional create " \
+          'actions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#propose-alternate-request-response-type) ' \
+          'are permitted. Manually check the suggestion to verify whether this is an actual error.'
+        issue.instance_variable_set(:@severity, 'warning')
+        issue.instance_variable_set(:@message, new_message)
+      end
+
       no_resource_issues.reject do |issue|
         issue.message.match?(/but is fixed to 'create' in the profile/)
       end
