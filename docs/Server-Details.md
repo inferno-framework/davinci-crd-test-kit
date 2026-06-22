@@ -98,7 +98,7 @@ workflow as the v2.0.1 suite and adds checks for v2.2.1-specific behavior includ
 - Demonstration of coverage-information extension must support elements across the test session.
 - Demonstration that the billing-options extension is not required for the server to respond.
 - The ability of the server to respond with specific coverage determinations
-  such as `indeterminate` under particular circumstances.
+  such as `indeterminate` or `not-covered` under particular circumstances.
 
 ## Testing Limitations
 
@@ -132,20 +132,5 @@ The following requirements are not currently tested:
 - `found-29`: Servers SHALL use prefetch expressions in the manner described
   below if those data elements are relevant to their coverage determination or
   other decision support.
-- `resp-25`: Regardless of the content, this "Coverage Information" response
-  type SHALL NOT use a card.
 - `resp-35`: However, CRD servers SHALL NOT send a systemAction to update the
   order unless something is new or changed.
-- `resp-43`: If the CRD server encounters technical issues that prevent it from
-  determining a coverage, prior auth, or documentation requirement response
-  (e.g. due to internal communication issues, authorization failure, temporary
-  unavailability of the CRD client's FHIR API, etc.), it SHALL indicate
-  "indeterminate" in the appropriate element with a reason code of technical and
-  additional details in the reason.text.
-- `resp-44`: If the CRD server is unable to resolve the patient for a reason
-  other than technology failure, the Coverage Information SHALL indicate
-  "not-covered" in 'coverage' with a reason code of no-member-found.
-- `resp-45`: If the CRD server is able to resolve the patient but they do not
-  have active coverage or cannot resolve to a single coverage, the Coverage
-  Information SHALL indicate "not-covered" with a reason of either
-  coverage-not-found or no-active-coverage, as appropriate.

@@ -66,6 +66,10 @@ will require the server to make FHIR requests to retrieve additional data, and
 to ensure that this is data that could not be available through other means,
 such as by being cached from earlier tests.
 
+The No Member Found Group (4.2), Coverage Not Found Group (4.3), and No Active
+Coverage group (4.4) each require the user to enter a request body that will
+elicit each of those specific responses from the server.
+
 ## Interpreting Results
 
 A passing session means the server demonstrated conformant behavior for the discovery response
