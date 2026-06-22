@@ -17,6 +17,7 @@ module DaVinciCRDTestKit
       )
       input :invoked_hook
       output :contexts
+      simulation_verification
 
       run do
         load_tagged_requests(tested_hook_name)
