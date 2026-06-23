@@ -213,6 +213,24 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'filters out errors if-none-exist extension on systemActions' do
+      extension_issue = MockValidationIssue.new(
+        message: 'Server response 1, systemAction 1 (uncategorized): CDSHooksResponse.systemActions[0].extension: The extension definition http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist|2.2.1 defines the contexts of use as element:CDSHooksResponse.cards.suggestions.actions.extension, which does not match the location of use which is CDSHooksElement.extension,CDSHooksExtensions,CDSHooksResponse.systemActions.extension', # rubocop:disable Layout/LineLength
+        severity: 'error',
+        filtered: false
+      )
+
+      system_action = form_completion_card['suggestions'].first['actions'].first
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_system_action_against_logical_model(system_action, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to_not(
+        include(
+          hash_including(message: a_string_including('defines the context of use as'))
+        )
+      )
+    end
+
     it 'filters out no suggestion errors for smart app launch cards' do
       extension_issue = MockValidationIssue.new(
         message: 'CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0',
