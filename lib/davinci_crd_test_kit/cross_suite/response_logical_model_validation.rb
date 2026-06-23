@@ -148,6 +148,10 @@ module DaVinciCRDTestKit
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
                                  add_messages_to_runnable: false, validator_response_details: validation_issues)
 
+      validation_issues
+        .reject! do |issue|
+          issue.message.match?(%r{The extension definition http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist|2\.2\.1 defines the contexts of use as.*CDSHooksResponse.systemActions.extension\z}) # rubocop:disable Layout/LineLength
+        end
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = manually_check_action_specific_errors(action, validation_issues, action_type,
                                                               request_body, error_prefix, ig_semver)
