@@ -9,15 +9,15 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryStandardPrefetchExpressionsTest
       'description' => 'An example of a CDS Service invoked when a user starts an encounter',
       'id' => 'encounter-start-service',
       'prefetch' => {
-        'pat' => 'Patient/{{context.patientId}}',
-        'enc' => 'Encounter/{{context.encounterId}}',
-        'cov' => 'Coverage?patient={{context.patientId}}&status=active',
-        'roles' => 'PractitionerRole?_id={{%enc.participant.individual.resolve().ofType(PractitionerRole).id}}',
-        'pracs' => 'Practitioner?_id={{%roles.entry.resource.practitioner.resolve().id|' \
-                   '%enc.participant.individual.resolve().ofType(Practitioner).id}}',
+        'locs' => 'Location?_id={{%roles.entry.resource.location.resolve().id|%enc.location.location.resolve().id}}',
         'orgs' => 'Organization?_id={{%roles.entry.resource.organization.resolve().id|' \
                   '%enc.serviceProvider.resolve().ofType(Organization).id}}',
-        'locs' => 'Location?_id={{%roles.entry.resource.location.resolve().id|%enc.location.location.resolve().id}}'
+        'pat' => 'Patient/{{context.patientId}}',
+        'roles' => 'PractitionerRole?_id={{%enc.participant.individual.resolve().ofType(PractitionerRole).id}}',
+        'enc' => 'Encounter/{{context.encounterId}}',
+        'cov' => 'Coverage?patient={{context.patientId}}&status=active',
+        'pracs' => 'Practitioner?_id={{%roles.entry.resource.practitioner.resolve().id|' \
+                   '%enc.participant.individual.resolve().ofType(Practitioner).id}}'
       }
     }
   end
