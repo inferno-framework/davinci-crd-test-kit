@@ -39,70 +39,6 @@ module DaVinciCRDTestKit
       input :coverage_info
       input :mock_ehr_bundle, optional: true
 
-      def find_extension_value(extension, url, *properties)
-        found_extension = extension.extension.find { |ext| ext.url == url }
-        return nil unless found_extension
-
-        properties.reduce(found_extension) do |current, prop|
-          return current unless current.respond_to?(prop)
-
-          current.send(prop)
-        end
-      end
-
-      def extract_and_group_coverage_info(resource)
-        resource.extension.each_with_object({}) do |extension, grouped_extensions|
-          next unless extension.url == COVERAGE_INFO_EXT_URL
-
-          coverage_key = find_extension_value(extension, 'coverage', 'valueReference', 'reference')
-          grouped_extensions[coverage_key] ||= []
-          grouped_extensions[coverage_key] << extension
-        end
-      end
-
-      # For the same coverage, ensure coverage-assertion-ids and satisfied-pa-ids are the same.
-      # For different coverages, ensure coverage-assertion-ids and satisfied-pa-ids are distinct.
-      def multiple_extensions_conformance_check(grouped_coverage_info, resource)
-        resource_ref = "#{resource.resourceType}/#{resource.id}"
-        assertion_ids_across_coverages = Set.new
-        pa_ids_across_coverages = Set.new
-
-        grouped_coverage_info.each do |coverage, extensions|
-          coverage_assertion_ids = collect_extensions_id(extensions, 'coverage-assertion-id', 'valueString').uniq
-          satisfied_pa_ids = collect_extensions_id(extensions, 'satisfied-pa-id', 'valueString').uniq.compact
-          assert coverage_assertion_ids.length == 1,
-                 same_coverage_conformance_error_msg(resource_ref, coverage, 'coverage-assertion-ids')
-
-          assert satisfied_pa_ids.length <= 1,
-                 same_coverage_conformance_error_msg(resource_ref, coverage, 'satisfied-pa-ids')
-
-          assertion_id = coverage_assertion_ids.first
-          assert !assertion_ids_across_coverages.include?(assertion_id),
-                 different_coverage_conformance_error_msg(resource_ref, 'coverage-assertion-ids')
-          assertion_ids_across_coverages.add(assertion_id)
-          pa_id = satisfied_pa_ids.first
-          next unless pa_id
-
-          assert !pa_ids_across_coverages.include?(pa_id),
-                 different_coverage_conformance_error_msg(resource_ref, 'satisfied-pa-ids')
-          pa_ids_across_coverages.add(pa_id)
-        end
-      end
-
-      def collect_extensions_id(extensions, url, *properties)
-        extensions.map do |extension|
-          find_extension_value(extension, url, *properties)
-        end
-      end
-
-      def same_coverage_conformance_error_msg(resource_ref, coverage, id_name)
-        "#{resource_ref}: extension has multiple repetitions of coverage `#{coverage}` with different #{id_name}."
-      end
-
-      def different_coverage_conformance_error_msg(resource_ref, id_name)
-        "#{resource_ref}: extensions referencing differing coverage SHALL have distinct #{id_name}."
-      end
-
       def verify_only_coverage_info_changed(action)
         request = matching_request_for_action(action)
         source_resource = find_action_source_resource(action, request)
@@ -131,8 +67,6 @@ module DaVinciCRDTestKit
         profile_url = structure_definition_map('v221')[resource.resourceType]
         resource_is_valid?(resource:, profile_url:)
 
-        grouped_coverage_info = extract_and_group_coverage_info(resource)
-        multiple_extensions_conformance_check(grouped_coverage_info, resource)
         verify_only_coverage_info_changed(coverage_info_system_action)
       end
 

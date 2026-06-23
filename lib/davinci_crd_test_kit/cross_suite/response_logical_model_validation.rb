@@ -152,10 +152,103 @@ module DaVinciCRDTestKit
         .reject! do |issue|
           issue.message.match?(%r{The extension definition http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist|2\.2\.1 defines the contexts of use as.*CDSHooksResponse.systemActions.extension\z}) # rubocop:disable Layout/LineLength
         end
+
+      if action_type == CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
+        check_multiple_coverage_info_extension_conformance(action)
+      end
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = manually_check_action_specific_errors(action, validation_issues, action_type,
                                                               request_body, error_prefix, ig_semver)
       add_messages_not_excluded(filtered_issues, error_prefix)
+    end
+
+    def check_multiple_coverage_info_extension_conformance(action)
+      resource = FHIR.from_contents(action['resource'].to_json)
+
+      grouped_coverage_info = extract_and_group_coverage_info(resource)
+      multiple_extensions_conformance_check(grouped_coverage_info, resource)
+    end
+
+    def extract_and_group_coverage_info(resource)
+      resource.extension.each_with_object({}) do |extension, grouped_extensions|
+        next unless extension.url == COVERAGE_INFO_EXT_URL
+
+        coverage_key = find_extension_value(extension, 'coverage', 'valueReference', 'reference')
+        grouped_extensions[coverage_key] ||= []
+        grouped_extensions[coverage_key] << extension
+      end
+    end
+
+    # For the same coverage, ensure coverage-assertion-ids and satisfied-pa-ids are the same.
+    # For different coverages, ensure coverage-assertion-ids and satisfied-pa-ids are distinct.
+    def multiple_extensions_conformance_check(grouped_coverage_info, resource)
+      resource_ref = "#{resource.resourceType}/#{resource.id}"
+      assertion_ids_across_coverages = Set.new
+      pa_ids_across_coverages = Set.new
+
+      grouped_coverage_info.each do |coverage, extensions|
+        coverage_assertion_ids = collect_extensions_id(extensions, 'coverage-assertion-id', 'valueString').uniq
+        satisfied_pa_ids = collect_extensions_id(extensions, 'satisfied-pa-id', 'valueString').uniq.compact
+        if coverage_assertion_ids.length != 1
+          add_message(
+            'error',
+            same_coverage_conformance_error_msg(resource_ref, coverage, 'coverage-assertion-ids')
+          )
+        end
+
+        if satisfied_pa_ids.length > 1
+          add_message(
+            'error',
+            same_coverage_conformance_error_msg(resource_ref, coverage, 'satisfied-pa-ids')
+          )
+        end
+
+        assertion_id = coverage_assertion_ids.first
+        if assertion_ids_across_coverages.include?(assertion_id)
+          add_message(
+            'error',
+            different_coverage_conformance_error_msg(resource_ref, 'coverage-assertion-ids')
+          )
+        end
+
+        assertion_ids_across_coverages.add(assertion_id)
+        pa_id = satisfied_pa_ids.first
+        next unless pa_id
+
+        if pa_ids_across_coverages.include?(pa_id)
+          add_message(
+            'error',
+            different_coverage_conformance_error_msg(resource_ref, 'satisfied-pa-ids')
+          )
+        end
+
+        pa_ids_across_coverages.add(pa_id)
+      end
+    end
+
+    def collect_extensions_id(extensions, url, *properties)
+      extensions.map do |extension|
+        find_extension_value(extension, url, *properties)
+      end
+    end
+
+    def find_extension_value(extension, url, *properties)
+      found_extension = extension.extension.find { |ext| ext.url == url }
+      return nil unless found_extension
+
+      properties.reduce(found_extension) do |current, prop|
+        return current unless current.respond_to?(prop)
+
+        current.send(prop)
+      end
+    end
+
+    def same_coverage_conformance_error_msg(resource_ref, coverage, id_name)
+      "#{resource_ref}: extension has multiple repetitions of coverage `#{coverage}` with different #{id_name}."
+    end
+
+    def different_coverage_conformance_error_msg(resource_ref, id_name)
+      "#{resource_ref}: extensions referencing differing coverage SHALL have distinct #{id_name}."
     end
 
     def add_messages_not_excluded(issues, error_prefix)
