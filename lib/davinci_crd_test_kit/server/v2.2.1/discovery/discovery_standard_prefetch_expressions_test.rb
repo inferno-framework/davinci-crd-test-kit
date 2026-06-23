@@ -117,6 +117,52 @@ module DaVinciCRDTestKit
         services.reject { |service| ignored_service_ids.include?(service['id']) }
       end
 
+      def standard_key_for_expression(expression, standard_expressions)
+        standard_expressions.find { |_key, standard_expression| standard_expression == expression }&.first
+      end
+
+      def referenced_prefetch_keys(expression)
+        return [] unless expression.is_a?(String)
+
+        expression.scan(/%([A-Za-z][A-Za-z0-9_-]*)/).flatten
+      end
+
+      def references_only_advertised_prefetch_keys?(expression, prefetch)
+        (referenced_prefetch_keys(expression) - prefetch.keys).empty?
+      end
+
+      def canonicalize_prefetch_variables(expression, key_aliases)
+        return expression unless expression.is_a?(String)
+
+        expression.gsub(/%([A-Za-z][A-Za-z0-9_-]*)/) do |match|
+          actual_key = Regexp.last_match(1)
+          standard_key = key_aliases[actual_key]
+
+          standard_key ? "%#{standard_key}" : match
+        end
+      end
+
+      def infer_key_aliases(prefetch, standard_expressions)
+        key_aliases = {}
+
+        loop do
+          changed = false
+
+          prefetch.each do |actual_key, actual_expression|
+            canonicalized_expression = canonicalize_prefetch_variables(actual_expression, key_aliases)
+            standard_key = standard_key_for_expression(canonicalized_expression, standard_expressions)
+            next if standard_key.blank? || key_aliases[actual_key] == standard_key
+
+            key_aliases[actual_key] = standard_key
+            changed = true
+          end
+
+          break unless changed
+        end
+
+        key_aliases
+      end
+
       run do
         object = parse_json(cds_services)
         assert object['services'], 'Discovery response did not contain `services`'
@@ -134,8 +180,12 @@ module DaVinciCRDTestKit
           standard_expressions = STANDARD_PREFETCH_EXPRESSIONS[service['hook']]
           next if standard_expressions.blank?
 
+          key_aliases = infer_key_aliases(service['prefetch'], standard_expressions)
+
           service['prefetch'].each do |prefetch_key, prefetch_value|
-            next if standard_expressions.value?(prefetch_value)
+            canonical_prefetch_value = canonicalize_prefetch_variables(prefetch_value, key_aliases)
+            next if references_only_advertised_prefetch_keys?(prefetch_value, service['prefetch']) &&
+                    standard_expressions.value?(canonical_prefetch_value)
 
             msg = "Service `#{service['id']}` advertises prefetch expression `#{prefetch_value}` " \
                   "for hook `#{service['hook']}` in prefetch field `#{prefetch_key}`, which does not match " \
