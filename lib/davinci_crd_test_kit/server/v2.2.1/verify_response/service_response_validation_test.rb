@@ -12,13 +12,11 @@ module DaVinciCRDTestKit
       title 'Service responses contain valid cards and systemActions'
       id :crd_v221_service_response_validation
       description %(
-        As per the [CDS Hooks spec section on CDS Service
-        Response](https://cds-hooks.hl7.org/2.0/#cds-service-response), a
-        successful server's response to a service request must be a JSON object
-        containing a `cards` array and optionally a `systemActions` array.
+        This test validates the responses against the [CRD v2.2.1 logical
+        models](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4).
 
-        Each card must contain the following required fields: `summary`, `indicator`, and `source`.
-        The required fields must have a valid data structure.
+        This test implements [corrections to errors in the logical
+        models](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Logical-Model-Validation-Changes).
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
