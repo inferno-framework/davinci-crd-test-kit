@@ -10,9 +10,13 @@ module DaVinciCRDTestKit
       id :crd_v221_client_skip_long_running_attestation_test
       title 'Client allows the user to continue their workflow during long-running requests (Attestation)'
       description %(
-        During this test, the tester will confirm that the client system allowed
-        its user to continue with their workflow while the sytem was waiting for the previous
-        long-running hook request to return.
+        The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-6)
+        that client systems not block their users while waiting for long-running CRD Hook calls.
+        During this test, the tester will confirm that the client system allows users to continue
+        with their workflow when a hook request is long-running. This could be accomplished,
+        for example, by providing a bypass/continue mechanism when a CRD server is taking too long
+        to respond, or by always running hooks requests in the background and notifying users when they
+        return pertinent information.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-6'
@@ -35,7 +39,7 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Long Running Request Attestation**:
 
-            I attest that the user had the option to continue their workflow
+            I attest that the user was able to continue their workflow
             while waiting for the long-running hook request to return a response:
 
             [Click here](#{attest_true_url}) if the above statement is **true**.
