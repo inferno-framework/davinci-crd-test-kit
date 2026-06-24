@@ -2,7 +2,9 @@
 
 During development and debugging, it can be useful to run the client and server suites
 against each other to confirm behavior, design decisions, or bug fixes. The following
-instructions can be used to do so.
+instructions can be used to do so. These instructions do not work when running the
+test kit locally within Docker due to networking restrictions when running without a
+dedicated hostname.
 
 ## v2.0.1
 
@@ -16,7 +18,7 @@ instructions can be used to do so.
    1. In the client session, run group "1.2.x <hook name>" leaving the inputs as is. A
       "User Action Required" dialog will appear indicating that Inferno is waiting for the
       hook invocation.
-   1. In the server session, run the corresponding grou "3.x <hook name>" leaving the inputs
+   1. In the server session, run the corresponding group "3.x <hook name>" leaving the inputs
       as is.
    1. Once the server test are complete, return to the client tests and click the link
       in the "User Action Required" dialog indicating requests are complete to continue the
