@@ -4,7 +4,7 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_service_registration_attestation
-      title 'CRD client registers Inferno (Attestation)'
+      title 'CRD client registers Inferno'
       description %(
         Inferno simulates two CRD servers which can be discovered at the following endpoints:
         - Complete Prefetch Service Discovery Endpoint: #{ClientURLs.discovery_url}
@@ -21,6 +21,7 @@ module DaVinciCRDTestKit
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
           hook request field).
       )
+      attestation
       verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
       input :complete_prefetch_service_organization_id,

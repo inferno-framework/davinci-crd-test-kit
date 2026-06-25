@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_client_skip_long_running_attestation_test
-      title 'Client allows the user to continue their workflow during long-running requests (Attestation)'
+      title 'Client allows the user to continue their workflow during long-running requests'
       description %(
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-6)
         that client systems not block their users while waiting for long-running CRD Hook calls.
@@ -18,6 +18,7 @@ module DaVinciCRDTestKit
         to respond, or by always running hooks requests in the background and notifying users when they
         return pertinent information.
       )
+      attestation
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-6'
 

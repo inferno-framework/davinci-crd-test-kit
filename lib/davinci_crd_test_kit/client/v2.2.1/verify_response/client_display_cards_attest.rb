@@ -10,12 +10,13 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_card_display_attest_test
-      title 'Client displays returned decision support details to the user (Attestation)'
+      title 'Client displays returned decision support details to the user'
       description %(
         During this test, the tester will confirm that the received cards and actions in the
         hook responses have been displayed or otherwise made available to users of the client system
         in an appopriate way that allows for consideration and action if warranted.
       )
+      attestation
 
       def responded_card_types
         list_card_types_in_requests(requests)
