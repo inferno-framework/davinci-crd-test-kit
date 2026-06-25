@@ -84,6 +84,19 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryStandardPrefetchExpressionsTest
     expect(warning_messages).to be_empty
   end
 
+  it 'passes without warnings when FHIRPath alternatives appear in a different order' do
+    service = standard_encounter_start_service.merge(
+      'prefetch' => standard_encounter_start_service['prefetch'].merge(
+        'locs' => 'Location?_id={{%enc.location.location.resolve().id|%roles.entry.resource.location.resolve().id}}'
+      )
+    )
+
+    result = run(runnable, cds_services: { 'services' => [service] }.to_json)
+
+    expect(result.result).to eq('pass'), result.result_message
+    expect(warning_messages).to be_empty
+  end
+
   it 'warns when an advertised prefetch expression is not standard for the hook' do
     service = standard_encounter_start_service.merge(
       'prefetch' => standard_encounter_start_service['prefetch'].merge(
