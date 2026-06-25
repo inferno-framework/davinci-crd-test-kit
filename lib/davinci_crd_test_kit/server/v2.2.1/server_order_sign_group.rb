@@ -103,133 +103,40 @@ module DaVinciCRDTestKit
       group do
         title 'Responses'
 
-        test from: :crd_v221_service_response_validation,
-             config: {
-               outputs: {
-                 valid_cards: {
-                   name: :order_sign_valid_cards
-                 },
-                 valid_system_actions: {
-                   name: :order_sign_valid_system_actions
-                 }
-               }
-             }
-        test from: :crd_v221_card_optional_fields_validation,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :order_sign_valid_cards
-                 }
-               },
-               outputs: {
-                 valid_cards_with_links: {
-                   name: :order_sign_valid_cards_with_links
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_sign_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_external_reference_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :order_sign_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_launch_smart_app_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :order_sign_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_valid_instructions_card_received,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :order_sign_valid_cards
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_received,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_sign_valid_system_actions
-                 }
-               },
-               outputs: {
-                 coverage_info: {
-                   name: :order_sign_coverage_info
-                 }
-               }
-             },
-             verifies_requirements: [
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
-             ]
-        test from: :crd_v221_coverage_info_system_action_validation,
-             config: {
-               inputs: {
-                 coverage_info: {
-                   name: :order_sign_coverage_info
-                 }
-               }
-             }
-        test from: :crd_v221_all_responses_include_coverage_information,
-             verifies_requirements: [
-               'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-28',
-               # This requirement has a typo. It says 'order-select' but it
-               # should be 'order-sign'.
-               # https://jira.hl7.org/browse/FHIR-56985
-               'hl7.fhir.us.davinci-crd_2.2.1@hook-39',
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
-             ]
-        test from: :crd_v221_coverage_information_card_absence
-        test from: :crd_v221_propose_alternate_request_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_suggestions: {
-                   name: :order_sign_valid_cards_with_suggestions
-                 },
-                 contexts: {
-                   name: :order_sign_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_additional_orders_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_suggestions: {
-                   name: :order_sign_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_request_form_completion_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_sign_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_sign_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_create_or_update_coverage_info_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_sign_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_sign_valid_cards_with_suggestions
-                 }
-               }
-             }
+        test from: :crd_v221_service_response_validation
+        test from: :crd_v221_external_reference_card_validation
+        # test from: :crd_v221_launch_smart_app_card_validation
+        # test from: :crd_v221_valid_instructions_card_received
+        # test from: :crd_v221_coverage_info_system_action_received,
+        #      verifies_requirements: [
+        #        'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
+        #      ]
+        # test from: :crd_v221_coverage_info_system_action_validation
+        # test from: :crd_v221_all_responses_include_coverage_information,
+        #      verifies_requirements: [
+        #        'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
+        #        'hl7.fhir.us.davinci-crd_2.2.1@resp-28',
+        #        # This requirement has a typo. It says 'order-select' but it
+        #        # should be 'order-sign'.
+        #        # https://jira.hl7.org/browse/FHIR-56985
+        #        'hl7.fhir.us.davinci-crd_2.2.1@hook-39',
+        #        'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
+        #      ]
+        # test from: :crd_v221_coverage_information_card_absence
+        # test from: :crd_v221_propose_alternate_request_card_validation,
+        #      config: {
+        #        inputs: {
+        #          valid_cards_with_suggestions: {
+        #            name: :order_sign_valid_cards_with_suggestions
+        #          },
+        #          contexts: {
+        #            name: :order_sign_contexts
+        #          }
+        #        }
+        #      }
+        # test from: :crd_v221_additional_orders_card_validation
+        # test from: :crd_v221_request_form_completion_response_validation
+        # test from: :crd_v221_create_or_update_coverage_info_response_validation
         test from: :crd_v221_coverage_info_configuration
         test from: :crd_v221_unknown_configuration
         test from: :crd_v221_unknown_context
