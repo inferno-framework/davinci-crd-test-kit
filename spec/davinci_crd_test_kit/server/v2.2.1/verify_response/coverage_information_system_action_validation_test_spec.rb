@@ -8,6 +8,10 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_authorization_hook_response.json'))
     JSON.parse(json)['systemActions'].first
   end
+  let(:valid_response_body) do
+    File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_authorization_hook_response.json'))
+  end
+  let(:cards) { JSON.parse(valid_response_body)['cards'] }
   let(:coverage_information_extension) do
     valid_coverage_info_system_action.dig('resource', 'extension', 0).deep_dup
   end
@@ -76,7 +80,9 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-sign', request_body: order_sign_request_body, actions: [action])
 
-    result = run(runnable, coverage_info: [action].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('pass'), result.result_message
   end
@@ -89,7 +95,9 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-sign', request_body: order_sign_request_body, actions: [action])
 
-    result = run(runnable, coverage_info: [action].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/changed outside the coverage-information extension/)
@@ -103,7 +111,9 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-sign', request_body: order_sign_request_body, actions: [action])
 
-    result = run(runnable, coverage_info: [action].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to match(/changed outside the coverage-information extension/)
@@ -115,9 +125,11 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-dispatch', request_body: order_dispatch_request_body, actions: [action])
 
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
     result = run(
       runnable,
-      coverage_info: [action].to_json,
+      invoked_hook: 'order-sign',
       mock_ehr_bundle: mock_bundle_with(service_request_resource).to_json
     )
 
@@ -132,7 +144,9 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-dispatch', request_body:, actions: [action])
 
-    result = run(runnable, coverage_info: [action].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-dispatch')
 
     expect(result.result).to eq('pass'), result.result_message
   end
@@ -147,9 +161,11 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'appointment-book', request_body: appointment_request, actions: [action])
 
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
     result = run(
       runnable,
-      coverage_info: [action].to_json,
+      invoked_hook: 'appointment-book',
       mock_ehr_bundle: mock_bundle_with(service_request_resource).to_json
     )
 
@@ -162,10 +178,80 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     action = coverage_info_action(updated_resource)
     stub_hook_requests(hook_name: 'order-dispatch', request_body: order_dispatch_request_body, actions: [action])
 
-    result = run(runnable, coverage_info: [action].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-dispatch')
 
     expect(result.result).to eq('pass'), result.result_message
     expect(entity_result_message.type).to eq('warning')
     expect(entity_result_message.message).to match(/could not resolve the original source resource/i)
+  end
+
+  it 'skips if no successful hook responses were received' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result: request_result,
+      request_body: nil,
+      response_body: nil,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 400
+    )
+
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
+
+    result = run(runnable, invoked_hook: 'order-sign')
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to match(/No successful hook responses/)
+  end
+
+  it 'skips if no Coverage Information actions present' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result: request_result,
+      request_body: nil,
+      response_body: { cards: [cards.last] }.to_json,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
+
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
+
+    result = run(runnable, invoked_hook: 'order-sign')
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to match(/do not contain any Coverage Information system actions/)
+  end
+
+  it 'fails if the Coverage Information action is not valid' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result: request_result,
+      request_body: nil,
+      response_body: valid_response_body,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
+
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
+    allow_any_instance_of(runnable).to receive(:conforms_to_logical_model?).and_return(nil)
+    allow_any_instance_of(runnable).to(
+      receive(:manually_check_action_specific_errors)
+        .and_return(
+          [
+            OpenStruct.new(severity: 'error', message: 'ERROR MESSAGE')
+          ]
+        )
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/Not all Coverage Information/)
+    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
   end
 end
