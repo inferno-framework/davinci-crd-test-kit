@@ -105,7 +105,7 @@ module DaVinciCRDTestKit
 
         test from: :crd_v221_service_response_validation
         test from: :crd_v221_external_reference_card_validation
-        # test from: :crd_v221_launch_smart_app_card_validation
+        test from: :crd_v221_launch_smart_app_card_validation
         # test from: :crd_v221_valid_instructions_card_received
         # test from: :crd_v221_coverage_info_system_action_received,
         #      verifies_requirements: [

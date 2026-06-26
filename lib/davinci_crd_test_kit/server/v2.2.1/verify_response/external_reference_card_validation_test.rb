@@ -1,7 +1,7 @@
 require_relative '../../server_test_helper'
 require_relative '../../server_hook_helper'
 require_relative '../../../cross_suite/cards_identification'
-require_relative '../../../cross_suite/cards_validation'
+require_relative '../../../cross_suite/response_logical_model_validation'
 
 module DaVinciCRDTestKit
   module V221
@@ -24,6 +24,9 @@ module DaVinciCRDTestKit
         cards by verifying:
         - The presence of a `links` array within each card.
         - That every link in the `links` array of a card is of type `absolute`.
+
+        The test will be skipped if no External Reference cards are found within
+        the returned valid cards.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-22'
