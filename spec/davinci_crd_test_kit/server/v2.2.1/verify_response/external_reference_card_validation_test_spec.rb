@@ -7,12 +7,6 @@ RSpec.describe DaVinciCRDTestKit::V221::ExternalReferenceCardValidationTest do
     File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_authorization_hook_response.json'))
   end
   let(:cards) { JSON.parse(valid_response_body)['cards'] }
-  let(:external_ref_card) { cards.find { |card| card['links'].present? } }
-  let(:valid_cards) do
-    json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'valid_cards.json'))
-    JSON.parse(json)
-  end
-  let(:valid_cards_with_links) { valid_cards.filter { |card| card['links'].present? } }
 
   before do
     allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
