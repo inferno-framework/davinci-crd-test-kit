@@ -12,19 +12,20 @@ module DaVinciCRDTestKit
       title 'Server returns a Coverage Information system action'
       id :crd_v221_coverage_info_system_action_received
       description %(
-        This test validates that a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+        This test validates that a [Coverage
+        Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
         system action was returned. It does so by:
-        - First checking for the presence of actions with a `resource` element of the following types:
+        - First checking for the presence of actions with a `resource` element
+          of the following types:
           - For `appointment-book`: Appointment
-          - For `order-sign` or `order-dispatch`: DeviceRequest, MedicationRequest, NutritionOrder,
-            ServiceRequest, or VisionPrescription
-        - Then, among the target actions, checking if their resource has the [coverage-information extension](http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information).
+          - For `order-sign` or `order-dispatch`: DeviceRequest,
+            MedicationRequest, NutritionOrder, ServiceRequest, or
+            VisionPrescription
+        - Then, among the target actions, checking if their resource has the
+          [coverage-information
+          extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html).
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@272', 'hl7.fhir.us.davinci-crd_2.0.1@273',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@274', 'hl7.fhir.us.davinci-crd_2.0.1@275',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@276', 'hl7.fhir.us.davinci-crd_2.0.1@277'
 
-      input :valid_system_actions, :invoked_hook
       output :coverage_info
 
       def resources_by_hook
