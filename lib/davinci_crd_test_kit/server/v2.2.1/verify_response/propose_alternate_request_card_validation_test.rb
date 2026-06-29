@@ -13,12 +13,12 @@ module DaVinciCRDTestKit
 
       title 'Propose Alternate Request cards are valid'
       id :crd_v221_propose_alternate_request_card_validation
-      description %(
-        This test validates that all [Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)
-        cards received are valid. It checks for the presence of a card's suggestion
-        with a single action with `Action.type` of `update` or a card with at least
-        two actions, one with `Action.type` of `delete` and the other with
-        `Action.type` of `create`.
+      description %( This test validates that all [Propose Alternate
+        Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#propose-alternate-request-response-type)
+        cards received are valid. It checks for the presence of a card's
+        suggestion with a single action with `Action.type` of `update` or a card
+        with at least two actions, one with `Action.type` of `delete` and the
+        other with `Action.type` of `create`.
       )
       optional
 
