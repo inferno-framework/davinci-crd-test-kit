@@ -119,17 +119,7 @@ module DaVinciCRDTestKit
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
         test from: :crd_v221_coverage_information_card_absence
-        # test from: :crd_v221_propose_alternate_request_card_validation,
-        #      config: {
-        #        inputs: {
-        #          valid_cards_with_suggestions: {
-        #            name: :order_sign_valid_cards_with_suggestions
-        #          },
-        #          contexts: {
-        #            name: :order_sign_contexts
-        #          }
-        #        }
-        #      }
+        test from: :crd_v221_propose_alternate_request_card_validation
         # test from: :crd_v221_additional_orders_card_validation
         # test from: :crd_v221_request_form_completion_response_validation
         # test from: :crd_v221_create_or_update_coverage_info_response_validation
