@@ -1,12 +1,22 @@
 RSpec.describe DaVinciCRDTestKit::V221::AdditionalOrdersValidationTest do
   let(:suite_id) { 'crd_server' }
+  let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:valid_cards) do
-    json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'valid_cards.json'))
-    JSON.parse(json)
+  let(:valid_response_body) do
+    {
+      cards:
+    }.to_json
   end
-  let(:cards_with_suggestions) { valid_cards.filter { |card| card['suggestions'].present? } }
+  let(:cards) do
+    JSON.parse(
+      File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'valid_cards.json'))
+    )
+  end
+
+  before do
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
+  end
 
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
@@ -15,36 +25,83 @@ RSpec.describe DaVinciCRDTestKit::V221::AdditionalOrdersValidationTest do
       .first
   end
 
-  before do
-    allow_any_instance_of(runnable).to receive(:resource_is_valid?).and_return(true)
-  end
+  it 'passes if cards contain a valid additional orders card' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: valid_response_body,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
 
-  it 'passes if valid additional orders as companions cards are received' do
-    result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
+
+    result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('pass'), result.result_message
   end
 
-  it 'fails if valid_cards_with_suggestions is not valid json' do
-    result = run(runnable, valid_cards_with_suggestions: '[[')
-    expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Invalid JSON/)
-  end
+  it 'skips if no successful hook responses were received' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: nil,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 400
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
 
-  it 'fails if additional orders card has errors' do
-    cards_with_suggestions[2]['suggestions'].first['actions'].first['resourceId'] = '123'
-
-    result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json)
-    expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Additional Order cards are not valid/)
-    expect(entity_result_message.message).to match(/`resourceId` should not be populated/)
-  end
-
-  it 'skips if no additional orders as companions card present' do
-    dup_cards = cards_with_suggestions.deep_dup
-    dup_cards.reject! { |card| card['summary'].include?('Additional Orders As Companions') }
-
-    result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json)
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(%r{does not include Additional Orders as companion/prerequisite cards})
+    expect(result.result_message).to match(/No successful hook responses/)
+  end
+
+  it 'skips if no Additional Orders card present' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: { cards: [cards.first] }.to_json,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
+
+    result = run(runnable, invoked_hook: 'order-sign')
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to match(/do not contain any Additional Orders cards/)
+  end
+
+  it 'fails if the Additional Orders card is not valid' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: valid_response_body,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
+
+    allow_any_instance_of(runnable).to receive(:conforms_to_logical_model?).and_return(nil)
+    allow_any_instance_of(runnable).to(
+      receive(:manually_check_card_specific_errors)
+        .and_return(
+          [
+            OpenStruct.new(severity: 'error', message: 'ERROR MESSAGE')
+          ]
+        )
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/Not all Additional Orders/)
+    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
   end
 end
