@@ -122,7 +122,7 @@ module DaVinciCRDTestKit
         test from: :crd_v221_propose_alternate_request_card_validation
         test from: :crd_v221_additional_orders_card_validation
         test from: :crd_v221_request_form_completion_response_validation
-        # test from: :crd_v221_create_or_update_coverage_info_response_validation
+        test from: :crd_v221_create_or_update_coverage_info_response_validation
         test from: :crd_v221_coverage_info_configuration
         test from: :crd_v221_unknown_configuration
         test from: :crd_v221_unknown_context
