@@ -4,9 +4,7 @@ require_relative 'verify_request/service_request_required_fields_validation_test
 require_relative 'verify_request/service_request_optional_fields_validation_test'
 require_relative 'verify_request/service_request_context_validation_test'
 require_relative 'verify_response/service_response_validation_test'
-require_relative 'verify_response/card_optional_fields_validation_test'
 require_relative 'verify_response/external_reference_card_validation_test'
-require_relative 'verify_response/coverage_information_system_action_received_test'
 require_relative 'verify_response/coverage_information_system_action_validation_test'
 require_relative 'verify_response/coverage_information_card_absence_test'
 require_relative 'verify_response/coverage_info_configuration_test'
@@ -97,81 +95,11 @@ module DaVinciCRDTestKit
       group do
         title 'Responses'
 
-        test from: :crd_v221_service_response_validation,
-             config: {
-               outputs: {
-                 valid_cards: {
-                   name: :appointment_book_valid_cards
-                 },
-                 valid_system_actions: {
-                   name: :appointment_book_valid_system_actions
-                 }
-               }
-             }
-        test from: :crd_v221_card_optional_fields_validation,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :appointment_book_valid_cards
-                 }
-               },
-               outputs: {
-                 valid_cards_with_links: {
-                   name: :appointment_book_valid_cards_with_links
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :appointment_book_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_external_reference_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :appointment_book_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_launch_smart_app_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :appointment_book_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_valid_instructions_card_received,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :appointment_book_valid_cards
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_received,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :appointment_book_valid_system_actions
-                 }
-               },
-               outputs: {
-                 coverage_info: {
-                   name: :appointment_book_coverage_info
-                 }
-               }
-             },
-             verifies_requirements: [
-               'hl7.fhir.us.davinci-crd_2.2.1@resp-26'
-             ]
-        test from: :crd_v221_coverage_info_system_action_validation,
-             config: {
-               inputs: {
-                 coverage_info: {
-                   name: :appointment_book_coverage_info
-                 }
-               }
-             }
+        test from: :crd_v221_service_response_validation
+        test from: :crd_v221_external_reference_card_validation
+        test from: :crd_v221_launch_smart_app_card_validation
+        test from: :crd_v221_valid_instructions_card_received
+        test from: :crd_v221_coverage_info_system_action_validation
         test from: :crd_v221_all_responses_include_coverage_information,
              verifies_requirements: [
                'hl7.fhir.us.davinci-crd_2.2.1@hook-16',
@@ -180,28 +108,8 @@ module DaVinciCRDTestKit
                'hl7.fhir.us.davinci-crd_2.2.1@resp-29'
              ]
         test from: :crd_v221_coverage_information_card_absence
-        test from: :crd_v221_request_form_completion_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :appointment_book_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :appointment_book_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_create_or_update_coverage_info_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :appointment_book_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :appointment_book_valid_cards_with_suggestions
-                 }
-               }
-             }
+        test from: :crd_v221_request_form_completion_response_validation
+        test from: :crd_v221_create_or_update_coverage_info_response_validation
         test from: :crd_v221_coverage_info_configuration
         test from: :crd_v221_unknown_configuration
         test from: :crd_v221_unknown_context

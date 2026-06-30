@@ -82,33 +82,10 @@ module DaVinciCRDTestKit
       group do
         title 'Responses'
 
-        test from: :crd_v221_service_response_validation,
-             config: {
-               outputs: {
-                 valid_cards: {
-                   name: :no_member_found_valid_cards
-                 },
-                 valid_system_actions: {
-                   name: :no_member_found_valid_system_actions
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_received,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :no_member_found_valid_system_actions
-                 }
-               },
-               outputs: {
-                 coverage_info: {
-                   name: :no_member_found_coverage_info
-                 }
-               }
-             }
+        test from: :crd_v221_service_response_validation
         test from: :crd_v221_coverage_info_system_action_validation,
              config: {
-               inputs: {
+               outputs: {
                  coverage_info: {
                    name: :no_member_found_coverage_info
                  }
