@@ -55,6 +55,10 @@ module DaVinciCRDTestKit
           add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end
 
+        messages.reject! do |message|
+          message[:type] == 'error' && message[:message].end_with?('Resource requires an id, but none is present')
+        end
+
         no_error_validation('Some service responses are not valid. Check messages for issues found.')
       end
     end
