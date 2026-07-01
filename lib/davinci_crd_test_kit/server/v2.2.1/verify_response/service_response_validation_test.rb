@@ -12,13 +12,11 @@ module DaVinciCRDTestKit
       title 'Service responses contain valid cards and systemActions'
       id :crd_v221_service_response_validation
       description %(
-        As per the [CDS Hooks spec section on CDS Service
-        Response](https://cds-hooks.hl7.org/2.0/#cds-service-response), a
-        successful server's response to a service request must be a JSON object
-        containing a `cards` array and optionally a `systemActions` array.
+        This test validates the responses against the [CRD v2.2.1 logical
+        models](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4).
 
-        Each card must contain the following required fields: `summary`, `indicator`, and `source`.
-        The required fields must have a valid data structure.
+        This test implements [corrections to errors in the logical
+        models](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Logical-Model-Validation-Changes).
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
@@ -77,12 +75,18 @@ module DaVinciCRDTestKit
 
         successful_requests.each_with_index do |request, index|
           service_response = JSON.parse(request.response_body)
+
           perform_cards_validation(service_response['cards'], service_response['systemActions'].present?, 'v221', index)
 
           perform_system_actions_validation(service_response['systemActions'], index)
 
-          # perform_response_logical_model_validation(service_response['cards'], service_response['systemActions'],
-          #                                           index)
+          perform_response_logical_model_validation(
+            service_response['cards'],
+            service_response['systemActions'],
+            request.request_body,
+            index,
+            '2.2.1'
+          )
         rescue JSON::ParserError
           add_message('error', "Invalid JSON: server response #{index + 1} is not valid JSON.")
         end
