@@ -29,7 +29,8 @@ module DaVinciCRDTestKit
         the returned valid cards.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-22'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-19',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-22'
 
       input :invoked_hook
 

@@ -45,6 +45,7 @@ module DaVinciCRDTestKit
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-20',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-62',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-65'
 

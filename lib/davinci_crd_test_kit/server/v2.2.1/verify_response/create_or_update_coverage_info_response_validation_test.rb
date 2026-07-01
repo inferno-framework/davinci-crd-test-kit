@@ -39,7 +39,8 @@ module DaVinciCRDTestKit
           are received, the test is skipped.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-71'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-71'
 
       input :invoked_hook
 

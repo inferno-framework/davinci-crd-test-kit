@@ -48,7 +48,8 @@ module DaVinciCRDTestKit
         The test will skip if no Identify Additional Orders cards are found.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-57',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-58'
 
       input :invoked_hook

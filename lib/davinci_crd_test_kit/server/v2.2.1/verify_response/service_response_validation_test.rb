@@ -21,10 +21,7 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-4',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-5',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-22',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-24',
-                            'hl7.fhir.us.davinci-crd_2.2.1@resp-56'
+                            'hl7.fhir.us.davinci-crd_2.2.1@resp-13'
 
       input :invoked_hook
 
