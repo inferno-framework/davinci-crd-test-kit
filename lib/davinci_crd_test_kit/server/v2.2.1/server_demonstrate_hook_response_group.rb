@@ -13,8 +13,10 @@ module DaVinciCRDTestKit
         and return a valid response. Inferno will use the provided request body and will either use the provided service
         id or infer one from the hook indicated in the request and the server's discovery response.
         It ensures that the user-provided request and the server's response are both
-        valid as per the requirements described in the [CRD IG section](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html)
-        and the [CDS Hooks](https://cds-hooks.hl7.org/) hook specification for the corresponding hook.
+        valid as per the requirements described in the [CRD IG
+        section](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html) and
+        the [CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/index.html) hook
+        specification for the corresponding hook.
       )
 
       config options: { hook_name: ANY_HOOK_TAG }

@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       title 'Coverage Information system actions are valid across all hooks'
       id :crd_v221_coverage_info_system_action_across_hooks_validation
       description %(
-        This test verifies the presence of valid [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
+        This test verifies the presence of valid [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
         system action returned by CRD services across all hooks invoked. It verifies the following for each action:
         - The action type is `update`.
         - The resource within the action conforms its respective FHIR profile.
