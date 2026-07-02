@@ -70,6 +70,10 @@ module DaVinciCRDTestKit
         @results_repo ||= Inferno::Repositories::Results.new
       end
 
+      def session_data_repo
+        @ssesion_data_repo ||= Inferno::Repositories::SessionData.new
+      end
+
       def service_connection
         @service_connection ||= Faraday.new(url: @service_endpoint, request: { open_timeout: 30 })
       end
@@ -185,12 +189,28 @@ module DaVinciCRDTestKit
       end
 
       def add_unknown_context(request_body)
+        unknown_context_key = random_key
+
+        session_data_repo.save(
+          name: :unknown_context_key,
+          value: unknown_context_key,
+          type: 'text',
+          test_session_id: @test_session_id
+        )
         request_body['context'] ||= {}
-        request_body['context'][random_key] ||= random_key
+        request_body['context'][unknown_context_key] ||= unknown_context_key
       end
 
       def add_unknown_element(request_body)
-        request_body[random_key] ||= random_key
+        unknown_element_key = random_key
+
+        session_data_repo.save(
+          name: :unknown_element_key,
+          value: unknown_element_key,
+          type: 'text',
+          test_session_id: @test_session_id
+        )
+        request_body[unknown_element_key] ||= unknown_element_key
       end
 
       def parsed_response_body(response)
