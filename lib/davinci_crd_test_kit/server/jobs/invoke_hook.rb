@@ -71,7 +71,7 @@ module DaVinciCRDTestKit
       end
 
       def session_data_repo
-        @ssesion_data_repo ||= Inferno::Repositories::SessionData.new
+        @session_data_repo ||= Inferno::Repositories::SessionData.new
       end
 
       def service_connection
