@@ -10,6 +10,8 @@ module DaVinciCRDTestKit
       title 'Inferno invokes the selected hook with invalid authorization'
       id :crd_v221_server_technical_issues_invoke_hook_test
 
+      output :unknown_context_key, :unknown_element_key
+
       def perform_invoke_hook_job(*)
         Inferno::Jobs.perform(DaVinciCRDTestKit::Jobs::InvokeHookWithBadAuth, *)
       end

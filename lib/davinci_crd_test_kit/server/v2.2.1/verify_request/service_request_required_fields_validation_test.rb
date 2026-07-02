@@ -15,7 +15,10 @@ module DaVinciCRDTestKit
         During this test, Inferno will check each request body against the structural and content
         requirements for the invoked hook.
       )
-      input :invoked_hook, :unknown_context_key, :unknown_element_key
+      input :invoked_hook
+      input :unknown_context_key, optional: true
+      input :unknown_element_key, optional: true
+
       output :contexts
 
       run do
