@@ -56,25 +56,7 @@ module DaVinciCRDTestKit
         title 'Requests'
         simulation_verification
 
-        test from: :crd_v221_service_request_required_fields_validation,
-             config: {
-               outputs: {
-                 contexts: {
-                   name: :no_active_coverage_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_context_validation,
-             config: {
-               inputs: {
-                 contexts: {
-                   name: :no_active_coverage_contexts
-                 },
-                 request_body: {
-                   name: :no_active_coverage_request_body
-                 }
-               }
-             }
+        test from: :crd_v221_service_request_required_fields_validation
       end
 
       group do

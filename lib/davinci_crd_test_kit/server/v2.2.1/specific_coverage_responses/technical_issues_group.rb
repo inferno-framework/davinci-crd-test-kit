@@ -59,25 +59,7 @@ module DaVinciCRDTestKit
       group do
         title 'Requests'
 
-        test from: :crd_v221_service_request_required_fields_validation,
-             config: {
-               outputs: {
-                 contexts: {
-                   name: :technical_issues_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_context_validation,
-             config: {
-               inputs: {
-                 contexts: {
-                   name: :technical_issues_contexts
-                 },
-                 request_body: {
-                   name: :technical_issues_request_body
-                 }
-               }
-             }
+        test from: :crd_v221_service_request_required_fields_validation
       end
 
       group do

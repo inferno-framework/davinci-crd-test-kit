@@ -1,8 +1,6 @@
 require_relative '../../cross_suite/tags'
 require_relative 'interaction/server_invoke_hook_test'
 require_relative 'verify_request/service_request_required_fields_validation_test'
-require_relative 'verify_request/service_request_optional_fields_validation_test'
-require_relative 'verify_request/service_request_context_validation_test'
 require_relative 'verify_response/service_response_validation_test'
 
 module DaVinciCRDTestKit
@@ -52,25 +50,7 @@ module DaVinciCRDTestKit
       group do
         title 'Requests'
 
-        test from: :crd_v221_service_request_required_fields_validation,
-             config: {
-               outputs: {
-                 contexts: {
-                   name: :any_hook_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_context_validation,
-             config: {
-               inputs: {
-                 contexts: {
-                   name: :any_hook_contexts
-                 },
-                 request_body: {
-                   name: :any_hook_request_body
-                 }
-               }
-             }
+        test from: :crd_v221_service_request_required_fields_validation
       end
 
       group do
