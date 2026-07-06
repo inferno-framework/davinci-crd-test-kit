@@ -14,8 +14,9 @@ module DaVinciCRDTestKit
       description %(
         # Background
 
-        The #{title} Group verifies that a [CRD Server](https://hl7.org/fhir/us/davinci-crd/2.2.1/CapabilityStatement-crd-server.html)
-        supports at least one of the hooks supported by the [CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#supported-hooks).
+        The #{title} Group verifies that a CRD Server supports at least one of
+        the hooks supported by the [CRD
+        IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#supported-hooks).
         The supported hooks include:
         - [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#appointment-book)
         - [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#encounter-start)
@@ -33,9 +34,9 @@ module DaVinciCRDTestKit
 
         # Test Methodology
 
-        In these tests, Inferno acts as a [CRD Client](https://hl7.org/fhir/us/davinci-crd/2.2.1/CapabilityStatement-crd-client.html)
-        that initiates CDS Hooks calls. This test sequence is broken up into groups,
-        each group corresponding to a supported hook and defining a set of tests verifying
+        In these tests, Inferno acts as a CRD Client that initiates CDS Hooks
+        calls. This test sequence is broken up into groups, each group
+        corresponding to a supported hook and defining a set of tests verifying
         the ability of the server to respond to the given hook invocation. An
         additional group checks that the Coverage Information response type is
         supported for at least one hook.
