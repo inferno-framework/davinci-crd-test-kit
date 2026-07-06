@@ -18,14 +18,14 @@ module DaVinciCRDTestKit
         the hooks supported by the [CRD
         IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#supported-hooks).
         The supported hooks include:
-        - [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#appointment-book)
-        - [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#encounter-start)
-        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#encounter-discharge)
-        - [order-select](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#order-select)
-        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#order-dispatch)
-        - [order-sign](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#order-sign)
+        - [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
+        - [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
+        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        - [order-select](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-select)
+        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
+        - [order-sign](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-sign)
 
-        The [CRD 2.2.1 IG section on Supported Hooks](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#supported-hooks)
+        The [CRD 2.2.1 IG section on Supported Hooks](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#supported-hooks)
         states that "CRD Servers conforming to this implementation guide
         SHALL provide a service for all hooks and order resource types required of
         CRD clients by this implementation guide unless the server has determined that
