@@ -3,6 +3,7 @@ require_relative 'discovery/discovery_configuration_test'
 require_relative 'discovery/discovery_endpoint_test'
 require_relative 'discovery/discovery_services_validation_test'
 require_relative 'discovery/discovery_prefetch_support_test'
+require_relative 'discovery/discovery_standard_prefetch_expressions_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -64,6 +65,7 @@ module DaVinciCRDTestKit
       test from: :crd_v221_discovery_services_validation
       test from: :crd_v221_discovery_configuration
       test from: :crd_v221_discovery_prefetch_support
+      test from: :crd_v221_discovery_standard_prefetch_expressions
     end
   end
 end
