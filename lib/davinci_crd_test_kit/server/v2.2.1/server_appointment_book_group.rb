@@ -74,6 +74,7 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
+        simulation_verification
 
         test from: :crd_v221_service_request_required_fields_validation,
              config: {
