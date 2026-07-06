@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
         This group of tests invokes the encounter-start hook and ensures that
         the user-provided requests are valid as per the requirements described
         in the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
-        and the [CDS Hooks specification section on encounter-start context](http://cds-hooks.hl7.org/hooks/STU1/encounter-start.html).
+        and the [CDS Hooks specification section on encounter-start context](https://cds-hooks.hl7.org/hooks/STU1/encounter-start.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
         the [CRD IG section on encounter-start hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
         and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).

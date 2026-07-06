@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
         This group of tests invokes the encounter-discharge hook and ensures that
         the user-provided requests are valid as per the requirements described
         in the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
-        and the [CDS Hooks specification section on encounter-discharge context](http://cds-hooks.hl7.org/hooks/STU1/encounter-discharge.html).
+        and the [CDS Hooks specification section on encounter-discharge context](https://cds-hooks.hl7.org/hooks/STU1/encounter-discharge.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
         the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
         and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).

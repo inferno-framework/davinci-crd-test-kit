@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
         This group of tests invokes the order-dispatch hook and ensures that
         the user-provided requests are valid as per the requirements described
         in the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
-        and the [CDS Hooks specification section on order-dispatch context](http://cds-hooks.hl7.org/hooks/STU1/order-dispatch.html).
+        and the [CDS Hooks specification section on order-dispatch context](https://cds-hooks.hl7.org/hooks/STU1/order-dispatch.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
         the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
         and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).
