@@ -14,17 +14,18 @@ module DaVinciCRDTestKit
       description %(
         # Background
 
-        The #{title} Group verifies that a [CRD Server](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-server.html)
-        supports at least one of the hooks supported by the [CRD IG](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#supported-hooks).
+        The #{title} Group verifies that a CRD Server supports at least one of
+        the hooks supported by the [CRD
+        IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html#supported-hooks).
         The supported hooks include:
-        - [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
-        - [encounter-start](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
-        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
-        - [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
-        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
-        - [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
+        - [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
+        - [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
+        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        - [order-select](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-select)
+        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
+        - [order-sign](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-sign)
 
-        The [CRD STU2 IG section on Supported Hooks](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#supported-hooks)
+        The [CRD 2.2.1 IG section on Supported Hooks](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#supported-hooks)
         states that "CRD Servers conforming to this implementation guide
         SHALL provide a service for all hooks and order resource types required of
         CRD clients by this implementation guide unless the server has determined that
@@ -33,27 +34,22 @@ module DaVinciCRDTestKit
 
         # Test Methodology
 
-        In these tests, Inferno acts as a [CRD Client](https://hl7.org/fhir/us/davinci-crd/STU2/CapabilityStatement-crd-client.html)
-        that initiates CDS Hooks calls. This test sequence is broken up into groups,
-        each group corresponding to a supported hook and defining a set of tests verifying
+        In these tests, Inferno acts as a CRD Client that initiates CDS Hooks
+        calls. This test sequence is broken up into groups, each group
+        corresponding to a supported hook and defining a set of tests verifying
         the ability of the server to respond to the given hook invocation. An
         additional group checks that the Coverage Information response type is
         supported for at least one hook.
 
         Each hook group test verifies that:
         - The hook can be invoked.
-        - The user-provided request payload contains the required fields as specified
-          in the [CDS Hooks section on HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1).
-        - The user-provided request payload contains the optional fields as specified
-          in the [CDS Hooks section on HTTP request requirements](https://cds-hooks.hl7.org/2.0/#http-request_1) -
-          optional.
+        - The user-provided request payload is valid as specified
+          in the [CDS Hooks section on HTTP request requirements](https://cds-hooks.hl7.org/2026Jan/en/index.html#http-request-1).
         - Each card and system action returned by the server is valid as described in the
-          [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response).
-        - Each [CRD response type](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#potential-crd-response-types)
+          [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).
+        - Each [CRD response type](https://hl7.org/fhir/us/davinci-crd/2.2.1/cards.html#potential-crd-response-types)
           returned is valid - optional for some response types. See the individual test groups for more details.
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@4', 'hl7.fhir.us.davinci-crd_2.0.1@152',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@153'
 
       group from: :crd_v221_server_appointment_book,
             optional: true

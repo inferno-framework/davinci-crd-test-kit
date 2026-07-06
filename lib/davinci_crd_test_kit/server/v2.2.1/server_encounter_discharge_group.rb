@@ -21,24 +21,20 @@ module DaVinciCRDTestKit
       description %(
         This group of tests invokes the encounter-discharge hook and ensures that
         the user-provided requests are valid as per the requirements described
-        in the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
-        and the [CDS Hooks specification section on encounter-discharge context](https://cds-hooks.hl7.org/hooks/encounter-discharge/2023SepSTU1Ballot/encounter-discharge/).
+        in the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        and the [CDS Hooks specification section on encounter-discharge context](https://cds-hooks.hl7.org/hooks/STU1/encounter-discharge.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
-        the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
-        and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response).
+        the [CRD IG section on encounter-discharge hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).
 
         This group includes tests to validate the following CRD response types:
-        - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information) - optional
-        - [Create or update coverage information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)\
-        - optional
-        - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) - optional
-        - [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) - optional
-        - [Launch SMART application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application) -
-        optional
-        - [Request form completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion) -
-        optional
+        - [External Reference](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#external-reference-response-type)
+        - [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
+        - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+        - [Request Form Completion](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#request-form-completion-response-type)
+        - [Update Coverage Records](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#update-coverage-records-response-type)
+        - [Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#launch-smart-application-response-type)
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@168', 'hl7.fhir.us.davinci-crd_2.0.1@196'
 
       config options: { hook_name: ENCOUNTER_DISCHARGE_TAG }
       run_as_group
