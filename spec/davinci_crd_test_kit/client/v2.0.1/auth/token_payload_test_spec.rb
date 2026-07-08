@@ -156,6 +156,18 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
       expect(entity_result_message.message).to match(/Token validation error: Signature verification failed/)
     end
 
+    it 'passes when JWK has no alg field but JWT header specifies alg' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = JWT.encode token_payload, rsa_key, 'RS384', token_header
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('pass')
+    end
+
     it 'fails if it receives a JWT Authorization header with missing claims' do
       allow(test).to receive(:suite).and_return(suite)
 

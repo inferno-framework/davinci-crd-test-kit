@@ -56,13 +56,15 @@ module DaVinciCRDTestKit
 
           begin
             jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys # NOTE: pre-verified json
+            header_segment = auth_tokens_list[index].split('.').first
+            jwt_header = JSON.parse(Base64.urlsafe_decode64(header_segment + '=' * ((4 - header_segment.length % 4) % 4)))
 
             payload, =
               JWT.decode(
                 auth_tokens_list[index],
                 JWT::JWK.import(jwk).public_key,
                 true,
-                algorithms: [jwk[:alg]],
+                algorithms: [jwk[:alg] || jwt_header['alg']],
                 exp_leeway: 60,
                 iss: cds_jwt_iss,
                 aud: public_hook_url(request),
