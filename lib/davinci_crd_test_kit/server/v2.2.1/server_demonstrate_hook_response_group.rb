@@ -1,8 +1,6 @@
 require_relative '../../cross_suite/tags'
 require_relative 'interaction/server_invoke_hook_test'
 require_relative 'verify_request/service_request_required_fields_validation_test'
-require_relative 'verify_request/service_request_optional_fields_validation_test'
-require_relative 'verify_request/service_request_context_validation_test'
 require_relative 'verify_response/service_response_validation_test'
 
 module DaVinciCRDTestKit
@@ -15,8 +13,10 @@ module DaVinciCRDTestKit
         and return a valid response. Inferno will use the provided request body and will either use the provided service
         id or infer one from the hook indicated in the request and the server's discovery response.
         It ensures that the user-provided request and the server's response are both
-        valid as per the requirements described in the [CRD IG section](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html)
-        and the [CDS Hooks](https://cds-hooks.hl7.org/) hook specification for the corresponding hook.
+        valid as per the requirements described in the [CRD IG
+        section](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html) and
+        the [CDS Hooks](https://cds-hooks.hl7.org/2026Jan/en/index.html) hook
+        specification for the corresponding hook.
       )
 
       config options: { hook_name: ANY_HOOK_TAG }
@@ -52,25 +52,7 @@ module DaVinciCRDTestKit
       group do
         title 'Requests'
 
-        test from: :crd_v221_service_request_required_fields_validation,
-             config: {
-               outputs: {
-                 contexts: {
-                   name: :any_hook_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_context_validation,
-             config: {
-               inputs: {
-                 contexts: {
-                   name: :any_hook_contexts
-                 },
-                 request_body: {
-                   name: :any_hook_request_body
-                 }
-               }
-             }
+        test from: :crd_v221_service_request_required_fields_validation
       end
 
       group do

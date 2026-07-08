@@ -1,5 +1,6 @@
 RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
-  let(:test_session_id) { '12345' }
+  let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
+  let(:test_session_id) { test_session.id }
   let(:test_run_id) { '12345' }
   let(:result_id) { '12345' }
   let(:suite_id) { 'crd_server' }

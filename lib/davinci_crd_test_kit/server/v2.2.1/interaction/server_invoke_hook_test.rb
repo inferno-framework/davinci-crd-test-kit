@@ -9,6 +9,8 @@ module DaVinciCRDTestKit
       title 'Inferno invokes the selected hook'
       id :crd_v221_server_invoke_hook_test
 
+      output :unknown_context_key, :unknown_element_key
+
       def coverage_info_configuration_supported?
         true
       end

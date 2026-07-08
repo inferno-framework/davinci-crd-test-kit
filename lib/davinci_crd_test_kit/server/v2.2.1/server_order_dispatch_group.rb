@@ -1,8 +1,6 @@
 require_relative '../../cross_suite/tags'
 require_relative 'interaction/server_invoke_hook_test'
 require_relative 'verify_request/service_request_required_fields_validation_test'
-require_relative 'verify_request/service_request_optional_fields_validation_test'
-require_relative 'verify_request/service_request_context_validation_test'
 require_relative 'verify_response/service_response_validation_test'
 require_relative 'verify_response/external_reference_card_validation_test'
 require_relative 'verify_response/launch_smart_app_card_validation_test'
@@ -25,29 +23,24 @@ module DaVinciCRDTestKit
       description %(
         This group of tests invokes the order-dispatch hook and ensures that
         the user-provided requests are valid as per the requirements described
-        in the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
-        and the [CDS Hooks specification section on order-dispatch context](https://cds-hooks.hl7.org/hooks/order-dispatch/2023SepSTU1Ballot/order-dispatch/).
+        in the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
+        and the [CDS Hooks specification section on order-dispatch context](https://cds-hooks.hl7.org/hooks/STU1/order-dispatch.html).
         It also ensures that the contents of the server's response are valid as per the requirements described in
-        the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
-        and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2.0/#cds-service-response).
+        the [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
+        and the [CDS Hooks section on CDS Service Response](https://cds-hooks.hl7.org/2026Jan/en/#cds-service-response).
 
-        The [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
+        The [CRD IG section on order-dispatch hook](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
         states that "servers SHALL, at minimum, support returning and processing the Coverage Information
         system action for all invocations of this hook."
 
         This group includes tests to validate the following CRD response types:
-        - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)
-        - [Create or update coverage information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)\
-        - optional
-        - [External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference) - optional
-        - [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) - optional
-        - [Launch SMART application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application) -
-        optional
-        - [Request form completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion) -
-        optional
+        - [External Reference](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#external-reference-response-type)
+        - [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
+        - [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+        - [Request Form Completion](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#request-form-completion-response-type)
+        - [Update Coverage Records](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#update-coverage-records-response-type)
+        - [Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#launch-smart-application-response-type)
       )
-      # verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@164', 'hl7.fhir.us.davinci-crd_2.0.1@168',
-      #                       'hl7.fhir.us.davinci-crd_2.0.1@204', 'hl7.fhir.us.davinci-crd_2.0.1@207'
 
       config options: { hook_name: ORDER_DISPATCH_TAG }
       run_as_group
@@ -73,23 +66,7 @@ module DaVinciCRDTestKit
       group do
         title 'Requests'
 
-        test from: :crd_v221_service_request_required_fields_validation,
-             config: {
-               outputs: {
-                 contexts: {
-                   name: :order_dispatch_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_context_validation,
-             config: {
-               inputs: {
-                 contexts: {
-                   name: :order_dispatch_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_service_request_optional_fields_validation
+        test from: :crd_v221_service_request_required_fields_validation
       end
 
       group do

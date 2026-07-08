@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       title 'Discovery response contains valid services'
       id :crd_v221_discovery_services_validation
       description %(
-        As per the [CDS Hooks Spec](https://cds-hooks.hl7.org/2.0/#response),
+        As per the [CDS Hooks Spec](https://cds-hooks.hl7.org/2026Jan/en/index.html#response),
         the response to the discovery endpoint SHALL be an object containing
         a list of CDS services. If your CDS server hosts no CDS services,
         the discovery endpoint should return a 200 HTTP response with
