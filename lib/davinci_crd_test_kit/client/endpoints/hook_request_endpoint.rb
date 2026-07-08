@@ -136,7 +136,7 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def apply_hook_configuration(response_body)
+    def apply_hook_configuration(response_body) # rubocop:disable Metrics/CyclomaticComplexity
       return response_body unless response_body.present? && coverage_info_disabled?
 
       cards = response_body['cards']
@@ -146,6 +146,8 @@ module DaVinciCRDTestKit
       if system_actions.is_a?(Array)
         response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
       end
+
+      response_body.delete 'systemActions' if response_body['systemActions'].blank?
 
       response_body
     end

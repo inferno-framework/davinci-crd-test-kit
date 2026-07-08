@@ -1,4 +1,4 @@
-RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
+RSpec.describe DaVinciCRDTestKit::V221::CreateOrUpdateCoverageInfoResponseValidationTest do
   let(:suite_id) { 'crd_server' }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:runnable) { described_class }
@@ -14,7 +14,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     )
   end
   let(:system_action_response) do
-    File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'form_completion_system_action.json'))
+    File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'create_or_update_coverage_system_action.json'))
   end
 
   before do
@@ -28,7 +28,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
       .first
   end
 
-  it 'passes if cards contain a valid form completion card' do
+  it 'passes if cards contain a valid update coverage card' do
     repo_create(
       :request,
       direction: 'outgoing',
@@ -63,7 +63,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     expect(result.result_message).to match(/No successful hook responses/)
   end
 
-  it 'skips if no Form Completion card present' do
+  it 'skips if no Update Coverage card present' do
     repo_create(
       :request,
       direction: 'outgoing',
@@ -78,10 +78,10 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any Request Form Completion/)
+    expect(result.result_message).to match(/do not contain any Update Coverage Records/)
   end
 
-  it 'fails if a Form Completion card is not valid' do
+  it 'fails if a Update Coverage card is not valid' do
     repo_create(
       :request,
       direction: 'outgoing',
@@ -104,11 +104,11 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Request Form Completion/)
+    expect(result.result_message).to match(/Not all Update Coverage Records/)
     expect(entity_result_message.message).to match(/ERROR MESSAGE/)
   end
 
-  it 'fails if a Form Completion systemAction is not valid' do
+  it 'fails if a Update Coverage systemAction is not valid' do
     repo_create(
       :request,
       direction: 'outgoing',
@@ -131,7 +131,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Request Form Completion/)
+    expect(result.result_message).to match(/Not all Update Coverage Records/)
     expect(entity_result_message.message).to match(/ERROR MESSAGE/)
   end
 end

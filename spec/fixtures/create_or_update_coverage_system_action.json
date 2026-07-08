@@ -1,0 +1,47 @@
+{
+  "systemActions": [
+    {
+      "type": "update",
+      "description": "Update current coverage record",
+      "resource": {
+        "id": "crd221-demo-coverage-complete-prefetch",
+        "status": "active",
+        "subscriberId": "10A3D58WH456",
+        "beneficiary": {
+          "reference": "Patient/crd221-demo-patient"
+        },
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+              "code": "self"
+            }
+          ]
+        },
+        "period": {
+          "start": "2026-06-30",
+          "end": "2026-07-30"
+        },
+        "payor": [
+          {
+            "reference": "Organization/crd221-demo-payer-complete-prefetch"
+          }
+        ],
+        "class": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
+                  "code": "plan"
+                }
+              ]
+            },
+            "value": "Medicare Part A"
+          }
+        ],
+        "resourceType": "Coverage"
+      }
+    }
+  ]
+}
