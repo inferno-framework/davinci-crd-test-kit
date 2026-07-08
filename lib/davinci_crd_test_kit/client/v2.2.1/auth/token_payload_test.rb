@@ -57,7 +57,8 @@ module DaVinciCRDTestKit
           begin
             jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys # NOTE: pre-verified json
             header_segment = auth_tokens_list[index].split('.').first
-            jwt_header = JSON.parse(Base64.urlsafe_decode64(header_segment + '=' * ((4 - header_segment.length % 4) % 4)))
+            padding = '=' * ((4 - (header_segment.length % 4)) % 4)
+            jwt_header = JSON.parse(Base64.urlsafe_decode64(header_segment + padding))
 
             payload, =
               JWT.decode(
