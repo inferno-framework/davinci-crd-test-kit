@@ -172,12 +172,16 @@ module DaVinciCRDTestKit
       end
 
       check_is_fhir_resource(prefetched_value, target_resource_type: 'Bundle')
-      unless prefetched_value['entry'].size == 1
-        errors << "#{error_prefix} exactly one Coverage must be provided."
-        return
-      end
+      if prefetched_value['resourceType'] == 'Bundle'
+        unless prefetched_value['entry']&.size == 1
+          errors << "#{error_prefix} exactly one Coverage must be provided."
+          return
+        end
 
-      check_coverage(prefetched_value.dig('entry', 0, 'resource'))
+        check_coverage(prefetched_value.dig('entry', 0, 'resource'))
+      elsif prefetched_value['resourceType'] == 'Coverage'
+        check_coverage(prefetched_value)
+      end
     end
 
     def check_coverage(prefetched_coverage)
@@ -198,7 +202,7 @@ module DaVinciCRDTestKit
       end
 
       target_patient_id = hook_request.dig('context', 'patientId')
-      unless prefetched_coverage.dig('beneficiary', 'reference') == "Patient/#{target_patient_id}"
+      unless prefetched_coverage.dig('beneficiary', 'reference').ends_with?("Patient/#{target_patient_id}")
         errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
                   "expected Patient/#{target_patient_id}, got #{prefetched_coverage.dig('beneficiary',
                                                                                         'reference')}."

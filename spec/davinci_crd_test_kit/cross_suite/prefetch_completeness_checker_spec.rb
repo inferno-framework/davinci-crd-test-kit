@@ -305,6 +305,26 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         .to eq(['(Request 1) Prefetch Template coverage - prefetched Coverage has an unexpected ' \
                 'beneficiary reference: expected Patient/example, got Patient/wrong.'])
     end
+
+    it 'returns an error when the coverage Bundle has no entry element' do
+      order_sign_request['prefetch'] = { 'coverage' => { 'resourceType' => 'Bundle' } }
+      expect(errors_for(order_sign_request, templates))
+        .to eq(['(Request 1) Prefetch Template coverage - exactly one Coverage must be provided.'])
+    end
+
+    it 'returns a resourceType error when the prefetched value is a Coverage resource' do
+      order_sign_request['prefetch'] = { 'coverage' => crd_coverage_example }
+      expect(errors_for(order_sign_request, templates))
+        .to eq(['(Request 1) Prefetch Template coverage - prefetched value has unexpected resourceType: ' \
+                'expected Bundle, got Coverage.'])
+    end
+
+    it 'returns a resourceType error when the prefetched value is a Patient resource' do
+      order_sign_request['prefetch'] = { 'coverage' => crd_patient_example }
+      expect(errors_for(order_sign_request, templates))
+        .to eq(['(Request 1) Prefetch Template coverage - prefetched value has unexpected resourceType: ' \
+                'expected Bundle, got Patient.'])
+    end
   end
 
   describe 'unsupported search template' do
