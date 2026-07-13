@@ -166,7 +166,10 @@ With those caveats, a passing execution of this suite would include:
 
 If you would like to try out the order-sign hook invocation tests against
 [the public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
-you can do so using the following steps:
+you can do so using the following steps. Note that this reference implementation has
+not been updated for the 2.2.1 version of the CRD IG so many failures are expected during this
+execution. However, it can give you a sense for what executing the Inferno tests against a 
+client system will look like.
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using the default "US Core Version",
    which will not be used.

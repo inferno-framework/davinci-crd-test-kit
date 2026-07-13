@@ -76,7 +76,11 @@ module DaVinciCRDTestKit
     end
 
     def make_response
-      if invoked_hook != requested_hook
+      if requested_hook.blank?
+        error_response("No hook requested - populate the 'hook' element in the request.",
+                       code: 400,
+                       outcome_code: 'value')
+      elsif invoked_hook != requested_hook
         error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
                        "requested the #{requested_hook} hook.",
                        code: 400,
@@ -105,7 +109,7 @@ module DaVinciCRDTestKit
 
     def process_valid_hook
       if ig_version == 'v201'
-        send(:"gather_#{requested_hook.gsub('-', '_')}_data")
+        send(:"gather_#{requested_hook&.gsub('-', '_')}_data")
         request_coverage
       elsif ig_version == 'v221'
         request_additional_fhir_data
@@ -168,7 +172,7 @@ module DaVinciCRDTestKit
                    wrong_hook_for_test? ||
                    !AVAILABLE_HOOKS.include?(requested_hook)
 
-      [hook_instance_tag, hook_or_group_tag]
+      [hook_instance_tag, hook_or_group_tag].compact
     end
 
     def hook_instance_tag
@@ -178,7 +182,7 @@ module DaVinciCRDTestKit
     def hook_or_group_tag
       if test.config.options[:crd_test_group].present?
         test.config.options[:crd_test_group]
-      else
+      elsif name.present?
         DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")
       end
     end
@@ -206,7 +210,7 @@ module DaVinciCRDTestKit
     end
 
     def name
-      requested_hook.gsub('-', '_')
+      requested_hook&.gsub('-', '_')
     end
 
     # -----------------------

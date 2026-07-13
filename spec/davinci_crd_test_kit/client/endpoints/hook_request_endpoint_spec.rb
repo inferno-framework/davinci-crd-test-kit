@@ -115,6 +115,30 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         .to match(/Hook instance `#{order_sign_hook_request['hookInstance']}` has already been used in this session./)
     end
 
+    it 'returns 400 with OperationOutcome when the hook field is missing from the request' do
+      allow(test).to receive(:suite).and_return(suite)
+      token = jwt_helper.build(
+        aud: order_sign_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384'
+      )
+
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: instructions_card_template.to_json)
+
+      order_sign_hook_request.delete('hook')
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, order_sign_hook_request)
+
+      expect(last_response.status).to eq(400)
+      parsed_body = JSON.parse(last_response.body)
+      expect(parsed_body['resourceType']).to eq('OperationOutcome')
+      expect(parsed_body['issue'].first['details']['text'])
+        .to match(/No hook requested/)
+    end
+
     it 'returns 400 with OperationOutcome when the requested hook does not match the invoked hook' do
       allow(test).to receive(:suite).and_return(suite)
       token = jwt_helper.build(
