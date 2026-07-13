@@ -23,6 +23,11 @@ module DaVinciCRDTestKit
         capabilities of a CRD client as described in [version 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
         of the Da Vinci Coverage Requirements Discovery (CRD) Implementation Guide.
 
+        These tests are a **DRAFT** intended to allow CRD implementers to perform
+        preliminary checks of their implementations against the CRD IG requirements and
+        [provide feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues) on the tests.
+        Future versions of these tests may validate other requirements and may change how these are tested.
+
         Detailed information about this test suite can be found in the
         [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the
         [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki), including:
