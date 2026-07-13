@@ -201,16 +201,24 @@ module DaVinciCRDTestKit
                   "expected active, got #{prefetched_coverage['status']}."
       end
 
-      target_patient_id = hook_request.dig('context', 'patientId')
-      target_patient_ref =
-        target_patient_id.starts_with?('Patient/') ? target_patient_id : "Patient/#{target_patient_id}"
-      unless prefetched_coverage.dig('beneficiary', 'reference').ends_with?(target_patient_ref)
-        errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
-                  "expected #{target_patient_ref}, got #{prefetched_coverage.dig('beneficiary',
-                                                                                 'reference')}."
-      end
+      check_coverage_beneficiary(prefetched_coverage)
 
       nil
+    end
+
+    def check_coverage_beneficiary(prefetched_coverage)
+      target_patient_id = hook_request.dig('context', 'patientId')
+      patient_id = target_patient_id&.delete_prefix('Patient/')
+      relative_ref = "Patient/#{patient_id}"
+      fhir_server = hook_request['fhirServer']&.chomp('/')
+      absolute_ref = "#{fhir_server}/#{relative_ref}" if fhir_server.present?
+
+      actual_ref = prefetched_coverage.dig('beneficiary', 'reference')
+      return if actual_ref == relative_ref || (absolute_ref && actual_ref == absolute_ref)
+
+      expected_refs = [relative_ref, absolute_ref].compact.join(' or ')
+      errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
+                "expected #{expected_refs}, got #{actual_ref}."
     end
 
     def check_read(prefetched_value, instantiated_request)

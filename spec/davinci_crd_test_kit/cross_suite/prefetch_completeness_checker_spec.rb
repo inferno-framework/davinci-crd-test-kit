@@ -303,7 +303,8 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       order_sign_request['prefetch'] = { 'coverage' => crd_coverage_example_bundle }
       expect(errors_for(order_sign_request, templates))
         .to eq(['(Request 1) Prefetch Template coverage - prefetched Coverage has an unexpected ' \
-                'beneficiary reference: expected Patient/example, got Patient/wrong.'])
+                'beneficiary reference: expected Patient/example or https://example/r4/Patient/example, ' \
+                'got Patient/wrong.'])
     end
 
     it 'returns an error when the coverage Bundle has no entry element' do
