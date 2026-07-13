@@ -202,10 +202,12 @@ module DaVinciCRDTestKit
       end
 
       target_patient_id = hook_request.dig('context', 'patientId')
-      unless prefetched_coverage.dig('beneficiary', 'reference').ends_with?("Patient/#{target_patient_id}")
+      target_patient_ref =
+        target_patient_id.starts_with?('Patient/') ? target_patient_id : "Patient/#{target_patient_id}"
+      unless prefetched_coverage.dig('beneficiary', 'reference').ends_with?(target_patient_ref)
         errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
-                  "expected Patient/#{target_patient_id}, got #{prefetched_coverage.dig('beneficiary',
-                                                                                        'reference')}."
+                  "expected #{target_patient_ref}, got #{prefetched_coverage.dig('beneficiary',
+                                                                                 'reference')}."
       end
 
       nil
