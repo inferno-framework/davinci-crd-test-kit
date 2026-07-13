@@ -1,3 +1,16 @@
+# 0.14.1
+* FQM-327: Update coverage info response type checking by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/108
+* FQM-312: Check for technical failure code by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/109
+* FQM-321: Verify that servers don't use cards for coverage information by @tstrass in https://github.com/inferno-framework/davinci-crd-test-kit/pull/112
+* FQM-313, FQM-314: Unresolved patient and unresolved coverage tests by @tstrass in https://github.com/inferno-framework/davinci-crd-test-kit/pull/113
+* ID-147: Client doc updates by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/110
+* FQM-289: Use logical models for server response validation by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/121
+* FQM-337: Simulation verification labels by @tstrass in https://github.com/inferno-framework/davinci-crd-test-kit/pull/119
+* FQM-318: Standard prefetch expressions test by @tstrass in https://github.com/inferno-framework/davinci-crd-test-kit/pull/120
+* FQM-334: Fix response validation tests by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/123
+* Update server docs by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/111
+* Fix reported CRD Client Bugs by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/129
+
 # 0.14.0
 * ID-35: Enable Wiki Publication Workflow by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/40
 * ID-26: Add additional CDS request validation by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/37
