@@ -78,7 +78,8 @@ module DaVinciCRDTestKit
     end
 
     def draft_orders_conform_to_profiles?(request_body, request_index, ig_semver)
-      resource = FHIR.from_contents(request_body.dig('context', 'draftOrders')&.to_json)
+      draft_orders = request_body.dig('context', 'draftOrders').to_json
+      resource = FHIR.from_contents(draft_orders)
       resource_is_valid?(resource:, profile_url: "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-bundle-request|#{ig_semver}",
                          message_prefix: "(Request #{request_index + 1}) context.draftOrders - ")
     end
