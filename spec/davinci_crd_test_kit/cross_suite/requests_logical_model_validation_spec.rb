@@ -326,7 +326,7 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
       it 'does not raise an error when draftOrders is absent' do
         order_sign_request['context'].delete('draftOrders')
         expect { module_instance.send(:check_context_resource_profiles, order_sign_request, 0, '2.2.1') }
-          .not_to raise_error
+          .to_not raise_error
       end
     end
 
