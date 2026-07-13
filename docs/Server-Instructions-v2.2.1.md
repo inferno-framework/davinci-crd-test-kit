@@ -54,6 +54,22 @@ Once groups associated with all supported hooks have been run, execute group
 have been met. These tests use the requests made during other groups so cannot be run
 before they have been run.
 
+### Specific Coverage Responses
+
+Group 4 includes tests to determine that the server can provide specific types
+of coverage information responses under particular conditions.
+
+The Technical Issues Group (4.1) simulates technical issues by providing
+credentials which will result in 500 errors when the CRD server makes FHIR
+requests. For this group, it is necessary to provide a hook request body which
+will require the server to make FHIR requests to retrieve additional data, and
+to ensure that this is data that could not be available through other means,
+such as by being cached from earlier tests.
+
+The No Member Found Group (4.2), Coverage Not Found Group (4.3), and No Active
+Coverage group (4.4) each require the user to enter a request body that will
+elicit each of those specific responses from the server.
+
 ## Interpreting Results
 
 A passing session means the server demonstrated conformant behavior for the discovery response

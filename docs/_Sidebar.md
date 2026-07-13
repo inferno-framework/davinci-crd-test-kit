@@ -14,6 +14,7 @@
 *   [Server Testing Details](Server-Details)
 *   [Server v2.0.1 Testing Instructions](Server-Instructions)
 *   [Server v2.2.1 Testing Instructions](Server-Instructions-v2.2.1)
+*   [Logical Model Validation Changes](Logical-Model-Validation-Changes)
 
 **Contributing to this Test Kit**
 *   [Technical Overview](Technical-Overview)
