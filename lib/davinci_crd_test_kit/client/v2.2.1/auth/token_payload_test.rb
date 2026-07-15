@@ -59,13 +59,20 @@ module DaVinciCRDTestKit
             header_segment = auth_tokens_list[index].split('.').first
             padding = '=' * ((4 - (header_segment.length % 4)) % 4)
             jwt_header = JSON.parse(Base64.urlsafe_decode64(header_segment + padding))
+            alg = jwk[:alg] || jwt_header['alg']
+
+            unless alg&.match?(/\A(RS|ES|PS)\d+\z/)
+              add_request_message('error', "Token validation error: Unsupported or missing algorithm: #{alg.inspect}",
+                                  index)
+              next
+            end
 
             payload, =
               JWT.decode(
                 auth_tokens_list[index],
                 JWT::JWK.import(jwk).public_key,
                 true,
-                algorithms: [jwk[:alg] || jwt_header['alg']],
+                algorithms: [alg],
                 exp_leeway: 60,
                 iss: cds_jwt_iss,
                 aud: public_hook_url(request),
