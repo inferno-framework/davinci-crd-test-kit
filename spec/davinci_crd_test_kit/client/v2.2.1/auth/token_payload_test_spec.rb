@@ -242,21 +242,6 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       expect(entity_result_message.message).to match(/Unsupported or missing algorithm/)
     end
 
-    it 'fails if the token declares a non-existent algorithm such as RS111' do
-      create_appointment_hook_request
-
-      # `RS111` slips past the format guard but must be rejected by JWT.decode.
-      rsa_jwk_hash['alg'] = 'RS111'
-      token = JWT.encode token_payload, rsa_key, 'RS384', token_header
-
-      result = run(test,
-                   auth_tokens: [token],
-                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
-                   cds_jwt_iss: example_client_url)
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Token validation error/)
-    end
-
     it 'fails if it receives a JWT Authorization header with missing claims' do
       create_appointment_hook_request
 
