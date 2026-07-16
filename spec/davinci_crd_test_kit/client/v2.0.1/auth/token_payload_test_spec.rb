@@ -168,6 +168,20 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
       expect(result.result).to eq('pass')
     end
 
+    it 'fails when JWK omits alg and the JWT header declares a fake algorithm' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      # No alg on the JWK -> falls back to the (fake) header alg, which JWT.decode rejects.
+      token = JWT.encode token_payload, rsa_key, 'RS384', token_header.merge(alg: 'RS111')
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to match(/Token validation error/)
+    end
+
     it 'fails if the token uses an unsupported algorithm such as HS256' do
       allow(test).to receive(:suite).and_return(suite)
 
