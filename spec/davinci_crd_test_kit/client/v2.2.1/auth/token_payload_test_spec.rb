@@ -225,7 +225,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported or missing algorithm/)
+      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
     end
 
     it 'fails if the token uses the `none` algorithm' do
@@ -239,7 +239,25 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported or missing algorithm/)
+      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
+    end
+
+    it 'reports every problem at once rather than stopping at the first failed check' do
+      create_appointment_hook_request
+
+      # One token with two independent problems: a disallowed alg AND a missing `exp` claim.
+      token = JWT.encode token_payload.except(:exp), 'shared_secret', 'HS256', token_header.merge(alg: 'HS256')
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+
+      messages = results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+        .first.messages.map(&:message)
+      expect(messages).to include(a_string_matching(/CDS Hooks prohibits/))
+      expect(messages).to include(a_string_matching(/missing required claims: `exp`/))
     end
 
     it 'fails if it receives a JWT Authorization header with missing claims' do

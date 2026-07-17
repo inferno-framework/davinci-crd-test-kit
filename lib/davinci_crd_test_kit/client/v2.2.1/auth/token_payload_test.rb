@@ -56,18 +56,23 @@ module DaVinciCRDTestKit
 
           begin
             jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys # NOTE: pre-verified json
-            header_segment = auth_tokens_list[index].split('.').first
-            padding = '=' * ((4 - (header_segment.length % 4)) % 4)
-            jwt_header = JSON.parse(Base64.urlsafe_decode64(header_segment + padding))
-            alg = jwk[:alg] || jwt_header['alg']
+            unverified_payload, jwt_header = JWT.decode(auth_tokens_list[index], nil, false)
+          rescue StandardError => e
+            add_request_message('error', "Token validation error: #{e.message}", index)
+            next
+          end
 
-            unless alg&.match?(/\A(RS|ES|PS)\d+\z/)
-              add_request_message('error', "Token validation error: Unsupported or missing algorithm: #{alg.inspect}",
-                                  index)
-              next
-            end
+          alg = jwk[:alg] || jwt_header['alg']
 
-            payload, =
+          # Continue checking the rest of the token even when one check fails, so the tester sees every
+          # issue at once rather than fixing them one error at a time.
+          # CDS Hooks prohibits the `none` algorithm and symmetric (HMAC) algorithms for the authentication JWT.
+          if alg.to_s.match?(/\A(none|hs\d+)\z/i)
+            add_request_message('error',
+                                "Token signature algorithm #{alg.inspect} is not permitted; CDS Hooks prohibits " \
+                                'the `none` algorithm and symmetric (HMAC) algorithms.', index)
+          else
+            begin
               JWT.decode(
                 auth_tokens_list[index],
                 JWT::JWK.import(jwk).public_key,
@@ -82,18 +87,16 @@ module DaVinciCRDTestKit
                 verify_iss: true,
                 verify_aud: true
               )
-          rescue StandardError => e
-            add_request_message('error', "Token validation error: #{e.message}", index)
-            next
+            rescue StandardError => e
+              add_request_message('error', "Token validation error: #{e.message}", index)
+            end
           end
 
-          missing_claims = required_claims - payload.keys
+          missing_claims = required_claims - unverified_payload.keys
+          next if missing_claims.empty?
+
           missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
-
-          unless missing_claims.empty?
-            add_request_message('error', "JWT payload missing required claims: #{missing_claims_string}", index)
-            next
-          end
+          add_request_message('error', "JWT payload missing required claims: #{missing_claims_string}", index)
         end
         assert_no_error_messages("#{requests_with_errors_prefix}Token payload is missing required claims or " \
                                  'does not have a valid signature. See Messages for details.')
