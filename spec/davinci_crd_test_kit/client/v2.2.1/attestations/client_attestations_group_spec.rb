@@ -4,7 +4,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
   let(:suite_id) { 'crd_client_v221' }
   let(:group) { described_class }
 
-  # Every requirement from the CRD v2.2.1 client attestation set, in spreadsheet order.
+  
   let(:expected_requirements) do
     [
       'hl7.fhir.us.davinci-crd_2.2.1@sec-1',
