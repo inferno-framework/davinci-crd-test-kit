@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class CoverageBasedInvocationAttestationTest < Inferno::Test
       id :crd_v221_coverage_based_invocation_attestation
-      title 'Health IT module invokes hooks appropriately based on active coverage(s)'
+      ATTESTATION_TITLE = 'Health IT module invokes hooks appropriately based on active coverage(s)'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module uses the patient's coverage information to decide which payer services to invoke:
 
@@ -22,7 +23,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-30', 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
 
       input :coverage_based_invocation_attestation,
-            title: 'Health IT module invokes hooks appropriately based on active coverage(s)',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module uses the patient's coverage information to decide which payer
               services to invoke:

@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class MustSupportExposureAttestationTest < Inferno::Test
       id :crd_v221_must_support_exposure_attestation
-      title 'Health IT module exposes maintained must support elements'
+      ATTESTATION_TITLE = 'Health IT module exposes maintained must support elements'.freeze
+      title ATTESTATION_TITLE
       description %(
         Where the Health IT module maintains a mustSupport data element and surfaces it to users, that element
         is exposed in its FHIR interface when the data exists and privacy constraints permit.
@@ -11,7 +12,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'
 
       input :must_support_exposure_attestation,
-            title: 'Health IT module exposes maintained must support elements',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that, where the Health IT module maintains a mustSupport data element and surfaces it to
               users, that element is exposed in its FHIR interface when the data exists and privacy constraints

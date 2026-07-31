@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class WorkflowIntegrationAttestationTest < Inferno::Test
       id :crd_v221_workflow_integration_attestation
-      title 'Health IT module integrates hook invocations transparently into user workflows'
+      ATTESTATION_TITLE = 'Health IT module integrates hook invocations transparently into user workflows'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module integrates CRD hook invocations into the regular user workflow:
 
@@ -17,7 +18,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-48'
 
       input :workflow_integration_attestation,
-            title: 'Health IT module integrates hook invocations transparently into user workflows',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module integrates CRD hook invocations into the regular user workflow:
 

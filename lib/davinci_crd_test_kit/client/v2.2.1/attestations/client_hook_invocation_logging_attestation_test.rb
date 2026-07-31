@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class HookInvocationLoggingAttestationTest < Inferno::Test
       id :crd_v221_hook_invocation_logging_attestation
-      title 'Health IT module retains logs of all CRD-related hook invocations'
+      ATTESTATION_TITLE = 'Health IT module retains logs of all CRD-related hook invocations'.freeze
+      title ATTESTATION_TITLE
       description %(
         In addition to any logging performed for security purposes, the Health IT module retains logs of all
         CRD-related hook invocations and their responses so that they can be accessed in the event of a dispute.
@@ -11,7 +12,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-37'
 
       input :hook_invocation_logging_attestation,
-            title: 'Health IT module retains logs of all CRD-related hook invocations',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that, in addition to any logging performed for security purposes, the Health IT module
               retains logs of all CRD-related hook invocations and their responses so that they can be accessed

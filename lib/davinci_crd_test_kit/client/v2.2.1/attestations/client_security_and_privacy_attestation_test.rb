@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class SecurityAndPrivacyAttestationTest < Inferno::Test
       id :crd_v221_security_and_privacy_attestation
-      title 'Health IT module adheres to security and privacy requirements'
+      ATTESTATION_TITLE = 'Health IT module adheres to security and privacy requirements'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module adheres to the security and privacy rules that CRD inherits from the
         specifications it builds on, including FHIR, SMART App Launch, and CDS Hooks.
@@ -11,7 +12,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@sec-1'
 
       input :security_and_privacy_attestation,
-            title: 'Health IT module adheres to security and privacy requirements',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module adheres to the security and privacy rules that CRD inherits from the
               specifications it builds on, including FHIR, SMART App Launch, and CDS Hooks.

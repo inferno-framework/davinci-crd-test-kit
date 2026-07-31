@@ -1,21 +1,21 @@
-require_relative 'attestations/authorized_scope_test'
-require_relative 'attestations/coverage_based_invocation_test'
-require_relative 'attestations/data_element_expectations_test'
-require_relative 'attestations/hook_invocation_logging_test'
-require_relative 'attestations/must_support_exposure_test'
-require_relative 'attestations/must_support_use_test'
-require_relative 'attestations/order_sign_support_test'
-require_relative 'attestations/prefetch_key_omission_test'
-require_relative 'attestations/resource_identifiers_test'
-require_relative 'attestations/response_case_distinction_test'
-require_relative 'attestations/security_and_privacy_test'
-require_relative 'attestations/workflow_integration_test'
+require_relative 'attestations/client_authorized_scope_attestation_test'
+require_relative 'attestations/client_coverage_based_invocation_attestation_test'
+require_relative 'attestations/client_data_element_expectations_attestation_test'
+require_relative 'attestations/client_hook_invocation_logging_attestation_test'
+require_relative 'attestations/client_must_support_exposure_attestation_test'
+require_relative 'attestations/client_must_support_use_attestation_test'
+require_relative 'attestations/client_order_sign_support_attestation_test'
+require_relative 'attestations/client_prefetch_key_omission_attestation_test'
+require_relative 'attestations/client_resource_identifiers_attestation_test'
+require_relative 'attestations/client_response_case_distinction_attestation_test'
+require_relative 'attestations/client_security_and_privacy_attestation_test'
+require_relative 'attestations/client_workflow_integration_attestation_test'
 
 module DaVinciCRDTestKit
   module V221
     class CRDClientAttestationsGroup < Inferno::TestGroup
       id :crd_v221_client_attestations
-      title 'Visual Inspection'
+      title 'Visual Inspection and Attestation'
       description %(
         Verify conformance to the CRD **SHALL** requirements.
 

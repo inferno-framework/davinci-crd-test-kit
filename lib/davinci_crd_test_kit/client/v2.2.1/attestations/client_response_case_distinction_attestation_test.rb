@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class ResponseCaseDistinctionAttestationTest < Inferno::Test
       id :crd_v221_response_case_distinction_attestation
-      title 'Health IT module distinguishes different response cases to users'
+      ATTESTATION_TITLE = 'Health IT module distinguishes different response cases to users'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module distinguishes between the different CRD response cases when presenting results
         to users:
@@ -17,7 +18,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@impl-1', 'hl7.fhir.us.davinci-crd_2.2.1@resp-49'
 
       input :response_case_distinction_attestation,
-            title: 'Health IT module distinguishes different response cases to users',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module distinguishes between the different CRD response cases when
               presenting results to users:

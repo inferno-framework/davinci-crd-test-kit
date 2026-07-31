@@ -2,8 +2,9 @@ module DaVinciCRDTestKit
   module V221
     class AuthorizedScopeAttestationTest < Inferno::Test
       id :crd_v221_authorized_scope_attestation
-      title "Health IT module takes the user's authorized scope into account when providing data during " \
-            'CDS Hook invocations'
+      ATTESTATION_TITLE = "Health IT module takes the user's authorized scope into account when providing data " \
+                          'during CDS Hook invocations'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module limits the data it makes available to CDS Services to what the current user is
         authorized to access:
@@ -20,8 +21,7 @@ module DaVinciCRDTestKit
                             'cds-hooks_3.0.0-ballot@173'
 
       input :authorized_scope_attestation,
-            title: "Health IT module takes the user's authorized scope into account when providing data during " \
-                   'CDS Hook invocations',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module limits the data it makes available to CDS Services to what the
               current user is authorized to access:

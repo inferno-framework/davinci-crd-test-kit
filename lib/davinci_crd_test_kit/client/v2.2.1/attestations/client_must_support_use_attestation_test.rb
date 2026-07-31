@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class MustSupportUseAttestationTest < Inferno::Test
       id :crd_v221_must_support_use_attestation
-      title 'Health IT module uses received must support data'
+      ATTESTATION_TITLE = 'Health IT module uses received must support data'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module makes the mustSupport data it receives available to the appropriate clinical or
         administrative user, or leverages that data within its workflow as necessary to follow the intention of
@@ -12,7 +13,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-6'
 
       input :must_support_use_attestation,
-            title: 'Health IT module uses received must support data',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module makes the mustSupport data it receives available to the
               appropriate clinical or administrative user, or leverages that data within its workflow as

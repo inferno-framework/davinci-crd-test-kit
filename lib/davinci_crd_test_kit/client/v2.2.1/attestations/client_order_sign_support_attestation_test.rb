@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class OrderSignSupportAttestationTest < Inferno::Test
       id :crd_v221_order_sign_support_attestation
-      title 'Health IT module supports order-sign for all types of orders that can be placed'
+      ATTESTATION_TITLE = 'Health IT module supports order-sign for all types of orders that can be placed'.freeze
+      title ATTESTATION_TITLE
       description %(
         For the products and services it supports ordering that are covered by one of the CRD-supported request
         types, the Health IT module supports the `order-sign` hook for each of those order types.
@@ -11,7 +12,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'
 
       input :order_sign_support_attestation,
-            title: 'Health IT module supports order-sign for all types of orders that can be placed',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that, for the products and services it supports ordering that are covered by one of the
               CRD-supported request types, the Health IT module supports the `order-sign` hook for each of those

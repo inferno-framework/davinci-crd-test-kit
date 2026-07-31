@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class ResourceIdentifiersAttestationTest < Inferno::Test
       id :crd_v221_resource_identifiers_attestation
-      title 'Health IT module does not use business identifiers in resource identifiers'
+      ATTESTATION_TITLE = 'Health IT module does not use business identifiers in resource identifiers'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module ensures that the resource identifiers it exposes over the CRD interface are
         distinct from, and have no determinable relationship with, any business identifiers associated with
@@ -12,7 +13,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@sec-7'
 
       input :resource_identifiers_attestation,
-            title: 'Health IT module does not use business identifiers in resource identifiers',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module ensures that the resource identifiers it exposes over the CRD
               interface are distinct from, and have no determinable relationship with, any business identifiers

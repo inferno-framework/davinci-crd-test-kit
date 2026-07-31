@@ -2,7 +2,8 @@ module DaVinciCRDTestKit
   module V221
     class DataElementExpectationsAttestationTest < Inferno::Test
       id :crd_v221_data_element_expectations_attestation
-      title 'Health IT module does not set additional expectations for data elements'
+      ATTESTATION_TITLE = 'Health IT module does not set additional expectations for data elements'.freeze
+      title ATTESTATION_TITLE
       description %(
         The Health IT module does not place expectations on CRD servers beyond what the CRD specification
         requires:
@@ -21,7 +22,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@conf-13', 'hl7.fhir.us.davinci-crd_2.2.1@found-33'
 
       input :data_element_expectations_attestation,
-            title: 'Health IT module does not set additional expectations for data elements',
+            title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module does not place expectations on CRD servers beyond what the CRD
               specification requires:
