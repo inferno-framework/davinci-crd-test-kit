@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class CoverageBasedInvocationAttestationTest < Inferno::Test
@@ -5,45 +7,21 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module invokes hooks appropriately based on active coverage(s)'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module uses the patient's coverage information to decide which payer services to invoke:
-
-        - Hooks are only invoked on payer services where the patient record indicates active coverage with the
-          payer associated with the service, and where there is no recorded indication that the patient intends
-          to bypass insurance coverage, such as a service or product flagged as "patient-pay".
-        - Where a patient has multiple active coverages that could be relevant to the current order,
-          appointment, or other activity, the coverage most likely to be primary is selected and coverage
-          information is solicited for that one payer only.
-        - If services are invoked on other payers, the response types that return coverage information are
-          disabled for those "likely secondary" payers.
-        - Where multiple active coverages are deemed appropriate to call, all CRD server calls are invoked in
-          parallel and their results are displayed simultaneously to ensure a timely response to user action.
+        During this test, the tester will confirm that the Health IT module invokes hooks on payer services
+        appropriately based on the patient's active coverages.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26', 'hl7.fhir.us.davinci-crd_2.2.1@dev-28',
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-30', 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :coverage_based_invocation_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module uses the patient's coverage information to decide which payer
-              services to invoke:
-
-              - Hooks are only invoked on payer services where the patient record indicates active coverage with
-                the payer associated with the service, and where there is no recorded indication that the
-                patient intends to bypass insurance coverage, such as a service or product flagged as
-                "patient-pay".
-                ([dev-26](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-26))
-              - Where a patient has multiple active coverages that could be relevant to the current order,
-                appointment, or other activity, the coverage most likely to be primary is selected and coverage
-                information is solicited for that one payer only.
-                ([dev-28](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-28))
-              - If services are invoked on other payers, the response types that return coverage information are
-                disabled for those "likely secondary" payers.
-                ([dev-30](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-30))
-              - Where multiple active coverages are deemed appropriate to call, all CRD server calls are invoked
-                in parallel and their results are displayed simultaneously to ensure a timely response to user
-                action.
-                ([dev-32](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-32))
+              I attest that the Health IT module invokes hooks on payer services appropriately based on the
+              patient's active coverages.
             ),
             type: 'radio',
             default: 'false',
@@ -59,10 +37,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert coverage_based_invocation_attestation == 'true',
-               'Health IT module does not invoke hooks appropriately based on the patient active coverages.'
-
-        pass coverage_based_invocation_attestation_note if coverage_based_invocation_attestation_note.present?
+        assert coverage_based_invocation_attestation == 'true'
       end
     end
   end

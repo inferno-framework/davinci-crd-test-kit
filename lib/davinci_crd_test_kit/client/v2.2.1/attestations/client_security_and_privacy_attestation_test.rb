@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class SecurityAndPrivacyAttestationTest < Inferno::Test
@@ -5,18 +7,20 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module adheres to security and privacy requirements'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module adheres to the security and privacy rules that CRD inherits from the
-        specifications it builds on, including FHIR, SMART App Launch, and CDS Hooks.
+        During this test, the tester will confirm that the Health IT module adheres to the security and privacy
+        rules that CRD inherits from the specifications it builds on.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@sec-1'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :security_and_privacy_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module adheres to the security and privacy rules that CRD inherits from the
-              specifications it builds on, including FHIR, SMART App Launch, and CDS Hooks.
-              ([sec-1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/security.html#ci-c-sec-1))
+              I attest that the Health IT module adheres to the security and privacy rules that CRD inherits from
+              the specifications it builds on.
             ),
             type: 'radio',
             default: 'false',
@@ -32,10 +36,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert security_and_privacy_attestation == 'true',
-               'Health IT module does not adhere to the inherited security and privacy requirements.'
-
-        pass security_and_privacy_attestation_note if security_and_privacy_attestation_note.present?
+        assert security_and_privacy_attestation == 'true'
       end
     end
   end

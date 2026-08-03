@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class MustSupportUseAttestationTest < Inferno::Test
@@ -5,20 +7,18 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module uses received must support data'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module makes the mustSupport data it receives available to the appropriate clinical or
-        administrative user, or leverages that data within its workflow as necessary to follow the intention of
-        the provided decision support.
+        During this test, the tester will confirm that the Health IT module uses the mustSupport data it receives.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-6'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :must_support_use_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module makes the mustSupport data it receives available to the
-              appropriate clinical or administrative user, or leverages that data within its workflow as
-              necessary to follow the intention of the provided decision support.
-              ([conf-6](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-6))
+              I attest that the Health IT module uses the mustSupport data it receives.
             ),
             type: 'radio',
             default: 'false',
@@ -34,10 +34,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert must_support_use_attestation == 'true',
-               'Health IT module does not use the must support data that it receives.'
-
-        pass must_support_use_attestation_note if must_support_use_attestation_note.present?
+        assert must_support_use_attestation == 'true'
       end
     end
   end

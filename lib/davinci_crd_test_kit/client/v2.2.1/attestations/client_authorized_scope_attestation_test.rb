@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class AuthorizedScopeAttestationTest < Inferno::Test
@@ -6,34 +8,21 @@ module DaVinciCRDTestKit
                           'during CDS Hook invocations'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module limits the data it makes available to CDS Services to what the current user is
-        authorized to access:
-
-        - Prefetched data only includes resources that are within the user's authorized scope.
-        - The data to which a CDS Service is given access is limited to the same restrictions and authorizations
-          afforded the current user.
-        - The access token provided to a CDS Service is scoped to the CDS Service being invoked and to the
-          current user.
-        - Access is denied to any requested resource that is outside the user's authorized scope.
+        During this test, the tester will confirm that the Health IT module limits the data it makes available to CDS
+        Services to what the current user is authorized to access.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'cds-hooks_3.0.0-ballot@42', 'cds-hooks_3.0.0-ballot@63', 'cds-hooks_3.0.0-ballot@64',
                             'cds-hooks_3.0.0-ballot@173'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :authorized_scope_attestation,
             title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module limits the data it makes available to CDS Services to what the
-              current user is authorized to access:
-
-              - Prefetched data only includes resources that are within the user's authorized scope.
-                ([CDS Hooks prefetch template](https://cds-hooks.hl7.org/2026Jan/en/index.html#prefetch-template))
-              - The data to which a CDS Service is given access is limited to the same restrictions and
-                authorizations afforded the current user, and the access token provided to a CDS Service is
-                scoped to the CDS Service being invoked and to the current user.
-                ([CDS Hooks FHIR resource access](https://cds-hooks.hl7.org/2026Jan/en/index.html#fhir-resource-access))
-              - Access is denied to any requested resource that is outside the user's authorized scope.
-                ([CDS Hooks trusting CDS services](https://cds-hooks.hl7.org/2026Jan/en/index.html#trusting-cds-services))
+              current user is authorized to access.
             ),
             type: 'radio',
             default: 'false',
@@ -49,11 +38,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert authorized_scope_attestation == 'true',
-               "Health IT module does not take the user's authorized scope into account when providing data " \
-               'during CDS Hook invocations.'
-
-        pass authorized_scope_attestation_note if authorized_scope_attestation_note.present?
+        assert authorized_scope_attestation == 'true'
       end
     end
   end

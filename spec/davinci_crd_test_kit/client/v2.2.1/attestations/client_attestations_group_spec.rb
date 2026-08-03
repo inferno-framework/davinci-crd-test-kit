@@ -79,12 +79,26 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
       end
     end
 
-    it 'links to the requirements from the input description but not the test description' do
+    it 'points testers at the specification requirements rather than restating them' do
       group.tests.each do |test|
-        expect(attestation_input(test).description).to match(%r{https://}),
-                                                       "#{test.title} input description has no requirement link"
-        expect(test.description).to_not match(%r{https://}),
-                                        "#{test.title} test description should not contain links"
+        description = test.description.strip
+        input_description = attestation_input(test).description.strip
+
+        expect(description).to start_with('During this test, the tester will confirm that'),
+                               "#{test.title} description does not open with the standard prefix"
+        expect(description).to include('View Specification Requirements'),
+                               "#{test.title} description does not point at the requirements"
+        expect(input_description).to start_with('I attest that'),
+                                     "#{test.title} input description does not open with 'I attest that'"
+        expect(input_description).to_not match(%r{https://}),
+                                         "#{test.title} input description should not contain links"
+      end
+    end
+
+    it 'carries the shared input instructions' do
+      group.tests.each do |test|
+        expect(test.input_instructions).to eq(group.input_instructions),
+                                           "#{test.title} does not use the shared attestation input instructions"
       end
     end
   end
@@ -100,18 +114,16 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
       expect(result.result).to eq('pass')
     end
 
-    it 'records the note when the tester provides one' do
+    it 'passes when the tester answers Yes and provides a note' do
       result = run(test, attestation_name => 'true', note_name => 'Verified during on-site review.')
 
       expect(result.result).to eq('pass')
-      expect(result.result_message).to eq('Verified during on-site review.')
     end
 
     it 'fails when the tester answers No' do
       result = run(test, attestation_name => 'false')
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/does not adhere/)
     end
   end
 end

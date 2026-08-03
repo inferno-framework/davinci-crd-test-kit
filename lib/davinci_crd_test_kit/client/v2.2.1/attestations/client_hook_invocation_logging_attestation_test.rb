@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class HookInvocationLoggingAttestationTest < Inferno::Test
@@ -5,19 +7,20 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module retains logs of all CRD-related hook invocations'.freeze
       title ATTESTATION_TITLE
       description %(
-        In addition to any logging performed for security purposes, the Health IT module retains logs of all
-        CRD-related hook invocations and their responses so that they can be accessed in the event of a dispute.
+        During this test, the tester will confirm that the Health IT module retains logs of all CRD-related hook
+        invocations and their responses.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-37'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :hook_invocation_logging_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that, in addition to any logging performed for security purposes, the Health IT module
-              retains logs of all CRD-related hook invocations and their responses so that they can be accessed
-              in the event of a dispute.
-              ([found-37](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-37))
+              I attest that the Health IT module retains logs of all CRD-related hook invocations and their
+              responses.
             ),
             type: 'radio',
             default: 'false',
@@ -33,10 +36,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert hook_invocation_logging_attestation == 'true',
-               'Health IT module does not retain logs of all CRD-related hook invocations and their responses.'
-
-        pass hook_invocation_logging_attestation_note if hook_invocation_logging_attestation_note.present?
+        assert hook_invocation_logging_attestation == 'true'
       end
     end
   end

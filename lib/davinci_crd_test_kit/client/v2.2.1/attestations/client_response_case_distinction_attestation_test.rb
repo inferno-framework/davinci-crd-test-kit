@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class ResponseCaseDistinctionAttestationTest < Inferno::Test
@@ -5,31 +7,20 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module distinguishes different response cases to users'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module distinguishes between the different CRD response cases when presenting results
-        to users:
-
-        - If it suppresses "default presumption" coverage information messages, it mitigates the potential for
-          those messages to be misinterpreted in the event that CRD is unavailable.
-        - Discrete information propagated into the order extension is available to the user for viewing. This
-          may be handled with icons, flyovers, or other mechanisms instead of traditional CDS Hooks card
-          rendering.
+        During this test, the tester will confirm that the Health IT module distinguishes the different CRD
+        response cases when presenting results to users.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@impl-1', 'hl7.fhir.us.davinci-crd_2.2.1@resp-49'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :response_case_distinction_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module distinguishes between the different CRD response cases when
-              presenting results to users:
-
-              - If it suppresses "default presumption" coverage information messages, it mitigates the potential
-                for those messages to be misinterpreted in the event that CRD is unavailable.
-                ([impl-1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/implementation.html#ci-c-impl-1))
-              - Discrete information propagated into the order extension is available to the user for viewing.
-                This may be handled with icons, flyovers, or other mechanisms instead of traditional CDS Hooks
-                card rendering.
-                ([resp-49](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#ci-c-resp-49))
+              I attest that the Health IT module distinguishes the different CRD response cases when presenting
+              results to users.
             ),
             type: 'radio',
             default: 'false',
@@ -45,10 +36,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert response_case_distinction_attestation == 'true',
-               'Health IT module does not distinguish the different CRD response cases to users.'
-
-        pass response_case_distinction_attestation_note if response_case_distinction_attestation_note.present?
+        assert response_case_distinction_attestation == 'true'
       end
     end
   end

@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class PrefetchKeyOmissionAttestationTest < Inferno::Test
@@ -5,18 +7,19 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module omits prefetch keys when data not available'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module omits a prefetch key from the hook request when the relevant details cannot be
-        provided, for example because of intermittent connectivity issues.
+        During this test, the tester will confirm that the Health IT module omits prefetch keys when the relevant
+        data cannot be provided.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'cds-hooks_3.0.0-ballot@51'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :prefetch_key_omission_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module omits a prefetch key from the hook request when the relevant
-              details cannot be provided, for example because of intermittent connectivity issues.
-              ([CDS Hooks prefetch template](https://cds-hooks.hl7.org/2026Jan/en/index.html#prefetch-template))
+              I attest that the Health IT module omits prefetch keys when the relevant data cannot be provided.
             ),
             type: 'radio',
             default: 'false',
@@ -32,10 +35,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert prefetch_key_omission_attestation == 'true',
-               'Health IT module does not omit prefetch keys when the relevant details cannot be provided.'
-
-        pass prefetch_key_omission_attestation_note if prefetch_key_omission_attestation_note.present?
+        assert prefetch_key_omission_attestation == 'true'
       end
     end
   end

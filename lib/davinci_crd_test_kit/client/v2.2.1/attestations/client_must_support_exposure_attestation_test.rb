@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class MustSupportExposureAttestationTest < Inferno::Test
@@ -5,19 +7,20 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module exposes maintained must support elements'.freeze
       title ATTESTATION_TITLE
       description %(
-        Where the Health IT module maintains a mustSupport data element and surfaces it to users, that element
-        is exposed in its FHIR interface when the data exists and privacy constraints permit.
+        During this test, the tester will confirm that the Health IT module exposes the mustSupport elements it
+        maintains and surfaces to users in its FHIR interface.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :must_support_exposure_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that, where the Health IT module maintains a mustSupport data element and surfaces it to
-              users, that element is exposed in its FHIR interface when the data exists and privacy constraints
-              permit.
-              ([conf-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3))
+              I attest that the Health IT module exposes the mustSupport elements it maintains and surfaces to
+              users in its FHIR interface.
             ),
             type: 'radio',
             default: 'false',
@@ -33,10 +36,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert must_support_exposure_attestation == 'true',
-               'Health IT module does not expose the must support elements that it maintains and surfaces to users.'
-
-        pass must_support_exposure_attestation_note if must_support_exposure_attestation_note.present?
+        assert must_support_exposure_attestation == 'true'
       end
     end
   end

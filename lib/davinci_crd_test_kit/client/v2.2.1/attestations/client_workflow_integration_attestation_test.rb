@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class WorkflowIntegrationAttestationTest < Inferno::Test
@@ -5,32 +7,21 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module integrates hook invocations transparently into user workflows'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module integrates CRD hook invocations into the regular user workflow:
-
-        - Hook invocation occurs transparently as part of the user workflow.
-        - Users are not required to transcribe order, appointment, or other data into a separate interface that
-          is distinct from the regular provider workflow, unless they are performing a "what if" situation.
-        - The CDS Hooks system action functionality is supported so that annotations are automatically stored on
-          the relevant request, appointment, or other record without any user intervention.
+        During this test, the tester will confirm that the Health IT module integrates CRD hook invocations
+        transparently into the regular user workflow.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-7', 'hl7.fhir.us.davinci-crd_2.2.1@hook-8',
                             'hl7.fhir.us.davinci-crd_2.2.1@resp-48'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :workflow_integration_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module integrates CRD hook invocations into the regular user workflow:
-
-              - Hook invocation occurs transparently as part of the user workflow.
-                ([hook-7](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-7))
-              - Users are not required to transcribe order, appointment, or other data into a separate interface
-                that is distinct from the regular provider workflow, unless they are performing a "what if"
-                situation.
-                ([hook-8](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-8))
-              - The CDS Hooks system action functionality is supported so that annotations are automatically
-                stored on the relevant request, appointment, or other record without any user intervention.
-                ([resp-48](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#ci-c-resp-48))
+              I attest that the Health IT module integrates CRD hook invocations transparently into the regular
+              user workflow.
             ),
             type: 'radio',
             default: 'false',
@@ -46,10 +37,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert workflow_integration_attestation == 'true',
-               'Health IT module does not integrate hook invocations transparently into user workflows.'
-
-        pass workflow_integration_attestation_note if workflow_integration_attestation_note.present?
+        assert workflow_integration_attestation == 'true'
       end
     end
   end

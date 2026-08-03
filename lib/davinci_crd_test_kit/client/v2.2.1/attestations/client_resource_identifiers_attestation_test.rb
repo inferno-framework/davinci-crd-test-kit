@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class ResourceIdentifiersAttestationTest < Inferno::Test
@@ -5,20 +7,20 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module does not use business identifiers in resource identifiers'.freeze
       title ATTESTATION_TITLE
       description %(
-        The Health IT module ensures that the resource identifiers it exposes over the CRD interface are
-        distinct from, and have no determinable relationship with, any business identifiers associated with
-        those records.
+        During this test, the tester will confirm that the Health IT module does not expose resource identifiers
+        that have a determinable relationship with business identifiers.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@sec-7'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :resource_identifiers_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module ensures that the resource identifiers it exposes over the CRD
-              interface are distinct from, and have no determinable relationship with, any business identifiers
-              associated with those records.
-              ([sec-7](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/security.html#ci-c-sec-7))
+              I attest that the Health IT module does not expose resource identifiers that have a determinable
+              relationship with business identifiers.
             ),
             type: 'radio',
             default: 'false',
@@ -34,10 +36,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert resource_identifiers_attestation == 'true',
-               'Health IT module exposes resource identifiers that are related to business identifiers.'
-
-        pass resource_identifiers_attestation_note if resource_identifiers_attestation_note.present?
+        assert resource_identifiers_attestation == 'true'
       end
     end
   end

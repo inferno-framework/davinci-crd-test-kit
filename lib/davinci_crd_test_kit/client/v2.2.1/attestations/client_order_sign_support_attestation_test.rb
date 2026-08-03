@@ -1,3 +1,5 @@
+require_relative 'attestation_instructions'
+
 module DaVinciCRDTestKit
   module V221
     class OrderSignSupportAttestationTest < Inferno::Test
@@ -5,19 +7,19 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module supports order-sign for all types of orders that can be placed'.freeze
       title ATTESTATION_TITLE
       description %(
-        For the products and services it supports ordering that are covered by one of the CRD-supported request
-        types, the Health IT module supports the `order-sign` hook for each of those order types.
+        During this test, the tester will confirm that the Health IT module supports the `order-sign` hook for all
+        order types it can place.
+        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
+        test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'
+      input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :order_sign_support_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that, for the products and services it supports ordering that are covered by one of the
-              CRD-supported request types, the Health IT module supports the `order-sign` hook for each of those
-              order types.
-              ([hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-3))
+              I attest that the Health IT module supports the `order-sign` hook for all order types it can place.
             ),
             type: 'radio',
             default: 'false',
@@ -33,10 +35,7 @@ module DaVinciCRDTestKit
             optional: true
 
       run do
-        assert order_sign_support_attestation == 'true',
-               'Health IT module does not support the `order-sign` hook for all order types that it supports.'
-
-        pass order_sign_support_attestation_note if order_sign_support_attestation_note.present?
+        assert order_sign_support_attestation == 'true'
       end
     end
   end
