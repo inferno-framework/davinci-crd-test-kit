@@ -3,6 +3,7 @@ require_relative 'client_hooks_group'
 require_relative 'client_cross_hook_group'
 require_relative 'client_registration_group'
 require_relative 'client_long_running_hook_group'
+require_relative 'client_attestations_group'
 require_relative '../endpoints/cds_services_discovery_handler'
 require_relative '../../cross_suite/tags'
 require_relative 'client_urls'
@@ -229,6 +230,7 @@ module DaVinciCRDTestKit
       end
 
       group from: :crd_v221_client_fhir_api
+      group from: :crd_v221_client_attestations
     end
   end
 end
