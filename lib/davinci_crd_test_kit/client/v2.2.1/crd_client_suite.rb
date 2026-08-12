@@ -168,6 +168,15 @@ module DaVinciCRDTestKit
         end
       end
 
+      fhir_resource_validator :no_custom_extensions do
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
+
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+          extensions [] # no extensions not in the spec
+        end
+      end
+
       suite_option :us_core_version,
                    title: 'US Core Version',
                    list_options: [

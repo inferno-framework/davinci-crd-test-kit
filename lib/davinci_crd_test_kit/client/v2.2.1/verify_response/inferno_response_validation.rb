@@ -14,6 +14,8 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that each hook response built by Inferno's simulated CRD servers
         and returned to the client conforms to CDS Hooks and CRD requirements. These responses must be conformant
         for the client to demonstrate its ability to accept and process valid CRD responses.
+        To prevent the injection of non-standard information into Inferno responses, these validations will
+        strictly check that all extensions are allowed at the locations they appear by the CRD specification.
 
         If this test fails when the tester provided a custom response template, adjust the
         provided template and the submitted requests so that the response built by Inferno
@@ -29,7 +31,7 @@ module DaVinciCRDTestKit
       simulation_verification
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@3', 'cds-hooks_3.0.0-ballot@222', 'cds-hooks_3.0.0-ballot@223',
-                            'cds-hooks_3.0.0-ballot@224'
+                            'cds-hooks_3.0.0-ballot@224', 'hl7.fhir.us.davinci-crd_2.2.1@conf-10'
 
       input :custom_response_template, optional: true
 
@@ -62,7 +64,8 @@ module DaVinciCRDTestKit
                                                     response_hash['systemActions'],
                                                     request_hash,
                                                     index,
-                                                    '2.2.1')
+                                                    '2.2.1',
+                                                    validator: :no_custom_extensions)
         rescue JSON::ParserError
           next
         end

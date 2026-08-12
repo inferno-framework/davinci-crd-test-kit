@@ -31,8 +31,8 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         true
       end
 
-      def resource_is_valid?(resource:, message_prefix: '')
-        @resource_is_valid_calls << { resource:, message_prefix: }
+      def resource_is_valid?(resource:, message_prefix: '', validator: :default)
+        @resource_is_valid_calls << { resource:, message_prefix:, validator: }
         true
       end
 
@@ -141,6 +141,19 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       expect(call[:object]).to eq('cards' => [external_reference_card])
       expect(call[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-externalReference')
+    end
+
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to conforms_to_logical_model?' do
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver,
+                                                          validator: :no_custom_extensions)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
     end
 
     it 'uses the additional orders logical model for additional-orders cards' do
@@ -313,6 +326,14 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         call = module_instance.resource_is_valid_calls.first
         expect(call[:resource].resourceType).to eq('Questionnaire')
         expect(call[:message_prefix]).to include('suggestion 1, action 1')
+        expect(call[:validator]).to eq(:default)
+      end
+
+      it 'passes a specified validator through to resource_is_valid? for the Questionnaire resource' do
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver,
+                                                            validator: :no_custom_extensions)
+
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:no_custom_extensions)
       end
 
       it 'does not filter out other validation errors' do
@@ -403,6 +424,20 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       expect(call[:object]).to eq('systemActions' => [coverage_information_action])
       expect(call[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-coverageInformation')
+    end
+
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                   ig_semver)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to conforms_to_logical_model?' do
+      module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                   ig_semver, validator: :no_custom_extensions)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
     end
 
     it 'records an error and skips validation when a system action is not a JSON object' do
@@ -644,6 +679,20 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-instructions',
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-coverageInformation'
       )
+    end
+
+    it 'passes a specified validator through to both card and system action validation' do
+      module_instance.perform_response_logical_model_validation(
+        [external_reference_card],
+        [coverage_information_action],
+        request_body,
+        0,
+        ig_semver,
+        validator: :no_custom_extensions
+      )
+
+      expect(module_instance.conforms_calls.length).to eq(2)
+      expect(module_instance.conforms_calls).to all(include(validator: :no_custom_extensions))
     end
 
     it 'handles missing cards and systemActions gracefully' do

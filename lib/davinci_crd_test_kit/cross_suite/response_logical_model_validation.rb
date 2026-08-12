@@ -39,21 +39,24 @@ module DaVinciCRDTestKit
       "#{CRD_LOGICAL_MODEL_BASE}/#{profile_name}"
     end
 
-    def perform_response_logical_model_validation(cards, system_actions, request_body, response_index, ig_semver)
+    def perform_response_logical_model_validation(cards, system_actions, request_body, response_index, ig_semver,
+                                                  validator: :default)
       if cards.is_a?(Array)
         cards.each_with_index do |card, card_index|
-          validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver)
+          validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver, validator:)
         end
       end
 
       return unless system_actions.is_a?(Array)
 
       system_actions.each_with_index do |action, action_index|
-        validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
+        validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver,
+                                                     validator:)
       end
     end
 
-    def validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver)
+    def validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver,
+                                            validator: :default)
       label = logical_model_entity_label(response_index, card_index, 'card')
       unless card.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -71,7 +74,8 @@ module DaVinciCRDTestKit
 
       validation_issues = []
       conforms_to_logical_model?({ 'cards' => [card] }, logical_model_url(profile_name),
-                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues,
+                                 validator:)
 
       validate_summary_length(card, label)
       validate_suggestion_uuid_presence(card, label) unless ['v201', '2.0.1'].include? ig_semver
@@ -79,7 +83,7 @@ module DaVinciCRDTestKit
 
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
-                                                            request_body, error_prefix, ig_semver)
+                                                            request_body, error_prefix, ig_semver, validator:)
       add_messages_not_excluded(filtered_issues, error_prefix)
     end
 
@@ -123,7 +127,8 @@ module DaVinciCRDTestKit
       )
     end
 
-    def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
+    def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver,
+                                                     validator: :default)
       label = logical_model_entity_label(response_index, action_index, 'systemAction')
       unless action.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -146,7 +151,8 @@ module DaVinciCRDTestKit
 
       validation_issues = []
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
-                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues,
+                                 validator:)
 
       validation_issues
         .reject! do |issue|
@@ -272,10 +278,10 @@ module DaVinciCRDTestKit
     end
 
     def manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
-                                            ig_semver)
+                                            ig_semver, validator: :default)
       case card_type
       when CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
-        manually_check_form_completion_errors(card, validation_issues, error_prefix)
+        manually_check_form_completion_errors(card, validation_issues, error_prefix, validator:)
       when CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
         manually_check_propose_alternative_errors(card, validation_issues, request_body,
                                                   error_prefix, ig_semver)
@@ -306,10 +312,10 @@ module DaVinciCRDTestKit
       end
     end
 
-    def manually_check_form_completion_errors(card, validation_issues, error_prefix)
+    def manually_check_form_completion_errors(card, validation_issues, error_prefix, validator: :default)
       validation_issues.reject do |issue|
         if issue.message.match?(/The type 'Questionnaire' is not valid - must be Task/)
-          check_questionnaire_actions(card, issue.message, error_prefix)
+          check_questionnaire_actions(card, issue.message, error_prefix, validator:)
           true
         else
           false
@@ -317,7 +323,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def check_questionnaire_actions(card, error_message, error_prefix)
+    def check_questionnaire_actions(card, error_message, error_prefix, validator: :default)
       extracted_indexes =
         error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
       unless extracted_indexes
@@ -330,7 +336,7 @@ module DaVinciCRDTestKit
 
       message_prefix = "#{error_prefix} suggestion #{suggestion_index + 1}, action #{action_index + 1} - "
       resource = FHIR.from_contents(card['suggestions'][suggestion_index]['actions'][action_index]['resource'].to_json)
-      resource_is_valid?(resource:, message_prefix:) # no questionnaire profile applied per CRD
+      resource_is_valid?(resource:, message_prefix:, validator:) # no questionnaire profile applied per CRD
 
       return if resource.id.present?
 
