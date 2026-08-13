@@ -156,7 +156,7 @@ module DaVinciCRDTestKit
 
       validation_issues
         .reject! do |issue|
-          issue.message.match?(%r{The extension definition http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist|2\.2\.1 defines the contexts of use as.*CDSHooksResponse.systemActions.extension\z}) # rubocop:disable Layout/LineLength
+          issue.message.match?(%r{CDSHooksResponse\.systemActions\[\d+\]\.extension: The extension definition http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist\|2\.2\.1 defines the contexts of use as}) # rubocop:disable Layout/LineLength
         end
 
       if action_type == CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
