@@ -36,21 +36,23 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         true
       end
 
-      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver,
+                                                      validator: :default)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver:, validator: }
       end
 
       def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix,
-                                                                   ig_semver)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
+                                                                   ig_semver, validator: :default)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver:, validator: }
       end
 
-      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
-        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver, validator: :default)
+        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_semver:, validator: }
       end
 
-      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
-        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver,
+                                                                   validator: :default)
+        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_semver:, validator: }
       end
 
       def scratch

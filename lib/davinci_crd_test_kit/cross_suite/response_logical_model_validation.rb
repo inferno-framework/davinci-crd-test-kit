@@ -164,7 +164,7 @@ module DaVinciCRDTestKit
       end
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = manually_check_action_specific_errors(action, validation_issues, action_type,
-                                                              request_body, error_prefix, ig_semver)
+                                                              request_body, error_prefix, ig_semver, validator:)
       add_messages_not_excluded(filtered_issues, error_prefix)
     end
 
@@ -284,10 +284,10 @@ module DaVinciCRDTestKit
         manually_check_form_completion_errors(card, validation_issues, error_prefix, validator:)
       when CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
         manually_check_propose_alternative_errors(card, validation_issues, request_body,
-                                                  error_prefix, ig_semver)
+                                                  error_prefix, ig_semver, validator:)
       when CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
         manually_check_additional_orders_errors(card, validation_issues, request_body,
-                                                error_prefix, ig_semver)
+                                                error_prefix, ig_semver, validator:)
       when CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
         manually_check_launch_smart_app_errors(validation_issues)
       else
@@ -296,17 +296,17 @@ module DaVinciCRDTestKit
     end
 
     def manually_check_action_specific_errors(action, validation_issues, action_type, request_body,
-                                              error_prefix, ig_semver)
+                                              error_prefix, ig_semver, validator: :default)
       case action_type
       when DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
         manually_check_coverage_information_errors(action, validation_issues, request_body,
-                                                   error_prefix, ig_semver)
+                                                   error_prefix, ig_semver, validator:)
       when DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE
         manually_check_update_coverage_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator:)
       when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         manually_check_form_completion_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator:)
       else
         validation_issues
       end
@@ -350,12 +350,13 @@ module DaVinciCRDTestKit
     end
 
     def manually_check_propose_alternative_errors(card, validation_issues, request_body,
-                                                  error_prefix, ig_semver)
+                                                  error_prefix, ig_semver, validator: :default)
       no_resource_issues = manually_check_action_resources_for_order_profile_conformance(card,
                                                                                          validation_issues,
                                                                                          request_body,
                                                                                          error_prefix,
-                                                                                         ig_semver)
+                                                                                         ig_semver,
+                                                                                         validator:)
 
       no_resource_issues.each do |issue|
         next unless issue.message.match?(/Constraint failed: crd-respar-1/)
@@ -374,23 +375,24 @@ module DaVinciCRDTestKit
     end
 
     def manually_check_additional_orders_errors(card, validation_issues, request_body,
-                                                error_prefix, ig_semver)
+                                                error_prefix, ig_semver, validator: :default)
       manually_check_action_resources_for_order_profile_conformance(card,
                                                                     validation_issues,
                                                                     request_body,
                                                                     error_prefix,
-                                                                    ig_semver)
+                                                                    ig_semver,
+                                                                    validator:)
     end
 
     def manually_check_action_resources_for_order_profile_conformance(card, validation_issues, request_body,
-                                                                      error_prefix, ig_semver)
+                                                                      error_prefix, ig_semver, validator: :default)
       if card['suggestions'].present?
         card['suggestions'].each_with_index do |suggestion, suggestion_index|
           next unless suggestion['actions'].present?
 
           suggestion['actions'].each_with_index do |action, action_index|
             action_error_prefix = "#{error_prefix}suggestion #{suggestion_index + 1}, action #{action_index + 1} - "
-            check_action_target(action, request_body, action_error_prefix, ig_semver)
+            check_action_target(action, request_body, action_error_prefix, ig_semver, validator:)
           end
         end
       end
@@ -398,36 +400,37 @@ module DaVinciCRDTestKit
       reject_resource_issues(validation_issues)
     end
 
-    def check_action_target(action, request_body, error_prefix, ig_semver)
+    def check_action_target(action, request_body, error_prefix, ig_semver, validator: :default)
       local_reference?(action['resourceId'], error_prefix) if action['resourceId'].present?
       return unless action['resource'].present?
 
-      check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_semver)
+      check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_semver, validator:)
     end
 
     def manually_check_coverage_information_errors(action, validation_issues, request_body,
-                                                   error_prefix, ig_semver)
+                                                   error_prefix, ig_semver, validator: :default)
       if action['resource'].present?
         check_resource_conformance_to_order_or_encounter_profile(action['resource'], request_body,
-                                                                 error_prefix, ig_semver)
+                                                                 error_prefix, ig_semver, validator:)
       end
       reject_resource_issues(validation_issues)
     end
 
     def manually_check_update_coverage_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator: :default)
       check_required_action_type(action, 'update', error_prefix, 'coverage update action response type')
       if action['resource'].present?
-        check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_semver)
+        check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_semver, validator:)
       end
       reject_resource_issues(validation_issues)
     end
 
     def manually_check_form_completion_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator: :default)
       check_required_action_type(action, 'create', error_prefix, 'form completion action response type')
       if action['resource'].present?
-        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver)
+        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver,
+                                                                 validator:)
       end
       reject_resource_issues(validation_issues)
     end
