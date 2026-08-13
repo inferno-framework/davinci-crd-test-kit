@@ -299,6 +299,21 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver,
+                                                          validator: :no_custom_extensions)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
     it 'does not filter the if-none-exist extension "contexts of use" error on cards' do
       extension_issue = MockValidationIssue.new(
         message: 'CDSHooksResponse.cards[0].suggestions[0].actions[0].extension: The extension definition ' \
@@ -495,6 +510,23 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver)
 
       expect(module_instance.messages).to_not include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
+    it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+      unknown_action = { 'type' => 'update', 'description' => 'x',
+                         'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.systemActions[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver,
+                                                                   validator: :no_custom_extensions)
+
+      expect(module_instance.messages).to include(
         hash_including(message: a_string_including('Unrecognized property'))
       )
     end

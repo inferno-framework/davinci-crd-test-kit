@@ -84,6 +84,7 @@ module DaVinciCRDTestKit
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
                                                             request_body, error_prefix, ig_semver, validator:)
+      filter_logical_model_extension_issues(filtered_issues, validator)
       add_messages_not_excluded(filtered_issues, error_prefix)
     end
 
@@ -165,6 +166,7 @@ module DaVinciCRDTestKit
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = manually_check_action_specific_errors(action, validation_issues, action_type,
                                                               request_body, error_prefix, ig_semver, validator:)
+      filter_logical_model_extension_issues(filtered_issues, validator)
       add_messages_not_excluded(filtered_issues, error_prefix)
     end
 
@@ -259,7 +261,7 @@ module DaVinciCRDTestKit
 
     def add_messages_not_excluded(issues, error_prefix)
       issues.each do |issue|
-        next if issue.filtered || logical_model_extension_issue?(issue)
+        next if issue.filtered
 
         add_message(issue.severity, "#{error_prefix}#{issue.message}")
       end
@@ -272,6 +274,12 @@ module DaVinciCRDTestKit
     # -------------------------------------------------------------------------
     # Validator Filtering and Manual Checks Depending on the Card Type
     # -------------------------------------------------------------------------
+
+    def filter_logical_model_extension_issues(issues, validator)
+      return if validator == :no_custom_extensions
+
+      issues.each { |issue| issue.filtered = issue.filtered || logical_model_extension_issue?(issue) }
+    end
 
     def logical_model_extension_issue?(issue)
       issue.message.match(/\.extension: Unrecognized property/).present?
