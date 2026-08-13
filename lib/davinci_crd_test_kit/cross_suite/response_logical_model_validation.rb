@@ -275,16 +275,6 @@ module DaVinciCRDTestKit
     # Validator Filtering and Manual Checks Depending on the Card Type
     # -------------------------------------------------------------------------
 
-    def filter_logical_model_extension_issues(issues, validator)
-      return if validator == :no_custom_extensions
-
-      issues.each { |issue| issue.filtered = issue.filtered || logical_model_extension_issue?(issue) }
-    end
-
-    def logical_model_extension_issue?(issue)
-      issue.message.match(/\.extension: Unrecognized property/).present?
-    end
-
     def manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
                                             ig_semver, validator: :default)
       case card_type

@@ -114,8 +114,6 @@ module DaVinciCRDTestKit
 
       CRD_MESSAGE_FILTERS = [
         /\A\S+: \S+: URL value '.*' does not resolve/,
-        %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
-        /CDSHooksRequest.extension: Unrecognized property/,
         /No definition could be found for URL value/
       ].freeze
 

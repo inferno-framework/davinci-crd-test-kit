@@ -13,6 +13,18 @@ module DaVinciCRDTestKit
       end
     end
 
+    def filter_logical_model_extension_issues(issues, validator)
+      return if validator == :no_custom_extensions
+
+      issues.each { |issue| issue.filtered = issue.filtered || logical_model_extension_issue?(issue) }
+    end
+
+    # Logical models validation doesn't currently respect the `"extensions": ["any"]`
+    # validator floag
+    def logical_model_extension_issue?(issue)
+      issue.message.match(/\.extension: Unrecognized property/).present?
+    end
+
     # -------------------------------------------------------------------------
     # Check resource conformance outside the logical models
     # -------------------------------------------------------------------------
