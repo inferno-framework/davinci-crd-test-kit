@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
     end
 
     # Logical models validation doesn't currently respect the `"extensions": ["any"]`
-    # validator floag
+    # validator flag
     def logical_model_extension_issue?(issue)
       issue.message.match(/\.extension: Unrecognized property/).present?
     end

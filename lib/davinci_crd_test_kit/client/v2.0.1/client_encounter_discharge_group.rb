@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
         options: {
           hook_name: 'encounter-discharge',
           hook_path: ENCOUNTER_DISCHARGE_PATH,
-          crd_interaction_group: 'hook-encounter-discharge',
+          crd_interaction_group: 'hooks-encounter-discharge',
           include_in_cross_hook_analysis: true
         }
       )

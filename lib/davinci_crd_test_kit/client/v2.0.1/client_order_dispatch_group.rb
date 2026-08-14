@@ -59,7 +59,7 @@ module DaVinciCRDTestKit
         options: {
           hook_name: 'order-dispatch',
           hook_path: ORDER_DISPATCH_PATH,
-          crd_interaction_group: 'hook-order-dispatch',
+          crd_interaction_group: 'hooks-order-dispatch',
           include_in_cross_hook_analysis: true
         }
       )

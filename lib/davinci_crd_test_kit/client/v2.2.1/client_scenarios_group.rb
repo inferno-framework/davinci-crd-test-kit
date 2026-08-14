@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         and responses beyond those required for the scenario and for Inferno to
         recognize client requests are not checked. Testers are expected to follow
         the same workflows as used during other tests and should adhere to the
-        same CRD requirements when performcing these scenarios.
+        same CRD requirements when performing these scenarios.
       DESCRIPTION
 
       group from: :crd_v221_client_long_running_hook

@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
         options: {
           hook_name: 'encounter-start',
           hook_path: ENCOUNTER_START_PATH,
-          crd_interaction_group: 'hook-encounter-start',
+          crd_interaction_group: 'hooks-encounter-start',
           include_in_cross_hook_analysis: true
         }
       )

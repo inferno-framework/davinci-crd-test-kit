@@ -60,7 +60,7 @@ module DaVinciCRDTestKit
         options: {
           hook_name: 'order-sign',
           hook_path: ORDER_SIGN_PATH,
-          crd_interaction_group: 'hook-order-sign',
+          crd_interaction_group: 'hooks-order-sign',
           include_in_cross_hook_analysis: true
         }
       )

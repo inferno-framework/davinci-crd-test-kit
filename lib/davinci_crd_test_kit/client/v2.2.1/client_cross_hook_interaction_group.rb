@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
       title 'Additional Hook Invocations for Cross Hook Support Demonstration'
       id :crd_v221_client_cross_hook_interaction
       description <<~DESCRIPTION
-        Optionally demonstrate more hook request demonstrating additional cross-hook
+        Optionally send more hook requests demonstrating additional cross-hook
         features.
 
         Inferno's simulated hook endpoints can be discovered at:
