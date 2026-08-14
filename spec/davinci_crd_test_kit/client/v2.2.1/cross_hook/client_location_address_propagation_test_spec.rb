@@ -32,7 +32,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
     { 'resourceType' => 'Location', 'id' => 'parent-1' }
   end
 
-  def create_hook_request(body:, tags: [hook_name])
+  def create_hook_request(body:, tags: [hook_name, DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
     repo_create(
       :request,
       direction: 'incoming',

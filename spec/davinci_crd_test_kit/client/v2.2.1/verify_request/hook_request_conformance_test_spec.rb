@@ -21,7 +21,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
   end
 
   before do
-    test.config(options: { hook_name: })
+    test.config(options: { hook_name:, crd_interaction_group: hook_name })
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
   end
 

@@ -21,7 +21,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchProfilesTest do
       end
 
       config(
-        options: { hook_name: 'order-sign' }
+        options: { hook_name: 'order-sign', crd_interaction_group: 'order-sign' }
       )
     end
   end

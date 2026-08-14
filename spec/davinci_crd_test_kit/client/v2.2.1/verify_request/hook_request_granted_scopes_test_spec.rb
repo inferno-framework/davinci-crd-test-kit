@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
 
   let(:test) do
     Class.new(described_class) do
-      config(options: { hook_name: 'appointment-book' })
+      config(options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' })
     end
   end
 

@@ -8,7 +8,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
 
   let(:test) do
     Class.new(described_class) do
-      config(options: { hook_name: 'order-sign' })
+      config(options: { hook_name: 'order-sign', crd_interaction_group: 'order-sign' })
     end
   end
 

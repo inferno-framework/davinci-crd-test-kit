@@ -4,6 +4,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientPrefetchCompleteAndSubsetTest do
   let(:runnable) do
     Inferno::Repositories::Tests.new.find(
       'crd_client_v221-crd_v221_client_hook_invocation-crd_v221_client_cross_hook' \
+      '-crd_v221_client_cross_hook_additional_capabilities' \
       '-crd_v221_client_prefetch_complete_and_subset'
     )
   end
@@ -46,7 +47,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientPrefetchCompleteAndSubsetTest do
       test_session_id: test_session.id,
       request_body: { 'hook' => 'order-sign', 'hookInstance' => SecureRandom.uuid }.to_json,
       status: 200,
-      tags: ['order-sign']
+      tags: ['order-sign', DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG]
     )
   end
 
