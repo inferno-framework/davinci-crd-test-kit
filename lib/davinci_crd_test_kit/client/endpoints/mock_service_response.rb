@@ -297,10 +297,13 @@ module DaVinciCRDTestKit
     end
 
     def find_prefetched_resource(request_body, key_options)
-      found_key = key_options&.find { |key| request_body['prefetch'][key].present? }
+      prefetch = request_body['prefetch']
+      return if prefetch.blank?
+
+      found_key = key_options&.find { |key| prefetch[key].present? }
       return unless found_key.present?
 
-      request_body['prefetch'][found_key]
+      prefetch[found_key]
     end
 
     def prefetch_key_options_for_system_actions
