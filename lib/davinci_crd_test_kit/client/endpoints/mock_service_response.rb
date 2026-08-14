@@ -284,22 +284,30 @@ module DaVinciCRDTestKit
 
     def identify_resources_for_system_actions
       update_resource = context[resource_to_update_field_name]
-      prefetch_id = prefetch_key_for_system_actions
+      prefetch_id_options = prefetch_key_options_for_system_actions
+      prefetched_resource = find_prefetched_resource(request_body, prefetch_id_options)
 
       if update_resource.is_a? Hash
         FHIR.from_contents(update_resource.to_json)
-      elsif prefetch_id.present? && request_body['prefetch'] && request_body['prefetch'][prefetch_id]
-        FHIR.from_contents(request_body['prefetch'][prefetch_id].to_json)
+      elsif prefetched_resource.present?
+        FHIR.from_contents(prefetched_resource.to_json)
       elsif update_resource.present?
         get_context_resource(update_resource)
       end
     end
 
-    def prefetch_key_for_system_actions
+    def find_prefetched_resource(request_body, key_options)
+      found_key = key_options&.find { |key| request_body['prefetch'][key].present? }
+      return unless found_key.present?
+
+      request_body['prefetch'][found_key]
+    end
+
+    def prefetch_key_options_for_system_actions
       if requested_hook.starts_with?('encounter')
-        'encounter'
+        ['encounter', 'enc'] # handle subset service
       elsif requested_hook == 'order-dispatch'
-        'order'
+        ['order'] # v2.2.1 order-dispatch handled elsewhere
       end
     end
 
