@@ -59,7 +59,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :order_select_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-select'
+          hook_name: 'order-select',
+          crd_interaction_group: 'hooks-order-select',
+          include_in_cross_hook_analysis: true
         }
       )
 

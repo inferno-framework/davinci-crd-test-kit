@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        load_hook_requests
+        load_interaction_group_requests
 
         skip_if request.blank?, "No #{response_label.downcase}s to verify."
 

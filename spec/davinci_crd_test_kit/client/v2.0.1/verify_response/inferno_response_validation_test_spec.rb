@@ -10,7 +10,7 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
   let(:coverage_tag) { 'coverage' }
   let(:order_sign_coverage_test) do
     Class.new(DaVinciCRDTestKit::V201::InfernoResponseValidationTest) do
-      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG, crd_test_group: 'coverage' } })
+      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG, crd_interaction_group: 'coverage' } })
     end
   end
   let(:results_repo) { Inferno::Repositories::Results.new }

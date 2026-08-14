@@ -58,7 +58,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :encounter_start_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'encounter-start'
+          hook_name: 'encounter-start',
+          crd_interaction_group: 'hooks-encounter-start',
+          include_in_cross_hook_analysis: true
         }
       )
 

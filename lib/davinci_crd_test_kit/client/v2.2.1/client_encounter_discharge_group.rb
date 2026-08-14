@@ -59,7 +59,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'encounter-discharge'
+          hook_name: 'encounter-discharge',
+          crd_interaction_group: 'hooks-encounter-discharge',
+          include_in_cross_hook_analysis: true
         }
       )
 

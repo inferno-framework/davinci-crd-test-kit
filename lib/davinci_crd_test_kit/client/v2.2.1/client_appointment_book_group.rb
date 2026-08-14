@@ -60,7 +60,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'appointment-book'
+          hook_name: 'appointment-book',
+          crd_interaction_group: 'hooks-appointment-book',
+          include_in_cross_hook_analysis: true
         }
       )
 

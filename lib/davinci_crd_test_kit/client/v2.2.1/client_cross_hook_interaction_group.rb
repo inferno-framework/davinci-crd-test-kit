@@ -56,7 +56,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :cross_hooks_crd_jwks_keys_json }
         },
         options: {
-          crd_interaction_group: 'additional-cross-hook'
+          hook_name: ANY_HOOK_TAG,
+          crd_interaction_group: 'additional-cross-hooks',
+          include_in_cross_hook_analysis: true
         }
       )
 

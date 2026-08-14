@@ -78,7 +78,7 @@ module DaVinciCRDTestKit
       end
 
       def loaded_requests
-        @loaded_requests ||= requests_to_analyze
+        @loaded_requests ||= load_requests_for_cross_hook_analysis
       end
 
       def prefetched_location_hash

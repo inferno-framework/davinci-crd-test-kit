@@ -165,26 +165,29 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      return [LONG_RUNNING_GROUP_TAG] if long_running_group?
       return [DUPLICATED_HOOK_INSTANCE_TAG] if hook_instance_already_used?
 
       return [] if invoked_hook != requested_hook ||
                    wrong_hook_for_test? ||
                    !AVAILABLE_HOOKS.include?(requested_hook)
 
-      [hook_instance_tag, hook_or_group_tag].compact
+      [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag].compact
     end
 
     def hook_instance_tag
       TagMethods.hook_instance_tag(request_body['hookInstance'])
     end
 
-    def hook_or_group_tag
-      if test.config.options[:crd_test_group].present?
-        test.config.options[:crd_test_group]
-      elsif name.present?
-        DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG")
-      end
+    def hook_tag
+      DaVinciCRDTestKit.const_get(:"#{name.upcase}_TAG") if name.present?
+    end
+
+    def interaction_group_tag
+      test.config.options[:crd_interaction_group].presence
+    end
+
+    def cross_hook_tag
+      CROSS_HOOK_ANALYSIS_TAG if test.config.options[:include_in_cross_hook_analysis]
     end
 
     def error_response(error_message, code: 400, outcome_code: 'invalid')
@@ -218,7 +221,7 @@ module DaVinciCRDTestKit
     # -----------------------
 
     def long_running_group?
-      test.config.options[:crd_test_group] == LONG_RUNNING_GROUP_TAG
+      test.config.options[:crd_interaction_group] == LONG_RUNNING_GROUP_TAG
     end
 
     def long_running_pause_time

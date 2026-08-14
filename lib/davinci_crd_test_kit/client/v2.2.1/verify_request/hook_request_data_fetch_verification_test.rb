@@ -33,7 +33,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        hook_requests = load_hook_requests
+        hook_requests = load_interaction_group_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 

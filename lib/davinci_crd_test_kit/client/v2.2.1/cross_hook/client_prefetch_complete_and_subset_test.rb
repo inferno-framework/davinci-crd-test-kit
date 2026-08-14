@@ -50,7 +50,7 @@ module DaVinciCRDTestKit
 
       run do
         subset_prefetch_requests, complete_prefetch_requests =
-          requests_to_analyze.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
+          load_requests_for_cross_hook_analysis.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
         completeness_tests = find_completeness_tests
         check_for_demonstration(subset_prefetch_requests, completeness_tests, :subset)
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)

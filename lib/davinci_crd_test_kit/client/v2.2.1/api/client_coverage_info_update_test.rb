@@ -43,7 +43,7 @@ module DaVinciCRDTestKit
       run do
         supported_resource_types = extract_supported_resource_types(resource) # extract before loading other requests
 
-        loaded_requests = requests_to_analyze # all requests for one hook or all requests for all hooks
+        loaded_requests = load_requests_for_cross_hook_analysis # all requests for one hook or all requests for all hooks
         skip_if loaded_requests.blank?, 'No hook requests found, run hook tests first.'
 
         resources_to_check, unsupported = find_coverage_info_responses(loaded_requests)

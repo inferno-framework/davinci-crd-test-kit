@@ -285,10 +285,10 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     end
   end
 
-  describe 'when a crd_test_group is configured' do
+  describe 'when a crd_interaction_group is configured' do
     let(:test) do
       Class.new(described_class) do
-        config(options: { hook_name: 'order-sign', crd_test_group: 'some-group' })
+        config(options: { hook_name: 'order-sign', crd_interaction_group: 'some-group' })
       end
     end
 
