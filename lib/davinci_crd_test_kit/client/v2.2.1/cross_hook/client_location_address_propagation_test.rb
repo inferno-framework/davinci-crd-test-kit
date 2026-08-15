@@ -70,7 +70,11 @@ module DaVinciCRDTestKit
 
         message_prefix = "Parent of prefetched 'Location/#{root_id}'"
         add_message('error', "Location/#{location.id}: #{message_prefix} does not conform to the CRD Location profile.")
-        validator_response_details.each { |issue| add_message(issue.severity, "(#{message_prefix}) #{issue.message}") }
+        validator_response_details.each do |issue|
+          next if issue.filtered
+
+          add_message(issue.severity, "(#{message_prefix}) #{issue.message}")
+        end
       end
 
       def fetched_locations_checked_for_conformance

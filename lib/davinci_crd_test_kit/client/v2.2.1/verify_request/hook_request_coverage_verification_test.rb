@@ -97,11 +97,19 @@ module DaVinciCRDTestKit
                               request_index)
         end
 
+        check_payer_resource_conformance(payer_resource, request_index)
+      end
+
+      def check_payer_resource_conformance(payer_resource, request_index)
         validator_response_details = []
         resource_is_valid?(resource: payer_resource, profile_url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization|2.2.1',
                            add_messages_to_runnable: false, validator_response_details:)
 
-        validator_response_details.each { |issue| add_request_message(issue.severity, issue.message, request_index) }
+        validator_response_details.each do |issue|
+          next if issue.filtered
+
+          add_request_message(issue.severity, issue.message, request_index)
+        end
       end
 
       run do
