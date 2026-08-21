@@ -1,6 +1,7 @@
 require_relative 'gather_response_generation_data'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
+require_relative 'unknown_content_service_response'
 require_relative '../../cross_suite/cards_identification'
 require_relative '../../cross_suite/tags'
 
@@ -10,6 +11,7 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::GatherResponseGenerationData
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
+    include DaVinciCRDTestKit::UnknownContentServiceResponse
 
     AVAILABLE_HOOKS = [
       'appointment-book',
@@ -130,7 +132,9 @@ module DaVinciCRDTestKit
     end
 
     def hook_response
-      if response_approach == 'custom'
+      if unknown_content_group?
+        build_unknown_content_hook_response
+      elsif response_approach == 'custom'
         build_custom_hook_response
       else
         build_mock_hook_response
@@ -217,11 +221,15 @@ module DaVinciCRDTestKit
     end
 
     # -----------------------
-    # Long Running Group handling
+    # Scenario Group handling
     # -----------------------
 
     def long_running_group?
       test.config.options[:crd_interaction_group] == LONG_RUNNING_GROUP_TAG
+    end
+
+    def unknown_content_group?
+      test.config.options[:crd_interaction_group] == UNKNOWN_CONTENT_GROUP_TAG
     end
 
     def long_running_pause_time
@@ -230,12 +238,12 @@ module DaVinciCRDTestKit
         &.dig('value').to_i
     end
 
-    # end the wait immediately after the long-running request returns
-    # pause here because update_result runs before response generation
+    # end the wait immediately after the scenario request returns
+    # pause for long-running requests here because update_result runs before response generation
     def update_result
-      return unless long_running_group?
+      return unless long_running_group? || unknown_content_group?
 
-      sleep long_running_pause_time
+      sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
     end
   end
