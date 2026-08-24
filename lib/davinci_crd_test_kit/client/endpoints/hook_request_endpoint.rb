@@ -115,6 +115,7 @@ module DaVinciCRDTestKit
         request_coverage
       elsif ig_version == 'v221'
         request_additional_fhir_data
+        request_access_level_target if user_access_level_group?
       end
       response_body = apply_hook_configuration(hook_response)
       return unless response_body.present?
@@ -136,6 +137,8 @@ module DaVinciCRDTestKit
         build_unknown_content_hook_response
       elsif self_pay_group? || long_running_group? || multiple_payers_group?
         build_coverage_information_hook_response
+      elsif user_access_level_group?
+        build_access_level_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
       else
@@ -262,10 +265,18 @@ module DaVinciCRDTestKit
     # the multiple payers scenario is excluded so that the wait continues until the tester
     # acknowledges that all requests have been sent, since more than one request may be made
     def update_result
-      return unless long_running_group? || unknown_content_group? || self_pay_group?
+      return unless long_running_group? || unknown_content_group? || self_pay_group? || user_access_level_group?
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
+    end
+
+    # -----------------------
+    # ID-216: User Access Level Scoping handling
+    # -----------------------
+
+    def user_access_level_group?
+      [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
     end
   end
 end
