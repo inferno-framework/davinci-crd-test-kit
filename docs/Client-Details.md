@@ -179,6 +179,15 @@ hook configuration options specified in hook requests, including:
   including cards with a `coverage-info` source type or topic, and coverage information and
   form completion responses in the `systemActions` list.
 
+#### User Access Level Scoping
+
+During the "User Access Level Scoping" scenario, Inferno reads a tester-specified target resource
+using the access token supplied in each hook request, in addition to the data described above.
+Inferno does not simulate different access levels itself: whether the read succeeds is entirely
+determined by the access token the tested client sends, so testers must arrange for their own
+system (or an intermediary FHIR server) to grant and deny access to the target resource for the
+full-access and limited-access requests respectively.
+
 ## Testing Limitations
 
 Much of what the CRD IG specifies is optional, such as which hooks and resource
@@ -208,3 +217,6 @@ Specific general limitations across all versions include:
   and workarounds have been added to the test kit. If you identify an error
   reported by Inferno that you believe is inaccurate, please report it
   using [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
+- The User Access Level Scoping scenario relies on the tested system (or an intermediary FHIR
+  server) to actually enforce different access for the two users; Inferno only reads the target
+  resource and compares the results.
