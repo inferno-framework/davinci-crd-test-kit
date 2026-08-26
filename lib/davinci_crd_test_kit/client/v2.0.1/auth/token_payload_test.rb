@@ -64,25 +64,25 @@ module DaVinciCRDTestKit
             add_message('error',
                         "#{request_number}Token signature algorithm #{alg.inspect} is not permitted; CDS Hooks " \
                         'prohibits the `none` algorithm and symmetric (HMAC) algorithms.')
-          else
-            begin
-              JWT.decode(
-                auth_tokens_list[index],
-                JWT::JWK.import(jwk).public_key,
-                true,
-                algorithms: [alg],
-                exp_leeway: 60,
-                iss: cds_jwt_iss,
-                aud: hook_url,
-                verify_not_before: false,
-                verify_iat: false,
-                verify_jti: true,
-                verify_iss: true,
-                verify_aud: true
-              )
-            rescue StandardError => e
-              add_message('error', "#{request_number}Token validation error: #{e.message}")
-            end
+          end
+
+          begin
+            JWT.decode(
+              auth_tokens_list[index],
+              JWT::JWK.import(jwk).public_key,
+              true,
+              algorithms: [alg],
+              exp_leeway: 60,
+              iss: cds_jwt_iss,
+              aud: hook_url,
+              verify_not_before: false,
+              verify_iat: false,
+              verify_jti: true,
+              verify_iss: true,
+              verify_aud: true
+            )
+          rescue StandardError => e
+            add_message('error', "#{request_number}Token validation error: #{e.message}")
           end
 
           missing_claims = required_claims - unverified_payload.keys
