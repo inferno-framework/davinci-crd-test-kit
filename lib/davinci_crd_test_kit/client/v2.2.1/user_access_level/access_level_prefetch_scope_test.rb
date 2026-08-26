@@ -1,4 +1,5 @@
 require_relative '../../tagged_request_load_helper'
+require_relative '../client_urls'
 require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
@@ -9,6 +10,7 @@ module DaVinciCRDTestKit
     # Mechanically/attestation-verifies cds-hooks_3.0.0-ballot@42.
     class AccessLevelPrefetchScopeTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include ClientURLs
 
       id :crd_v221_access_level_prefetch_scope
       title 'Prefetched data access is scoped to the EHR user'
@@ -26,23 +28,8 @@ module DaVinciCRDTestKit
       input :access_level_target_reference,
             title: 'Target Resource Reference',
             locked: true
-      input :access_level_prefetch_attestation,
-            title: "Health IT module limits prefetched data to the user's authorized access scope",
-            description: %(
-              The target resource was not present in the full-access request's prefetch, so this
-              scenario could not directly demonstrate that prefetch data is scoped by user access. I
-              attest that the Health IT module limits the data made available via prefetch to what
-              the current user is authorized to access.
-            ),
-            type: 'radio',
-            optional: true,
-            default: 'false',
-            options: {
-              list_options: [
-                { label: 'Yes', value: 'true' },
-                { label: 'No', value: 'false' }
-              ]
-            }
+      output :attest_true_url
+      output :attest_false_url
 
       def prefetch_contains_reference?(request_body, reference)
         request_body['prefetch'].to_h.values.any? do |prefetched|
@@ -78,10 +65,28 @@ module DaVinciCRDTestKit
                  'limited-access prefetch data, but was expected to be restricted for the ' \
                  'limited-access user.'
         else
-          assert access_level_prefetch_attestation == 'true',
-                 "`#{access_level_target_reference}` was not present in the full-access request's " \
-                 'prefetch, so this scenario could not demonstrate that prefetch data is scoped by ' \
-                 'user access.'
+          identifier = SecureRandom.hex(32)
+          attest_true_url = "#{resume_pass_url}?token=#{identifier}"
+          attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+          output(attest_true_url:)
+          output(attest_false_url:)
+          wait(
+            identifier:,
+            message: <<~MESSAGE
+              **Prefetch Data Access Attestation**:
+
+              `#{access_level_target_reference}` was not present in the full-access request's
+              prefetch, so this scenario could not directly demonstrate that prefetch data is
+              scoped by user access.
+
+              I attest that the Health IT module limits the data made available via prefetch to
+              what the current user is authorized to access.
+
+              [Click here](#{attest_true_url}) if the above statement is **true**.
+
+              [Click here](#{attest_false_url}) if the above statement is **false**.
+            MESSAGE
+          )
         end
       rescue JSON::ParserError => e
         assert false, "Unable to parse a hook request body as JSON: #{e.message}"
