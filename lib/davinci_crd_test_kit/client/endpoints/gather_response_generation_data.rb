@@ -1,4 +1,5 @@
 require_relative '../../cross_suite/tags'
+require_relative '../../cross_suite/hook_request_resource_extraction'
 
 module DaVinciCRDTestKit
   # Make requests to client's FHIR server to use in building responses
@@ -310,39 +311,13 @@ module DaVinciCRDTestKit
     end
 
     def prefetched_resources
-      @prefetched_resources ||=
-        if request_body['prefetch'].blank? || !request_body['prefetch'].is_a?(Hash)
-          {}
-        else
-          request_body['prefetch'].values.each_with_object({}) do |prefetched_resource, resource_hash|
-            next unless prefetched_resource.is_a?(Hash)
+      @prefetched_resources ||= {}.tap do |resource_hash|
+        HookRequestResourceExtraction.each_prefetch_resource(request_body['prefetch']) do |resource|
+          next unless resource_has_required_details?(resource)
 
-            add_prefetch_resource_to_resource_hash(prefetched_resource, resource_hash)
-          end
+          resource_hash["#{resource['resourceType']}/#{resource['id']}"] = resource
         end
-    end
-
-    def add_prefetch_resource_to_resource_hash(prefetched_resource, resource_hash)
-      if prefetched_resource['resourceType'] == 'Bundle'
-        prefetched_resource['entry']&.each do |entry|
-          next unless entry_has_required_details?(entry)
-
-          one_resource = entry['resource']
-          key = "#{one_resource['resourceType']}/#{one_resource['id']}"
-          resource_hash[key] = one_resource
-        end
-      elsif resource_has_required_details?(prefetched_resource)
-
-        key = "#{prefetched_resource['resourceType']}/#{prefetched_resource['id']}"
-        resource_hash[key] = prefetched_resource
       end
-    end
-
-    def entry_has_required_details?(entry)
-      entry.present? &&
-        entry.is_a?(Hash) &&
-        entry['resource'].present? &&
-        resource_has_required_details?(entry['resource'])
     end
 
     def resource_has_required_details?(resource)

@@ -107,7 +107,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientUnknownContentReceiveRequestTest, 
     post_hook_request
 
     expect(last_response).to be_server_error
-    expect(last_response.body).to match(/find test run with identifier/)
+    expect(last_response.body).to match(/Unable to find test run/)
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end

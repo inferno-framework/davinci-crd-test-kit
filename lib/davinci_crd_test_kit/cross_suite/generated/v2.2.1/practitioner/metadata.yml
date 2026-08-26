@@ -1,0 +1,36 @@
+---
+:resource: Practitioner
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner
+:profile_name: CRD Practitioner
+:profile_version: 2.2.1
+:must_supports:
+  :extensions: []
+  :slices:
+  - :slice_id: Practitioner.identifier:NPI
+    :slice_name: NPI
+    :path: identifier
+    :discriminator:
+      :type: patternIdentifier
+      :path: ''
+      :system: http://hl7.org/fhir/sid/us-npi
+  - :slice_id: Practitioner.identifier:tin
+    :slice_name: tin
+    :path: identifier
+    :discriminator:
+      :type: patternIdentifier
+      :path: ''
+      :system: urn:oid:2.16.840.1.113883.4.4
+  :elements:
+  - :path: address
+  - :path: address.city
+  - :path: address.country
+  - :path: address.line
+  - :path: address.postalCode
+  - :path: address.state
+  - :path: identifier
+  - :path: name
+  - :path: name.family
+  - :path: telecom
+  - :path: telecom.system
+  - :path: telecom.value
+  :recursive_elements: []

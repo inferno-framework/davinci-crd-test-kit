@@ -1,0 +1,32 @@
+---
+:resource: Encounter
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter
+:profile_name: CRD Encounter
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Encounter.extension:Coverage-Information
+    :slice_name: Coverage-Information
+    :path: extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+    :modifier_extension: false
+  - :id: Encounter.serviceType.extension:BillingOptions
+    :slice_name: BillingOptions
+    :path: serviceType.extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
+    :modifier_extension: false
+  :slices: []
+  :elements:
+  - :path: appointment
+    :types:
+    - Reference
+  - :path: contained
+  - :path: diagnosis
+  - :path: diagnosis.condition
+    :types:
+    - Reference
+  - :path: length
+  - :path: location.period
+  - :path: location.status
+  - :path: serviceType
+  :recursive_elements: []

@@ -79,34 +79,34 @@ module DaVinciCRDTestKit
 
     def make_response
       if requested_hook.blank?
-        error_response("No hook requested - populate the 'hook' element in the request.",
-                       code: 400,
-                       outcome_code: 'value')
+        hook_error_response("No hook requested - populate the 'hook' element in the request.",
+                            code: 400,
+                            outcome_code: 'value')
       elsif invoked_hook != requested_hook
-        error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
-                       "requested the #{requested_hook} hook.",
-                       code: 400,
-                       outcome_code: 'value')
+        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
+                            "requested the #{requested_hook} hook.",
+                            code: 400,
+                            outcome_code: 'value')
       elsif wrong_hook_for_test?
-        error_response("Hook '#{requested_hook}' is not being tested in the current session. " \
-                       "This session is currently testing the '#{tested_hook}' hook.",
-                       code: 422,
-                       outcome_code: 'value')
+        hook_error_response("Hook '#{requested_hook}' is not being tested in the current session. " \
+                            "This session is currently testing the '#{tested_hook}' hook.",
+                            code: 422,
+                            outcome_code: 'value')
       elsif hook_instance_already_used?
-        error_response(
+        hook_error_response(
           "Invalid Request: Hook instance `#{request_body['hookInstance']}` has already been used in this session.",
           outcome_code: 'value'
         )
       elsif AVAILABLE_HOOKS.include?(requested_hook)
         process_valid_hook
       else
-        error_response("Invalid Request: hook `#{requested_hook}` is not supported by this server.",
-                       outcome_code: 'value')
+        hook_error_response("Invalid Request: hook `#{requested_hook}` is not supported by this server.",
+                            outcome_code: 'value')
       end
     rescue StandardError => e
-      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}",
-                     code: 500,
-                     outcome_code: 'exception')
+      hook_error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}",
+                          code: 500,
+                          outcome_code: 'exception')
     end
 
     def process_valid_hook
@@ -140,7 +140,7 @@ module DaVinciCRDTestKit
         build_mock_hook_response
       end
     rescue StandardError => e
-      error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
+      hook_error_response("Inferno failed to generate a response: #{e.message} at #{e.backtrace.first}", code: 500)
       nil
     end
 
@@ -194,7 +194,7 @@ module DaVinciCRDTestKit
       CROSS_HOOK_ANALYSIS_TAG if test.config.options[:include_in_cross_hook_analysis]
     end
 
-    def error_response(error_message, code: 400, outcome_code: 'invalid')
+    def hook_error_response(error_message, code: 400, outcome_code: 'invalid')
       response.status = code
       response.body = error_operation_outcome(outcome_code, error_message).to_json
       response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })

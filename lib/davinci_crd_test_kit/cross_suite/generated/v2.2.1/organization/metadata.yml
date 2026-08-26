@@ -1,0 +1,41 @@
+---
+:resource: Organization
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization
+:profile_name: CRD Organization
+:profile_version: 2.2.1
+:must_supports:
+  :extensions: []
+  :slices:
+  - :slice_id: Organization.identifier:NPI
+    :slice_name: NPI
+    :path: identifier
+    :discriminator:
+      :type: patternIdentifier
+      :path: ''
+      :system: http://hl7.org/fhir/sid/us-npi
+  - :slice_id: Organization.identifier:tin
+    :slice_name: tin
+    :path: identifier
+    :discriminator:
+      :type: patternIdentifier
+      :path: ''
+      :system: urn:oid:2.16.840.1.113883.4.4
+  :elements:
+  - :path: active
+  - :path: address
+  - :path: address.city
+  - :path: address.country
+  - :path: address.line
+  - :path: address.postalCode
+  - :path: address.state
+  - :path: identifier
+  - :path: name
+  - :path: partOf
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization
+  - :path: telecom
+  - :path: telecom.system
+  - :path: telecom.value
+  :recursive_elements: []
