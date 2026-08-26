@@ -156,6 +156,78 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
       expect(entity_result_message.message).to match(/Token validation error: Signature verification failed/)
     end
 
+    it 'passes when JWK has no alg field but JWT header specifies alg' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = JWT.encode token_payload, rsa_key, 'RS384', token_header
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'fails when JWK omits alg and the JWT header declares a fake algorithm' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      # No alg on the JWK -> falls back to the (fake) header alg, which JWT.decode rejects.
+      token = JWT.encode token_payload, rsa_key, 'RS384', token_header.merge(alg: 'RS111')
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to match(/Token validation error/)
+    end
+
+    it 'fails if the token uses an unsupported algorithm such as HS256' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      hs256_header = token_header.merge(alg: 'HS256')
+      token = JWT.encode token_payload, 'shared_secret', 'HS256', hs256_header
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
+    end
+
+    it 'fails if the token uses the `none` algorithm' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      none_header = { alg: 'none', kid: rsa_jwk['kid'], typ: 'JWT' }
+      token = JWT.encode token_payload, nil, 'none', none_header
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
+    end
+
+    it 'reports every problem at once rather than stopping at the first failed check' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      # One token with two independent problems: a disallowed alg AND a missing `exp` claim.
+      token = JWT.encode token_payload.except(:exp), 'shared_secret', 'HS256', token_header.merge(alg: 'HS256')
+
+      result = run(test,
+                   auth_tokens: [token],
+                   auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+                   cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+
+      messages = results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+        .first.messages.map(&:message)
+      expect(messages).to include(a_string_matching(/CDS Hooks prohibits/))
+      expect(messages).to include(a_string_matching(/missing required claims: `exp`/))
+    end
+
     it 'fails if it receives a JWT Authorization header with missing claims' do
       allow(test).to receive(:suite).and_return(suite)
 

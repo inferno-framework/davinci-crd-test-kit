@@ -49,34 +49,47 @@ module DaVinciCRDTestKit
 
           begin
             jwk = JSON.parse(auth_token_jwk).deep_symbolize_keys
-
-            payload, =
-              JWT.decode(
-                auth_tokens_list[index],
-                JWT::JWK.import(jwk).public_key,
-                true,
-                algorithms: [jwk[:alg]],
-                exp_leeway: 60,
-                iss: cds_jwt_iss,
-                aud: hook_url,
-                verify_not_before: false,
-                verify_iat: false,
-                verify_jti: true,
-                verify_iss: true,
-                verify_aud: true
-              )
+            unverified_payload, jwt_header = JWT.decode(auth_tokens_list[index], nil, false)
           rescue StandardError => e
             add_message('error', "#{request_number}Token validation error: #{e.message}")
             next
           end
 
-          missing_claims = required_claims - payload.keys
-          missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
+          alg = jwk[:alg] || jwt_header['alg']
 
-          unless missing_claims.empty?
-            add_message('error', "#{request_number}JWT payload missing required claims: #{missing_claims_string}")
-            next
+          # Continue checking the rest of the token even when one check fails, so the tester sees every
+          # issue at once rather than fixing them one error at a time.
+          # CDS Hooks prohibits the `none` algorithm and symmetric (HMAC) algorithms for the authentication JWT.
+          if alg.to_s.match?(/\A(none|hs\d+)\z/i)
+            add_message('error',
+                        "#{request_number}Token signature algorithm #{alg.inspect} is not permitted; CDS Hooks " \
+                        'prohibits the `none` algorithm and symmetric (HMAC) algorithms.')
           end
+
+          begin
+            JWT.decode(
+              auth_tokens_list[index],
+              JWT::JWK.import(jwk).public_key,
+              true,
+              algorithms: [alg],
+              exp_leeway: 60,
+              iss: cds_jwt_iss,
+              aud: hook_url,
+              verify_not_before: false,
+              verify_iat: false,
+              verify_jti: true,
+              verify_iss: true,
+              verify_aud: true
+            )
+          rescue StandardError => e
+            add_message('error', "#{request_number}Token validation error: #{e.message}")
+          end
+
+          missing_claims = required_claims - unverified_payload.keys
+          next if missing_claims.empty?
+
+          missing_claims_string = missing_claims.map { |claim| "`#{claim}`" }.join(', ')
+          add_message('error', "#{request_number}JWT payload missing required claims: #{missing_claims_string}")
         end
         no_error_validation('Token payload is missing required claims or does not have a valid signature.')
       end
