@@ -1,10 +1,16 @@
 require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/user_access_level/access_level_prefetch_scope_test' # rubocop:disable Layout/LineLength
 require_relative '../../../../../lib/davinci_crd_test_kit/cross_suite/tags'
 
-RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest do
+RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request do
   let(:suite_id) { 'crd_client_v221' }
   let(:test) { described_class }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
+  let(:results_repo) { Inferno::Repositories::Results.new }
+
+  let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
+  let(:known_token) { 'abc123' }
+  let(:attest_true_url) { "#{base_url}/resume_pass?token=#{known_token}" }
+  let(:attest_false_url) { "#{base_url}/resume_fail?token=#{known_token}" }
 
   let(:target_reference) { 'Observation/123' }
   let(:target_resource) { { 'resourceType' => 'Observation', 'id' => '123' } }
@@ -92,44 +98,48 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest do
     let(:limited_body) { hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => other_resource }) }
 
     before do
+      allow(SecureRandom).to receive(:hex).and_return(known_token)
       create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
       create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     end
 
-    it 'passes when the tester attests that prefetch data is scoped by user access' do
-      result = run(test, access_level_target_reference: target_reference,
-                         access_level_prefetch_attestation: 'true')
+    it 'enters a wait state prompting the tester to attest' do
+      result = run(test, access_level_target_reference: target_reference)
+      expect(result.result).to eq('wait')
+      expect(result.result_message).to match(/I attest/)
+      expect(result.result_message).to match(/#{Regexp.escape(target_reference)}/)
+    end
+
+    it 'passes when the tester attests true' do
+      result = run(test, access_level_target_reference: target_reference)
+      expect(result.result).to eq('wait')
+
+      get(attest_true_url)
+
+      result = results_repo.find(result.id)
       expect(result.result).to eq('pass')
     end
 
-    it 'fails when the tester attests that prefetch data is not scoped by user access' do
-      result = run(test, access_level_target_reference: target_reference,
-                         access_level_prefetch_attestation: 'false')
-      expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/could not demonstrate/)
-    end
-
-    it 'fails when the tester does not answer the attestation' do
+    it 'fails when the tester attests false' do
       result = run(test, access_level_target_reference: target_reference)
-      expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/could not demonstrate/)
-    end
+      expect(result.result).to eq('wait')
 
-    it 'still uses the attestation fallback even if the target is present only in the limited prefetch' do
-      limited_body['prefetch'] = { 'observation' => target_resource }
-      result = run(test, access_level_target_reference: target_reference,
-                         access_level_prefetch_attestation: 'true')
-      expect(result.result).to eq('pass')
-    end
+      get(attest_false_url)
 
-    it 'still requires the attestation (rather than failing on a "present in both" check) when the target ' \
-       'is present only in the limited prefetch' do
-      limited_body['prefetch'] = { 'observation' => target_resource }
-      result = run(test, access_level_target_reference: target_reference)
+      result = results_repo.find(result.id)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/could not demonstrate/)
-      expect(result.result_message).to_not match(/present in both/)
     end
+  end
+
+  it 'still falls back to attestation even if the target is present only in the limited prefetch' do
+    full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => other_resource })
+    limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => target_resource })
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
+
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('wait')
+    expect(result.result_message).to_not match(/present in both/)
   end
 
   it 'fails when a hook request body is not valid JSON' do
