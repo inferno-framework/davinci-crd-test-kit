@@ -44,7 +44,7 @@ module DaVinciCRDTestKit
       output :attest_false_url
 
       run do
-        load_hook_requests
+        load_interaction_group_requests
         skip_if responded_card_types.blank?, 'No responses sent to the client.'
 
         identifier = SecureRandom.hex(32)

@@ -32,9 +32,10 @@ RSpec.describe DaVinciCRDTestKit::PrefetchProfileValidation do
     JSON.parse(File.read(File.join(__dir__, '..', '..', 'fixtures', 'crd_practitioner_example.json')))
   end
 
-  let(:issue_struct) { Struct.new(:severity, :message) }
-  let(:error_issue) { issue_struct.new('error', 'something went wrong') }
-  let(:warning_issue) { issue_struct.new('warning', 'heads up') }
+  let(:issue_struct) { Struct.new(:severity, :message, :filtered) }
+  let(:error_issue) { issue_struct.new('error', 'something went wrong', false) }
+  let(:warning_issue) { issue_struct.new('warning', 'heads up', false) }
+  let(:filtered_issue) { issue_struct.new('error', 'ignore me', true) }
 
   let(:patient_bundle) do
     { 'resourceType' => 'Bundle',
@@ -107,6 +108,21 @@ RSpec.describe DaVinciCRDTestKit::PrefetchProfileValidation do
       module_instance.check_prefetch_profiles({ 'patient' => patient_resource }, 0)
 
       expect(module_instance.messages.first[:type]).to eq('warning')
+    end
+
+    it 'does not add a message for issues marked as filtered' do
+      module_instance.issues_to_return = [filtered_issue]
+      module_instance.check_prefetch_profiles({ 'patient' => patient_resource }, 0)
+
+      expect(module_instance.messages).to be_empty
+    end
+
+    it 'adds messages for unfiltered issues while excluding filtered ones' do
+      module_instance.issues_to_return = [filtered_issue, error_issue]
+      module_instance.check_prefetch_profiles({ 'patient' => patient_resource }, 0)
+
+      expect(module_instance.messages.size).to eq(1)
+      expect(module_instance.messages.first[:message]).to include('something went wrong')
     end
   end
 

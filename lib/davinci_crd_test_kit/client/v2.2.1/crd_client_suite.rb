@@ -2,7 +2,7 @@ require_relative 'client_fhir_api_group'
 require_relative 'client_hooks_group'
 require_relative 'client_cross_hook_group'
 require_relative 'client_registration_group'
-require_relative 'client_long_running_hook_group'
+require_relative 'client_scenarios_group'
 require_relative 'client_attestations_group'
 require_relative '../endpoints/cds_services_discovery_handler'
 require_relative '../../cross_suite/tags'
@@ -115,7 +115,6 @@ module DaVinciCRDTestKit
       CRD_MESSAGE_FILTERS = [
         /\A\S+: \S+: URL value '.*' does not resolve/,
         %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
-        /CDSHooksRequest.extension: Unrecognized property/,
         /No definition could be found for URL value/
       ].freeze
 
@@ -163,6 +162,21 @@ module DaVinciCRDTestKit
 
         exclude_message do |message|
           US_CORE_7_MESSAGE_FILTERS.any? do |match_template|
+            message.message.match?(match_template)
+          end
+        end
+      end
+
+      fhir_resource_validator :no_custom_extensions do
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
+
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+          extensions [] # no extensions not in the spec
+        end
+
+        exclude_message do |message|
+          CRD_MESSAGE_FILTERS.any? do |match_template|
             message.message.match?(match_template)
           end
         end
@@ -225,8 +239,8 @@ module DaVinciCRDTestKit
 
         group from: :crd_v221_client_registration
         group from: :crd_v221_client_hooks
+        group from: :crd_v221_client_scenarios
         group from: :crd_v221_client_cross_hook
-        group from: :crd_v221_client_long_running_hook
       end
 
       group from: :crd_v221_client_fhir_api

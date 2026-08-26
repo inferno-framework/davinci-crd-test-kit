@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([])
 
       result = run(test, server_endpoint:, smart_auth_info:)
 
@@ -96,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([hook_request_without_coverage_info])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([hook_request_without_coverage_info])
 
       result = run(test, server_endpoint:, smart_auth_info:)
 
@@ -108,7 +108,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return(['Patient']) # DeviceRequest not listed
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([hook_request_with_coverage_info])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([hook_request_with_coverage_info])
 
       result = run(test, server_endpoint:, smart_auth_info:)
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
@@ -127,7 +127,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: '{}',
             response_body: { cards: [], systemActions: [non_coverage_info_action] }.to_json
@@ -144,7 +144,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: '{}',
             response_body: { cards: [] }.to_json
@@ -163,8 +163,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([hook_request_with_coverage_info,
-                                                      hook_request_with_coverage_info])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([hook_request_with_coverage_info,
+                                                                        hook_request_with_coverage_info])
 
       result = run(test, server_endpoint:, smart_auth_info:)
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
@@ -180,7 +180,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([hook_request_with_coverage_info])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([hook_request_with_coverage_info])
     end
 
     it 'fails with an error message when the target resource cannot be read' do
@@ -300,7 +300,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
         .to receive(:extract_supported_resource_types)
         .and_return([device_request_resource_type, second_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [
             hook_request_with_coverage_info,
             Inferno::Entities::Request.new(
@@ -343,7 +343,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: '{}',
             response_body: { cards: [], systemActions: [action_with_two_coverage_info_extensions] }.to_json
@@ -373,7 +373,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([device_request_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: '{}',
             response_body: { cards: [], systemActions: [action_with_duplicate_url] }.to_json
@@ -425,7 +425,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       allow_any_instance_of(described_class)
         .to receive(:extract_supported_resource_types).and_return([complete_resource_type])
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: '{}',
             response_body: { cards: [], systemActions: [complete_system_action] }.to_json

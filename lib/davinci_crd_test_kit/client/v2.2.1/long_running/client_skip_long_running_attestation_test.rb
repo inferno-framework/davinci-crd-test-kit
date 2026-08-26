@@ -26,7 +26,7 @@ module DaVinciCRDTestKit
       output :attest_false_url
 
       run do
-        long_running_requests = load_hook_requests
+        long_running_requests = load_interaction_group_requests
         skip_if long_running_requests.blank?, 'Long-running requests not demonstrated: ' \
                                               'no hook requests sent during the previous wait.'
 

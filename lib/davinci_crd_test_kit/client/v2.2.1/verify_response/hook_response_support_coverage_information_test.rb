@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
       DESCRIPTION
 
       run do
-        hook_requests = load_hook_requests
+        hook_requests = load_interaction_group_requests
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 
         sorted_cards = sorted_cards_from_requests(hook_requests)

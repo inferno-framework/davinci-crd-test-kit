@@ -34,6 +34,8 @@ module DaVinciCRDTestKit
                          profile_url: target_crd_profile,
                          validator_response_details: validation_details, add_messages_to_runnable: false)
       validation_details.each do |issue|
+        next if issue.filtered
+
         prefix = prefetch_profile_error_prefix(request_index, bundle_entry_index)
         add_message(issue.severity, "#{prefix}#{issue.message}")
       end

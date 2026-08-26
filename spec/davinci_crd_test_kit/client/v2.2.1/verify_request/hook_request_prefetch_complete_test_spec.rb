@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestPrefetchCompleteTest do
   let(:order_sign_url) { "#{base_url}/cds-services/order-sign-service" }
   let(:test) do
     Class.new(described_class) do
-      config(options: { hook_name: 'order-sign' })
+      config(options: { hook_name: 'order-sign', crd_interaction_group: 'order-sign' })
     end
   end
 

@@ -2,7 +2,8 @@ RSpec.describe DaVinciCRDTestKit::V221::InfernoResponseValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:order_sign_test) do
     Class.new(described_class) do
-      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG } })
+      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG,
+                          crd_interaction_group: DaVinciCRDTestKit::ORDER_SIGN_TAG } })
 
       def conforms_to_logical_model?(*_args, **_kwargs)
         true

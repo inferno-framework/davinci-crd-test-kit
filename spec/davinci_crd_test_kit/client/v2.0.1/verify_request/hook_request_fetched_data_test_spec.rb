@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestFetchedDataTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V201::HookRequestFetchedDataTest) do
         config(
-          options: { hook_name: 'appointment-book' }
+          options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' }
         )
       end
     end
@@ -166,7 +166,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestFetchedDataTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V201::HookRequestFetchedDataTest) do
         config(
-          options: { hook_name: 'appointment-book', crd_test_group: 'alpha' }
+          options: { hook_name: 'appointment-book', crd_interaction_group: 'alpha' }
         )
       end
     end

@@ -11,7 +11,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
 
   let(:test) do
     Class.new(described_class) do
-      config(options: { hook_name: 'order-sign' })
+      config(options: { hook_name: 'order-sign', crd_interaction_group: 'order-sign' })
     end
   end
 
@@ -198,6 +198,38 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result_messages.map(&:message).join).to match(/does not conform to profile/)
   end
 
+  it 'includes individual validator issues that are not filtered' do
+    issue = instance_double(Inferno::DSL::FHIRResourceValidation::ValidatorIssue,
+                            severity: 'error', message: 'Unfiltered issue', filtered: false)
+    allow_any_instance_of(test).to receive(:resource_is_valid?) do |instance, **kwargs|
+      kwargs[:validator_response_details] << issue
+      instance.add_message('error', 'Resource does not conform to profile')
+      false
+    end
+    create_hook_request
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to match(/Unfiltered issue/)
+  end
+
+  it 'does not include validator issues marked as filtered' do
+    issue = instance_double(Inferno::DSL::FHIRResourceValidation::ValidatorIssue,
+                            severity: 'error', message: 'Filtered out issue', filtered: true)
+    allow_any_instance_of(test).to receive(:resource_is_valid?) do |instance, **kwargs|
+      kwargs[:validator_response_details] << issue
+      instance.add_message('error', 'Resource does not conform to profile')
+      false
+    end
+    create_hook_request
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to_not match(/Filtered out issue/)
+  end
+
   it 'includes request number in error message for the failing request' do
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
     second_instance = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
@@ -285,10 +317,10 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     end
   end
 
-  describe 'when a crd_test_group is configured' do
+  describe 'when a crd_interaction_group is configured' do
     let(:test) do
       Class.new(described_class) do
-        config(options: { hook_name: 'order-sign', crd_test_group: 'some-group' })
+        config(options: { hook_name: 'order-sign', crd_interaction_group: 'some-group' })
       end
     end
 

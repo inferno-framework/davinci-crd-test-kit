@@ -1,9 +1,11 @@
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V201
     class ClientCardMustSupportExternalReferenceTest < Inferno::Test
       include CardsIdentification
+      include TaggedRequestLoadHelper
 
       title 'External Reference Card Support'
       id :crd_v201_client_card_must_support_external_reference
@@ -15,43 +17,8 @@ module DaVinciCRDTestKit
         and/or the hook requests made by the client during the Hooks tests such that an External Reference card is returned and support for it is demonstrated.
       DESCRIPTION
 
-      ALL_HOOKS = [
-        APPOINTMENT_BOOK_TAG,
-        ENCOUNTER_START_TAG,
-        ENCOUNTER_DISCHARGE_TAG,
-        ORDER_DISPATCH_TAG,
-        ORDER_SELECT_TAG,
-        ORDER_SIGN_TAG
-      ].freeze
-
-      def configured_hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load(hook_name)
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
-      def requests_to_analyze
-        if configured_hook_name.present?
-          load_requests_for_tags(tags_to_load(configured_hook_name))
-        else
-          ALL_HOOKS.each_with_object([]) do |hook_name, request_list|
-            request_list.concat(load_requests_for_tags(tags_to_load(hook_name)))
-          end
-        end
-      end
-
-      def load_requests_for_tags(tags_to_load)
-        load_tagged_requests(*tags_to_load)
-      end
-
       run do
-        loaded_requests = requests_to_analyze
+        loaded_requests = load_requests_for_cross_hook_analysis
         sorted_cards = sorted_cards_from_requests(loaded_requests)
 
         assert sorted_cards['cards'][EXTERNAL_REFERENCE_RESPONSE_TYPE].present?,

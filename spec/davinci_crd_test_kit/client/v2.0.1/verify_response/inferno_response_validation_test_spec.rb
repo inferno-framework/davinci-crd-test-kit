@@ -4,13 +4,14 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
   let(:suite_id) { 'crd_client' }
   let(:order_sign_test) do
     Class.new(DaVinciCRDTestKit::V201::InfernoResponseValidationTest) do
-      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG } })
+      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG,
+                          crd_interaction_group: DaVinciCRDTestKit::ORDER_SIGN_TAG } })
     end
   end
   let(:coverage_tag) { 'coverage' }
   let(:order_sign_coverage_test) do
     Class.new(DaVinciCRDTestKit::V201::InfernoResponseValidationTest) do
-      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG, crd_test_group: 'coverage' } })
+      config({ options: { hook_name: DaVinciCRDTestKit::ORDER_SIGN_TAG, crd_interaction_group: 'coverage' } })
     end
   end
   let(:results_repo) { Inferno::Repositories::Results.new }

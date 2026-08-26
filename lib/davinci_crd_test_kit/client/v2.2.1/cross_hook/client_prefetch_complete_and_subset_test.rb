@@ -1,10 +1,12 @@
 require_relative '../../tagged_request_load_helper'
+require_relative '../../cross_hook_helper'
 require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
     class ClientPrefetchCompleteAndSubsetTest < Inferno::Test
       include TaggedRequestLoadHelper
+      include CrossHookHelper
 
       title 'Client can provide both the complete standard prefetch data set and a subset'
       id :crd_v221_client_prefetch_complete_and_subset
@@ -50,24 +52,13 @@ module DaVinciCRDTestKit
 
       run do
         subset_prefetch_requests, complete_prefetch_requests =
-          requests_to_analyze.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
+          load_requests_for_cross_hook_analysis.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
         completeness_tests = find_completeness_tests
         check_for_demonstration(subset_prefetch_requests, completeness_tests, :subset)
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)
 
         skip_if error_messages?,
                 'The client did not demonstrate both complete and subset prefetch capability. See Messages for details.'
-      end
-
-      def find_completeness_tests
-        hooks_group = self.class.parent.parent.groups.find do |group|
-          group.id.to_s.include?('crd_v221_client_hooks')
-        end
-        hooks_group.groups.map do |group|
-          group.groups.flat_map(&:tests).find do |test|
-            test.id.to_s.include?('crd_v221_hook_request_prefetch_complete')
-          end
-        end.compact
       end
 
       def check_for_demonstration(requests, completeness_tests, target_name)

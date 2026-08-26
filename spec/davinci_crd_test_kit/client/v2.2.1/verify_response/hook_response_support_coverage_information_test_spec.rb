@@ -26,7 +26,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientHookResponseSupportCoverageInforma
 
     it 'fails when no coverage information actions are found' do
       allow_any_instance_of(described_class)
-        .to receive(:load_hook_requests).and_return(
+        .to receive(:load_interaction_group_requests).and_return(
           [Inferno::Entities::Request.new(
             request_body: order_sign_hook_request,
             response_body: { cards: [], systemActions: [] }.to_json
@@ -40,7 +40,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientHookResponseSupportCoverageInforma
 
     it 'passes when a coverage information action is present' do
       allow_any_instance_of(described_class)
-        .to receive(:load_hook_requests).and_return(
+        .to receive(:load_interaction_group_requests).and_return(
           [Inferno::Entities::Request.new(
             request_body: order_sign_hook_request,
             response_body: order_sign_hook_response_with_coverage_info

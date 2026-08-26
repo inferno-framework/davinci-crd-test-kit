@@ -60,7 +60,9 @@ module DaVinciCRDTestKit
         },
         options: {
           hook_name: 'order-select',
-          hook_path: ORDER_SELECT_PATH
+          hook_path: ORDER_SELECT_PATH,
+          crd_interaction_group: 'hooks-order-select',
+          include_in_cross_hook_analysis: true
         }
       )
 

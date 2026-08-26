@@ -32,7 +32,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
     { 'resourceType' => 'Location', 'id' => 'parent-1' }
   end
 
-  def create_hook_request(body:, tags: [hook_name])
+  def create_hook_request(body:, tags: [hook_name, DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
     repo_create(
       :request,
       direction: 'incoming',
@@ -222,7 +222,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
 
     it 'includes individual validation issues in messages when conformance fails' do
       issue = instance_double(Inferno::DSL::FHIRResourceValidation::ValidatorIssue,
-                              severity: 'error', message: 'Missing required field')
+                              severity: 'error', message: 'Missing required field', filtered: false)
       instance = test.new
       allow(instance).to receive(:prefetched_location_hash).and_return({})
       allow(instance).to receive(:resource_is_valid?) do |resource: nil, profile_url: nil, # rubocop:disable Lint/UnusedBlockArgument
@@ -234,6 +234,22 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       location = FHIR.from_contents(parent_location_without_address.to_json)
       instance.check_location_conformance(location, 'loc-2')
       expect(instance.messages).to include(a_hash_including(message: a_string_including('Missing required field')))
+    end
+
+    it 'does not include validation issues marked as filtered' do
+      issue = instance_double(Inferno::DSL::FHIRResourceValidation::ValidatorIssue,
+                              severity: 'error', message: 'Filtered out issue', filtered: true)
+      instance = test.new
+      allow(instance).to receive(:prefetched_location_hash).and_return({})
+      allow(instance).to receive(:resource_is_valid?) do |resource: nil, profile_url: nil, # rubocop:disable Lint/UnusedBlockArgument
+                                                          add_messages_to_runnable: true, # rubocop:disable Lint/UnusedBlockArgument
+                                                          validator_response_details: nil|
+        validator_response_details << issue
+        false
+      end
+      location = FHIR.from_contents(parent_location_without_address.to_json)
+      instance.check_location_conformance(location, 'loc-2')
+      expect(instance.messages).to_not include(a_hash_including(message: a_string_including('Filtered out issue')))
     end
 
     it 'does not re-check conformance for a location already validated' do

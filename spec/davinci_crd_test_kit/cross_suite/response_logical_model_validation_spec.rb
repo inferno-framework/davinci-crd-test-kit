@@ -31,26 +31,28 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         true
       end
 
-      def resource_is_valid?(resource:, message_prefix: '')
-        @resource_is_valid_calls << { resource:, message_prefix: }
+      def resource_is_valid?(resource:, message_prefix: '', validator: :default)
+        @resource_is_valid_calls << { resource:, message_prefix:, validator: }
         true
       end
 
-      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver,
+                                                      validator: :default)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver:, validator: }
       end
 
       def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix,
-                                                                   ig_semver)
-        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver: }
+                                                                   ig_semver, validator: :default)
+        @resource_conformance_calls << { resource_hash:, request_body:, error_prefix:, ig_semver:, validator: }
       end
 
-      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
-        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver, validator: :default)
+        @coverage_profile_calls << { resource_hash:, error_prefix:, ig_semver:, validator: }
       end
 
-      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
-        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_semver: }
+      def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver,
+                                                                   validator: :default)
+        @questionnaire_task_profile_calls << { resource_hash:, error_prefix:, ig_semver:, validator: }
       end
 
       def scratch
@@ -141,6 +143,19 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       expect(call[:object]).to eq('cards' => [external_reference_card])
       expect(call[:url])
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-externalReference')
+    end
+
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to conforms_to_logical_model?' do
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver,
+                                                          validator: :no_custom_extensions)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
     end
 
     it 'uses the additional orders logical model for additional-orders cards' do
@@ -284,6 +299,39 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
       )
     end
 
+    it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.cards[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver,
+                                                          validator: :no_custom_extensions)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
+    it 'does not filter the if-none-exist extension "contexts of use" error on cards' do
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.cards[0].suggestions[0].actions[0].extension: The extension definition ' \
+                 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist' \
+                 '|2.2.1 defines the contexts of use as element:CDSHooksResponse.cards.suggestions.actions.extension' \
+                 ', which does not match the location of use which is CDSHooksElement.extension,' \
+                 'CDSHooksExtensions,CDSHooksResponse.systemActions.extension',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_card_against_logical_model(external_reference_card, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('defines the contexts of use as'))
+      )
+    end
+
     context 'when validation returns a Questionnaire type error for a form completion card' do
       let(:questionnaire_error_message) do
         "CDSHooksResponse.cards[0].suggestions[0].actions[0].resource: The type 'Questionnaire' " \
@@ -313,6 +361,14 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         call = module_instance.resource_is_valid_calls.first
         expect(call[:resource].resourceType).to eq('Questionnaire')
         expect(call[:message_prefix]).to include('suggestion 1, action 1')
+        expect(call[:validator]).to eq(:default)
+      end
+
+      it 'passes a specified validator through to resource_is_valid? for the Questionnaire resource' do
+        module_instance.validate_card_against_logical_model(form_completion_card, 0, request_body, 0, ig_semver,
+                                                            validator: :no_custom_extensions)
+
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:no_custom_extensions)
       end
 
       it 'does not filter out other validation errors' do
@@ -405,6 +461,20 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         .to eq('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-coverageInformation')
     end
 
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                   ig_semver)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to conforms_to_logical_model?' do
+      module_instance.validate_system_action_against_logical_model(coverage_information_action, 0, request_body, 0,
+                                                                   ig_semver, validator: :no_custom_extensions)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
+    end
+
     it 'records an error and skips validation when a system action is not a JSON object' do
       module_instance.validate_system_action_against_logical_model('not an action', 0, request_body, 0, ig_semver)
 
@@ -441,6 +511,43 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
 
       expect(module_instance.messages).to_not include(
         hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
+    it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+      unknown_action = { 'type' => 'update', 'description' => 'x',
+                         'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.systemActions[0].extension: Unrecognized property',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver,
+                                                                   validator: :no_custom_extensions)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
+
+    it 'filters out the if-none-exist extension "contexts of use" error on systemActions' do
+      unknown_action = { 'type' => 'update', 'description' => 'x',
+                         'resource' => { 'resourceType' => 'Patient', 'id' => 'p' } }
+      extension_issue = MockValidationIssue.new(
+        message: 'CDSHooksResponse.systemActions[0].extension: The extension definition ' \
+                 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist' \
+                 '|2.2.1 defines the contexts of use as element:CDSHooksResponse.cards.suggestions.actions.extension' \
+                 ', which does not match the location of use which is CDSHooksElement.extension,' \
+                 'CDSHooksExtensions,CDSHooksResponse.systemActions.extension',
+        severity: 'error',
+        filtered: false
+      )
+      module_instance.injected_validation_issues = [extension_issue]
+      module_instance.validate_system_action_against_logical_model(unknown_action, 0, request_body, 0, ig_semver)
+
+      expect(module_instance.messages).to_not include(
+        hash_including(message: a_string_including('defines the contexts of use as'))
       )
     end
 
@@ -644,6 +751,20 @@ RSpec.describe DaVinciCRDTestKit::ResponseLogicalModelValidation do
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-instructions',
         'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-coverageInformation'
       )
+    end
+
+    it 'passes a specified validator through to both card and system action validation' do
+      module_instance.perform_response_logical_model_validation(
+        [external_reference_card],
+        [coverage_information_action],
+        request_body,
+        0,
+        ig_semver,
+        validator: :no_custom_extensions
+      )
+
+      expect(module_instance.conforms_calls.length).to eq(2)
+      expect(module_instance.conforms_calls).to all(include(validator: :no_custom_extensions))
     end
 
     it 'handles missing cards and systemActions gracefully' do

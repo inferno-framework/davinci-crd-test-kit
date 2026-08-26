@@ -1,11 +1,13 @@
 require_relative '../client_urls'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V201
     class ClientCardDisplayAttest < Inferno::Test
       include ClientURLs
       include CardsIdentification
+      include TaggedRequestLoadHelper
 
       id :crd_v201_card_display_attest_test
       title 'Check that returned decision support details are displayed to the user'
@@ -15,18 +17,6 @@ module DaVinciCRDTestKit
         to the user in an appopriate way that allows for consideration and action
         if warranted.
       )
-
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
 
       def responded_card_types
         list_card_types_in_requests(requests)
@@ -54,7 +44,7 @@ module DaVinciCRDTestKit
       output :attest_false_url
 
       run do
-        load_tagged_requests(*tags_to_load)
+        load_interaction_group_requests
         skip_if responded_card_types.blank?, 'No responses sent to the client.'
 
         identifier = SecureRandom.hex(32)

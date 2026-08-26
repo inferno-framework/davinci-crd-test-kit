@@ -7,7 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestSecuredTransportTest do
 
   let(:test) do
     Class.new(described_class) do
-      config(options: { hook_name: 'appointment-book' })
+      config(options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' })
     end
   end
 
@@ -78,10 +78,10 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestSecuredTransportTest do
     expect(result_messages.map(&:message)).to include(match(/\(Request 2\).*fhirServer/))
   end
 
-  describe 'when a crd_test_group is configured' do
+  describe 'when a crd_interaction_group is configured' do
     let(:test) do
       Class.new(described_class) do
-        config(options: { hook_name: 'appointment-book', crd_test_group: 'some-group' })
+        config(options: { hook_name: 'appointment-book', crd_interaction_group: 'some-group' })
       end
     end
 
