@@ -22,7 +22,8 @@ demonstration of cards and actions conforming to the supported CRD response type
 ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
 [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html)).
 
-The server suites each contain three top-level groups:
+The v2.0.1 server suite contains three top-level groups, and the v2.2.1 suite
+contains four:
 1. The "Discovery" group validates a CRD server's discovery response.
 1. The v2.0.1 "Demonstrate A Hook Response" group and the v2.2.1
    "Hook Response Demonstration" group validate that the server can respond to
@@ -31,6 +32,9 @@ The server suites each contain three top-level groups:
    one or more CDS Hooks calls for each hook type
    that the tester provides request bodies for. It then validates that the responses
    are conformant and cover the response behavior required by the hook type.
+1. The v2.2.1 suite also contains a "Specific Coverage Responses" group, which
+   tests the abliity of a CRD server to provide specific types of coverage
+   information responses under particular conditions.
 
 All requests and responses are checked for conformance to the targeted CRD IG and
 CDS Hooks requirements individually and used in aggregate to determine whether
@@ -93,6 +97,8 @@ workflow as the v2.0.1 suite and adds checks for v2.2.1-specific behavior includ
 - Tolerance of unknown configuration values, unknown context values, and unknown CDS Hooks fields.
 - Demonstration of coverage-information extension must support elements across the test session.
 - Demonstration that the billing-options extension is not required for the server to respond.
+- The ability of the server to respond with specific coverage determinations
+  such as `indeterminate` or `not-covered` under particular circumstances.
 
 ## Testing Limitations
 
@@ -126,20 +132,5 @@ The following requirements are not currently tested:
 - `found-29`: Servers SHALL use prefetch expressions in the manner described
   below if those data elements are relevant to their coverage determination or
   other decision support.
-- `resp-25`: Regardless of the content, this "Coverage Information" response
-  type SHALL NOT use a card.
 - `resp-35`: However, CRD servers SHALL NOT send a systemAction to update the
   order unless something is new or changed.
-- `resp-43`: If the CRD server encounters technical issues that prevent it from
-  determining a coverage, prior auth, or documentation requirement response
-  (e.g. due to internal communication issues, authorization failure, temporary
-  unavailability of the CRD client's FHIR API, etc.), it SHALL indicate
-  "indeterminate" in the appropriate element with a reason code of technical and
-  additional details in the reason.text.
-- `resp-44`: If the CRD server is unable to resolve the patient for a reason
-  other than technology failure, the Coverage Information SHALL indicate
-  "not-covered" in 'coverage' with a reason code of no-member-found.
-- `resp-45`: If the CRD server is able to resolve the patient but they do not
-  have active coverage or cannot resolve to a single coverage, the Coverage
-  Information SHALL indicate "not-covered" with a reason of either
-  coverage-not-found or no-active-coverage, as appropriate.

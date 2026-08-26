@@ -13,27 +13,44 @@ module DaVinciCRDTestKit
       end
     end
 
+    def filter_logical_model_extension_issues(issues, validator)
+      return if validator == :no_custom_extensions
+
+      issues.each { |issue| issue.filtered = issue.filtered || logical_model_extension_issue?(issue) }
+    end
+
+    # Logical models validation doesn't currently respect the `"extensions": ["any"]`
+    # validator flag
+    def logical_model_extension_issue?(issue)
+      issue.message.match(/\.extension: Unrecognized property/).present?
+    end
+
     # -------------------------------------------------------------------------
     # Check resource conformance outside the logical models
     # -------------------------------------------------------------------------
 
-    def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver)
-      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Coverage)
+    def check_resource_conformance_to_coverage_profile(resource_hash, error_prefix, ig_semver, validator: :default)
+      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Coverage, validator:)
     end
 
-    def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver)
-      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Task)
+    def check_resource_conformance_to_questionnaire_task_profile(resource_hash, error_prefix, ig_semver,
+                                                                 validator: :default)
+      check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, FHIR::Task, validator:)
     end
 
-    def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_semver)
+    def check_resource_conformance_to_order_or_encounter_profile(resource_hash, request_body, error_prefix, ig_semver,
+                                                                 validator: :default)
       check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
+                                            validator:,
                                             allowed_types: ProfilesAndResourceTypes::ORDER_OR_ENCOUNTER_RESOURCE_CLASSES,
                                             disallowed_message: 'is not allowed as a target ' \
                                                                 'for a coverage-information action')
     end
 
-    def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver)
+    def check_resource_conformance_to_order_profile(resource_hash, request_body, error_prefix, ig_semver,
+                                                    validator: :default)
       check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
+                                            validator:,
                                             allowed_types: ProfilesAndResourceTypes::ORDER_RESOURCE_CLASSES,
                                             disallowed_message: 'is not allowed for CRD orders')
     end
@@ -51,11 +68,11 @@ module DaVinciCRDTestKit
       yield resource
     end
 
-    def check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, expected_class)
+    def check_resource_type_and_validate(resource_hash, error_prefix, ig_semver, expected_class, validator: :default)
       parse_action_resource(resource_hash, error_prefix) do |resource|
         if resource.is_a?(expected_class)
           resource_is_valid?(resource:, profile_url: structure_definition_map(ig_semver)[resource.resourceType],
-                             message_prefix: error_prefix)
+                             message_prefix: error_prefix, validator:)
         else
           add_message('error', "#{error_prefix}found resource type '#{resource.resourceType}' " \
                                "expected '#{expected_class.name.split('::').last}'.")
@@ -64,14 +81,14 @@ module DaVinciCRDTestKit
     end
 
     def check_order_like_resource_conformance(resource_hash, request_body, error_prefix, ig_semver,
-                                              allowed_types:, disallowed_message:)
+                                              allowed_types:, disallowed_message:, validator: :default)
       parse_action_resource(resource_hash, error_prefix) do |resource|
         case resource
         when FHIR::Appointment
-          check_appointment_conformance(resource, request_body, error_prefix, ig_semver)
+          check_appointment_conformance(resource, request_body, error_prefix, ig_semver, validator:)
         when *allowed_types
           resource_is_valid?(resource:, profile_url: structure_definition_map(ig_semver)[resource.resourceType],
-                             message_prefix: error_prefix)
+                             message_prefix: error_prefix, validator:)
         else
           add_message('error', "#{error_prefix}resource type '#{resource.resourceType}' #{disallowed_message}.")
         end
@@ -82,7 +99,7 @@ module DaVinciCRDTestKit
     # Appointment conformance (requires extra help to decide profile and check profile-based slicing)
     # -------------------------------------------------------------------------
 
-    def check_appointment_conformance(appointment, request_body, error_prefix, ig_semver)
+    def check_appointment_conformance(appointment, request_body, error_prefix, ig_semver, validator: :default)
       target_appointment_profile =
         if appointment.basedOn.present?
           'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-with-order'
@@ -92,7 +109,7 @@ module DaVinciCRDTestKit
 
       validation_issues = []
       resource_is_valid?(resource: appointment, profile_url: "#{target_appointment_profile}|#{ig_semver}",
-                         add_messages_to_runnable: false, validator_response_details: validation_issues)
+                         add_messages_to_runnable: false, validator_response_details: validation_issues, validator:)
 
       manually_check_appointment_validation_errors(validation_issues, appointment, request_body)
         .each do |issue|

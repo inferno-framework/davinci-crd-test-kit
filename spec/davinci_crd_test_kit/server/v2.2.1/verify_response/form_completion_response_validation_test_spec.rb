@@ -1,68 +1,24 @@
 RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
-  let(:suite_id) { 'crd_client_v221' }
+  let(:suite_id) { 'crd_server' }
+  let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:runnable) { described_class }
   let(:results_repo) { Inferno::Repositories::Results.new }
-  let(:base_card) do
+  let(:valid_response_body) do
     {
-      'summary' => 'Order Select Request Form Completion Card',
-      'uuid' => 'jksfghisldlrldsse',
-      'detail' => 'This is a Card containing one or more suggestions.',
-      'indicator' => 'info',
-      'source' => {
-        'label' => 'Inferno',
-        'url' => 'https://inferno.healthit.gov/',
-        'topic' => {
-          'system' => 'http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp',
-          'code' => 'order-select',
-          'display' => 'Order Select'
-        }
-      },
-      'selectionBehavior' => 'any',
-      'suggestions' => [
-        {
-          'label' => "Add 'completion of the ABC form' to your task list (possibly for reassignment)",
-          'actions' => [
-            {
-              'type' => 'create',
-              'description' => 'Create form',
-              'resource' => {
-                'resourceType' => 'Questionnaire',
-                'url' => 'http://example.org/Questionnaire/XYZ'
-              }
-            },
-            {
-              'type' => 'create',
-              'description' => 'Create task',
-              'resource' => {
-                'resourceType' => 'Task',
-                'code' => {
-                  'coding' => [
-                    {
-                      'system' => 'http://hl7.org/fhir/uv/sdc/CodeSystem/temp',
-                      'code' => 'complete-questionnaire'
-                    }
-                  ]
-                },
-                'input' => [
-                  {
-                    'type' => {
-                      'text' => 'questionnaire',
-                      'coding' => [
-                        {
-                          'system' => 'http://hl7.org/fhir/uv/sdc/CodeSystem/temp',
-                          'code' => 'questionnaire'
-                        }
-                      ]
-                    },
-                    'valueCanonical' => 'http://example.org/Questionnaire/XYZ'
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    }
+      cards:
+    }.to_json
+  end
+  let(:cards) do
+    JSON.parse(
+      File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'valid_cards.json'))
+    )
+  end
+  let(:system_action_response) do
+    File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'form_completion_system_action.json'))
+  end
+
+  before do
+    allow_any_instance_of(runnable).to receive(:tested_hook_name).and_return('order-sign')
   end
 
   def entity_result_message
@@ -72,50 +28,110 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
       .first
   end
 
-  before do
-    allow_any_instance_of(runnable).to receive(:resource_is_valid?).and_return(true)
-  end
+  it 'passes if cards contain a valid form completion card' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: valid_response_body,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
 
-  it 'passes if questionnaire creation actions include the if-none-exist extension' do
-    card = base_card
-    card['suggestions'].first['actions'].first['extension'] = {
-      'davinci-crd.if-none-exist': 'http://example.org/Questionnaire/XYZ'
-    }
-    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                           valid_system_actions: [].to_json)
+    allow_any_instance_of(runnable).to receive(:perform_response_logical_model_validation).and_return(nil)
 
+    result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('pass'), result.result_message
   end
 
-  it 'fails if form creation actions do not include the if-none-exist extension' do
-    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                           valid_system_actions: [].to_json)
+  it 'skips if no successful hook responses were received' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: nil,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 400
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
 
-    expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/is not present/)
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to match(/No successful hook responses/)
   end
 
-  it 'fails if the if-none-exist extension is the wrong type' do
-    card = base_card
-    card['suggestions'].first['actions'].first['extension'] = {
-      'davinci-crd.if-none-exist': ['http://example.org/Questionnaire/XYZ']
-    }
-    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                           valid_system_actions: [].to_json)
+  it 'skips if no Form Completion card present' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: { cards: [cards.first] }.to_json,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
 
-    expect(result.result).to eq('fail'), result.result_message
-    expect(entity_result_message.message).to match(/is not a string/)
+    result = run(runnable, invoked_hook: 'order-sign')
+
+    expect(result.result).to eq('skip'), result.result_message
+    expect(result.result_message).to match(/do not contain any Request Form Completion/)
   end
 
-  it 'fails if the if-none-exist extension is an empty string' do
-    card = base_card
-    card['suggestions'].first['actions'].first['extension'] = {
-      'davinci-crd.if-none-exist': ''
-    }
-    result = run(runnable, valid_cards_with_suggestions: [base_card].to_json,
-                           valid_system_actions: [].to_json)
+  it 'fails if a Form Completion card is not valid' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: valid_response_body,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
 
+    allow_any_instance_of(runnable).to receive(:conforms_to_logical_model?).and_return(nil)
+    allow_any_instance_of(runnable).to(
+      receive(:manually_check_card_specific_errors)
+        .and_return(
+          [
+            OpenStruct.new(severity: 'error', message: 'ERROR MESSAGE')
+          ]
+        )
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(entity_result_message.message).to match(/is an empty string/)
+    expect(result.result_message).to match(/Not all Request Form Completion/)
+    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+  end
+
+  it 'fails if a Form Completion systemAction is not valid' do
+    repo_create(
+      :request,
+      direction: 'outgoing',
+      test_session_id: test_session.id,
+      result:,
+      request_body: nil,
+      response_body: system_action_response,
+      tags: [DaVinciCRDTestKit::ORDER_SIGN_TAG],
+      status: 200
+    )
+
+    allow_any_instance_of(runnable).to receive(:conforms_to_logical_model?).and_return(nil)
+    allow_any_instance_of(runnable).to(
+      receive(:manually_check_action_specific_errors)
+        .and_return(
+          [
+            OpenStruct.new(severity: 'error', message: 'ERROR MESSAGE')
+          ]
+        )
+    )
+    result = run(runnable, invoked_hook: 'order-sign')
+    expect(result.result).to eq('fail'), result.result_message
+    expect(result.result_message).to match(/Not all Request Form Completion/)
+    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
   end
 end

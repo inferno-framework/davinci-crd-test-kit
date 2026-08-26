@@ -39,21 +39,24 @@ module DaVinciCRDTestKit
       "#{CRD_LOGICAL_MODEL_BASE}/#{profile_name}"
     end
 
-    def perform_response_logical_model_validation(cards, system_actions, request_body, response_index, ig_semver)
+    def perform_response_logical_model_validation(cards, system_actions, request_body, response_index, ig_semver,
+                                                  validator: :default)
       if cards.is_a?(Array)
         cards.each_with_index do |card, card_index|
-          validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver)
+          validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver, validator:)
         end
       end
 
       return unless system_actions.is_a?(Array)
 
       system_actions.each_with_index do |action, action_index|
-        validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
+        validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver,
+                                                     validator:)
       end
     end
 
-    def validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver)
+    def validate_card_against_logical_model(card, response_index, request_body, card_index, ig_semver,
+                                            validator: :default)
       label = logical_model_entity_label(response_index, card_index, 'card')
       unless card.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -71,15 +74,62 @@ module DaVinciCRDTestKit
 
       validation_issues = []
       conforms_to_logical_model?({ 'cards' => [card] }, logical_model_url(profile_name),
-                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues,
+                                 validator:)
+
+      validate_summary_length(card, label)
+      validate_suggestion_uuid_presence(card, label) unless ['v201', '2.0.1'].include? ig_semver
+      validate_no_smart_suggestions(card, label) if card_type == CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
 
       error_prefix = "#{label} (#{card_type || 'uncategorized'}): "
       filtered_issues = manually_check_card_specific_errors(card, validation_issues, card_type,
-                                                            request_body, error_prefix, ig_semver)
+                                                            request_body, error_prefix, ig_semver, validator:)
+      filter_logical_model_extension_issues(filtered_issues, validator)
       add_messages_not_excluded(filtered_issues, error_prefix)
     end
 
-    def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver)
+    def validate_summary_length(card, label)
+      return unless card['summary'].is_a? String
+
+      summary_length = card['summary'].length
+
+      return if summary_length < 140
+
+      add_message(
+        'error',
+        "#{label} summary length of #{summary_length} characters is longer than " \
+        'the maximum allowed of 139 characters.'
+      )
+    end
+
+    def validate_suggestion_uuid_presence(card, label)
+      return unless card['suggestions'].presence.is_a? Array
+      return unless card['suggestions'].all?(Hash)
+
+      card['suggestions'].each_with_index do |suggestion, index|
+        next if suggestion['uuid'].present?
+
+        add_message(
+          'error',
+          "#{label} suggestion #{index + 1} does not contain a `uuid`"
+        )
+      end
+    end
+
+    def validate_no_smart_suggestions(card, label)
+      suggestion_count = card['suggestions']&.length || 0
+
+      return if suggestion_count.zero?
+
+      add_message(
+        'error',
+        "#{label} CDSHooksResponse.cards.suggestions: max allowed = 0, but found #{suggestion_count} " \
+        '(from http://hl7.org/fhir/us/davinci-crd/StructureDefinition/CRDHooksResponse-launchSMART|2.2.1)'
+      )
+    end
+
+    def validate_system_action_against_logical_model(action, response_index, request_body, action_index, ig_semver,
+                                                     validator: :default)
       label = logical_model_entity_label(response_index, action_index, 'systemAction')
       unless action.is_a?(Hash)
         add_message('error', "#{label} is not a JSON object; skipping logical model validation.")
@@ -102,17 +152,116 @@ module DaVinciCRDTestKit
 
       validation_issues = []
       conforms_to_logical_model?({ 'systemActions' => [action] }, logical_model_url(profile_name),
-                                 add_messages_to_runnable: false, validator_response_details: validation_issues)
+                                 add_messages_to_runnable: false, validator_response_details: validation_issues,
+                                 validator:)
 
+      validation_issues
+        .reject! do |issue|
+          issue.message.match?(%r{CDSHooksResponse\.systemActions\[\d+\]\.extension: The extension definition http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/CDSHookServiceResponseExtensionIfNoneExist\|2\.2\.1 defines the contexts of use as}) # rubocop:disable Layout/LineLength
+        end
+
+      if action_type == CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
+        check_multiple_coverage_info_extension_conformance(action)
+      end
       error_prefix = "#{label} (#{action_type || 'uncategorized'}): "
       filtered_issues = manually_check_action_specific_errors(action, validation_issues, action_type,
-                                                              request_body, error_prefix, ig_semver)
+                                                              request_body, error_prefix, ig_semver, validator:)
+      filter_logical_model_extension_issues(filtered_issues, validator)
       add_messages_not_excluded(filtered_issues, error_prefix)
+    end
+
+    def check_multiple_coverage_info_extension_conformance(action)
+      resource = FHIR.from_contents(action['resource'].to_json)
+
+      grouped_coverage_info = extract_and_group_coverage_info(resource)
+      multiple_extensions_conformance_check(grouped_coverage_info, resource)
+    end
+
+    def extract_and_group_coverage_info(resource)
+      resource.extension.each_with_object({}) do |extension, grouped_extensions|
+        next unless extension.url == COVERAGE_INFO_EXT_URL
+
+        coverage_key = find_extension_value(extension, 'coverage', 'valueReference', 'reference')
+        grouped_extensions[coverage_key] ||= []
+        grouped_extensions[coverage_key] << extension
+      end
+    end
+
+    # For the same coverage, ensure coverage-assertion-ids and satisfied-pa-ids are the same.
+    # For different coverages, ensure coverage-assertion-ids and satisfied-pa-ids are distinct.
+    def multiple_extensions_conformance_check(grouped_coverage_info, resource)
+      resource_ref = "#{resource.resourceType}/#{resource.id}"
+      assertion_ids_across_coverages = Set.new
+      pa_ids_across_coverages = Set.new
+
+      grouped_coverage_info.each do |coverage, extensions|
+        coverage_assertion_ids = collect_extensions_id(extensions, 'coverage-assertion-id', 'valueString').uniq
+        satisfied_pa_ids = collect_extensions_id(extensions, 'satisfied-pa-id', 'valueString').uniq.compact
+        if coverage_assertion_ids.length != 1
+          add_message(
+            'error',
+            same_coverage_conformance_error_msg(resource_ref, coverage, 'coverage-assertion-ids')
+          )
+        end
+
+        if satisfied_pa_ids.length > 1
+          add_message(
+            'error',
+            same_coverage_conformance_error_msg(resource_ref, coverage, 'satisfied-pa-ids')
+          )
+        end
+
+        assertion_id = coverage_assertion_ids.first
+        if assertion_ids_across_coverages.include?(assertion_id)
+          add_message(
+            'error',
+            different_coverage_conformance_error_msg(resource_ref, 'coverage-assertion-ids')
+          )
+        end
+
+        assertion_ids_across_coverages.add(assertion_id)
+        pa_id = satisfied_pa_ids.first
+        next unless pa_id
+
+        if pa_ids_across_coverages.include?(pa_id)
+          add_message(
+            'error',
+            different_coverage_conformance_error_msg(resource_ref, 'satisfied-pa-ids')
+          )
+        end
+
+        pa_ids_across_coverages.add(pa_id)
+      end
+    end
+
+    def collect_extensions_id(extensions, url, *properties)
+      extensions.map do |extension|
+        find_extension_value(extension, url, *properties)
+      end
+    end
+
+    def find_extension_value(extension, url, *properties)
+      found_extension = extension.extension.find { |ext| ext.url == url }
+      return nil unless found_extension
+
+      properties.reduce(found_extension) do |current, prop|
+        return current unless current.respond_to?(prop)
+
+        current.send(prop)
+      end
+    end
+
+    def same_coverage_conformance_error_msg(resource_ref, coverage, id_name)
+      "#{resource_ref}: extension has multiple repetitions of coverage `#{coverage}` with different #{id_name}."
+    end
+
+    def different_coverage_conformance_error_msg(resource_ref, id_name)
+      "#{resource_ref}: extensions referencing differing coverage SHALL have distinct #{id_name}."
     end
 
     def add_messages_not_excluded(issues, error_prefix)
       issues.each do |issue|
-        next if issue.filtered || logical_model_extension_issue?(issue)
+        next if issue.filtered
 
         add_message(issue.severity, "#{error_prefix}#{issue.message}")
       end
@@ -126,47 +275,45 @@ module DaVinciCRDTestKit
     # Validator Filtering and Manual Checks Depending on the Card Type
     # -------------------------------------------------------------------------
 
-    def logical_model_extension_issue?(issue)
-      issue.message.match(/\.extension: Unrecognized property/).present?
-    end
-
     def manually_check_card_specific_errors(card, validation_issues, card_type, request_body, error_prefix,
-                                            ig_semver)
+                                            ig_semver, validator: :default)
       case card_type
-      when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
-        manually_check_form_completion_errors(card, validation_issues, error_prefix)
-      when DaVinciCRDTestKit::CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
+      when CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
+        manually_check_form_completion_errors(card, validation_issues, error_prefix, validator:)
+      when CardsIdentification::PROPOSE_ALTERNATIVE_REQUEST_RESPONSE_TYPE
         manually_check_propose_alternative_errors(card, validation_issues, request_body,
-                                                  error_prefix, ig_semver)
-      when DaVinciCRDTestKit::CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
+                                                  error_prefix, ig_semver, validator:)
+      when CardsIdentification::ADDITIONAL_ORDERS_RESPONSE_TYPE
         manually_check_additional_orders_errors(card, validation_issues, request_body,
-                                                error_prefix, ig_semver)
+                                                error_prefix, ig_semver, validator:)
+      when CardsIdentification::LAUNCH_SMART_APP_RESPONSE_TYPE
+        manually_check_launch_smart_app_errors(validation_issues)
       else
         validation_issues
       end
     end
 
     def manually_check_action_specific_errors(action, validation_issues, action_type, request_body,
-                                              error_prefix, ig_semver)
+                                              error_prefix, ig_semver, validator: :default)
       case action_type
       when DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
         manually_check_coverage_information_errors(action, validation_issues, request_body,
-                                                   error_prefix, ig_semver)
+                                                   error_prefix, ig_semver, validator:)
       when DaVinciCRDTestKit::CardsIdentification::CREATE_OR_UPDATE_COVERAGE_RESPONSE_TYPE
         manually_check_update_coverage_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator:)
       when DaVinciCRDTestKit::CardsIdentification::FORM_COMPLETION_RESPONSE_TYPE
         manually_check_form_completion_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator:)
       else
         validation_issues
       end
     end
 
-    def manually_check_form_completion_errors(card, validation_issues, error_prefix)
+    def manually_check_form_completion_errors(card, validation_issues, error_prefix, validator: :default)
       validation_issues.reject do |issue|
         if issue.message.match?(/The type 'Questionnaire' is not valid - must be Task/)
-          check_questionnaire_actions(card, issue.message, error_prefix)
+          check_questionnaire_actions(card, issue.message, error_prefix, validator:)
           true
         else
           false
@@ -174,7 +321,7 @@ module DaVinciCRDTestKit
       end
     end
 
-    def check_questionnaire_actions(card, error_message, error_prefix)
+    def check_questionnaire_actions(card, error_message, error_prefix, validator: :default)
       extracted_indexes =
         error_message.match(/CDSHooksResponse\.cards\[0\]\.suggestions\[(\d+)\]\.actions\[(\d+)\]\.resource/)
       unless extracted_indexes
@@ -187,43 +334,63 @@ module DaVinciCRDTestKit
 
       message_prefix = "#{error_prefix} suggestion #{suggestion_index + 1}, action #{action_index + 1} - "
       resource = FHIR.from_contents(card['suggestions'][suggestion_index]['actions'][action_index]['resource'].to_json)
-      resource_is_valid?(resource:, message_prefix:) # no questionnaire profile applied per CRD
+      resource_is_valid?(resource:, message_prefix:, validator:) # no questionnaire profile applied per CRD
 
       return if resource.id.present?
 
       add_message('error', "#{message_prefix}Questionnaire must have an id.")
     end
 
+    def manually_check_launch_smart_app_errors(validation_issues)
+      validation_issues.reject do |issue|
+        issue.message.match?(/CDSHooksResponse.cards.suggestions: minimum required = 1, but only found 0/)
+      end
+    end
+
     def manually_check_propose_alternative_errors(card, validation_issues, request_body,
-                                                  error_prefix, ig_semver)
+                                                  error_prefix, ig_semver, validator: :default)
       no_resource_issues = manually_check_action_resources_for_order_profile_conformance(card,
                                                                                          validation_issues,
                                                                                          request_body,
                                                                                          error_prefix,
-                                                                                         ig_semver)
+                                                                                         ig_semver,
+                                                                                         validator:)
+
+      no_resource_issues.each do |issue|
+        next unless issue.message.match?(/Constraint failed: crd-respar-1/)
+
+        new_message =
+          "#{issue.message}. In some cases [additional create " \
+          'actions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#propose-alternate-request-response-type) ' \
+          'are permitted. Manually check the suggestion to verify whether this is an actual error.'
+        issue.instance_variable_set(:@severity, 'warning')
+        issue.instance_variable_set(:@message, new_message)
+      end
+
       no_resource_issues.reject do |issue|
         issue.message.match?(/but is fixed to 'create' in the profile/)
       end
     end
 
     def manually_check_additional_orders_errors(card, validation_issues, request_body,
-                                                error_prefix, ig_semver)
+                                                error_prefix, ig_semver, validator: :default)
       manually_check_action_resources_for_order_profile_conformance(card,
                                                                     validation_issues,
                                                                     request_body,
                                                                     error_prefix,
-                                                                    ig_semver)
+                                                                    ig_semver,
+                                                                    validator:)
     end
 
     def manually_check_action_resources_for_order_profile_conformance(card, validation_issues, request_body,
-                                                                      error_prefix, ig_semver)
+                                                                      error_prefix, ig_semver, validator: :default)
       if card['suggestions'].present?
         card['suggestions'].each_with_index do |suggestion, suggestion_index|
           next unless suggestion['actions'].present?
 
           suggestion['actions'].each_with_index do |action, action_index|
             action_error_prefix = "#{error_prefix}suggestion #{suggestion_index + 1}, action #{action_index + 1} - "
-            check_action_target(action, request_body, action_error_prefix, ig_semver)
+            check_action_target(action, request_body, action_error_prefix, ig_semver, validator:)
           end
         end
       end
@@ -231,36 +398,37 @@ module DaVinciCRDTestKit
       reject_resource_issues(validation_issues)
     end
 
-    def check_action_target(action, request_body, error_prefix, ig_semver)
+    def check_action_target(action, request_body, error_prefix, ig_semver, validator: :default)
       local_reference?(action['resourceId'], error_prefix) if action['resourceId'].present?
       return unless action['resource'].present?
 
-      check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_semver)
+      check_resource_conformance_to_order_profile(action['resource'], request_body, error_prefix, ig_semver, validator:)
     end
 
     def manually_check_coverage_information_errors(action, validation_issues, request_body,
-                                                   error_prefix, ig_semver)
+                                                   error_prefix, ig_semver, validator: :default)
       if action['resource'].present?
         check_resource_conformance_to_order_or_encounter_profile(action['resource'], request_body,
-                                                                 error_prefix, ig_semver)
+                                                                 error_prefix, ig_semver, validator:)
       end
       reject_resource_issues(validation_issues)
     end
 
     def manually_check_update_coverage_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator: :default)
       check_required_action_type(action, 'update', error_prefix, 'coverage update action response type')
       if action['resource'].present?
-        check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_semver)
+        check_resource_conformance_to_coverage_profile(action['resource'], error_prefix, ig_semver, validator:)
       end
       reject_resource_issues(validation_issues)
     end
 
     def manually_check_form_completion_action_errors(action, validation_issues,
-                                                     error_prefix, ig_semver)
+                                                     error_prefix, ig_semver, validator: :default)
       check_required_action_type(action, 'create', error_prefix, 'form completion action response type')
       if action['resource'].present?
-        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver)
+        check_resource_conformance_to_questionnaire_task_profile(action['resource'], error_prefix, ig_semver,
+                                                                 validator:)
       end
       reject_resource_issues(validation_issues)
     end

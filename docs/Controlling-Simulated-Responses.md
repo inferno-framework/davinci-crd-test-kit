@@ -10,8 +10,19 @@ demonstrate the capabilities of their systems without the need to perform
 Inferno-specific configuration, Inferno provides testers with the option to specify
 the responses to hook invocations made against Inferno during a testing session.
 
-Because this configuration can be complex, Inferno also provides an option for it to
+Because this configuration can be complex, Inferno can also
 mock simple responses so that testers can get started more easily.
+
+Note that in either case, the responses sent by Inferno must not include data
+that goes beyond what is specified by the CRD standard so as to show that the
+client can interact with a system meeting only the base CRD standard. Inferno
+enforces this requirement by failing when a custom extension not defined within
+CRD is found within a response returned by Inferno. While client requests are typically
+allowed to have custom extensions, portions of the request that are echoed back in
+Inferno responses (e.g., mocked coverage-information systemActions, or templates using
+the `com.inferno.resourceSelectionCriteria` extension), they will cause failures
+on the responses. This may be relaxed in the future and testers are welcome to
+provide feedback on the current behavior via github issues.
 
 ## Mocked Responses
 

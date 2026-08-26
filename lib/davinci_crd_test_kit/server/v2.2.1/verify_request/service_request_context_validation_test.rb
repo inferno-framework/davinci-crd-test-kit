@@ -16,6 +16,7 @@ module DaVinciCRDTestKit
         required fields.
       )
       input :contexts, :invoked_hook
+      simulation_verification
 
       run do
         parsed_contexts = parse_json(contexts)

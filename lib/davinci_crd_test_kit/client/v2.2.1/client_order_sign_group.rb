@@ -60,7 +60,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-sign'
+          hook_name: 'order-sign',
+          crd_interaction_group: 'hooks-order-sign',
+          include_in_cross_hook_analysis: true
         }
       )
 

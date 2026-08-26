@@ -1,9 +1,11 @@
 require_relative '../../../cross_suite/prefetch_contents_validation'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V201
     class HookRequestPrefetchEqualsQueriedTest < Inferno::Test
       include PrefetchContentsValidation
+      include TaggedRequestLoadHelper
 
       id :crd_v201_hook_request_prefetch_equals_queried
       title 'Prefetched data is equivalent to queried data'
@@ -39,18 +41,6 @@ module DaVinciCRDTestKit
         override_access_token.present? ? override_access_token : client_access_token
       end
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
       def cds_services_json
         JSON.parse(File.read(File.join(
                                __dir__, '..', 'cds-services-v201.json'
@@ -67,7 +57,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_interaction_group_requests
 
         skip_if hook_requests.blank?, 'No Hook Requests to verify.'
 

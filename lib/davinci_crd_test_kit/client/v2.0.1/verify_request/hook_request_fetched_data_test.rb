@@ -1,8 +1,11 @@
 require_relative '../../../cross_suite/tags'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V201
     class HookRequestFetchedDataTest < Inferno::Test
+      include TaggedRequestLoadHelper
+
       id :crd_v201_hook_request_fetched_data
       title 'Minimum resource dataset was accessible during the hook invocation'
       description %(
@@ -33,24 +36,12 @@ module DaVinciCRDTestKit
       )
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.0.1@43', 'hl7.fhir.us.davinci-crd_2.0.1@323'
 
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
-
       def no_error_validation(message)
         assert messages.none? { |msg| msg[:type] == 'error' }, message
       end
 
       run do
-        hook_requests = load_tagged_requests(*tags_to_load)
+        hook_requests = load_interaction_group_requests
 
         hook_requests.each do |hook_request|
           request_body = JSON.parse(hook_request.request_body)

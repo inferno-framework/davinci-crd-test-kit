@@ -56,7 +56,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V221::DecodeAuthTokenTest) do
         config(
-          options: { hook_name: 'appointment-book' }
+          options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' }
         )
       end
     end

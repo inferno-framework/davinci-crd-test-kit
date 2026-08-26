@@ -17,6 +17,7 @@ module DaVinciCRDTestKit
         informational message.
       )
       optional
+      simulation_verification
 
       run do
         load_tagged_requests(tested_hook_name)

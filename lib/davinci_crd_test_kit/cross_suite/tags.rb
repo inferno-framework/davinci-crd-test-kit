@@ -7,12 +7,14 @@ module DaVinciCRDTestKit
   ORDER_SIGN_TAG = 'order-sign'.freeze
   DISCOVERY_TAG = 'cds_discovery'.freeze
   ANY_HOOK_TAG = 'any_hook'.freeze
+  CROSS_HOOK_ANALYSIS_TAG = 'cross_hook'.freeze
   DATA_FETCH_TAG = 'data_fetch'.freeze
   PAYER_ORG_FETCH_TAG = 'payer_org'.freeze
   PARENT_LOCATION_FETCH_TAG = 'parent_location'.freeze
   HOOK_INSTANCE_TAG_PREFIX = 'hi_'.freeze
   HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX = 'hi_data_fetch_'.freeze
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
+  UNKNOWN_CONTENT_GROUP_TAG = 'unknown_content_request'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze

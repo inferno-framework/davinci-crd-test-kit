@@ -21,7 +21,8 @@ module DaVinciCRDTestKit
       config(
         options: {
           hook_name: ANY_HOOK_TAG,
-          crd_test_group: LONG_RUNNING_GROUP_TAG
+          crd_interaction_group: LONG_RUNNING_GROUP_TAG,
+          include_in_cross_hook_analysis: false
         }
       )
 

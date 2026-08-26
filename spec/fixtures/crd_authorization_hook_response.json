@@ -36,6 +36,28 @@
           "type": "absolute"
         }
       ]
+    },
+    {
+      "uuid": "a98c4870-523a-4dc5-b722-adba7ca198a0",
+      "summary": "Appointment Book Launch SMART App Card",
+      "detail": "This is a Launch SMARt App Card.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "url": "https://inferno.healthit.gov/",
+        "topic": {
+          "system": "http://hl7.org/fhir/us/davinci-crd/CodeSystem/temp",
+          "code": "appointment-book",
+          "display": "Appointment Book"
+        }
+      },
+      "links": [
+        {
+          "label": "Launch SMART App",
+          "url": "https://example.com/launch",
+          "type": "smart"
+        }
+      ]
     }
   ],
   "systemActions": [

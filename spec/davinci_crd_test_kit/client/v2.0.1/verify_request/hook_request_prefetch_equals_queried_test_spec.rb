@@ -172,7 +172,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestPrefetchEqualsQueriedTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V201::HookRequestPrefetchEqualsQueriedTest) do
         config(
-          options: { hook_name: 'appointment-book' }
+          options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' }
         )
       end
     end

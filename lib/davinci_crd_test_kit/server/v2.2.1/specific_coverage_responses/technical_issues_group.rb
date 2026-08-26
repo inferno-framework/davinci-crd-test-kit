@@ -58,6 +58,7 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
+        simulation_verification
 
         test from: :crd_v221_service_request_required_fields_validation,
              config: {
@@ -83,33 +84,10 @@ module DaVinciCRDTestKit
       group do
         title 'Responses'
 
-        test from: :crd_v221_service_response_validation,
-             config: {
-               outputs: {
-                 valid_cards: {
-                   name: :technical_issues_valid_cards
-                 },
-                 valid_system_actions: {
-                   name: :technical_issues_valid_system_actions
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_received,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :technical_issues_valid_system_actions
-                 }
-               },
-               outputs: {
-                 coverage_info: {
-                   name: :technical_issues_coverage_info
-                 }
-               }
-             }
+        test from: :crd_v221_service_response_validation
         test from: :crd_v221_coverage_info_system_action_validation,
              config: {
-               inputs: {
+               outputs: {
                  coverage_info: {
                    name: :technical_issues_coverage_info
                  }

@@ -4,6 +4,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientFHIRPathCollectionAsCommaDelimited
   let(:runnable) do
     Inferno::Repositories::Tests.new.find(
       'crd_client_v221-crd_v221_client_hook_invocation-crd_v221_client_cross_hook' \
+      '-crd_v221_client_cross_hook_additional_capabilities' \
       '-crd_v221_client_fhir_path_collection_as_comma_delimited_string'
     )
   end

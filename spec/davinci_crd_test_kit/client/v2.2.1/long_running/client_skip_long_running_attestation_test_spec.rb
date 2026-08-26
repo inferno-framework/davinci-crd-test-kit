@@ -13,7 +13,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
   end
 
   it 'skips when no long-running requests were sent during the previous wait' do
-    allow_any_instance_of(test).to receive(:load_hook_requests).and_return([])
+    allow_any_instance_of(test).to receive(:load_interaction_group_requests).and_return([])
 
     result = run(test)
 
@@ -22,7 +22,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
   end
 
   it 'enters wait state when long-running requests exist' do
-    allow_any_instance_of(test).to receive(:load_hook_requests).and_return(['stub_request'])
+    allow_any_instance_of(test).to receive(:load_interaction_group_requests).and_return(['stub_request'])
 
     result = run(test)
 
@@ -30,7 +30,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
   end
 
   it 'passes when the user attests true' do
-    allow_any_instance_of(test).to receive(:load_hook_requests).and_return(['stub_request'])
+    allow_any_instance_of(test).to receive(:load_interaction_group_requests).and_return(['stub_request'])
 
     result = run(test)
     expect(result.result).to eq('wait')
@@ -42,7 +42,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
   end
 
   it 'fails when the user attests false' do
-    allow_any_instance_of(test).to receive(:load_hook_requests).and_return(['stub_request'])
+    allow_any_instance_of(test).to receive(:load_interaction_group_requests).and_return(['stub_request'])
 
     result = run(test)
     expect(result.result).to eq('wait')

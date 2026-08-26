@@ -1,4 +1,4 @@
 module DaVinciCRDTestKit
-  VERSION = '0.14.0'.freeze
-  LAST_UPDATED = '2026-06-02'.freeze # TODO: update next release
+  VERSION = '0.14.1'.freeze
+  LAST_UPDATED = '2026-07-13'.freeze # TODO: update next release
 end

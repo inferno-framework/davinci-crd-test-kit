@@ -1,9 +1,11 @@
 require_relative '../../../cross_suite/cards_validation'
+require_relative '../../tagged_request_load_helper'
 
 module DaVinciCRDTestKit
   module V201
     class InfernoResponseValidationTest < Inferno::Test
       include CardsValidation
+      include TaggedRequestLoadHelper
 
       title 'Inferno CDS Service Response is Conformant'
       description %(
@@ -21,18 +23,6 @@ module DaVinciCRDTestKit
       id :crd_v201_inferno_response_validation
 
       input :custom_response_template, optional: true
-
-      def hook_name
-        config.options[:hook_name]
-      end
-
-      def crd_test_group
-        config.options[:crd_test_group]
-      end
-
-      def tags_to_load
-        crd_test_group.present? ? [hook_name, crd_test_group] : [hook_name]
-      end
 
       def response_label(index = nil)
         response_type = (custom_response_template.present? ? 'Custom built' : 'Mocked')
@@ -52,7 +42,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        load_tagged_requests(*tags_to_load)
+        load_interaction_group_requests
 
         skip_if request.blank?, "No #{response_label.downcase}s to verify."
 

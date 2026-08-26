@@ -59,7 +59,9 @@ module DaVinciCRDTestKit
         },
         options: {
           hook_name: 'appointment-book',
-          hook_path: APPOINTMENT_BOOK_PATH
+          hook_path: APPOINTMENT_BOOK_PATH,
+          crd_interaction_group: 'hooks-appointment-book',
+          include_in_cross_hook_analysis: true
         }
       )
 

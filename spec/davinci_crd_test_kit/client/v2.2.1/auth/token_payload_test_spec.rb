@@ -62,7 +62,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V221::TokenPayloadTest) do
         config(
-          options: { hook_name: 'appointment-book' }
+          options: { hook_name: 'appointment-book', crd_interaction_group: 'appointment-book' }
         )
       end
     end

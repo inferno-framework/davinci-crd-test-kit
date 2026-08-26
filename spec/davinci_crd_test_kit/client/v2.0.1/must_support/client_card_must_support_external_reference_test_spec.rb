@@ -24,7 +24,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientCardMustSupportExternalReferenceTe
   describe 'When checking external reference cards' do
     it 'fails when no external reference cards are found' do
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return([])
+        .to receive(:load_requests_for_cross_hook_analysis).and_return([])
 
       result = run(runnable)
       expect(result.result).to eq('fail')
@@ -33,7 +33,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ClientCardMustSupportExternalReferenceTe
 
     it 'passes when an external reference card is present' do
       allow_any_instance_of(described_class)
-        .to receive(:requests_to_analyze).and_return(
+        .to receive(:load_requests_for_cross_hook_analysis).and_return(
           [Inferno::Entities::Request.new(
             request_body: order_sign_hook_request,
             response_body: order_sign_hook_response

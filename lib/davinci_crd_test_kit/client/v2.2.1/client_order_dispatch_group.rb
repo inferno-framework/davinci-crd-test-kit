@@ -60,7 +60,9 @@ module DaVinciCRDTestKit
           crd_jwks_keys_json: { name: :order_dispatch_crd_jwks_keys_json }
         },
         options: {
-          hook_name: 'order-dispatch'
+          hook_name: 'order-dispatch',
+          crd_interaction_group: 'hooks-order-dispatch',
+          include_in_cross_hook_analysis: true
         }
       )
 

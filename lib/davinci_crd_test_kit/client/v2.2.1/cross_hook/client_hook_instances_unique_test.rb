@@ -1,11 +1,9 @@
-require_relative '../../tagged_request_load_helper'
 require_relative '../../multi_request_message_helper'
 require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
     class ClientHookInstancesUniqueTest < Inferno::Test
-      include TaggedRequestLoadHelper
       include MultiRequestMessageHelper
 
       title 'Client does not reuse hookInstance values'
@@ -21,14 +19,8 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@25'
 
-      config(
-        options: {
-          crd_test_group: DUPLICATED_HOOK_INSTANCE_TAG
-        }
-      )
-
       run do
-        duplicated_hook_instance_requests = load_hook_requests
+        duplicated_hook_instance_requests = load_tagged_requests(DUPLICATED_HOOK_INSTANCE_TAG)
         reused_values = duplicated_hook_instance_requests.map.with_index do |request, request_index|
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next nil unless request_body.present?

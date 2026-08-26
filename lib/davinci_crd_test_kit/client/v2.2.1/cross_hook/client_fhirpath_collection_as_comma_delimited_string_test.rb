@@ -1,6 +1,10 @@
+require_relative '../../cross_hook_helper'
+
 module DaVinciCRDTestKit
   module V221
     class ClientFHIRPathCollectionAsCommaDelimitedStringTest < Inferno::Test
+      include CrossHookHelper
+
       title 'Client correctly interprets collections when substituting FHIRPath results in prefetch templates'
       id :crd_v221_client_fhir_path_collection_as_comma_delimited_string
       description <<~DESCRIPTION
@@ -30,17 +34,6 @@ module DaVinciCRDTestKit
 
         skip 'No prefetch template requiring FHIRPath collection token substitution demonstrated. ' \
              'Perform more complex hook requests and re-run.'
-      end
-
-      def find_completeness_tests
-        hooks_group = self.class.parent.parent.groups.find do |group|
-          group.id.to_s.include?('crd_v221_client_hooks')
-        end
-        hooks_group.groups.map do |group|
-          group.groups.flat_map(&:tests).find do |test|
-            test.id.to_s.include?('crd_v221_hook_request_prefetch_complete')
-          end
-        end.compact
       end
 
       def completeness_tests_demonstrate_collection_token_substitution?(prefetch_completeness_tests)

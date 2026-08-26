@@ -22,14 +22,16 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         @messages << { type:, message: }
       end
 
-      def conforms_to_logical_model?(object, url, message_prefix: '', validator_response_details: nil, **_)
-        @conforms_calls << { object:, url:, message_prefix: }
+      def conforms_to_logical_model?(object, url, message_prefix: '', validator_response_details: nil,
+                                     validator: :default, **_)
+        @conforms_calls << { object:, url:, message_prefix:, validator: }
         validator_response_details&.concat(@mock_validation_details)
         true
       end
 
-      def resource_is_valid?(resource:, profile_url:, message_prefix: '', validator_response_details: nil, **_)
-        @resource_is_valid_calls << { resource:, profile_url:, message_prefix: }
+      def resource_is_valid?(resource:, profile_url:, message_prefix: '', validator_response_details: nil,
+                             validator: :default, **_)
+        @resource_is_valid_calls << { resource:, profile_url:, message_prefix:, validator: }
         validator_response_details&.concat(@mock_appointment_validation_details)
         true
       end
@@ -265,6 +267,19 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
 
       expect(module_instance.messages).to be_empty
     end
+
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.send(:check_bundle_non_entry_resource_conformance, bundle, 'prefix - ', '2.2.1')
+
+      expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to resource_is_valid?' do
+      module_instance.send(:check_bundle_non_entry_resource_conformance, bundle, 'prefix - ', '2.2.1',
+                           validator: :no_custom_extensions)
+
+      expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:no_custom_extensions)
+    end
   end
 
   describe '#check_logical_model_conformance_no_resource_checks' do
@@ -310,6 +325,48 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
 
       expect(module_instance.messages).to be_empty
     end
+
+    it 'defaults to the :default validator when none is specified' do
+      module_instance.send(:check_logical_model_conformance_no_resource_checks, order_sign_request, 0, '2.2.1')
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+    end
+
+    it 'passes a specified validator through to conforms_to_logical_model?' do
+      module_instance.send(:check_logical_model_conformance_no_resource_checks, order_sign_request, 0, '2.2.1',
+                           validator: :no_custom_extensions)
+
+      expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
+    end
+
+    it 'filters out extension unrecognized property issues by default' do
+      module_instance.mock_validation_details = [
+        IssueStub.new(filtered: false,
+                      location: 'CDSHooksRequest.extension',
+                      message: 'CDSHooksRequest.extension: Unrecognized property',
+                      severity: 'error')
+      ]
+
+      module_instance.send(:check_logical_model_conformance_no_resource_checks, order_sign_request, 0, '2.2.1')
+
+      expect(module_instance.messages).to be_empty
+    end
+
+    it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+      module_instance.mock_validation_details = [
+        IssueStub.new(filtered: false,
+                      location: 'CDSHooksRequest.extension',
+                      message: 'CDSHooksRequest.extension: Unrecognized property',
+                      severity: 'error')
+      ]
+
+      module_instance.send(:check_logical_model_conformance_no_resource_checks, order_sign_request, 0, '2.2.1',
+                           validator: :no_custom_extensions)
+
+      expect(module_instance.messages).to include(
+        hash_including(message: a_string_including('Unrecognized property'))
+      )
+    end
   end
 
   describe '#check_context_resource_profiles' do
@@ -321,6 +378,25 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(call[:profile_url]).to include('profile-bundle-request')
         expect(call[:profile_url]).to include('2.2.1')
         expect(call[:message_prefix]).to include('context.draftOrders')
+      end
+
+      it 'does not raise an error when draftOrders is absent' do
+        order_sign_request['context'].delete('draftOrders')
+        expect { module_instance.send(:check_context_resource_profiles, order_sign_request, 0, '2.2.1') }
+          .to_not raise_error
+      end
+
+      it 'defaults to the :default validator when none is specified' do
+        module_instance.send(:check_context_resource_profiles, order_sign_request, 0, '2.2.1')
+
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:default)
+      end
+
+      it 'passes a specified validator through to resource_is_valid?' do
+        module_instance.send(:check_context_resource_profiles, order_sign_request, 0, '2.2.1',
+                             validator: :no_custom_extensions)
+
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:no_custom_extensions)
       end
     end
 
@@ -353,6 +429,16 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(task_calls.first[:message_prefix]).to include('entry 1')
         expect(task_calls.last[:message_prefix]).to include('entry 2')
       end
+
+      it 'passes a specified validator through to resource_is_valid? for each task' do
+        module_instance.send(:check_context_resource_profiles, order_dispatch_request_v211, 0, '2.2.1',
+                             validator: :no_custom_extensions)
+
+        task_calls = module_instance.resource_is_valid_calls.select do |c|
+          c[:profile_url].include?('profile-task-dispatch')
+        end
+        expect(task_calls).to all(include(validator: :no_custom_extensions))
+      end
     end
 
     context 'when the hook is appointment-book' do
@@ -364,6 +450,14 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         end
         expect(bundle_call).to_not be_nil
         expect(bundle_call[:profile_url]).to include('2.2.1')
+      end
+
+      it 'passes a specified validator through to the bundle and appointment conformance checks' do
+        module_instance.send(:check_context_resource_profiles, appointment_book_request, 0, '2.2.1',
+                             validator: :no_custom_extensions)
+
+        expect(module_instance.resource_is_valid_calls).to_not be_empty
+        expect(module_instance.resource_is_valid_calls).to all(include(validator: :no_custom_extensions))
       end
     end
   end
@@ -392,6 +486,54 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(message[:type]).to eq('error')
         expect(message[:message]).to eq('(Request 1) FHIR resources provided in the hook context must have an id, ' \
                                         'none found for `context.draftOrders` entry 1.')
+      end
+    end
+
+    describe 'validator threading' do
+      it 'defaults to the :default validator when none is specified' do
+        module_instance.validate_request_against_logical_model(order_sign_request, 0, '2.2.1')
+
+        expect(module_instance.conforms_calls.first[:validator]).to eq(:default)
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:default)
+      end
+
+      it 'passes a specified validator through to both logical model and resource conformance checks' do
+        module_instance.validate_request_against_logical_model(order_sign_request, 0, '2.2.1',
+                                                               validator: :no_custom_extensions)
+
+        expect(module_instance.conforms_calls.first[:validator]).to eq(:no_custom_extensions)
+        expect(module_instance.resource_is_valid_calls.first[:validator]).to eq(:no_custom_extensions)
+      end
+
+      it 'filters out extension unrecognized property issues by default' do
+        module_instance.mock_validation_details = [
+          IssueStub.new(filtered: false,
+                        location: 'CDSHooksRequest.extension',
+                        message: 'CDSHooksRequest.extension: Unrecognized property',
+                        severity: 'error')
+        ]
+
+        module_instance.validate_request_against_logical_model(order_sign_request, 0, '2.2.1')
+
+        expect(module_instance.messages).to_not include(
+          hash_including(message: a_string_including('Unrecognized property'))
+        )
+      end
+
+      it 'does not filter extension unrecognized property issues when using the no_custom_extensions validator' do
+        module_instance.mock_validation_details = [
+          IssueStub.new(filtered: false,
+                        location: 'CDSHooksRequest.extension',
+                        message: 'CDSHooksRequest.extension: Unrecognized property',
+                        severity: 'error')
+        ]
+
+        module_instance.validate_request_against_logical_model(order_sign_request, 0, '2.2.1',
+                                                               validator: :no_custom_extensions)
+
+        expect(module_instance.messages).to include(
+          hash_including(message: a_string_including('Unrecognized property'))
+        )
       end
     end
   end

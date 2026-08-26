@@ -2,7 +2,8 @@ require_relative 'client_fhir_api_group'
 require_relative 'client_hooks_group'
 require_relative 'client_cross_hook_group'
 require_relative 'client_registration_group'
-require_relative 'client_long_running_hook_group'
+require_relative 'client_scenarios_group'
+require_relative 'client_attestations_group'
 require_relative '../endpoints/cds_services_discovery_handler'
 require_relative '../../cross_suite/tags'
 require_relative 'client_urls'
@@ -22,6 +23,11 @@ module DaVinciCRDTestKit
         The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of systems to the
         capabilities of a CRD client as described in [version 2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
         of the Da Vinci Coverage Requirements Discovery (CRD) Implementation Guide.
+
+        These tests are a **DRAFT** intended to allow CRD implementers to perform
+        preliminary checks of their implementations against the CRD IG requirements and
+        [provide feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues) on the tests.
+        Future versions of these tests may validate other requirements and may change how these are tested.
 
         Detailed information about this test suite can be found in the
         [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the
@@ -109,7 +115,6 @@ module DaVinciCRDTestKit
       CRD_MESSAGE_FILTERS = [
         /\A\S+: \S+: URL value '.*' does not resolve/,
         %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
-        /CDSHooksRequest.extension: Unrecognized property/,
         /No definition could be found for URL value/
       ].freeze
 
@@ -157,6 +162,21 @@ module DaVinciCRDTestKit
 
         exclude_message do |message|
           US_CORE_7_MESSAGE_FILTERS.any? do |match_template|
+            message.message.match?(match_template)
+          end
+        end
+      end
+
+      fhir_resource_validator :no_custom_extensions do
+        igs('hl7.fhir.us.davinci-crd#2.2.1')
+
+        validation_context do
+          snomedCT '731000124108' # explicit snomedCT expansion parameter
+          extensions [] # no extensions not in the spec
+        end
+
+        exclude_message do |message|
+          CRD_MESSAGE_FILTERS.any? do |match_template|
             message.message.match?(match_template)
           end
         end
@@ -219,11 +239,12 @@ module DaVinciCRDTestKit
 
         group from: :crd_v221_client_registration
         group from: :crd_v221_client_hooks
+        group from: :crd_v221_client_scenarios
         group from: :crd_v221_client_cross_hook
-        group from: :crd_v221_client_long_running_hook
       end
 
       group from: :crd_v221_client_fhir_api
+      group from: :crd_v221_client_attestations
     end
   end
 end

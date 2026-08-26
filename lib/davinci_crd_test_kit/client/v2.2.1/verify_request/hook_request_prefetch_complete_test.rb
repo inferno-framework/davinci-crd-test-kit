@@ -29,6 +29,12 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that each hook request body includes a `prefetch` field populated with
         valid JSON that contains exactly the requested prefetch keys and data sets described in the service description
         for the invoked service as calculated by Inferno based on the resources provided in the request.
+
+        Note that Inferno requires **all** requested prefetch keys to be present in the request even if there is no
+        data for that key. This because the [CDS Hook specification requires](https://cds-hooks.hl7.org/2026Jan/en/#example-of-pagination-in-prefetch)
+        that if "the CDS Client has no data to populate a template prefetch key, the prefetch template key MUST have a
+        value of null." For templates that request the results of a FHIR search interaction, an empty Bundle is also
+        acceptable.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@30', 'cds-hooks_3.0.0-ballot@231', 'cds-hooks_3.0.0-ballot@45',
                             'cds-hooks_3.0.0-ballot@46', 'cds-hooks_3.0.0-ballot@47', 'cds-hooks_3.0.0-ballot@232',
@@ -83,7 +89,7 @@ module DaVinciCRDTestKit
       end
 
       run do
-        hook_requests = load_hook_requests
+        hook_requests = load_interaction_group_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 

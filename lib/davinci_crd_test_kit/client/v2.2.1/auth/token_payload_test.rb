@@ -45,7 +45,7 @@ module DaVinciCRDTestKit
       run do
         auth_tokens_list = JSON.parse(auth_tokens)
         auth_tokens_jwk = JSON.parse(auth_tokens_jwk_json)
-        requests = load_hook_requests
+        requests = load_interaction_group_requests
         skip_if auth_tokens_list.compact.empty?, 'No Authorization tokens produced from the previous tests.'
         skip_if auth_tokens_jwk.compact.empty?, 'No Authorization token JWK produced from the previous test.'
 

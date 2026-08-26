@@ -4,7 +4,6 @@ require_relative 'verify_request/service_request_required_fields_validation_test
 require_relative 'verify_request/service_request_optional_fields_validation_test'
 require_relative 'verify_request/service_request_context_validation_test'
 require_relative 'verify_response/service_response_validation_test'
-require_relative 'verify_response/card_optional_fields_validation_test'
 require_relative 'verify_response/external_reference_card_validation_test'
 require_relative 'verify_response/launch_smart_app_card_validation_test'
 require_relative 'verify_response/instructions_card_received_test'
@@ -72,6 +71,7 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
+        simulation_verification
 
         test from: :crd_v221_service_request_required_fields_validation,
              config: {
@@ -95,122 +95,16 @@ module DaVinciCRDTestKit
       group do
         title 'Responses'
 
-        test from: :crd_v221_service_response_validation,
-             config: {
-               outputs: {
-                 valid_cards: {
-                   name: :order_select_valid_cards
-                 },
-                 valid_system_actions: {
-                   name: :order_select_valid_system_actions
-                 }
-               }
-             }
-        test from: :crd_v221_card_optional_fields_validation,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :order_select_valid_cards
-                 }
-               },
-               outputs: {
-                 valid_cards_with_links: {
-                   name: :order_select_valid_cards_with_links
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_select_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_external_reference_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :order_select_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_launch_smart_app_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_links: {
-                   name: :order_select_valid_cards_with_links
-                 }
-               }
-             }
-        test from: :crd_v221_valid_instructions_card_received,
-             config: {
-               inputs: {
-                 valid_cards: {
-                   name: :order_select_valid_cards
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_received,
-             optional: true,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_select_valid_system_actions
-                 }
-               },
-               outputs: {
-                 coverage_info: {
-                   name: :order_select_coverage_info
-                 }
-               }
-             }
-        test from: :crd_v221_coverage_info_system_action_validation,
-             optional: true,
-             config: {
-               inputs: {
-                 coverage_info: {
-                   name: :order_select_coverage_info
-                 }
-               }
-             }
+        test from: :crd_v221_service_response_validation
+        test from: :crd_v221_external_reference_card_validation
+        test from: :crd_v221_launch_smart_app_card_validation
+        test from: :crd_v221_valid_instructions_card_received
+        test from: :crd_v221_coverage_info_system_action_validation
         test from: :crd_v221_coverage_information_card_absence
-        test from: :crd_v221_propose_alternate_request_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_suggestions: {
-                   name: :order_select_valid_cards_with_suggestions
-                 },
-                 contexts: {
-                   name: :order_select_contexts
-                 }
-               }
-             }
-        test from: :crd_v221_additional_orders_card_validation,
-             config: {
-               inputs: {
-                 valid_cards_with_suggestions: {
-                   name: :order_select_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_request_form_completion_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_select_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_select_valid_cards_with_suggestions
-                 }
-               }
-             }
-        test from: :crd_v221_create_or_update_coverage_info_response_validation,
-             config: {
-               inputs: {
-                 valid_system_actions: {
-                   name: :order_select_valid_system_actions
-                 },
-                 valid_cards_with_suggestions: {
-                   name: :order_select_valid_cards_with_suggestions
-                 }
-               }
-             }
+        test from: :crd_v221_propose_alternate_request_card_validation
+        test from: :crd_v221_additional_orders_card_validation
+        test from: :crd_v221_request_form_completion_response_validation
+        test from: :crd_v221_create_or_update_coverage_info_response_validation
         test from: :crd_v221_coverage_info_configuration
         test from: :crd_v221_unknown_configuration
         test from: :crd_v221_unknown_context

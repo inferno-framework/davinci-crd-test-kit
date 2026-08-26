@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-12'
 
       run do
-        hook_requests = load_hook_requests
+        hook_requests = load_interaction_group_requests
 
         skip_if hook_requests.blank?, "No #{hook_name} hook requests received."
 

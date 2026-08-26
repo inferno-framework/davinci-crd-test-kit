@@ -56,14 +56,20 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. When a "User Action Required" dialog appears, switch to the "complete prefetch" server session and run group "3.x <hook name>"
    1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
    1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
-1. Run client group "1.3 Cross Hook".
+1. Run client group "1.3 Cross Hook", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
+   1. group "3.2 encounter-start" in the "complete prefetch" session
+   1. group "3.2 encounter-start" in the "subset prefetch" session
+   1. group "3.3 encounter-discharge" in the "complete prefetch" session
+   1. group "3.3 encounter-discharge" in the "subset prefetch" session
+   1. Once all complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
 
 Some tests will fail, including
-- TLS tests in the client suite (1.2.x.3.08) and server suites (1.01) will fail when executed in a local system.
-- Client tests 1.2.x.3.01 validating that the hook requests structure and content will fail with errors
+- TLS tests in the client suite (1.2.x.3.08 and 1.4.1.3.08) and server suites (1.01) will fail when executed in a local system.
+- Client tests 1.2.x.3.01 and 1.4.1.3.01 validating that the hook requests structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
+- Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
 
 ### Additional Optional Steps for Long-running Hook Request
 
@@ -93,6 +99,14 @@ All tests should pass.
      option selected.
 2. Once a "User Action Required" dialog appears, run client group "2 FHIR API". This will run for a while.
 3. Once complete, return to the server session and click the link to complete the tests.
+
+### Additional Optional Steps for Specific Coverage Responses
+
+1. Run client group "1.2.6 order-sign"
+1. Run server group "4 Specific Coverage Responses"
+   1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
+
+These tests should all fail.
 
 Some tests will fail, including:
 - Client test 2.1.1.01 requiring TLS will fail when executed in a local system.

@@ -172,12 +172,16 @@ module DaVinciCRDTestKit
       end
 
       check_is_fhir_resource(prefetched_value, target_resource_type: 'Bundle')
-      unless prefetched_value['entry'].size == 1
-        errors << "#{error_prefix} exactly one Coverage must be provided."
-        return
-      end
+      if prefetched_value['resourceType'] == 'Bundle'
+        unless prefetched_value['entry']&.size == 1
+          errors << "#{error_prefix} exactly one Coverage must be provided."
+          return
+        end
 
-      check_coverage(prefetched_value.dig('entry', 0, 'resource'))
+        check_coverage(prefetched_value.dig('entry', 0, 'resource'))
+      elsif prefetched_value['resourceType'] == 'Coverage'
+        check_coverage(prefetched_value)
+      end
     end
 
     def check_coverage(prefetched_coverage)
@@ -197,14 +201,24 @@ module DaVinciCRDTestKit
                   "expected active, got #{prefetched_coverage['status']}."
       end
 
-      target_patient_id = hook_request.dig('context', 'patientId')
-      unless prefetched_coverage.dig('beneficiary', 'reference') == "Patient/#{target_patient_id}"
-        errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
-                  "expected Patient/#{target_patient_id}, got #{prefetched_coverage.dig('beneficiary',
-                                                                                        'reference')}."
-      end
+      check_coverage_beneficiary(prefetched_coverage)
 
       nil
+    end
+
+    def check_coverage_beneficiary(prefetched_coverage)
+      target_patient_id = hook_request.dig('context', 'patientId')
+      patient_id = target_patient_id&.delete_prefix('Patient/')
+      relative_ref = "Patient/#{patient_id}"
+      fhir_server = hook_request['fhirServer']&.chomp('/')
+      absolute_ref = "#{fhir_server}/#{relative_ref}" if fhir_server.present?
+
+      actual_ref = prefetched_coverage.dig('beneficiary', 'reference')
+      return if actual_ref == relative_ref || (absolute_ref && actual_ref == absolute_ref)
+
+      expected_refs = [relative_ref, absolute_ref].compact.join(' or ')
+      errors << "#{error_prefix} prefetched Coverage has an unexpected beneficiary reference: " \
+                "expected #{expected_refs}, got #{actual_ref}."
     end
 
     def check_read(prefetched_value, instantiated_request)
