@@ -15,16 +15,14 @@ module DaVinciCRDTestKit
       title 'Client processes coverage information returned with unknown content'
       description %(
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-33)
-        that client systems ignore unexpected elements when processing instances and that they not depend
-        on elements beyond those the specification marks as mandatory or mustSupport. During this test,
-        the tester will confirm that the unknown element and custom extension included in the previous
-        response did not prevent the client system from processing the coverage information returned
-        alongside them and making it available to the user.
+        that client systems ignore unexpected elements within CDS Hooks structures when processing
+        instances. During this test, the tester will confirm that the unknown element and custom extension
+        included in the CDS section of the previous response did not prevent the client system from
+        processing the returned coverage information and making it available to the user.
       )
       attestation
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-10',
-                            'hl7.fhir.us.davinci-crd_2.2.1@found-33'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-33'
 
       output :attest_true_url
       output :attest_false_url

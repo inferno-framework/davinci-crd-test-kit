@@ -37,8 +37,17 @@ module DaVinciCRDTestKit
           message: %(
             **Unknown Response Content Test**:
 
-            Invoke any supported hook. This test will automatically continue once
-            Inferno has received a request and returned a response.
+            Invoke any supported hook on one of the two Inferno simulated
+            CRD servers discoverable at the following endpoints:
+
+            - Complete Prefetch: `#{discovery_url}`
+            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+
+            For Inferno to recognize these requests and associate them with this session,
+            the authentication JWT sent as a Bearer token in the Authorization header
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
+            will automatically continue once Inferno has received a request and returned
+            a response.
 
             The response will include coverage information alongside an element and a
             custom extension whose names are not defined by CRD or CDS Hooks. Clients
