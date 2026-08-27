@@ -51,27 +51,41 @@ module DaVinciCRDTestKit
         full_fetch = target_fetch_request(full_hook_requests)
         limited_fetch = target_fetch_request(limited_hook_requests)
 
-        assert full_fetch.present?,
-               "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
-               'full-access hook request.'
-        assert limited_fetch.present?,
-               "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
-               'limited-access hook request.'
+        if full_fetch.blank?
+          add_message('error',
+                      "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
+                      'full-access hook request.')
+        else
+          unless full_fetch.status.to_s.starts_with?('2')
+            add_message('error',
+                        "The full-access read of `#{access_level_target_reference}` failed with status " \
+                        "#{full_fetch.status}, but was expected to succeed.")
+          end
 
-        assert full_fetch.status.to_s.starts_with?('2'),
-               "The full-access read of `#{access_level_target_reference}` failed with status " \
-               "#{full_fetch.status}, but was expected to succeed."
+          expected_type, expected_id = access_level_target_reference.split('/')
+          full_resource = parse_fhir_resource(full_fetch.response_body)
+          resource_matches = full_resource.present? && full_resource.resourceType == expected_type &&
+                             full_resource.id == expected_id
+          unless resource_matches
+            add_message('error',
+                        "The full-access read of `#{access_level_target_reference}` succeeded, but did not " \
+                        'return the expected resource.')
+          end
+        end
 
-        expected_type, expected_id = access_level_target_reference.split('/')
-        full_resource = parse_fhir_resource(full_fetch.response_body)
-        assert full_resource.present? && full_resource.resourceType == expected_type && full_resource.id == expected_id,
-               "The full-access read of `#{access_level_target_reference}` succeeded, but did not " \
-               'return the expected resource.'
+        if limited_fetch.blank?
+          add_message('error',
+                      "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
+                      'limited-access hook request.')
+        elsif !VALID_DENIAL_STATUSES.include?(limited_fetch.status.to_i)
+          add_message('error',
+                      "The limited-access read of `#{access_level_target_reference}` returned status " \
+                      "#{limited_fetch.status}, but access should have been denied with one of " \
+                      "#{VALID_DENIAL_STATUSES.join(', ')}.")
+        end
 
-        assert VALID_DENIAL_STATUSES.include?(limited_fetch.status.to_i),
-               "The limited-access read of `#{access_level_target_reference}` returned status " \
-               "#{limited_fetch.status}, but access should have been denied with one of " \
-               "#{VALID_DENIAL_STATUSES.join(', ')}."
+        assert_no_error_messages("Access to `#{access_level_target_reference}` was not correctly scoped to " \
+                                 'the EHR user. See Messages for details.')
       end
     end
   end

@@ -58,22 +58,31 @@ module DaVinciCRDTestKit
         full_body = JSON.parse(full_requests.first.request_body)
         limited_body = JSON.parse(limited_requests.first.request_body)
 
-        assert full_body['hook'] == limited_body['hook'],
-               "The full-access request invoked the '#{full_body['hook']}' hook, but the " \
-               "limited-access request invoked the '#{limited_body['hook']}' hook. Both runs " \
-               'must invoke the same hook.'
+        unless full_body['hook'] == limited_body['hook']
+          add_message('error',
+                      "The full-access request invoked the '#{full_body['hook']}' hook, but the " \
+                      "limited-access request invoked the '#{limited_body['hook']}' hook. Both runs " \
+                      'must invoke the same hook.')
+        end
 
         full_patient_id = full_body.dig('context', 'patientId')
         limited_patient_id = limited_body.dig('context', 'patientId')
-        assert full_patient_id.present? && full_patient_id == limited_patient_id,
-               'The full-access and limited-access requests were made for different patients ' \
-               "(#{full_patient_id.inspect} vs #{limited_patient_id.inspect})."
+        unless full_patient_id.present? && full_patient_id == limited_patient_id
+          add_message('error',
+                      'The full-access and limited-access requests were made for different patients ' \
+                      "(#{full_patient_id.inspect} vs #{limited_patient_id.inspect}).")
+        end
 
         full_context_ids = primary_context_ids(full_body)
         limited_context_ids = primary_context_ids(limited_body)
-        assert full_context_ids.present? && full_context_ids == limited_context_ids,
-               'The full-access and limited-access requests do not reference the same order, ' \
-               "appointment, or encounter (#{full_context_ids} vs #{limited_context_ids})."
+        unless full_context_ids.present? && full_context_ids == limited_context_ids
+          add_message('error',
+                      'The full-access and limited-access requests do not reference the same order, ' \
+                      "appointment, or encounter (#{full_context_ids} vs #{limited_context_ids}).")
+        end
+
+        assert_no_error_messages('The full-access and limited-access requests do not represent the same ' \
+                                 'scenario. See Messages for details.')
       rescue JSON::ParserError => e
         assert false, "Unable to parse a hook request body as JSON: #{e.message}"
       end

@@ -5,6 +5,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
   let(:suite_id) { 'crd_client_v221' }
   let(:test) { described_class }
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
+  let(:results_repo) { Inferno::Repositories::Results.new }
 
   let(:patient_id) { 'pat-1' }
   let(:draft_order) { { 'resourceType' => 'MedicationRequest', 'id' => 'med-1' } }
@@ -41,6 +42,12 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     )
   end
 
+  def error_messages(result)
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [test])
+      .find { |r| r.id == result.id }
+      .messages.map(&:message).join("\n")
+  end
+
   it 'skips when no full-access hook request has been received' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
@@ -74,9 +81,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/must invoke the same hook/)
-    expect(result.result_message).to include("'order-sign' hook")
-    expect(result.result_message).to include("'order-select' hook")
+    expect(error_messages(result)).to match(/must invoke the same hook/)
+    expect(error_messages(result)).to include("'order-sign' hook")
+    expect(error_messages(result)).to include("'order-select' hook")
   end
 
   it 'fails when the two requests are for different patients' do
@@ -85,9 +92,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/different patients/)
-    expect(result.result_message).to include('"pat-1"')
-    expect(result.result_message).to include('"pat-2"')
+    expect(error_messages(result)).to match(/different patients/)
+    expect(error_messages(result)).to include('"pat-1"')
+    expect(error_messages(result)).to include('"pat-2"')
   end
 
   it 'fails when the two requests reference different draft orders' do
@@ -96,9 +103,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/do not reference the same order/)
-    expect(result.result_message).to include('MedicationRequest/med-1')
-    expect(result.result_message).to include('MedicationRequest/med-2')
+    expect(error_messages(result)).to match(/do not reference the same order/)
+    expect(error_messages(result)).to include('MedicationRequest/med-1')
+    expect(error_messages(result)).to include('MedicationRequest/med-2')
   end
 
   it 'passes for appointment-book requests that reference the same appointment' do
@@ -147,9 +154,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_encounter_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/do not reference the same order/)
-    expect(result.result_message).to include('enc-1')
-    expect(result.result_message).to include('enc-2')
+    expect(error_messages(result)).to match(/do not reference the same order/)
+    expect(error_messages(result)).to include('enc-1')
+    expect(error_messages(result)).to include('enc-2')
   end
 
   it 'passes for order-dispatch requests that reference the same order' do
