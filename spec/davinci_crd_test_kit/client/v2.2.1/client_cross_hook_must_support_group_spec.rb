@@ -14,9 +14,16 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
 
   let(:definition_ids) { described_class::TEST_DEFINITIONS.map { |definition| definition[:id].to_s } }
 
-  it 'holds one test per request type, the supporting profiles test, and the coverage information test' do
-    expect(described_class::TEST_DEFINITIONS.length).to eq(9)
-    expect(group.tests.length).to eq(10)
+  it 'holds one test per resource type plus the coverage information test' do
+    expect(described_class::TEST_DEFINITIONS.length).to eq(14)
+    expect(group.tests.length).to eq(15)
+  end
+
+  # Each test issues its own attestation, so a tester answers for one resource type at a time
+  it 'checks exactly one resource type per test' do
+    described_class::TEST_DEFINITIONS.each do |definition|
+      expect(definition[:profiles].length).to eq(1), "#{definition[:id]} batches multiple resource types"
+    end
   end
 
   it 'gives every test a unique id and title' do
@@ -80,11 +87,12 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
         .to contain_exactly('appointment_with_order', 'appointment_without_order')
     end
 
-    it 'groups the supporting profiles into a single test' do
-      supporting = described_class::TEST_DEFINITIONS
-        .find { |definition| definition[:id] == :crd_v221_supporting_profiles_must_support }
+    it 'gives each supporting profile its own test' do
+      supporting_ids = [:crd_v221_coverage_must_support, :crd_v221_location_must_support,
+                        :crd_v221_organization_must_support, :crd_v221_patient_must_support,
+                        :crd_v221_practitioner_must_support, :crd_v221_practitioner_role_must_support]
 
-      expect(supporting[:profiles].length).to eq(6)
+      expect(definition_ids).to include(*supporting_ids.map(&:to_s))
     end
   end
 
@@ -95,11 +103,18 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
       end
     end
 
-    it 'names each profile the supporting profiles test covers' do
-      test = group.tests.find { |candidate| candidate.id.to_s.end_with?('crd_v221_supporting_profiles_must_support') }
+    it 'names the profile each supporting profile test covers' do
+      {
+        crd_v221_coverage_must_support: 'CRD Coverage',
+        crd_v221_location_must_support: 'CRD Location',
+        crd_v221_organization_must_support: 'CRD Organization',
+        crd_v221_patient_must_support: 'CRD Patient',
+        crd_v221_practitioner_must_support: 'CRD Practitioner',
+        crd_v221_practitioner_role_must_support: 'HRex PractitionerRole Profile'
+      }.each do |test_id, profile_name|
+        test = group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
 
-      ['CRD Coverage', 'CRD Location', 'CRD Organization', 'CRD Patient', 'CRD Practitioner',
-       'HRex PractitionerRole Profile'].each do |profile_name|
+        expect(test).to_not be_nil, "#{test_id} not found"
         expect(test.description).to include("### #{profile_name}")
       end
     end

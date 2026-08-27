@@ -11,9 +11,9 @@ module DaVinciCRDTestKit
         observed across the hook requests the client made, and that the must support elements on
         them were populated.
 
-        Each request type is checked separately, so a client that supports only some of them will
+        Each resource type is checked separately, so a client that supports only some of them will
         be asked to attest to the ones it does not support. Expect one attestation prompt per
-        request type that was not fully demonstrated.
+        resource type that was not fully demonstrated.
 
         Requests made during the "Additional Hook Invocations for Cross Hook Support
         Demonstration" group above are included in this analysis, so anything not covered by the
@@ -44,16 +44,18 @@ module DaVinciCRDTestKit
                        profile_keys: %w[appointment_with_order appointment_without_order] }] },
         { id: :crd_v221_encounter_must_support, requirements: [CONF_3],
           profiles: [{ resource_type: 'Encounter', profile_keys: ['encounter'] }] },
-        { id: :crd_v221_supporting_profiles_must_support, requirements: [CONF_3],
-          title: 'Must support elements are observed on the profiles referenced within CRD requests',
-          profiles: [
-            { resource_type: 'Coverage', profile_keys: ['coverage'] },
-            { resource_type: 'Location', profile_keys: ['location'] },
-            { resource_type: 'Organization', profile_keys: ['organization'] },
-            { resource_type: 'Patient', profile_keys: ['patient'] },
-            { resource_type: 'Practitioner', profile_keys: ['practitioner'] },
-            { resource_type: 'PractitionerRole', profile_keys: ['practitioner_role'] }
-          ] }
+        { id: :crd_v221_coverage_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'Coverage', profile_keys: ['coverage'] }] },
+        { id: :crd_v221_location_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'Location', profile_keys: ['location'] }] },
+        { id: :crd_v221_organization_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'Organization', profile_keys: ['organization'] }] },
+        { id: :crd_v221_patient_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'Patient', profile_keys: ['patient'] }] },
+        { id: :crd_v221_practitioner_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'Practitioner', profile_keys: ['practitioner'] }] },
+        { id: :crd_v221_practitioner_role_must_support, requirements: [CONF_3],
+          profiles: [{ resource_type: 'PractitionerRole', profile_keys: ['practitioner_role'] }] }
       ].freeze
 
       TEST_DEFINITIONS.each do |definition|
