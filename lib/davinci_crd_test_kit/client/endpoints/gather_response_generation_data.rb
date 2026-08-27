@@ -359,9 +359,7 @@ module DaVinciCRDTestKit
       request_parent_locations
     end
 
-    # ID-216: read the tester-specified target resource (access_level_target_reference) using the
-    # access token from this hook request, tagging the result with ACCESS_LEVEL_TARGET_FETCH_TAG so
-    # AccessLevelApiAccessTest can compare the full-access and limited-access reads.
+    # ID-216: tags the fetch so AccessLevelApiAccessTest can find it via ACCESS_LEVEL_TARGET_FETCH_TAG.
     def request_access_level_target
       return if access_level_target_reference.blank?
 

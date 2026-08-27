@@ -4,10 +4,6 @@ require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
-    # Behavior verification (ID-216 test 5): if the target resource is present in the full-access
-    # run's prefetch, it must be absent from the limited-access run's prefetch. Otherwise, the
-    # tester attests that prefetch scoping by user access level could not be demonstrated.
-    # Mechanically/attestation-verifies cds-hooks_3.0.0-ballot@42.
     class AccessLevelPrefetchScopeTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include ClientURLs

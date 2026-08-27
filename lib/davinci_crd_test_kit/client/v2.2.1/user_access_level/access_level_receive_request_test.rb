@@ -3,9 +3,8 @@ require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
-    # Used for both the full-access and limited-access interaction tests in the
-    # "User Access Level Scoping" scenario group (ID-216). Each usage configures
-    # a distinct `crd_interaction_group` tag (full vs limited) via `config`.
+    # Used for both the full-access and limited-access interaction tests; each usage configures a
+    # distinct `crd_interaction_group` tag (full vs limited) via `config`.
     class AccessLevelReceiveRequestTest < Inferno::Test
       include ClientURLs
 

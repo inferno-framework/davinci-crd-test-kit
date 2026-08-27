@@ -9,9 +9,7 @@ module DaVinciCRDTestKit
       hook_card_response
     end
 
-    # ID-216: hardcoded mocked response for the User Access Level Scoping scenario - always a single
-    # coverage-information system action (reusing the same coverage-extension logic used elsewhere),
-    # regardless of tester response-configuration inputs. Never returns cards.
+    # ID-216: bypasses tester response-configuration inputs (selected_response_types/custom template).
     def build_access_level_hook_response
       response_body = { 'cards' => [] }
       return response_body unless patient_coverage.present?

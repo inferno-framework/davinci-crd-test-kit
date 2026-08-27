@@ -3,9 +3,6 @@ require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
-    # Behavior verification (ID-216 test 4): the tester-specified target resource must be readable
-    # via the FHIR API for the full-access user and denied for the limited-access user.
-    # Mechanically verifies cds-hooks_3.0.0-ballot@63, @64, @173.
     class AccessLevelApiAccessTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 

@@ -6,9 +6,6 @@ require_relative '../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
-    # ID-216: "User Access Level Scoping" scenario group. Verifies that payer data access exposed
-    # to a CDS Service during hook invocation is scoped to the authorized access level of the EHR
-    # user, by comparing a full-access run against a limited-access run of the same scenario.
     class ClientUserAccessLevelGroup < Inferno::TestGroup
       title 'User Access Level Scoping'
       id :crd_v221_client_user_access_level

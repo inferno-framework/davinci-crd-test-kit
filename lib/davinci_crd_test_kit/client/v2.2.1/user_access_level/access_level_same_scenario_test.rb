@@ -3,9 +3,6 @@ require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
-    # Simulation verification (ID-216 test 3): confirms the full-access and limited-access hook
-    # requests represent the same underlying scenario (hook, order/appointment/encounter context,
-    # patient) so that any observed access difference is attributable to the user, not the scenario.
     class AccessLevelSameScenarioTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
