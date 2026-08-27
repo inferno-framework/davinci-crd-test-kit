@@ -51,33 +51,41 @@ module DaVinciCRDTestKit
         full_fetch = target_fetch_request(full_hook_requests)
         limited_fetch = target_fetch_request(limited_hook_requests)
 
+        # request_access_level_target is called unconditionally while processing these hook requests, so a
+        # missing fetch here means Inferno itself failed to make it, not a tester-controlled condition.
         if full_fetch.blank?
-          add_message('error',
-                      "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
-                      'full-access hook request.')
-        else
-          unless full_fetch.status.to_s.starts_with?('2')
-            add_message('error',
-                        "The full-access read of `#{access_level_target_reference}` failed with status " \
-                        "#{full_fetch.status}, but was expected to succeed.")
-          end
-
-          expected_type, expected_id = access_level_target_reference.split('/')
-          full_resource = parse_fhir_resource(full_fetch.response_body)
-          resource_matches = full_resource.present? && full_resource.resourceType == expected_type &&
-                             full_resource.id == expected_id
-          unless resource_matches
-            add_message('error',
-                        "The full-access read of `#{access_level_target_reference}` succeeded, but did not " \
-                        'return the expected resource.')
-          end
+          raise Inferno::Exceptions::TestSuiteImplementationException.new(
+            'FHIR request',
+            "Expected FHIR read of `#{access_level_target_reference}` not performed during the full-access " \
+            'hook request.'
+          )
         end
 
         if limited_fetch.blank?
+          raise Inferno::Exceptions::TestSuiteImplementationException.new(
+            'FHIR request',
+            "Expected FHIR read of `#{access_level_target_reference}` not performed during the " \
+            'limited-access hook request.'
+          )
+        end
+
+        unless full_fetch.status.to_s.starts_with?('2')
           add_message('error',
-                      "Inferno did not attempt to read `#{access_level_target_reference}` during the " \
-                      'limited-access hook request.')
-        elsif !VALID_DENIAL_STATUSES.include?(limited_fetch.status.to_i)
+                      "The full-access read of `#{access_level_target_reference}` failed with status " \
+                      "#{full_fetch.status}, but was expected to succeed.")
+        end
+
+        expected_type, expected_id = access_level_target_reference.split('/')
+        full_resource = parse_fhir_resource(full_fetch.response_body)
+        resource_matches = full_resource.present? && full_resource.resourceType == expected_type &&
+                           full_resource.id == expected_id
+        unless resource_matches
+          add_message('error',
+                      "The full-access read of `#{access_level_target_reference}` succeeded, but did not " \
+                      'return the expected resource.')
+        end
+
+        unless VALID_DENIAL_STATUSES.include?(limited_fetch.status.to_i)
           add_message('error',
                       "The limited-access read of `#{access_level_target_reference}` returned status " \
                       "#{limited_fetch.status}, but access should have been denied with one of " \

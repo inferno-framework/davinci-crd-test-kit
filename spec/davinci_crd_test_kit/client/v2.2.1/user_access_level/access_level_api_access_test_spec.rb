@@ -73,24 +73,24 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     end
   end
 
-  it 'fails when Inferno never attempted a full-access read of the target resource' do
+  it 'errors when Inferno never attempted a full-access read of the target resource' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
     create_target_fetch(limited_instance, status: 403)
 
     result = run(test, access_level_target_reference: target_reference)
-    expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/did not attempt to read.*full-access/)
+    expect(result.result).to eq('error')
+    expect(result.result_message).to match(/not performed during the full-access hook request/)
   end
 
-  it 'fails when Inferno never attempted a limited-access read of the target resource' do
+  it 'errors when Inferno never attempted a limited-access read of the target resource' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
     create_target_fetch(full_instance, status: 200, response_body: matching_resource)
 
     result = run(test, access_level_target_reference: target_reference)
-    expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/did not attempt to read.*limited-access/)
+    expect(result.result).to eq('error')
+    expect(result.result_message).to match(/not performed during the limited-access hook request/)
   end
 
   it 'fails when the full-access read itself failed' do
