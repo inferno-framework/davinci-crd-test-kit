@@ -149,8 +149,6 @@ module DaVinciCRDTestKit
       end
 
       run do
-        
-        
         skip_if must_support_requests.blank?, 'No hook requests received.'
 
         unobserved = gather_unobserved
