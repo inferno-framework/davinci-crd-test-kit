@@ -1,5 +1,5 @@
 require_relative '../../cross_suite/tags'
-require_relative 'interaction/server_invoke_hook_test'
+require_relative 'interaction/server_invoke_hook_single_request_test'
 require_relative 'verify_request/service_request_required_fields_validation_test'
 require_relative 'verify_request/service_request_optional_fields_validation_test'
 require_relative 'verify_request/service_request_context_validation_test'
@@ -25,7 +25,7 @@ module DaVinciCRDTestKit
       group do
         title 'Interaction'
 
-        test from: :crd_v221_server_invoke_hook_test,
+        test from: :crd_v221_server_invoke_hook_single_request_test,
              config: {
                inputs: {
                  service_ids: {

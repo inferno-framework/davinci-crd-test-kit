@@ -109,7 +109,7 @@ for complete details on how to use these inputs.
 
 ### Cross Hook Verification
 
-After running one or more hook groups, run group "1.3 Cross Hook" to check if the client
+After running one or more hook groups, run group "1.4 Cross Hook" to check if the client
 has met requirements that must be demonstrated across all hook requests, but aren't required for each hook invocation.
 For example, clients must have received and attested to display support of the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
 response type including all must support elements on the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
@@ -121,10 +121,20 @@ demonstrated.
 
 ### Long-running Hook Requests
 
-Run group "1.4 Long-running Hook Request" to test that users can continue their workflow during long-running
+Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue their workflow during long-running
 responses. Inferno will pause for a specified number of seconds (at least 5) before responding to a hook
 invocation made during this test to allow testers to verify and demonstrate this capability in the tested
 client system.
+
+### User Access Level Scoping
+
+Run the "User Access Level Scoping" group under "1.3 Scenarios" to demonstrate that FHIR API and prefetch
+access to payer data is scoped to the EHR user's access level.
+Provide a reference to a resource that a full-access user can read and a limited-access user cannot, then
+invoke any supported hook once as each user for the same order, appointment, or encounter. Inferno will use
+the access token from each request to read the target resource and compare the two requests. If the target
+resource was not included in the full-access request's prefetch, you will be asked to attest whether
+prefetch data is limited by user access instead.
 
 ### FHIR API Testing
 
@@ -158,8 +168,8 @@ With those caveats, a passing execution of this suite would include:
 - Passing the corresponding hook group under the 1.2 Hooks group for each hook supported.
 - Passing all other groups, including
   - 1.1 Registration
-  - 1.3 Cross Hook
-  - 1.4 Long-running Hook Request
+  - 1.3 Scenarios
+  - 1.4 Cross Hook
   - 2 FHIR API
 
 ## Demonstration Execution

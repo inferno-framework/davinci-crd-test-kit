@@ -15,6 +15,10 @@ module DaVinciCRDTestKit
   HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX = 'hi_data_fetch_'.freeze
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
   UNKNOWN_CONTENT_GROUP_TAG = 'unknown_content_request'.freeze
+  # ID-216: User Access Level Scoping scenario
+  ACCESS_LEVEL_FULL_GROUP_TAG = 'access-level-full'.freeze
+  ACCESS_LEVEL_LIMITED_GROUP_TAG = 'access-level-limited'.freeze
+  ACCESS_LEVEL_TARGET_FETCH_TAG = 'access_level_target'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze
