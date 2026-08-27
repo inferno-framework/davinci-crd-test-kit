@@ -129,7 +129,7 @@ client system.
 ### User Access Level Scoping
 
 Run the "User Access Level Scoping" group under "1.3 Scenarios" to demonstrate that FHIR API and prefetch
-access to payer data is scoped to the EHR user's access level, rather than relying on attestation alone.
+access to payer data is scoped to the EHR user's access level.
 Provide a reference to a resource that a full-access user can read and a limited-access user cannot, then
 invoke any supported hook once as each user for the same order, appointment, or encounter. Inferno will use
 the access token from each request to read the target resource and compare the two requests. If the target
