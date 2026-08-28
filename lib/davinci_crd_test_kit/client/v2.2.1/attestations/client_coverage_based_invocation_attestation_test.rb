@@ -13,8 +13,8 @@ module DaVinciCRDTestKit
         test.
       )
       attestation
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26', 'hl7.fhir.us.davinci-crd_2.2.1@dev-28',
-                            'hl7.fhir.us.davinci-crd_2.2.1@dev-30', 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-28', 'hl7.fhir.us.davinci-crd_2.2.1@dev-30',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :coverage_based_invocation_attestation,

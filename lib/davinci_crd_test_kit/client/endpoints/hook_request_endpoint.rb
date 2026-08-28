@@ -1,7 +1,7 @@
 require_relative 'gather_response_generation_data'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
-require_relative 'unknown_content_service_response'
+require_relative 'scenario_service_response'
 require_relative '../../cross_suite/cards_identification'
 require_relative '../../cross_suite/tags'
 
@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::GatherResponseGenerationData
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
-    include DaVinciCRDTestKit::UnknownContentServiceResponse
+    include DaVinciCRDTestKit::ScenarioServiceResponse
 
     AVAILABLE_HOOKS = [
       'appointment-book',
@@ -134,6 +134,8 @@ module DaVinciCRDTestKit
     def hook_response
       if unknown_content_group?
         build_unknown_content_hook_response
+      elsif self_pay_group?
+        build_self_pay_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
       else
@@ -169,13 +171,21 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      return [DUPLICATED_HOOK_INSTANCE_TAG] if hook_instance_already_used?
+      tags =
+        if hook_instance_already_used?
+          [DUPLICATED_HOOK_INSTANCE_TAG]
+        elsif invoked_hook != requested_hook ||
+              wrong_hook_for_test? ||
+              !AVAILABLE_HOOKS.include?(requested_hook)
+          []
+        else
+          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag]
+        end
 
-      return [] if invoked_hook != requested_hook ||
-                   wrong_hook_for_test? ||
-                   !AVAILABLE_HOOKS.include?(requested_hook)
+      # the self-pay scenario checks for the absence of requests, so even invalid requests must carry the group tag
+      tags << interaction_group_tag if self_pay_group?
 
-      [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag].compact
+      tags.uniq.compact
     end
 
     def hook_instance_tag
@@ -232,6 +242,10 @@ module DaVinciCRDTestKit
       test.config.options[:crd_interaction_group] == UNKNOWN_CONTENT_GROUP_TAG
     end
 
+    def self_pay_group?
+      test.config.options[:crd_interaction_group] == SELF_PAY_GROUP_TAG
+    end
+
     def long_running_pause_time
       JSON.parse(result.input_json)
         .find { |input| input['name'].include?('long_running_pause_time') }
@@ -241,7 +255,7 @@ module DaVinciCRDTestKit
     # end the wait immediately after the scenario request returns
     # pause for long-running requests here because update_result runs before response generation
     def update_result
-      return unless long_running_group? || unknown_content_group?
+      return unless long_running_group? || unknown_content_group? || self_pay_group?
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
