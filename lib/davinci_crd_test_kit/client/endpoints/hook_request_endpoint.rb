@@ -1,8 +1,7 @@
 require_relative 'gather_response_generation_data'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
-require_relative 'unknown_content_service_response'
-require_relative 'self_pay_service_response'
+require_relative 'scenario_service_response'
 require_relative '../../cross_suite/cards_identification'
 require_relative '../../cross_suite/tags'
 
@@ -12,8 +11,7 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::GatherResponseGenerationData
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
-    include DaVinciCRDTestKit::UnknownContentServiceResponse
-    include DaVinciCRDTestKit::SelfPayServiceResponse
+    include DaVinciCRDTestKit::ScenarioServiceResponse
 
     AVAILABLE_HOOKS = [
       'appointment-book',
@@ -173,13 +171,21 @@ module DaVinciCRDTestKit
     end
 
     def tags
-      return [DUPLICATED_HOOK_INSTANCE_TAG] if hook_instance_already_used?
+      tags =
+        if hook_instance_already_used?
+          [DUPLICATED_HOOK_INSTANCE_TAG]
+        elsif invoked_hook != requested_hook ||
+              wrong_hook_for_test? ||
+              !AVAILABLE_HOOKS.include?(requested_hook)
+          []
+        else
+          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag]
+        end
 
-      return [] if invoked_hook != requested_hook ||
-                   wrong_hook_for_test? ||
-                   !AVAILABLE_HOOKS.include?(requested_hook)
+      # the self-pay scenario checks for the absence of requests, so even invalid requests must carry the group tag
+      tags << interaction_group_tag if self_pay_group?
 
-      [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag].compact
+      tags.uniq.compact
     end
 
     def hook_instance_tag

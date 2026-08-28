@@ -22,7 +22,6 @@ module DaVinciCRDTestKit
         conformance, or included in cross-hook evaluations, but any request received will
         cause the next test to fail.
       )
-      config options: { accepts_multiple_requests: true }
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
@@ -48,16 +47,7 @@ module DaVinciCRDTestKit
             performed during previous tests, but for a service or product where the patient
             record contains an indication that the patient intends to self-pay. Because the
             service or product is flagged as 'patient-pay', the client must not invoke any
-            hooks on Inferno's two simulated CRD servers discoverable at the following
-            endpoints:
-
-            - Complete Prefetch: `#{discovery_url}`
-            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
-
-            Inferno recognizes hook requests and associates them with this session when
-            the authentication JWT sent as a Bearer token in the Authorization header
-            has `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. Inferno expects
-            to receive no such requests during this test.
+            hooks.
 
             [Click here](#{continuation_url}) once the workflow is complete.
 

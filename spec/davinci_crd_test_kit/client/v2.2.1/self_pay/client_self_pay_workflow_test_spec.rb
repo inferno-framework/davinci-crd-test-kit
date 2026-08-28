@@ -69,6 +69,26 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayWorkflowTest, :request do
     expect(result.result).to eq('pass')
   end
 
+  it 'tags requests with the self-pay group tag even when the request is invalid' do
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint)
+      .to receive(:hook_instance_already_used?).and_return(true)
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint)
+      .to receive(:interaction_group_tag).and_return(DaVinciCRDTestKit::SELF_PAY_GROUP_TAG)
+
+    result = run(test, cds_jwt_iss: example_client_url)
+    expect(result.result).to eq('wait')
+
+    post_hook_request
+
+    expect(last_response.status).to eq(400)
+    result = results_repo.find(result.id)
+    expect(result.result).to eq('pass')
+
+    tagged_requests = Inferno::Repositories::Requests.new
+      .tagged_requests(test_session.id, [DaVinciCRDTestKit::SELF_PAY_GROUP_TAG])
+    expect(tagged_requests.length).to eq(1)
+  end
+
   it 'returns coverage information system actions and no cards' do
     run(test, cds_jwt_iss: example_client_url)
     post_hook_request
