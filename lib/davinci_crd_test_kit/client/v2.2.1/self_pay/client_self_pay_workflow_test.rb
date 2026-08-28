@@ -8,19 +8,12 @@ module DaVinciCRDTestKit
       id :crd_v221_client_self_pay_workflow
       title 'Client performs a self-pay workflow'
       description %(
-        During this test, Inferno will wait while the tester performs a workflow that would
-        normally trigger a hook request, but for a service or product that the patient record
-        indicates the patient intends to pay for themselves. Because there is a recorded
-        indication that the patient intends to bypass insurance coverage, the client is not
-        expected to invoke any hooks and Inferno does not expect to receive any requests.
-        Once the workflow is complete, the tester will click a link to continue the test.
-
-        If the client does make a hook request, Inferno will return a fixed [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-        containing a coverage information system action, which testers cannot change, and the
-        test will automatically continue. The details of the request and its response do not
-        matter for the purposes of this test and they will not be evaluated, checked for
-        conformance, or included in cross-hook evaluations, but any request received will
-        cause the next test to fail.
+        During this test, the tester will perform a self-pay scenario in which a patient has indicated
+        that they will pay for a service instead of asking their insurance to cover it. Because there
+        is a recorded indication that the patient intends to bypass insurance coverage, the client
+        is required to not invoke any hooks that would send details of the service to the payer.
+        The scenario must include an action related to the service that would normally trigger a
+        hook request and Inferno will verify that no hook requests are received.
       )
 
       input :cds_jwt_iss,
@@ -45,11 +38,12 @@ module DaVinciCRDTestKit
 
             Perform a workflow that would normally trigger a hook request, such as one
             performed during previous tests, but for a service or product where the patient
-            record contains an indication that the patient intends to self-pay. Because the
-            service or product is flagged as 'patient-pay', the client must not invoke any
-            hooks.
+            record contains an indication that the patient intends to self-pay. The client must
+            not send any hook requests to Inferno during the workflow.
 
-            [Click here](#{continuation_url}) once the workflow is complete.
+            By [clicking here](#{continuation_url}) I attest that a user completed a workflow
+            in the client system that would normally trigger a hook request for a service that
+            has been marked as self-pay.
 
             If Inferno receives a hook request, this test will automatically continue
             and the next test will fail.

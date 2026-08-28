@@ -16,7 +16,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayNoRequestTest do
     result = run(test)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/received 1 hook request/)
+    expect(result.result_message).to match(/incorrectly received a hook request/)
   end
 
   it 'fails when multiple hook requests were sent during the previous wait' do
@@ -26,6 +26,6 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayNoRequestTest do
     result = run(test)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/received 2 hook request/)
+    expect(result.result_message).to match(/incorrectly received a hook request/)
   end
 end

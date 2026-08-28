@@ -10,10 +10,10 @@ module DaVinciCRDTestKit
         The CRD IG requires clients to invoke hooks on payer services only when the patient
         record indicates active coverage with the payer associated with the service and there
         is no recorded indication that the patient intends to bypass insurance coverage, i.e.,
-        the service or product is not flagged as 'patient-pay'. During this scenario the tester
-        performs a workflow that would normally trigger a hook request, but for a service or
+        the service or product is not flagged as 'self-pay'. During this scenario the tester
+        will perform a workflow that would normally trigger a hook request, but for a service or
         product that the patient has indicated they intend to self-pay for, and Inferno
-        verifies that no hook requests are made.
+        will verify that no hook requests are made.
 
         Any hook requests made during these tests will not be checked for conformance
         or included in the cross-hook analyses around must support and other coverage requirements.
