@@ -15,6 +15,7 @@ module DaVinciCRDTestKit
   HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX = 'hi_data_fetch_'.freeze
   LONG_RUNNING_GROUP_TAG = 'long_running_request'.freeze
   UNKNOWN_CONTENT_GROUP_TAG = 'unknown_content_request'.freeze
+  SELF_PAY_GROUP_TAG = 'self_pay_request'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze
