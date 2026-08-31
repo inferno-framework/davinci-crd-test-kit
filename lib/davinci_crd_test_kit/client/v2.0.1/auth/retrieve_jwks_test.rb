@@ -110,9 +110,11 @@ module DaVinciCRDTestKit
       end
 
       def parse_or_fetch_jwks(jwk_set_input, crd_jwks_json)
-        JSON.parse(jwk_set_input)
-      rescue JSON::ParserError
-        fetch_jwks(jwk_set_input, crd_jwks_json)
+        if jwk_set_input.match?(%r{\Ahttps?://})
+          fetch_jwks(jwk_set_input, crd_jwks_json)
+        else
+          json_parse(jwk_set_input)
+        end
       end
     end
   end

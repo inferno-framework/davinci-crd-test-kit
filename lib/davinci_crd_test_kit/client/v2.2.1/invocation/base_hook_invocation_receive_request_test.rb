@@ -98,7 +98,7 @@ module DaVinciCRDTestKit
             selected_response_types
           else
             # matches the hook's default response type
-            primary_hook? ? DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE : DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE
+            primary_hook? ? [DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE] : [DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE]
           end.map do |response_type|
             if response_type == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
               "#{response_type}_action"

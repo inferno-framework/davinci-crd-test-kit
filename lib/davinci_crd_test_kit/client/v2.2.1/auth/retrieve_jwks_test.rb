@@ -120,9 +120,11 @@ module DaVinciCRDTestKit
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)
-        JSON.parse(jwk_set_input)
-      rescue JSON::ParserError
-        fetch_jwks(jwk_set_input, 'Fetched JWK Set input url response', index)
+        if jwk_set_input.match?(%r{\Ahttps?://})
+          fetch_jwks(jwk_set_input, 'Fetched JWK Set input url response', index)
+        else
+          parse_json_request_entity(jwk_set_input, 'JWK Set input', index)
+        end
       end
     end
   end

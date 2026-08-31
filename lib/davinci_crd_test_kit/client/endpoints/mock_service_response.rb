@@ -158,7 +158,7 @@ module DaVinciCRDTestKit
 
     # @private
     def connection
-      Faraday.new do |f|
+      @connection ||= Faraday.new do |f|
         f.request :url_encoded
         f.use FaradayMiddleware::FollowRedirects
       end
