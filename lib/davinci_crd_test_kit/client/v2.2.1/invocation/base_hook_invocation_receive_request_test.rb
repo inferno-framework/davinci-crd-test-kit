@@ -113,12 +113,7 @@ module DaVinciCRDTestKit
       def format_responded_response_types(response_types)
         response_types
           .map do |response_type|
-            response_type.split('_')
-              .map(&:capitalize)
-              .join(' ')
-              .sub('Smart', 'SMART')
-              .sub('Create Update', 'Create/Update')
-              .sub('Companions Prerequisites', 'Companions/Prerequisites')
+            DaVinciCRDTestKit::CardsIdentification.humanize_response_type(response_type)
               .sub('Card', '(card)')
               .sub('Action', '(systemAction)')
           end.join("\n            - ")

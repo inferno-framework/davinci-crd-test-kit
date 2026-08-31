@@ -35,6 +35,15 @@ module DaVinciCRDTestKit
       NutritionOrder ServiceRequest VisionPrescription
     ].freeze
 
+    def self.humanize_response_type(response_type)
+      response_type.split('_')
+        .map(&:capitalize)
+        .join(' ')
+        .sub('Smart', 'SMART')
+        .sub('Create Update', 'Create/Update')
+        .sub('Companions Prerequisites', 'Companions/Prerequisites')
+    end
+
     def identify_card_type(card) # rubocop:disable Metrics/CyclomaticComplexity
       return nil if card['type'].present? # action, not a card
       return ADDITIONAL_ORDERS_RESPONSE_TYPE if additional_orders_response_type?(card)
