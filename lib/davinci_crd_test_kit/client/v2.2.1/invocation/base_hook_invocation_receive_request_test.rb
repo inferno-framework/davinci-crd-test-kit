@@ -8,38 +8,38 @@ module DaVinciCRDTestKit
 
       RESPONSE_TYPE_OPTIONS = [
         {
-          label: 'External Reference',
+          label: 'External Reference (card)',
           value: 'external_reference'
         },
         {
-          label: 'Instructions',
+          label: 'Instructions (card)',
           value: 'instructions'
         },
         {
-          label: 'Coverage Information',
+          label: 'Coverage Information (systemAction)',
           value: 'coverage_information'
         },
         {
-          label: 'Request Form Completion',
+          label: 'Request Form Completion (card)',
           value: 'request_form_completion'
         },
         {
-          label: 'Create/Update Coverage Information',
+          label: 'Create/Update Coverage Information (card)',
           value: 'create_update_coverage_info'
         },
         {
-          label: 'Launch SMART Application',
+          label: 'Launch SMART Application (card)',
           value: 'launch_smart_app'
         }
       ].freeze
 
       ORDER_RESPONSE_TYPE_OPTIONS = (RESPONSE_TYPE_OPTIONS + [
         {
-          label: 'Propose Alternate Request',
+          label: 'Propose Alternate Request (card)',
           value: 'propose_alternate_request'
         },
         {
-          label: 'Additional Orders as Companions/Prerequisites',
+          label: 'Additional Orders as Companions/Prerequisites (card)',
           value: 'companions_prerequisites'
         }
       ]).freeze
