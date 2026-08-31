@@ -11,7 +11,8 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that for each request the JWKS can be retrieved from the JWKS uri if
         it is present in the `jku` field within the JWT token header. Additionally, keys will be extracted and
         outputted for use in subsequent tests. If the client does not provide a uri in the `jku` field,
-        Inferno will extract keys from the raw JWKS JSON provided out of band as a part of the "Registration" group.
+        Inferno will use the JWK Set provided out of band as a part of the "Registration" group, either
+        retrieving it from a url or, if provided directly, extracting keys from the raw JWKS JSON.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
@@ -22,12 +23,10 @@ module DaVinciCRDTestKit
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
             description: %(
-            The client's registered JWK Set containing it's public key. Used
-            only when a request was received with a JWT without the `jku` header.
-            Inferno assumes this input, provided during the "Registration"
-            group, contains the raw JSON representation of a JWKS (if a URI was provided
-            it would be populated in the `jku` header). Run or re-run the "Registration"
-            group to set or change this value.
+            The client's registered JWK Set, provided during the "Registration" group, containing
+            it's public key. Used only when a request was received with a JWT without the `jku`
+            header. May be either a publicly accessible url containing the JWKS, or the raw JWKS
+            JSON. Run or re-run the "Registration" group to set or change this value.
           ),
             locked: true,
             optional: true
@@ -49,18 +48,9 @@ module DaVinciCRDTestKit
           jku = JSON.parse(token_header)['jku'] # NOTE: pre-verified json
           jwks =
             if jku.present?
-              get(jku)
-
-              if response[:status] == 200
-                parse_json_request_entity(response[:body], 'Fetched jku url response', index)
-              else
-                add_request_message('error',
-                                    "Unexpected response status: expected 200, but received #{response[:status]}",
-                                    index)
-                nil
-              end
+              fetch_jwks(jku, 'Fetched jku url response', index)
             else
-              parse_json_request_entity(cds_jwk_set, 'JWK Set input', index)
+              parse_or_fetch_jwks(cds_jwk_set, index)
             end
           if jwks.blank?
             crd_jwks_keys_json << nil
@@ -114,6 +104,25 @@ module DaVinciCRDTestKit
         auth_token_headers.any? do |token_header|
           token_header.present? && JSON.parse(token_header)['jku'].blank?
         end
+      end
+
+      def fetch_jwks(uri, entity, index)
+        get(uri)
+
+        if response[:status] == 200
+          parse_json_request_entity(response[:body], entity, index)
+        else
+          add_request_message('error',
+                              "Unexpected response status: expected 200, but received #{response[:status]}",
+                              index)
+          nil
+        end
+      end
+
+      def parse_or_fetch_jwks(jwk_set_input, index)
+        JSON.parse(jwk_set_input)
+      rescue JSON::ParserError
+        fetch_jwks(jwk_set_input, 'Fetched JWK Set input url response', index)
       end
     end
   end
