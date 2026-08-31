@@ -18,14 +18,15 @@ module DaVinciCRDTestKit
       )
       attestation
 
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-49'
+
       def responded_card_types
-        list_card_types_in_requests(requests)
+        @responded_card_types ||= list_card_types_in_requests(requests)
       end
 
-      def format_responded_response_types
-        responded_card_types
+      def format_responded_response_types(response_types = responded_card_types)
+        response_types
           .map do |response_type|
-          response_type_string =
             response_type.split('_')
               .map(&:capitalize)
               .join(' ')
@@ -33,11 +34,47 @@ module DaVinciCRDTestKit
               .sub('Smart', 'SMART')
               .sub('Create Update', 'Create/Update')
               .sub('Companions Prerequisites', 'Companions/Prerequisites')
-              .sub('Card', '(card)')
-              .sub('Action', '(systemAction)')
-          response_type_string
+              .sub(' Card', '')
+              .sub(' Action', '')
+          end.join("\n")
+      end
+
+      def format_responded_card_types
+        @format_responded_card_types ||=
+          format_responded_response_types(responded_card_types.select do |type|
+            type.end_with?('_card')
+          end)
+      end
+
+      def format_responded_system_action_types
+        @format_responded_system_action_types ||=
+          format_responded_response_types(responded_card_types.select do |type|
+            type.end_with?('_action')
+          end)
+      end
+
+      CARD_AND_SYSTEM_ACTION_DISPLAY_PREFIX = "\n\n By attesting true, ".freeze
+      CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_PREFIX = 'you confirm that the following '.freeze
+      CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_CONNECTOR = "\n\n Additionally, ".freeze
+      CARD_AND_SYSTEM_ACTION_DISPLAY_CARD_CLAUSE =
+        'card types observed in Inferno\'s responses were displayed to users:'.freeze
+      CARD_AND_SYSTEM_ACTION_DISPLAY_SYSTEM_ACTION_CLAUSE =
+        'system action types observed in Inferno\'s responses were displayed to users ' \
+        'through standard card display, icons, flyovers, or another alternate mechanism:'.freeze
+
+      def card_and_system_action_details_display
+        if format_responded_card_types.present? && format_responded_system_action_types.present?
+          "#{CARD_AND_SYSTEM_ACTION_DISPLAY_PREFIX}#{CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_PREFIX}" \
+            "#{CARD_AND_SYSTEM_ACTION_DISPLAY_CARD_CLAUSE}\n#{format_responded_card_types}" \
+            "#{CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_CONNECTOR}#{CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_PREFIX}" \
+            "#{CARD_AND_SYSTEM_ACTION_DISPLAY_SYSTEM_ACTION_CLAUSE}\n#{format_responded_system_action_types}"
+        elsif format_responded_card_types.present?
+          "#{CARD_AND_SYSTEM_ACTION_DISPLAY_PREFIX}#{CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_PREFIX}" \
+            "#{CARD_AND_SYSTEM_ACTION_DISPLAY_CARD_CLAUSE}\n#{format_responded_card_types}"
+        else
+          "#{CARD_AND_SYSTEM_ACTION_DISPLAY_PREFIX}#{CARD_AND_SYSTEM_ACTION_DISPLAY_CLAUSE_PREFIX}" \
+            "#{CARD_AND_SYSTEM_ACTION_DISPLAY_SYSTEM_ACTION_CLAUSE}\n#{format_responded_system_action_types}"
         end
-          .join("\n")
       end
 
       output :attest_true_url
@@ -57,12 +94,12 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Card Display Attestation**:
 
-            I attest that the following CRD response types returned by Inferno's simulated
-            CRD servers were processed by the client system and displayed or otherwise made
-            available to users of the client system in an appropriate way that allows for
-            consideration and action if warranted:
+            I attest that the simulated CRD responses returned by Inferno during this
+            group were successfully processed by the client system and that they were
+            made available to users of the system in an appropriate way that allowed for
+            user review and action if warranted.
 
-            #{format_responded_response_types}
+            #{card_and_system_action_details_display}
 
             [Click here](#{attest_true_url}) if the above statement is **true**.
 
