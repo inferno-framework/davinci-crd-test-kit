@@ -156,8 +156,16 @@ module DaVinciCRDTestKit
       }[requested_hook]
     end
 
+    # @private
+    def connection
+      @connection ||= Faraday.new do |f|
+        f.request :url_encoded
+        f.use FaradayMiddleware::FollowRedirects
+      end
+    end
+
     def make_resource_request(uri, access_token)
-      response = Faraday.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" })
+      response = connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" })
       return unless response.status == 200
 
       resource = FHIR.from_contents(response.body)

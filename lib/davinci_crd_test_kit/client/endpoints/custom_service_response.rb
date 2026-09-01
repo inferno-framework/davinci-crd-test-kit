@@ -18,17 +18,17 @@ module DaVinciCRDTestKit
 
     def parsed_user_input
       if custom_response_template.blank?
-        error_response('No custom template provided for custom Inferno CRD response',
-                       code: 500,
-                       outcome_code: 'processing')
+        hook_error_response('No custom template provided for custom Inferno CRD response',
+                            code: 500,
+                            outcome_code: 'processing')
         nil
       else
         JSON.parse(custom_response_template)
       end
     rescue JSON::ParserError
-      error_response('Invalid template provided for custom Inferno CRD response: invalid JSON',
-                     code: 500,
-                     outcome_code: 'processing')
+      hook_error_response('Invalid template provided for custom Inferno CRD response: invalid JSON',
+                          code: 500,
+                          outcome_code: 'processing')
       nil
     end
 
@@ -45,7 +45,7 @@ module DaVinciCRDTestKit
 
       hook_response
     rescue FhirpathServiceError => e
-      error_response(
+      hook_error_response(
         'FHIRPath service error while generating custom response. ' \
         'Check the FHIRPath expressions and data in your response template and hook request. ' \
         "Details: #{e.message}",

@@ -69,9 +69,8 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     it 'propose_alternate_request for order-dispatch uses context order reference to fetch from FHIR server' do
       coverage = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json')))
       service_request = FHIR::ServiceRequest.new(id: 'example')
-      allow(Faraday).to receive(:get)
-        .with('https://example/r4/ServiceRequest/example', nil, anything)
-        .and_return(instance_double(Faraday::Response, status: 200, body: service_request.to_json))
+      stub_request(:get, 'https://example/r4/ServiceRequest/example')
+        .to_return(status: 200, body: service_request.to_json)
       messages_double = instance_double(Inferno::Repositories::Messages)
       allow(messages_double).to receive(:create)
       allow(Inferno::Repositories::Messages).to receive(:new).and_return(messages_double)
@@ -345,9 +344,8 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     it 'dispatched order not found in prefetch is fetched from FHIR server' do
       coverage = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json')))
       service_request = FHIR::ServiceRequest.new(id: 'example')
-      allow(Faraday).to receive(:get)
-        .with('https://example/r4/ServiceRequest/example', nil, anything)
-        .and_return(instance_double(Faraday::Response, status: 200, body: service_request.to_json))
+      stub_request(:get, 'https://example/r4/ServiceRequest/example')
+        .to_return(status: 200, body: service_request.to_json)
 
       creator = make_v221_creator(
         types: [],
@@ -365,6 +363,32 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(system_actions.first['resource'].resourceType).to eq('ServiceRequest')
     end
 
+    it 'make_resource_request follows a redirect from the FHIR server' do
+      coverage = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json')))
+      service_request = FHIR::ServiceRequest.new(id: 'example')
+      initial_request = stub_request(:get, 'https://example/r4/ServiceRequest/example')
+        .to_return(status: 302, headers: { 'Location' => 'https://example/r4/ServiceRequest/redirected' })
+      redirected_request = stub_request(:get, 'https://example/r4/ServiceRequest/redirected')
+        .to_return(status: 200, body: service_request.to_json)
+
+      creator = make_v221_creator(
+        types: [],
+        hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
+        body: {
+          'fhirServer' => 'https://example/r4',
+          'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+          'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] },
+          'prefetch' => { 'coverage' => coverage }
+        }
+      )
+      response = creator.build_mock_hook_response
+      system_actions = response['systemActions']
+      expect(system_actions).to be_present
+      expect(system_actions.first['resource'].resourceType).to eq('ServiceRequest')
+      expect(initial_request).to have_been_made.once
+      expect(redirected_request).to have_been_made.once
+    end
+
     it 'get_context_resource returns nil for a blank resource ID' do
       creator = make_v221_creator(types: [], body: order_sign_request_with_coverage)
       expect(creator.get_context_resource(nil)).to be_nil
@@ -379,9 +403,8 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
     it 'get_context_resource prepends encounter resource type to bare ID before fetching' do
       coverage = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json')))
       encounter = FHIR::Encounter.new(id: 'example')
-      allow(Faraday).to receive(:get)
-        .with('https://example/r4/Encounter/example', nil, anything)
-        .and_return(instance_double(Faraday::Response, status: 200, body: encounter.to_json))
+      stub_request(:get, 'https://example/r4/Encounter/example')
+        .to_return(status: 200, body: encounter.to_json)
 
       creator = make_v221_creator(
         types: ['coverage_information'],

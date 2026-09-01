@@ -41,30 +41,17 @@ module DaVinciCRDTestKit
           @request_number = index + 1
 
           jku = JSON.parse(token_header)['jku']
-          if jku.present?
-            get(jku)
+          jwks =
+            if jku.present?
+              fetch_jwks(jku, crd_jwks_json)
+            else
+              skip_if cds_jwk_set.blank?,
+                      %(#{request_number}JWK Set must be inputted if the client's JWK Set is not available via a URL
+                    identified by the jku header field)
 
-            if response[:status] != 200
-              add_message('error', %(
-                        #{request_number}Unexpected response status: expected 200, but received
-                        #{response[:status]}))
-              next
+              parse_or_fetch_jwks(cds_jwk_set, crd_jwks_json)
             end
-
-            @request_number = index + 1
-            jwks = json_parse(response[:body])
-            next if jwks.blank?
-
-            crd_jwks_json << response[:body]
-
-            jwks = JSON.parse(response[:body])
-          else
-            skip_if cds_jwk_set.blank?,
-                    %(#{request_number}JWK Set must be inputted if the client's JWK Set is not available via a URL
-                  identified by the jku header field)
-
-            jwks = JSON.parse(cds_jwk_set)
-          end
+          next if jwks.blank?
 
           keys = jwks['keys']
           unless keys.is_a?(Array)
@@ -103,6 +90,31 @@ module DaVinciCRDTestKit
                crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
         no_error_validation('Retrieving JWKS failed.')
+      end
+
+      def fetch_jwks(uri, crd_jwks_json)
+        get(uri)
+
+        if response[:status] != 200
+          add_message('error', %(
+                    #{request_number}Unexpected response status: expected 200, but received
+                    #{response[:status]}))
+          return false
+        end
+
+        jwks = json_parse(response[:body])
+        return false if jwks.blank?
+
+        crd_jwks_json << response[:body]
+        jwks
+      end
+
+      def parse_or_fetch_jwks(jwk_set_input, crd_jwks_json)
+        if jwk_set_input.match?(%r{\Ahttps?://})
+          fetch_jwks(jwk_set_input, crd_jwks_json)
+        else
+          json_parse(jwk_set_input)
+        end
       end
     end
   end

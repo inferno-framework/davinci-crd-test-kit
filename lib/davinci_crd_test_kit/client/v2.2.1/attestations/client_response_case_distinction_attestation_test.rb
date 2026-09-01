@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         test.
       )
       attestation
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@impl-1', 'hl7.fhir.us.davinci-crd_2.2.1@resp-49'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@impl-1'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 
       input :response_case_distinction_attestation,
