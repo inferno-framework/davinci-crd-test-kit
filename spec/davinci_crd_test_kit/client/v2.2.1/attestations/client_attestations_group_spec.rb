@@ -9,7 +9,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
     [
       'hl7.fhir.us.davinci-crd_2.2.1@sec-1',
       'hl7.fhir.us.davinci-crd_2.2.1@impl-1',
-      'hl7.fhir.us.davinci-crd_2.2.1@resp-49',
       'hl7.fhir.us.davinci-crd_2.2.1@conf-12',
       'hl7.fhir.us.davinci-crd_2.2.1@conf-13',
       'hl7.fhir.us.davinci-crd_2.2.1@found-33',

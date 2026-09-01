@@ -259,7 +259,10 @@ module DaVinciCRDTestKit
            request_body['fhirAuthorization'].present? &&
            request_body['fhirAuthorization']['access_token'].present?
           Faraday.new(url: request_body['fhirServer'], request: { open_timeout: 10 },
-                      headers: data_request_headers)
+                      headers: data_request_headers) do |f|
+            f.request :url_encoded
+            f.use FaradayMiddleware::FollowRedirects
+          end
         end
     end
 

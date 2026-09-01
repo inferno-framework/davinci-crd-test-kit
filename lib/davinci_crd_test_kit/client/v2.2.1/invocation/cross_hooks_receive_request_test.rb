@@ -1,10 +1,8 @@
-require_relative '../client_urls'
+require_relative 'base_hook_invocation_receive_request_test'
 
 module DaVinciCRDTestKit
   module V221
-    class CrossHooksReceiveRequestTest < Inferno::Test
-      include ClientURLs
-
+    class CrossHooksReceiveRequestTest < BaseHookInvocationReceiveRequestTest
       id :crd_v221_cross_hooks_request
       title 'Client invokes any hook'
       description %(
@@ -20,16 +18,6 @@ module DaVinciCRDTestKit
         5 minutes the test will become inactive and unresponsive to anything except cancelation).
       )
 
-      config options: { accepts_multiple_requests: true }
-
-      input :cds_jwt_iss,
-            title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
-            locked: true
       input :cross_hooks_response_approach,
             title: 'Response generation approach for all hooks',
             description: %(
@@ -61,42 +49,7 @@ module DaVinciCRDTestKit
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
             optional: true,
-            options: {
-              list_options: [
-                {
-                  label: 'External Reference',
-                  value: 'external_reference'
-                },
-                {
-                  label: 'Instructions',
-                  value: 'instructions'
-                },
-                {
-                  label: 'Coverage Information',
-                  value: 'coverage_information'
-                },
-                {
-                  label: 'Request Form Completion',
-                  value: 'request_form_completion'
-                },
-                {
-                  label: 'Create/Update Coverage Information',
-                  value: 'create_update_coverage_info'
-                },
-                {
-                  label: 'Launch SMART Application',
-                  value: 'launch_smart_app'
-                },
-                {
-                  label: 'Propose Alternate Request',
-                  value: 'propose_alternate_request'
-                },
-                {
-                  label: 'Additional Orders as Companions/Prerequisites',
-                  value: 'companions_prerequisites'
-                }
-              ]
-            },
+            options: { list_options: ORDER_RESPONSE_TYPE_OPTIONS },
             enable_when: { input_name: 'cross_hooks_response_approach', value: 'mocked' }
       input :cross_hooks_custom_response_template,
             title: 'Custom response template for all hook requests',
@@ -107,59 +60,37 @@ module DaVinciCRDTestKit
             type: 'textarea',
             optional: true,
             enable_when: { input_name: 'cross_hooks_response_approach', value: 'custom' }
-      output :continuation_url
 
-      def configured_response_details
-        if cross_hooks_response_approach == 'custom'
-          # rubocop:disable Layout/LineLength
-          'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
-            'from the **Custom response template for all hook requests** input ' \
-            'against the incoming request to create a response.'
-          # rubocop:enable Layout/LineLength
+      private
 
-        else
-          # rubocop:disable Layout/LineLength
-          'When responding, Inferno will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
-            'the following response types using the incoming request: ' \
-            "\n            - #{selected_response_types_string}"
-          # rubocop:enable Layout/LineLength
-        end
+      def hook_key
+        'cross_hooks'
       end
 
-      def selected_response_types_string
-        if cross_hooks_selected_response_types.present?
-          cross_hooks_selected_response_types.join("\n            - ")
-        else
-          'Coverage Information' # primary hook default
-        end
+      def hook_slug
+        'all'
       end
 
-      run do
-        identifier = cds_jwt_iss
-        continuation_url = "#{resume_pass_url}?token=#{identifier}"
-        output(continuation_url:)
+      def primary_hook?
+        true
+      end
 
-        wait(
-          identifier:,
-          message: %(
-            **Invoke any hook**:
+      def invoke_heading
+        'Invoke any hook'
+      end
 
-            Invoke any hook by sending requests to
-            one or both of the two Inferno simulated CRD servers
-            discoverable at the following endpoints:
+      def invoke_intro
+        "Invoke any hook by sending requests to\n            " \
+          "one or both of the two Inferno simulated CRD servers\n            " \
+          'discoverable at the following endpoints:'
+      end
 
-            - Complete Prefetch: `#{DISCOVERY_PATH}`
-            - Subset Prefetch: `#{PREFETCH_DISCOVERY_PATH}`
+      def complete_prefetch_url
+        discovery_url
+      end
 
-            For Inferno to recognize these requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
-
-            #{configured_response_details}
-
-            [Click here](#{continuation_url}) when you have finished submitting requests.
-          )
-        )
+      def subset_prefetch_url
+        prefetch_subset_discovery_url
       end
     end
   end

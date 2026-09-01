@@ -69,7 +69,7 @@ module DaVinciCRDTestKit
 
         exclude_message do |message|
           # extension definition issue present in 2.0.1 but corrected in later versions
-          message.message.match?(%r{The extension http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information is not allowed to be used at this point \(allowed = e:QuestionnaireResponse, e:Encounter, e:NutritionOrder, e:CommunicationRequest, e:DeviceRequest, e:ServiceRequest, e:MedicationRequest; this element is \[Appointment\]\)}) # rubocop:disable Layout/LineLength
+          message.message.match?(%r{The extension http://hl7\.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information v2\.0\.1 is not allowed to be used at this point \(this element is \[Appointment\]}) # rubocop:disable Layout/LineLength
         end
       end
 

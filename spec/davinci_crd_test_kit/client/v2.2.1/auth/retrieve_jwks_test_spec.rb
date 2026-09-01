@@ -100,6 +100,30 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'passes if it receives a valid jwk_set input provided as a url and no jku header is present' do
+    token_header_no_jku = token_header.except(:jku)
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header_no_jku.to_json],
+                       cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('pass')
+    expect(jwks_request).to have_been_made
+    expect(session_output(:crd_jwks_keys_json).first).to_not be_nil
+  end
+
+  it 'fails if the jwk_set url input returns a non 200 response and no jku header is present' do
+    token_header_no_jku = token_header.except(:jku)
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_return(status: 404, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header_no_jku.to_json],
+                       cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received/)
+    expect(jwks_request).to have_been_made
+  end
+
   it 'skips if jku field is not set, and no jwk_set is provided' do
     token_header_no_jku = token_header.except(:jku)
 

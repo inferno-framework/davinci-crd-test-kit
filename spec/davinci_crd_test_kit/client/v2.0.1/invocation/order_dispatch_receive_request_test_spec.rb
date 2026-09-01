@@ -172,7 +172,7 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
     post_json(server_endpoint, body.to_json)
 
     expect(last_response).to be_server_error
-    expect(last_response.body).to match(/Unable to find test run/)
+    expect(last_response.body).to match(/is not associated with a waiting session/)
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end
@@ -198,7 +198,7 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderDispatchReceiveRequestTest, :reques
     post_json(server_endpoint, body.to_json)
 
     expect(last_response).to be_server_error
-    expect(last_response.body).to match(/Unable to find test run/)
+    expect(last_response.body).to match(/is not associated with a waiting session/)
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end

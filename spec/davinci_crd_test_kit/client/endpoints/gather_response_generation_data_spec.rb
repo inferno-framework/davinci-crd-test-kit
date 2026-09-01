@@ -187,6 +187,21 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(module_instance.analyzed_resources[external_reference]).to eq(patient_example)
       expect(external_request).to have_been_made.once
     end
+
+    it 'follows a redirect when fetching a reference' do
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      redirected_location = "#{fhir_server}/Patient/redirected"
+
+      initial_request = stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 302, headers: { 'Location' => redirected_location })
+      redirected_request = stub_request(:get, redirected_location)
+        .to_return(status: 200, body: patient_example.to_json)
+
+      module_instance.gather_data_for_request([patient_example_reference_relative], [])
+      expect(module_instance.analyzed_resources[patient_example_reference_relative]).to eq(patient_example)
+      expect(initial_request).to have_been_made.once
+      expect(redirected_request).to have_been_made.once
+    end
   end
 
   describe 'when analyzing resources' do
