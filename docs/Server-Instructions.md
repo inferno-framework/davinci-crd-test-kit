@@ -54,7 +54,7 @@ If you would like to try out the order-sign hook invocation tests against
 you can do so using the following steps:
 
 1. Create a "Da Vinci CRD Server v2.0.1 Test Suite" session.
-1. Select the *CRD Server RI* option from the Preset dropdown in the upper left.
+1. Select the *CRD Server Reference Implementation* option from the Preset dropdown in the upper left.
 1. Click the "RUN ALL TESTS" button in the upper right and click "SUBMIT"
 1. Inferno will perform several hook invocations and complete the test run. Note that all
    tests may not pass.
