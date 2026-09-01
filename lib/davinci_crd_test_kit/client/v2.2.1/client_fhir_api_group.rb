@@ -10,16 +10,13 @@ module DaVinciCRDTestKit
         CRD client systems are responsible for returning data requested by the CRD server needed to provide decision support.
         This group contains tests that verify the required 'server' FHIR API capabilities.
         These 'server' capabilities are based on the US Core Server Capability Statement for the US Core version chosen
-        when initiating the test session:
-        - [US Core 3.1.1 Server Capability Statement](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html)
-        - [US Core 6.1.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html)
-        - [US Core 7.0.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html)
+        when the test session was initiated.
       DESCRIPTION
       id :crd_v221_client_fhir_api
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-1'
 
-      input_instructions %(
+      INPUT_INSTRUCTIONS = %(
         The location of and an access token for the client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
         the body of the latest hook invocation made during this session:
@@ -29,7 +26,9 @@ module DaVinciCRDTestKit
         If that access token will not be long-lived enough to perform
         a full test of the US Core FHIR API, provide an updated token and/or refresh
         token with Client ID and token endpoint so that Inferno can perform these tests.
-      )
+      ).freeze
+
+      input_instructions INPUT_INSTRUCTIONS
 
       input :url,
             title: 'FHIR Endpoint',
@@ -46,10 +45,11 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 3.1.1 Server Capability Statement](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html).
 
-          Note: these tests do not look for crd-specific data and so only verify conformance against
-          US Core profiles. The hook tests take the CRD-specific profiles into account.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
+          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_3_REQUIREMENT
+        input_instructions INPUT_INSTRUCTIONS
 
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_311_client_update_verification
@@ -60,10 +60,11 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 6.1.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html).
 
-          Note: these tests do not look for crd-specific data and so only verify conformance against
-          US Core profiles. The hook tests take the CRD-specific profiles into account.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
+          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_6_REQUIREMENT
+        input_instructions INPUT_INSTRUCTIONS
 
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_610_client_update_verification
@@ -74,10 +75,11 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 7.0.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html).
 
-          Note: these tests do not look for crd-specific data and so only verify conformance against
-          US Core profiles. The hook tests take the CRD-specific profiles into account.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
+          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_7_REQUIREMENT
+        input_instructions INPUT_INSTRUCTIONS
 
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_700_client_update_verification
