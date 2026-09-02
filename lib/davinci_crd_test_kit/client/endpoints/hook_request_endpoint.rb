@@ -136,6 +136,8 @@ module DaVinciCRDTestKit
         build_unknown_content_hook_response
       elsif self_pay_group?
         build_self_pay_hook_response
+      elsif multiple_payers_group?
+        build_multiple_payers_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
       else
@@ -246,6 +248,10 @@ module DaVinciCRDTestKit
       test.config.options[:crd_interaction_group] == SELF_PAY_GROUP_TAG
     end
 
+    def multiple_payers_group?
+      test.config.options[:crd_interaction_group] == MULTIPLE_PAYERS_GROUP_TAG
+    end
+
     def long_running_pause_time
       JSON.parse(result.input_json)
         .find { |input| input['name'].include?('long_running_pause_time') }
@@ -254,6 +260,8 @@ module DaVinciCRDTestKit
 
     # end the wait immediately after the scenario request returns
     # pause for long-running requests here because update_result runs before response generation
+    # the multiple payers scenario is excluded so that the wait continues until the tester
+    # acknowledges that all requests have been sent, since more than one request may be made
     def update_result
       return unless long_running_group? || unknown_content_group? || self_pay_group?
 

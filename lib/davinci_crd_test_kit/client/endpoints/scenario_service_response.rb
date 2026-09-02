@@ -13,6 +13,10 @@ module DaVinciCRDTestKit
       build_coverage_information_hook_response
     end
 
+    def build_multiple_payers_hook_response
+      build_coverage_information_hook_response
+    end
+
     def build_coverage_information_hook_response
       response_body = { 'cards' => [] }
       system_actions = coverage_information_system_actions
