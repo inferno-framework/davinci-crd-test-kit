@@ -14,10 +14,10 @@ module DaVinciCRDTestKit
         [six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html):
         * [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
         * [encounter-start](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
-        * [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
         * [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
-        * [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
         * [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
+        * [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
+        * [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
 
         Each hook group contains a test which waits for incoming hook requests from the CRD client, and tests which
         verify the incoming hook requests conform to the specific hook requirements specified the
@@ -58,16 +58,16 @@ module DaVinciCRDTestKit
       group from: :crd_v201_client_encounter_start,
             optional: true
 
-      group from: :crd_v201_client_encounter_discharge,
+      group from: :crd_v201_client_order_select,
             optional: true
 
-      group from: :crd_v201_client_order_select,
+      group from: :crd_v201_client_order_sign,
             optional: true
 
       group from: :crd_v201_client_order_dispatch,
             optional: true
 
-      group from: :crd_v201_client_order_sign,
+      group from: :crd_v201_client_encounter_discharge,
             optional: true
     end
   end

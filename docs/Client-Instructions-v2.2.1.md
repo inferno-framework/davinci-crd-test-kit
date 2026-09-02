@@ -178,15 +178,15 @@ NOTES:
   compete to associate requests. If you are seeing odd behavior, consider trying again at
   another time.
 
-### br-provider reference implementation
+### Da Vinci BR Provider reference implementation
 
-The [br-provider](https://br-provider.davinci.hl7.org/) reference implementation is
+The [Da Vinci BR Provider](https://br-provider.davinci.hl7.org/) reference implementation is
 actively maintained and can be used to demonstrate most of the CRD hooks. The following
 partial test run is not expected to fully pass, but demonstrates the steps needed in
 a realistic UI to interact with the Inferno CRD client tests.
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using any "US Core Version".
-1. Select the "br-provider Reference Implementation" option from the Preset dropdown in the upper left.
+1. Select the "Da Vinci BR Provider Reference Implementation" option from the Preset dropdown in the upper left.
 1. In a separate tab, navigate to https://br-provider.davinci.hl7.org/ and login (no password
    needed) as a practitioner (any).
 1. Configure the connection to Inferno's simulated CRD server by:
@@ -212,7 +212,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, only the two cards were clearly displayed, but the coverage-information
    system action was not.
-1. In Inferno, run group "1.2.4 order-select" without any changes to the inputs.
+1. In Inferno, run group "1.2.3 order-select" without any changes to the inputs.
    When the dialog appears indicating Inferno is ready to receive requests, return to the
    br-provider tab.
 1. Select an order (any) from the "Add Order" dropdown and click the "+ Add" button to the right
@@ -227,7 +227,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, only the two cards were clearly displayed, but the coverage-information
    system action was not.
-1. In Inferno, run group "1.2.6 order-sign" without any changes to the inputs.
+1. In Inferno, run group "1.2.4 order-sign" without any changes to the inputs.
    When the dialog appears indicating Inferno is ready to receive requests, return to the
    br-provider tab.
 1. Click the "Sign all Orders" button at the bottom of the chart frame (scroll down). On the
@@ -257,7 +257,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, the two cards were clearly displayed, and the details from the coverage-information
    system action (e.g., "covered" indication) were displayed with the list of linked orders.
-1. In Inferno, run group "1.2.3 encounter-discharge" without any changes to the inputs.
+1. In Inferno, run group "1.2.6 encounter-discharge" without any changes to the inputs.
    When the dialog appears indicating Inferno is ready to receive requests, return to the
    br-provider tab.
 1. Click the "Finish Encounter" button at the bottom of the chart frame. This will trigger
@@ -294,7 +294,7 @@ look like.
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using the default "US Core Version",
    which will not be used.
 1. Select the "CRD Request Generator Reference Implementation" option from the Preset dropdown in the upper left.
-1. Select the "1.2.6 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
+1. Select the "1.2.4 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
 1. Select the response types Inferno should respond with under the **Response types to return
    from order-sign hook requests** input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be

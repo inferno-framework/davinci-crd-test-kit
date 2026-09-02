@@ -108,7 +108,7 @@ you can do so using the following steps:
 1. Create a Da Vinci CRD Client v2.0.1 Test Suite session using the default "SMART App Launch Version",
    which will not be used.
 1. Select the *CRD Request Generator Reference Implementation* option from the Preset dropdown in the upper left.
-1. Select the "1.2.6 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
+1. Select the "1.2.4 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
 1. Select the response types Inferno should respond with under the "Response types to return
    from order-sign hook requests" input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be
