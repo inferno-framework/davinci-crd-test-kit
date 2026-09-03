@@ -5,31 +5,24 @@
   "inputs": [
     {
       "name": "cds_jwt_iss",
-      "description": "Value of the `iss` claim that will be sent in the JWT used to authorize the client's hook request sent as the Bearer token in the `Authorization` header. This value will be used to associate incoming requests with this test session and any requests that use a different `iss` value will not be recognized.",
       "title": "CRD JWT Issuer",
       "type": "text",
       "value": "https://br-provider.davinci.hl7.org"
     },
     {
       "name": "cds_jwk_set",
-      "description": "The CRD client's JWK Set containing it's public key. May be either a publicly accessible url containing the JWKS, or the raw JWKS. The client suite may be run without this input, but it is required for the tests to pass.",
-      "optional": true,
       "title": "CRD JSON Web Key Set (JWKS)",
       "type": "textarea",
       "value": "https://br-provider.davinci.hl7.org/oauth2/jwks"
     },
     {
       "name": "complete_prefetch_service_organization_id",
-      "description": "The FHIR Organization id associated with Inferno's simulated complete prefetch CRD server. This Organization must be referenced as the payer on Coverages in hook requests made to services described by the `https://inferno-qa.healthit.gov/suites/custom/crd_client_v221/cds-services` discovery endpoint. The client suite may be run without this input, but it is required for the tests to pass.",
-      "optional": true,
       "title": "Complete Prefetch Service Organization id",
       "type": "text",
       "value": "org1234"
     },
     {
       "name": "subset_prefetch_service_organization_id",
-      "description": "The FHIR Organization id associated with Inferno's simulated subset prefetch CRD server. This Organization must be referenced payer on Coverages in hook requests made to services described by the `https://inferno-qa.healthit.gov/suites/custom/crd_client_v221/prefetch-subset/cds-services` discovery endpoint. The client suite may be run without this input, but it is required for the tests to pass.",
-      "optional": true,
       "title": "Subset Prefetch Service Organization id",
       "type": "text",
       "value": ""
