@@ -182,9 +182,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts:
                          [order_dispatch_context, invalid_hook_request].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /Request 2: order-dispatch request context does not contain required field `patientId`/
-      )
+      expect(entity_result_message(test))
+        .to include('Request 2: order-dispatch request context does not contain required field `patientId`')
       expect(validation_request).to have_been_made.times(7)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made.times(2)
@@ -231,9 +230,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /order-dispatch request context does not contain required field `patientId`/
-      )
+      expect(entity_result_message(test))
+        .to include('order-dispatch request context does not contain required field `patientId`')
     end
 
     it 'fails if resource type and id cannot be extracted from context `performer` field' do
@@ -284,7 +282,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/expected 200, but received 404/)
+      expect(entity_result_message(test)).to include('expected 200, but received 404')
       expect(patient_resource_request).to have_been_made
       expect(service_request_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made
@@ -315,7 +313,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Resource does not conform to/)
+      expect(entity_result_message(test)).to include('Resource does not conform to')
       expect(validation_request).to have_been_made.times(4)
       expect(patient_resource_request).to have_been_made
       expect(service_request_resource_request).to have_been_made
@@ -348,7 +346,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Field `task` must be a `Task`/)
+      expect(entity_result_message(test)).to include('Field `task` must be a `Task`')
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made
       expect(service_request_resource_request).to have_been_made
@@ -383,7 +381,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_dispatch_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Resource does not conform to/)
+      expect(entity_result_message(test)).to include('Resource does not conform to')
       expect(validation_request).to have_been_made.times(3)
       expect(task_validation_request).to have_been_made
       expect(patient_resource_request).to have_been_made

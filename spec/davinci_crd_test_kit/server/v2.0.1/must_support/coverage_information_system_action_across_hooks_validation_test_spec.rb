@@ -31,6 +31,6 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionAcrossHoo
     run(runnable_within, appointment_book_coverage_info: [], base_url:)
     result = run(runnable_across)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/None of the hooks invoked returned valid Coverage Info system actions/)
+    expect(result.result_message).to include('None of the hooks invoked returned valid Coverage Info system actions')
   end
 end

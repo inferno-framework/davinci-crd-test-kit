@@ -34,6 +34,6 @@ RSpec.describe DaVinciCRDTestKit::V221::InvokeHookSingleTest do
                            service_request_bodies: request_bodies, mock_ehr_bundle:)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/supports only one request body/)
+    expect(result.result_message).to include('supports only one request body')
   end
 end

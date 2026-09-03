@@ -41,20 +41,20 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
   it 'fails when no JWKS is provided' do
     result = run_with_defaults(cds_jwk_set: nil)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message)).to include(match(/CRD JSON Web Key Set/))
+    expect(result_messages.map(&:message)).to include(include('CRD JSON Web Key Set'))
   end
 
   it 'fails when JWKS contains no valid keys' do
     empty_jwks = { 'keys' => [] }.to_json
     result = run_with_defaults(cds_jwk_set: empty_jwks)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message)).to include(match(/does not include any valid keys/))
+    expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
   end
 
   it 'adds a warning when JWKS is provided as raw JSON rather than a URL' do
     result = run_with_defaults
     expect(result.result).to eq('pass')
-    expect(result_messages.map(&:message)).to include(match(/strongly discouraged/))
+    expect(result_messages.map(&:message)).to include(include('strongly discouraged'))
   end
 
   it 'fails when both organization ids are the same' do
@@ -63,7 +63,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
       subset_prefetch_service_organization_id: 'same-org'
     )
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message)).to include(match(/unique Organization id/))
+    expect(result_messages.map(&:message)).to include(include('unique Organization id'))
   end
 
   it 'passes when organization ids differ' do
@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     )
     expect(result.result).to eq('fail')
     messages = result_messages.map(&:message)
-    expect(messages).to include(match(/CRD JSON Web Key Set/))
-    expect(messages).to include(match(/unique Organization id/))
+    expect(messages).to include(include('CRD JSON Web Key Set'))
+    expect(messages).to include(include('unique Organization id'))
   end
 end

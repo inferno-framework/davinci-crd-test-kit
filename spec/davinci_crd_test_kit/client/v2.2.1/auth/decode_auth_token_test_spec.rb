@@ -103,9 +103,8 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /\(Request 2\) Authorization token must be a JWT presented as a `Bearer` token/
-      )
+      expect(entity_result_message.message)
+        .to include('(Request 2) Authorization token must be a JWT presented as a `Bearer` token')
       expect(session_output(:auth_tokens)).to eq([token, nil])
       expect(session_output(:auth_token_payloads_json).length).to eq(2)
       expect(session_output(:auth_token_payloads_json).last).to be_nil
@@ -125,7 +124,8 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Authorization token must be a JWT presented as a `Bearer` token/)
+      expect(entity_result_message.message)
+        .to include('Authorization token must be a JWT presented as a `Bearer` token')
       expect(session_output(:auth_tokens)).to eq([nil])
       expect(session_output(:auth_token_payloads_json)).to eq([nil])
       expect(session_output(:auth_token_headers_json)).to eq([nil])

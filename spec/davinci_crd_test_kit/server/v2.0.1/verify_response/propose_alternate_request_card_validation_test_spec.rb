@@ -35,31 +35,31 @@ RSpec.describe DaVinciCRDTestKit::V201::ProposeAlternateRequestCardValidationTes
   it 'skips if valid_cards_with_suggestions not present' do
     result = run(runnable, contexts: [order_select_context].to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_cards_with_suggestions' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_cards_with_suggestions' is nil, skipping test")
   end
 
   it 'skips if contexts not present' do
     result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'contexts' is nil, skipping test/)
+    expect(result.result_message).to include("'contexts' is nil, skipping test")
   end
 
   it 'fails if valid_cards_with_suggestions is not valid json' do
     result = run(runnable, valid_cards_with_suggestions: '[[', contexts: [order_select_context].to_json)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'fails if contexts is not json' do
     result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json, contexts: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'skips if no propose alternate request card present' do
     result = run(runnable, valid_cards_with_suggestions: [].to_json, contexts: [order_select_context].to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/does not contain a Propose Alternate Request card/)
+    expect(result.result_message).to include('does not contain a Propose Alternate Request card')
   end
 
   it 'fails if the order being deleted is not in draftOrders' do
@@ -69,7 +69,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ProposeAlternateRequestCardValidationTes
 
     result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json, contexts: [order_select_context].to_json)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/must reference FHIR resource from the `draftOrders`/)
+    expect(entity_result_message.message).to include('must reference FHIR resource from the `draftOrders`')
   end
 
   it 'fails if there is no create action for the order being deleted' do
@@ -79,6 +79,6 @@ RSpec.describe DaVinciCRDTestKit::V201::ProposeAlternateRequestCardValidationTes
 
     result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json, contexts: [order_select_context].to_json)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/There's no `create` action/)
+    expect(entity_result_message.message).to include("There's no `create` action")
   end
 end

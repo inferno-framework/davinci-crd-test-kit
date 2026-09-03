@@ -153,7 +153,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
       result = run(test, auth_tokens: [token_invalid_key], auth_tokens_jwk_json: [jwk.to_json],
                          cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Token validation error: Signature verification failed/)
+      expect(entity_result_message.message).to include('Token validation error: Signature verification failed')
     end
 
     it 'passes when JWK has no alg field but JWT header specifies alg' do
@@ -179,7 +179,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Token validation error/)
+      expect(entity_result_message.message).to include('Token validation error')
     end
 
     it 'fails if the token uses an unsupported algorithm such as HS256' do
@@ -193,7 +193,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
+      expect(entity_result_message.message).to include('CDS Hooks prohibits')
     end
 
     it 'fails if the token uses the `none` algorithm' do
@@ -207,7 +207,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/CDS Hooks prohibits/)
+      expect(entity_result_message.message).to include('CDS Hooks prohibits')
     end
 
     it 'reports every problem at once rather than stopping at the first failed check' do
@@ -241,7 +241,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
                    auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/JWT payload missing required claims: `exp`/)
+      expect(entity_result_message.message).to include('JWT payload missing required claims: `exp`')
     end
   end
 end

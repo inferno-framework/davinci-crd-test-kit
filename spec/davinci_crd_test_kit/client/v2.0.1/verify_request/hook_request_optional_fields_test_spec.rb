@@ -130,9 +130,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(index: 2).message).to match(
-        /Request 2: `fhirAuthorization` did not contain required field: `access_token`/
-      )
+      expect(entity_result_message(index: 2).message)
+        .to include('Request 2: `fhirAuthorization` did not contain required field: `access_token`')
     end
 
     it 'passes and produces fhir server but not bearer token output when no `fhirAuthorization` field' do
@@ -231,7 +230,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Request 1: Hook request field `prefetch` is not of type Hash/)
+      expect(entity_result_message.message).to include('Request 1: Hook request field `prefetch` is not of type Hash')
     end
 
     it 'fails if an optional field is defined but empty (hash)' do
@@ -250,7 +249,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message)
-        .to match(/Request 1: Hook request field `prefetch` cannot be defined but blank/)
+        .to include('Request 1: Hook request field `prefetch` cannot be defined but blank')
     end
 
     it 'fails if an optional field is defined but empty (String)' do
@@ -269,7 +268,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message)
-        .to match(/Request 1: Hook request field `fhirServer` cannot be defined but blank/)
+        .to include('Request 1: Hook request field `fhirServer` cannot be defined but blank')
     end
 
     it 'fails if an empty additional field is included' do
@@ -288,7 +287,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message(index: 1).message)
-        .to match(/Request 1: Hook request field `new` cannot be defined but blank/)
+        .to include('Request 1: Hook request field `new` cannot be defined but blank')
     end
 
     it 'fails if an empty additional field is included in fhirAuthorization' do
@@ -306,7 +305,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(entity_result_message(index: 1).message)
-        .to match(/Request 1: `fhirAuthorization` field `new` cannot be defined but blank/)
+        .to include('Request 1: `fhirAuthorization` field `new` cannot be defined but blank')
     end
 
     it 'fails if hook request missing required field in fhirAuthorization' do
@@ -324,9 +323,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(index: 1).message).to match(
-        /Request 1: `fhirAuthorization` did not contain required field: `access_token`/
-      )
+      expect(entity_result_message(index: 1).message)
+        .to include('Request 1: `fhirAuthorization` did not contain required field: `access_token`')
     end
 
     it 'fails if hook request fhirAuthorization `token_type` is not `Bearer`' do
@@ -344,9 +342,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestOptionalFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(index: 1).message).to match(
-        /Request 1: `fhirAuthorization` `token_type` field is not set to 'Bearer'/
-      )
+      expect(entity_result_message(index: 1).message)
+        .to include("Request 1: `fhirAuthorization` `token_type` field is not set to 'Bearer'")
     end
 
     it 'passes if patient scope included but `patient` field is omitted' do

@@ -72,6 +72,6 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
     result = run(test)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Non-conformant hook request/)
+    expect(result.result_message).to include('Non-conformant hook request')
   end
 end

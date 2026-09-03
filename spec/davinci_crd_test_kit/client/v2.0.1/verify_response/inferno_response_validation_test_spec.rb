@@ -114,7 +114,7 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(/Invalid Inferno .*\(s\). Check messages for issues found./)
-      expect(first_error_message.message).to match(/Action does not contain required field/)
+      expect(first_error_message.message).to include('Action does not contain required field')
     end
 
     it 'fails if a card is invalid' do
@@ -124,7 +124,7 @@ RSpec.describe DaVinciCRDTestKit::V201::InfernoResponseValidationTest do
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to match(/Invalid Inferno .*\(s\). Check messages for issues found./)
-      expect(first_error_message.message).to match(/Card does not contain required field/)
+      expect(first_error_message.message).to include('Card does not contain required field')
     end
 
     it 'passes on Inferno mocked cards and actions' do

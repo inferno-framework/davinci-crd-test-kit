@@ -51,7 +51,7 @@ module DaVinciCRDTestKit
         services.reject { |service| ignored_service_ids.include?(service['id']) }
       end
 
-      # rubocop:disable Layout/LineLength
+      # rubocop:disable-next Layout/LineLength
       def standard_prefetch_expressions(hook)
         case hook
         when 'appointment-book'
@@ -111,7 +111,6 @@ module DaVinciCRDTestKit
           }
         end
       end
-      # rubocop:enable Layout/LineLength
 
       # The IG examples contain FHIRPath alternatives separated by `|`, and CDS Hooks prefetch field names can vary.
       # Build a canonical signature so alternative ordering and `%prefetchKey` names do not affect matching.

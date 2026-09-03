@@ -136,7 +136,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
-        .to match(/No hook requested/)
+        .to include('No hook requested')
     end
 
     it 'returns 400 with OperationOutcome when the requested hook does not match the invoked hook' do

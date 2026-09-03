@@ -31,7 +31,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
     result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '3')
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Long-running Request Pause Time/)
+    expect(result.result_message).to include('Long-running Request Pause Time')
   end
 
   it 'enters wait state when long_running_pause_time is at least 5 seconds' do
@@ -99,7 +99,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
     post_json(server_endpoint, body.to_json)
 
     expect(last_response).to be_server_error
-    expect(last_response.body).to match(/is not associated with a waiting session/)
+    expect(last_response.body).to include('is not associated with a waiting session')
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end

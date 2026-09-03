@@ -23,19 +23,19 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionReceivedT
   it 'skips if valid_system_actions not present' do
     result = run(runnable, invoked_hook: 'appointment-book')
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_system_actions' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_system_actions' is nil, skipping test")
   end
 
   it 'fails if valid_system_actions is not json' do
     result = run(runnable, { valid_system_actions: '[[', invoked_hook: 'appointment-book' })
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'fails if coverage information system action is missing' do
     result = run(runnable, { valid_system_actions: [other_system_action].to_json, invoked_hook: 'appointment-book' })
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Coverage Information system action was not returned/)
+    expect(result.result_message).to include('Coverage Information system action was not returned')
   end
 
   it 'persists output' do

@@ -251,7 +251,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
+      expect(entity_result_message(test)).to include('Resource does not conform to profile')
       expect(practitioner_validation_request).to have_been_made
     end
 
@@ -290,7 +290,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
+      expect(entity_result_message(test)).to include('Resource does not conform to profile')
       expect(patient_validation_request).to have_been_made
     end
 
@@ -332,7 +332,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Resource does not conform to profile/)
+      expect(entity_result_message(test)).to include('Resource does not conform to profile')
       expect(coverage_validation_request).to have_been_made
     end
 
@@ -345,9 +345,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /Expected `coverage` field's Coverage resource to have a `beneficiary`/
-      )
+      expect(entity_result_message(test))
+        .to include("Expected `coverage` field's Coverage resource to have a `beneficiary`")
     end
 
     it 'fails if prefetch `coverage` has wrong status' do
@@ -357,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
 
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Expected `coverage` field's Coverage resource to have a `status`/)
+      expect(entity_result_message(test)).to include("Expected `coverage` field's Coverage resource to have a `status`")
     end
 
     it 'fails if prefetch has an additional unrequested field' do
@@ -366,7 +365,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
 
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Client sent non-requested Prefetch field `unrequested`/)
+      expect(entity_result_message(test)).to include('Client sent non-requested Prefetch field `unrequested`')
     end
   end
 

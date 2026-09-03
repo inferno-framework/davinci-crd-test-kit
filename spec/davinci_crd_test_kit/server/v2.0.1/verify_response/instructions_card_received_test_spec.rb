@@ -15,13 +15,13 @@ RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedTest do
   it 'skips if valid_cards not present' do
     result = run(runnable)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_cards' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_cards' is nil, skipping test")
   end
 
   it 'fails if valid_cards is not json' do
     result = run(runnable, valid_cards: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'fails if no instructions card present' do
@@ -30,6 +30,6 @@ RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedTest do
 
     result = run(runnable, valid_cards: dup_cards.to_json)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/did not contain an Instructions card/)
+    expect(result.result_message).to include('did not contain an Instructions card')
   end
 end

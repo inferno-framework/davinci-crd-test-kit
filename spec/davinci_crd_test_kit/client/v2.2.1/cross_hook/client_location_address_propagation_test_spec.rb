@@ -76,7 +76,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
     it 'skips when there are no hook requests to analyze' do
       result = run(test)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No hook requests received/)
+      expect(result.result_message).to include('No hook requests received')
     end
 
     it 'passes when a prefetched location already has an address' do
@@ -112,8 +112,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
                           })
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(%r{Address missing on prefetched 'Location/loc-2'})
-      expect(result_messages.map(&:message).join).to match(%r{parent 'Location/parent-1' has an address})
+      expect(result_messages.map(&:message).join).to include("Address missing on prefetched 'Location/loc-2'")
+      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
     end
 
     it 'fails when the error is found by traversing to a grandparent with an address' do
@@ -129,8 +129,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
                           })
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(%r{Address missing on prefetched 'Location/child'})
-      expect(result_messages.map(&:message).join).to match(%r{parent 'Location/grandparent' has an address})
+      expect(result_messages.map(&:message).join).to include("Address missing on prefetched 'Location/child'")
+      expect(result_messages.map(&:message).join).to include("parent 'Location/grandparent' has an address")
     end
 
     it 'fails when the partOf reference cannot be resolved' do
@@ -141,7 +141,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
                           })
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(/Unable to check address propagation/)
+      expect(result_messages.map(&:message).join).to include('Unable to check address propagation')
       expect(result_messages.map(&:message).join).to match(%r{Location/missing-loc.*could not be fetched})
     end
 
@@ -155,7 +155,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       create_parent_location_fetch_request(location: parent_location_with_address)
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(%r{Address missing on prefetched 'Location/loc-2'})
+      expect(result_messages.map(&:message).join).to include("Address missing on prefetched 'Location/loc-2'")
     end
 
     it 'passes when a fetched parent location has no address' do
@@ -217,7 +217,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       result = run(test)
       expect(result.result).to eq('fail')
       expect(result_messages.map(&:message).join)
-        .to match(%r{Parent of prefetched 'Location/loc-2' does not conform to the CRD Location profile})
+        .to include("Parent of prefetched 'Location/loc-2' does not conform to the CRD Location profile")
     end
 
     it 'includes individual validation issues in messages when conformance fails' do

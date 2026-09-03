@@ -137,7 +137,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AllResponsesIncludeCoverageInformationTe
     result = run(runnable, { invoked_hook: 'appointment-book' })
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/1 successful hook calls/)
+    expect(result.result_message).to include('1 successful hook calls')
   end
 
   it 'ignores calls which already contain a coverage information extension' do
@@ -228,6 +228,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AllResponsesIncludeCoverageInformationTe
     result = run(runnable, { invoked_hook: 'appointment-book' })
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook calls/)
+    expect(result.result_message).to include('No successful hook calls')
   end
 end

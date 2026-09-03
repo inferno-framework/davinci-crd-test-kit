@@ -131,7 +131,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryStandardPrefetchExpressionsTest
 
     expect(result.result).to eq('pass'), result.result_message
     expect(warning_messages).to be_empty
-    expect(info_messages.first&.message).to match(/Ignoring service `ignored-service`/)
+    expect(info_messages.first&.message).to include('Ignoring service `ignored-service`')
   end
 
   it 'skips if no services advertise prefetch support' do
@@ -141,6 +141,6 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryStandardPrefetchExpressionsTest
     result = run(runnable, cds_services: { 'services' => [service] }.to_json)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No CRD services advertised prefetch support/)
+    expect(result.result_message).to include('No CRD services advertised prefetch support')
   end
 end
