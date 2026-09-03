@@ -61,7 +61,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestRequestedVersionTest do
     allow(test).to receive(:suite).and_return(suite)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No appointment-book hook requests received/)
+    expect(result.result_message).to include('No appointment-book hook requests received')
   end
 
   it 'fails when the extension is missing' do
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestRequestedVersionTest do
     create_hook_request(body:)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/expected a String, got Float/)
+    expect(entity_result_message.message).to include('expected a String, got Float')
   end
 
   it 'fails when the extension value is the wrong version string' do
@@ -96,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestRequestedVersionTest do
     create_hook_request(body: base_request_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/\(Request 2\)/)
+    expect(entity_result_message.message).to include('(Request 2)')
   end
 
   it 'fails when a request body is not valid JSON' do

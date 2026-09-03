@@ -165,9 +165,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts:
                          [order_sign_context, invalid_hook_request].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /Request 2: order-sign request context does not contain required field `patientId`/
-      )
+      expect(entity_result_message(test))
+        .to include('Request 2: order-sign request context does not contain required field `patientId`')
       expect(validation_request).to have_been_made.times(7)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made.times(2)
@@ -207,9 +206,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /order-sign request context does not contain required field `patientId`/
-      )
+      expect(entity_result_message(test))
+        .to include('order-sign request context does not contain required field `patientId`')
     end
 
     it 'fails if resource type and id cannot be extracted from context `userId` field' do
@@ -247,7 +245,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Unsupported resource type: `userId` type should be/)
+      expect(entity_result_message(test)).to include('Unsupported resource type: `userId` type should be')
     end
 
     it 'fails if client fhir server returns non 200 response' do
@@ -270,7 +268,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/expected 200, but received 404/)
+      expect(entity_result_message(test)).to include('expected 200, but received 404')
       expect(practitioner_resource_request).to have_been_made
       expect(patient_resource_request).to have_been_made
     end
@@ -356,7 +354,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/field `encounterId` should not be an empty/)
+      expect(entity_result_message(test)).to include('field `encounterId` should not be an empty')
       expect(validation_request).to have_been_made.times(4)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made
@@ -383,7 +381,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Wrong context resource type: Expected `Bundle`, got `Patient`/)
+      expect(entity_result_message(test)).to include('Wrong context resource type: Expected `Bundle`, got `Patient`')
     end
 
     it 'fails if no resources in context `draftOrder` field are one of the supported resources' do
@@ -451,7 +449,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                    contexts: [order_sign_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/NutritionOrder#pureeddiet-simple is invalid/)
+      expect(entity_result_message(test)).to include('NutritionOrder#pureeddiet-simple is invalid')
       expect(validation_request).to have_been_made.times(3)
       expect(nutrition_order_validation_request).to have_been_made
       expect(patient_resource_request).to have_been_made

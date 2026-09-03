@@ -110,10 +110,10 @@ RSpec.describe DaVinciCRDTestKit::V221::UnknownConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/unknown configuration were not valid/)
+    expect(result.result_message).to include('unknown configuration were not valid')
     expect(
       entity_result_messages.map(&:message).join(' ')
-    ).to match(/did not contain a coverage information system action/)
+    ).to include('did not contain a coverage information system action')
   end
 
   it 'skips if no unknown configuration follow-up request was made for primary hooks' do
@@ -122,7 +122,7 @@ RSpec.describe DaVinciCRDTestKit::V221::UnknownConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/response contained a coverage-info action/)
+    expect(result.result_message).to include('response contained a coverage-info action')
   end
 
   it 'omits if no unknown configuration follow-up request was made for secondary hooks' do
@@ -133,6 +133,6 @@ RSpec.describe DaVinciCRDTestKit::V221::UnknownConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('omit')
-    expect(result.result_message).to match(/response contained a coverage-info action/)
+    expect(result.result_message).to include('response contained a coverage-info action')
   end
 end

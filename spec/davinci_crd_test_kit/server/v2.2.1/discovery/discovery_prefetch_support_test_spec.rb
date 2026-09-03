@@ -44,6 +44,6 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryPrefetchSupportTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No CRD services advertised prefetch support/)
+    expect(result.result_message).to include('No CRD services advertised prefetch support')
   end
 end

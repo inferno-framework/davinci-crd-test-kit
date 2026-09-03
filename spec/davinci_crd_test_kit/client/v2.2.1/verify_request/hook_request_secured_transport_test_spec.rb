@@ -40,7 +40,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestSecuredTransportTest do
   it 'skips when no hook requests have been received' do
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No appointment-book hook requests received/)
+    expect(result.result_message).to include('No appointment-book hook requests received')
   end
 
   it 'passes when the request URL and fhirServer both use https' do
@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestSecuredTransportTest do
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message))
-      .to include(match(/Inferno's simulated CRD server must use the https protocol/))
+      .to include(include("Inferno's simulated CRD server must use the https protocol"))
   end
 
   it 'fails when fhirServer uses http' do

@@ -47,7 +47,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
         .to_return(status: 201, body: cds_services.to_json)
       result = run(runnable, base_url:, authentication_required:, encryption_method:)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Unexpected response status:/)
+      expect(result.result_message).to include('Unexpected response status:')
     end
 
     it 'fails when the response body is an invalid json' do
@@ -56,7 +56,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
       result = run(runnable, base_url:, authentication_required:, encryption_method:)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Invalid JSON/)
+      expect(result.result_message).to include('Invalid JSON')
     end
   end
 
@@ -99,7 +99,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
       result = run(runnable, cds_services: invalid_services.to_json)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/did not contain required field/)
+      expect(result.result_message).to include('did not contain required field')
     end
 
     it 'fails if a required service field is present but does not have the correct data type' do
@@ -120,14 +120,14 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
       result = run(runnable, cds_services: invalid_services.to_json)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/is not of type/)
+      expect(result.result_message).to include('is not of type')
     end
 
     it 'skips if "cds_services" input is missing' do
       result = run(runnable, cds_services: nil)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/'cds_services' is nil, skipping test/)
+      expect(result.result_message).to include("'cds_services' is nil, skipping test")
     end
 
     it 'skips if "services" attribute of cds services object is an empty array' do

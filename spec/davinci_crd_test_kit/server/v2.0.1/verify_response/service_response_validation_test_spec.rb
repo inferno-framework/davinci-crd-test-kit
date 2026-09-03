@@ -50,7 +50,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: hook)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/did not have the `systemActions` field/)
+      expect(entity_result_message.message).to include('did not have the `systemActions` field')
     end
 
     it 'fails if system actions is not an array' do
@@ -59,7 +59,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: hook)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not an array/)
+      expect(entity_result_message.message).to include('is not an array')
     end
 
     it 'persists outputs' do
@@ -88,7 +88,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/All service requests were unsuccessful/)
+      expect(result.result_message).to include('All service requests were unsuccessful')
     end
 
     it 'passes with warning if response body `cards` is an empty array' do
@@ -96,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('pass')
-      expect(entity_result_message.message).to match(/no decision support/)
+      expect(entity_result_message.message).to include('no decision support')
       expect(entity_result_message.type).to eq('warning')
     end
 
@@ -105,7 +105,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Invalid JSON/)
+      expect(entity_result_message.message).to include('Invalid JSON')
     end
 
     it 'fails if cards is missing from a response' do
@@ -113,7 +113,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/did not have the `cards` field/)
+      expect(entity_result_message.message).to include('did not have the `cards` field')
     end
 
     it 'fails if cards is not an array in at least one of the responses' do
@@ -121,7 +121,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not an array/)
+      expect(entity_result_message.message).to include('is not an array')
     end
 
     it 'fails if required field is missing from a card' do
@@ -156,7 +156,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
         result = run(runnable, invoked_hook: 'order-sign')
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/`summary` is over the 140-character limit/)
+        expect(entity_result_message.message).to include('`summary` is over the 140-character limit')
       end
     end
 
@@ -168,7 +168,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
 
         result = run(runnable, invoked_hook: 'order-sign')
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Allowed values are `info`, `warning`, `critical`/)
+        expect(entity_result_message.message).to include('Allowed values are `info`, `warning`, `critical`')
       end
     end
 
@@ -228,7 +228,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/does not contain required field `description`/)
+      expect(entity_result_message.message).to include('does not contain required field `description`')
     end
 
     it 'fails if systemAction required field is a wrong type' do
@@ -239,7 +239,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/field `description` is not of type/)
+      expect(entity_result_message.message).to include('field `description` is not of type')
     end
 
     it 'fails systemAction.type is not an allowed value' do
@@ -250,7 +250,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not allowed/)
+      expect(entity_result_message.message).to include('is not allowed')
     end
 
     it 'fails if a create action does not have a resource field' do
@@ -283,7 +283,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/does not contain required field `resourceId`/)
+      expect(entity_result_message.message).to include('does not contain required field `resourceId`')
     end
 
     it 'fails if a delete action resourceId is not an array' do
@@ -294,7 +294,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceResponseValidationTest do
       mock_server(body: body_dup)
       result = run(runnable, invoked_hook: 'order-sign')
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not of type `String`/)
+      expect(entity_result_message.message).to include('is not of type `String`')
     end
 
     it 'fails if a delete action resourceId item is not a relative reference' do

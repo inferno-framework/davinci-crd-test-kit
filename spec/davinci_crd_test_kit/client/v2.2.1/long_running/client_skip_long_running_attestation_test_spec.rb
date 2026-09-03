@@ -18,7 +18,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
     result = run(test)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/no hook requests sent during the previous wait/)
+    expect(result.result_message).to include('no hook requests sent during the previous wait')
   end
 
   it 'enters wait state when long-running requests exist' do

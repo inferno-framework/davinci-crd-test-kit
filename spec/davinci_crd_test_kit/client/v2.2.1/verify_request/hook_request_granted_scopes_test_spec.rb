@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
   it 'skips when no hook requests have been received' do
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No appointment-book hook requests received/)
+    expect(result.result_message).to include('No appointment-book hook requests received')
   end
 
   context 'with US Core 3 selected' do
@@ -89,8 +89,8 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       messages = result_messages.map(&:message)
       missing_message = messages.find { |m| m.include?('missing the following requested resource types') }
       expect(missing_message).to be_present
-      expect(missing_message).to match(/Patient/)
-      expect(missing_message).to match(/Condition/)
+      expect(missing_message).to include('Patient')
+      expect(missing_message).to include('Condition')
     end
 
     it 'fails when granted scopes include extra resource types' do
@@ -101,15 +101,15 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       messages = result_messages.map(&:message)
       extra_message = messages.find { |m| m.include?('beyond what was requested') }
       expect(extra_message).to be_present
-      expect(extra_message).to match(/Coverage/)
-      expect(extra_message).to match(/Specimen/)
+      expect(extra_message).to include('Coverage')
+      expect(extra_message).to include('Specimen')
     end
 
     it 'passes with a warning when all granted scopes use SMART v1 read interactions' do
       create_hook_request(scope: resource_scopes(us_core_3_resources, interaction: 'read'))
       result = run(test)
       expect(result.result).to eq('pass')
-      expect(result_messages.map(&:message)).to include(match(/SMART v1 `read` scope used/))
+      expect(result_messages.map(&:message)).to include(include('SMART v1 `read` scope used'))
     end
 
     it 'fails when granted scopes use mixed or unsupported interactions' do
@@ -118,7 +118,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       create_hook_request(scope: mixed_scope)
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include(match(/do not provide requested 'rs'/))
+      expect(result_messages.map(&:message)).to include(include("do not provide requested 'rs'"))
     end
 
     it 'fails when granted scopes mix user and patient levels' do
@@ -130,7 +130,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       create_hook_request(scope: mixed_scope)
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include(match(/did not use a consistent level of scope/))
+      expect(result_messages.map(&:message)).to include(include('did not use a consistent level of scope'))
     end
 
     it 'fails when granted scopes use an unexpected scope level' do
@@ -169,7 +169,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       create_hook_request(scope: resource_scopes(us_core_3_resources))
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include(match(/missing the following requested resource types/))
+      expect(result_messages.map(&:message)).to include(include('missing the following requested resource types'))
     end
   end
 
