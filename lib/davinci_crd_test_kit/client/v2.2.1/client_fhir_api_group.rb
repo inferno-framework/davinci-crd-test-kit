@@ -45,8 +45,8 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 3.1.1 Server Capability Statement](http://hl7.org/fhir/us/core/STU3.1.1/CapabilityStatement-us-core-server.html).
 
-          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
-          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data but
+          instead verify conformance against US Core profiles rather than the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_3_REQUIREMENT
         input_instructions INPUT_INSTRUCTIONS
@@ -60,8 +60,8 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 6.1.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU6.1/CapabilityStatement-us-core-server.html).
 
-          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
-          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data but
+          instead verify conformance against US Core profiles rather than the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_6_REQUIREMENT
         input_instructions INPUT_INSTRUCTIONS
@@ -75,8 +75,8 @@ module DaVinciCRDTestKit
           This test group verifies that the CRD client can respond to queries as required by the
           [US Core 7.0.0 Server Capability Statement](http://hl7.org/fhir/us/core/STU7/CapabilityStatement-us-core-server.html).
 
-          Note: unlike the hook tests, these US Core tests do not require CRD-specific data and but
-          instead verify conformance against US Core profiles instead of the CRD-defined profiles.
+          Note: unlike the hook tests, these US Core tests do not require CRD-specific data but
+          instead verify conformance against US Core profiles rather than the CRD-defined profiles.
         )
         required_suite_options CRDClientOptions::US_CORE_7_REQUIREMENT
         input_instructions INPUT_INSTRUCTIONS

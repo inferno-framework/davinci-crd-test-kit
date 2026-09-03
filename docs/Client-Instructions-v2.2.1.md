@@ -143,7 +143,7 @@ potentially only remaining active during the hook invocation itself. Since the F
 outside of a hook invocation and are long-running due to their comprehensive nature, the token provided
 on in the hook request may not be usable for these tests. If the token is not usable, testers
 may override the token and provide an appropriate token (and other details such as a refresh token and corresponding
-endpoints) in the "OAuth Credentials" input of the the FHIR API tests. Note that the token
+endpoints) in the "OAuth Credentials" input of the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
 
 ## Interpreting Results
@@ -231,7 +231,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    When the dialog appears indicating Inferno is ready to receive requests, return to the
    br-provider tab.
 1. Click the "Sign all Orders" button at the bottom of the chart frame (scroll down). On the
-   next screen, click the the "Confirm & Sign" button. This will trigger hook requests and
+   next screen, click the "Confirm & Sign" button. This will trigger hook requests and
    within a few seconds, you should see updated cards displayed in the frame at the right.
 1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
    a few moments to analyze the interactions and check them for conformance. After it has done
@@ -274,7 +274,7 @@ a realistic UI to interact with the Inferno CRD client tests.
 
 Those instructions demonstrate the bulk of the CRD ordering workflow. Not all tests are
 expected to pass. You can also
-- Login as a part to schedule an appointment and verify the appointment-book hook behavior
+- Login as a patient to schedule an appointment and verify the appointment-book hook behavior
   against Inferno.
 - Use the options to specify [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses),
   e.g., to demonstrate changing coverage-information details for the order across
