@@ -15,10 +15,10 @@ module DaVinciCRDTestKit
         one of the [six hooks described in the CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html):
         * [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
         * [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
-        * [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
         * [order-select](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-select)
-        * [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
         * [order-sign](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-sign)
+        * [order-dispatch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#order-dispatch)
+        * [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
 
         Each hook-specific group follows the same pattern:
         1. Allow the client to make hook invocations for the tested hook, waiting until the tester indicates
@@ -36,18 +36,18 @@ module DaVinciCRDTestKit
           `#{ClientURLs.discovery_url}`
           * `appointment-book` service id: `appointment-book-service`
           * `encounter-start` service id: `encounter-start-service`
-          * `encounter-discharge` service id: `encounter-discharge-service`
           * `order-select` service id: `order-select-service`
-          * `order-dispatch` service id: `order-dispatch-service`
           * `order-sign` service id: `order-sign-service`
+          * `order-dispatch` service id: `order-dispatch-service`
+          * `encounter-discharge` service id: `encounter-discharge-service`
         - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.prefetch_subset_discovery_url}`
           * `appointment-book` service id: `appointment-book-subset`
           * `encounter-start` service id: `encounter-start-subset`
-          * `encounter-discharge` service id: `encounter-discharge-subset`
           * `order-select` service id: `order-select-subset`
-          * `order-dispatch` service id: `order-dispatch-subset`
           * `order-sign` service id: `order-sign-subset`
+          * `order-dispatch` service id: `order-dispatch-subset`
+          * `encounter-discharge` service id: `encounter-discharge-subset`
       DESCRIPTION
       id :crd_v221_client_hooks
 
@@ -68,16 +68,16 @@ module DaVinciCRDTestKit
       group from: :crd_v221_client_encounter_start,
             optional: true
 
-      group from: :crd_v221_client_encounter_discharge,
+      group from: :crd_v221_client_order_select,
             optional: true
 
-      group from: :crd_v221_client_order_select,
+      group from: :crd_v221_client_order_sign,
             optional: true
 
       group from: :crd_v221_client_order_dispatch,
             optional: true
 
-      group from: :crd_v221_client_order_sign,
+      group from: :crd_v221_client_encounter_discharge,
             optional: true
     end
   end

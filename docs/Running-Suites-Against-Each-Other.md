@@ -59,8 +59,8 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
 1. Run client group "1.3 Cross Hook", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
    1. group "3.2 encounter-start" in the "complete prefetch" session
    1. group "3.2 encounter-start" in the "subset prefetch" session
-   1. group "3.3 encounter-discharge" in the "complete prefetch" session
-   1. group "3.3 encounter-discharge" in the "subset prefetch" session
+   1. group "3.6 encounter-discharge" in the "complete prefetch" session
+   1. group "3.6 encounter-discharge" in the "subset prefetch" session
    1. Once all complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
 1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
 
@@ -100,17 +100,18 @@ All tests should pass.
 2. Once a "User Action Required" dialog appears, run client group "2 FHIR API". This will run for a while.
 3. Once complete, return to the server session and click the link to complete the tests.
 
-### Additional Optional Steps for Specific Coverage Responses
-
-1. Run client group "1.2.6 order-sign"
-1. Run server group "4 Specific Coverage Responses"
-   1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
-
-These tests should all fail.
-
 Some tests will fail, including:
 - Client test 2.1.1.01 requiring TLS will fail when executed in a local system.
 - Client test 2.1.2.01 will fail because the CRD client simulation in the Server suite does not
   automatically update the Bundle with resource updates in `systemActions`.
 - Client test 2.1.11.10 will fail due to an expected conformance issue (this assumes that US Core version 3.1.1 was chosen at client session creation)
 - The server tests will fail as expected because no responses were sent by the client suite.
+
+
+### Additional Optional Steps for Specific Coverage Responses
+
+1. Run client group "1.2.4 order-sign"
+1. Run server group "4 Specific Coverage Responses"
+1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
+
+These tests should all fail.

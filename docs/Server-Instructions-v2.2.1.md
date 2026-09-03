@@ -45,7 +45,7 @@ The following groups and inputs can be used to expand the process described in t
 Additional hooks can be tested in the same manner by selecting and running the associated
 group as described in [Quick Start](#quick-start). For a complete run, exercise each supported
 hook group under "3 Hooks": "3.1 appointment-book", "3.2 encounter-start",
-"3.3 encounter-discharge", "3.4 order-select", "3.5 order-dispatch", and "3.6 order-sign".
+"3.3 order-select", "3.4 order-sign", "3.5 order-dispatch", and "3.6 encounter-discharge".
 
 ### Cross-hook Requirements
 
