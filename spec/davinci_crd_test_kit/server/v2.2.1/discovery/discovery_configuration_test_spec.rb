@@ -76,14 +76,14 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(first_error_message.message).to match(/does not contain a `coverage-info`/)
+    expect(first_error_message.message).to include('does not contain a `coverage-info`')
   end
 
   it 'fails if a primary hook service does not have a configuration option' do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(first_error_message.message).to match(/The following services do not contain any/)
+    expect(first_error_message.message).to include('The following services do not contain any')
   end
 
   it 'fails if a configuration option does not contain a required field' do
@@ -98,7 +98,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(first_error_message.message).to match(/does not contain `description` field/)
+    expect(first_error_message.message).to include('does not contain `description` field')
   end
 
   it 'fails if a configuration option field is the incorrect type' do
@@ -113,7 +113,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(first_error_message.message).to match(/field `description` to be a String, but found Array/)
+    expect(first_error_message.message).to include('field `description` to be a String, but found Array')
   end
 
   it 'fails if configuration options contain duplicate values' do
@@ -125,8 +125,8 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/contain invalid configuration options/)
-    expect(first_error_message.message).to match(/`appointment-book` contain duplicate values for `code`:/)
+    expect(result.result_message).to include('contain invalid configuration options')
+    expect(first_error_message.message).to include('`appointment-book` contain duplicate values for `code`:')
   end
 
   it 'ignores services in the ignore list' do
@@ -164,6 +164,6 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryConfigurationTest do
     result = run(runnable, cds_services: cds_services.to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(first_error_message.message).to match(/is not of type boolean/)
+    expect(first_error_message.message).to include('is not of type boolean')
   end
 end

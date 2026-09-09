@@ -138,6 +138,6 @@ RSpec.describe DaVinciCRDTestKit::V221::OrderDispatchCoverageInformationTest do
     result = run(runnable, { invoked_hook: 'appointment-book', mock_ehr_bundle: bundle.to_json })
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/are not included in the Mock EHR Data input/)
+    expect(result.result_message).to include('are not included in the Mock EHR Data input')
   end
 end

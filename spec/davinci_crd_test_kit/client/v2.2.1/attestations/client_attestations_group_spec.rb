@@ -87,7 +87,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
                                "#{test.title} description does not point at the requirements"
         expect(input_description).to start_with('I attest that'),
                                      "#{test.title} input description does not open with 'I attest that'"
-        expect(input_description).to_not match(%r{https://}),
+        expect(input_description).to_not include('https://'),
                                          "#{test.title} input description should not contain links"
       end
     end

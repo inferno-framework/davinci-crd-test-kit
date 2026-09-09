@@ -98,9 +98,8 @@ RSpec.describe DaVinciCRDTestKit::V201::DecodeAuthTokenTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /Request 2: Authorization token must be a JWT presented as a `Bearer` token/
-      )
+      expect(entity_result_message.message)
+        .to include('Request 2: Authorization token must be a JWT presented as a `Bearer` token')
     end
 
     it 'fails if authorization header does not present the JWT as a `Bearer` token' do
@@ -115,7 +114,8 @@ RSpec.describe DaVinciCRDTestKit::V201::DecodeAuthTokenTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Authorization token must be a JWT presented as a `Bearer` token/)
+      expect(entity_result_message.message)
+        .to include('Authorization token must be a JWT presented as a `Bearer` token')
     end
   end
 end

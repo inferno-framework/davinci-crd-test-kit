@@ -165,9 +165,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts:
                          [appointment_book_context, invalid_hook_request].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /Request 2: appointment-book request context does not contain required field `patientId`/
-      )
+      expect(entity_result_message(test))
+        .to include('Request 2: appointment-book request context does not contain required field `patientId`')
       expect(validation_request).to have_been_made.times(7)
       expect(patient_resource_request).to have_been_made
       expect(practitioner_resource_request).to have_been_made.times(2)
@@ -200,7 +199,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/context does not contain required field `patientId`/)
+      expect(entity_result_message(test)).to include('context does not contain required field `patientId`')
     end
 
     it 'fails if resource type and id cannot be extracted from context `userId` field' do
@@ -217,7 +216,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
       result = run(test, client_fhir_server:, client_access_token:,
                          contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Invalid `userId` format/)
+      expect(entity_result_message(test)).to include('Invalid `userId` format')
     end
 
     it 'fails if context `userId` field resource type is not valid' do
@@ -235,7 +234,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Unsupported resource type: `userId` type should be/)
+      expect(entity_result_message(test)).to include('Unsupported resource type: `userId` type should be')
     end
 
     it 'fails if client fhir server returns non 200 response' do
@@ -341,7 +340,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
       result = run(test, client_fhir_server:, client_access_token:,
                          contexts: [appointment_book_context].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(/Wrong context resource type: Expected `Bundle`, got `Patient`/)
+      expect(entity_result_message(test)).to include('Wrong context resource type: Expected `Bundle`, got `Patient`')
     end
 
     it 'fails if there are no appointment resources in context `appointments` field' do
@@ -366,9 +365,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidContextTest do
                          contexts: [appointment_book_context].to_json)
 
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to match(
-        /`appointments` bundle must contain at least one of the expected resource types:/
-      )
+      expect(entity_result_message(test))
+        .to include('`appointments` bundle must contain at least one of the expected resource types:')
     end
 
     it 'fails if all appointments in context `appointments` field not in proposed state' do

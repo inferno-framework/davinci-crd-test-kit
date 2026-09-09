@@ -27,13 +27,13 @@ RSpec.describe DaVinciCRDTestKit::V201::AdditionalOrdersValidationTest do
   it 'skips if valid_cards_with_suggestions not present' do
     result = run(runnable)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_cards_with_suggestions' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_cards_with_suggestions' is nil, skipping test")
   end
 
   it 'fails if valid_cards_with_suggestions is not valid json' do
     result = run(runnable, valid_cards_with_suggestions: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'skips if no additional orders as companions card present' do
@@ -42,6 +42,6 @@ RSpec.describe DaVinciCRDTestKit::V201::AdditionalOrdersValidationTest do
 
     result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(%r{does not include Additional Orders as companion/prerequisite cards})
+    expect(result.result_message).to include('does not include Additional Orders as companion/prerequisite cards')
   end
 end

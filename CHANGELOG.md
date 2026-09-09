@@ -1,3 +1,12 @@
+# 0.14.2
+* ID-170 client v221 attestations by @FlexonyoPizza in https://github.com/inferno-framework/davinci-crd-test-kit/pull/132
+* ID-211: no custom extensions in client responses and refactor for additional tests by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/133
+* ID-212: Unknown response content scenario by @abhinandan2012 in https://github.com/inferno-framework/davinci-crd-test-kit/pull/135
+* ID-164 Take alg value from JWT if not present in JWK by @FlexonyoPizza in https://github.com/inferno-framework/davinci-crd-test-kit/pull/128
+* ID-214: self-pay scenario by @abhinandan2012 in https://github.com/inferno-framework/davinci-crd-test-kit/pull/138
+* Updates and fixes (ID-210, ID-223, ID-224) by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/139
+* ID-226: br provider reference implementation preset by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/140
+
 # 0.14.1
 * FQM-327: Update coverage info response type checking by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/108
 * FQM-312: Check for technical failure code by @Jammjammjamm in https://github.com/inferno-framework/davinci-crd-test-kit/pull/109

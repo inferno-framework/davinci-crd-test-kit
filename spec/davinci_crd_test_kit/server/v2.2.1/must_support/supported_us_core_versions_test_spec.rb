@@ -39,7 +39,7 @@ RSpec.describe DaVinciCRDTestKit::V221::SupportedUSCoreVersionsTest do
     test_result = run(runnable)
 
     expect(test_result.result).to eq('skip')
-    expect(test_result.result_message).to match(/No requests were made in a previous test as expected/)
+    expect(test_result.result_message).to include('No requests were made in a previous test as expected')
   end
 
   it 'skips when successful hook requests contain no embedded FHIR resources' do
@@ -57,7 +57,7 @@ RSpec.describe DaVinciCRDTestKit::V221::SupportedUSCoreVersionsTest do
     test_result = run(runnable)
 
     expect(test_result.result).to eq('skip')
-    expect(test_result.result_message).to match(/No embedded FHIR resources were found/)
+    expect(test_result.result_message).to include('No embedded FHIR resources were found')
   end
 
   it 'passes when a single successful hook request demonstrates all required US Core versions' do
@@ -191,6 +191,6 @@ RSpec.describe DaVinciCRDTestKit::V221::SupportedUSCoreVersionsTest do
     test_result = run(runnable)
 
     expect(test_result.result).to eq('skip')
-    expect(test_result.result_message).to match(/All service requests were unsuccessful/)
+    expect(test_result.result_message).to include('All service requests were unsuccessful')
   end
 end

@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook responses/)
+    expect(result.result_message).to include('No successful hook responses')
   end
 
   it 'skips if no Form Completion card present' do
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any Request Form Completion/)
+    expect(result.result_message).to include('do not contain any Request Form Completion')
   end
 
   it 'fails if a Form Completion card is not valid' do
@@ -104,8 +104,8 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Request Form Completion/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Request Form Completion')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 
   it 'fails if a Form Completion systemAction is not valid' do
@@ -131,7 +131,7 @@ RSpec.describe DaVinciCRDTestKit::V221::FormCompletionResponseValidationTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Request Form Completion/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Request Form Completion')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 end

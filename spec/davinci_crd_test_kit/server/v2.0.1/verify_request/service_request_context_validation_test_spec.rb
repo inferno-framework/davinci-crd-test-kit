@@ -63,7 +63,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
         context_dup['userId'] = string
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Invalid `userId` format/)
+        expect(entity_result_message.message).to include('Invalid `userId` format')
       end
     end
 
@@ -73,7 +73,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported resource type/)
+      expect(entity_result_message.message).to include('Unsupported resource type')
     end
 
     it 'fails if patientId is a reference instead of a plain ID' do
@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/should be a plain ID, not a reference/)
+      expect(entity_result_message.message).to include('should be a plain ID, not a reference')
     end
 
     it 'fails if appointments field is not a FHIR resource' do
@@ -91,7 +91,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not a FHIR resource/)
+      expect(entity_result_message.message).to include('is not a FHIR resource')
     end
 
     it 'fails if appointments field is not a FHIR Bundle' do
@@ -100,7 +100,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Expected `Bundle`/)
+      expect(entity_result_message.message).to include('Expected `Bundle`')
     end
 
     it 'fails if bundle does not have at least one Appointment resource' do
@@ -111,7 +111,8 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/bundle must contain at least one of the expected resource types/)
+      expect(entity_result_message.message)
+        .to include('bundle must contain at least one of the expected resource types')
     end
 
     it 'fails if any of the Appointment resources in the bundle does not have a status of proposed' do
@@ -120,7 +121,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'appointment-book' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/must have a `proposed` status/)
+      expect(entity_result_message.message).to include('must have a `proposed` status')
     end
 
     it 'passes if context contains optional `encounterId` field' do
@@ -177,7 +178,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: runnable.new.tested_hook_name })
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Invalid `userId` format/)
+        expect(entity_result_message.message).to include('Invalid `userId` format')
       end
     end
 
@@ -187,7 +188,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: runnable.new.tested_hook_name })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported resource type/)
+      expect(entity_result_message.message).to include('Unsupported resource type')
     end
 
     it 'fails if patientId or encounterId is a reference instead of a plain ID' do
@@ -196,7 +197,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
         context_dup[field].prepend('/')
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: runnable.new.tested_hook_name })
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/should be a plain ID, not a reference/)
+        expect(entity_result_message.message).to include('should be a plain ID, not a reference')
       end
     end
   end
@@ -246,7 +247,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Invalid `userId` format/)
+        expect(entity_result_message.message).to include('Invalid `userId` format')
       end
     end
 
@@ -256,7 +257,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported resource type/)
+      expect(entity_result_message.message).to include('Unsupported resource type')
     end
 
     it 'fails if patientId is a reference instead of a plain ID' do
@@ -265,7 +266,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/should be a plain ID, not a reference/)
+      expect(entity_result_message.message).to include('should be a plain ID, not a reference')
     end
 
     it 'fails if draftOrders field is not a FHIR resource' do
@@ -274,7 +275,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/is not a FHIR resource/)
+      expect(entity_result_message.message).to include('is not a FHIR resource')
     end
 
     it 'fails if draftOrders field is not a FHIR Bundle' do
@@ -283,7 +284,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Expected `Bundle`/)
+      expect(entity_result_message.message).to include('Expected `Bundle`')
     end
 
     it 'fails if the bundle does not contain at least one expected resource type' do
@@ -294,7 +295,8 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/bundle must contain at least one of the expected resource types/)
+      expect(entity_result_message.message)
+        .to include('bundle must contain at least one of the expected resource types')
     end
 
     it 'fails if any item in selections field has an unsupported resource type' do
@@ -303,7 +305,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/Unsupported resource type/)
+      expect(entity_result_message.message).to include('Unsupported resource type')
     end
 
     it 'fails if any item in selections field is not refenced in the drafOrders bundle' do
@@ -312,7 +314,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-select' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/must reference FHIR resources in `draftOrders`/)
+      expect(entity_result_message.message).to include('must reference FHIR resources in `draftOrders`')
     end
   end
 
@@ -363,7 +365,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/`patientId` should not be an empty String/)
+      expect(entity_result_message.message).to include('`patientId` should not be an empty String')
     end
 
     it 'fails if performer is not correctly formatted `resource_type/resource_id`' do
@@ -373,7 +375,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
         result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
         expect(result.result).to eq('fail')
-        expect(entity_result_message.message).to match(/Invalid `performer` format/)
+        expect(entity_result_message.message).to include('Invalid `performer` format')
       end
     end
 
@@ -383,13 +385,13 @@ RSpec.describe DaVinciCRDTestKit::V201::ServiceRequestContextValidationTest do
 
       result = run(runnable, { contexts: [context_dup].to_json, invoked_hook: 'order-dispatch' })
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/should be a plain ID, not a reference/)
+      expect(entity_result_message.message).to include('should be a plain ID, not a reference')
     end
   end
 
   it 'skips if contexts is not provided' do
     result = run(runnable)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'contexts' is nil, skipping test/)
+    expect(result.result_message).to include("'contexts' is nil, skipping test")
   end
 end

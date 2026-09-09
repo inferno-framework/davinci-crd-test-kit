@@ -42,7 +42,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
     result = run(test, auth_token_headers_json: [token_header.to_json, invalid_token_header.to_json],
                        crd_jwks_keys_json: [jwks_hash_keys.to_json, jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Request 2: Token header must have the `alg` field/)
+    expect(entity_result_message.message).to include('Request 2: Token header must have the `alg` field')
   end
 
   it 'fails if it receives a JWT header without the `alg` field' do
@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
     result = run(test, auth_token_headers_json: [invalid_token_header.to_json],
                        crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Token header must have the `alg` field/)
+    expect(entity_result_message.message).to include('Token header must have the `alg` field')
   end
 
   it 'fails if it receives a JWT header without the `typ` field' do
@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
     result = run(test, auth_token_headers_json: [invalid_token_header.to_json],
                        crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Token header must have the `typ` field/)
+    expect(entity_result_message.message).to include('Token header must have the `typ` field')
   end
 
   it 'fails if it receives a JWT header with the `typ` field not set to JWT' do
@@ -68,7 +68,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Token header `typ` field must be set to 'JWT', instead was/)
+    expect(entity_result_message.message).to include("Token header `typ` field must be set to 'JWT', instead was")
   end
 
   it 'fails if it receives a JWT header without the `kid` field' do
@@ -77,7 +77,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
     result = run(test, auth_token_headers_json: [invalid_token_header.to_json],
                        crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Token header must have the `kid` field/)
+    expect(entity_result_message.message).to include('Token header must have the `kid` field')
   end
 
   it 'fails if it receives a JWT header that does not contain a kid found in the jwks' do
@@ -85,6 +85,6 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenHeaderTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/JWKS did not contain a public key with an id of `12345`/)
+    expect(entity_result_message.message).to include('JWKS did not contain a public key with an id of `12345`')
   end
 end

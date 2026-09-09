@@ -74,7 +74,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
     create_hook_request
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/never able to successfully obtain additional FHIR data/)
+    expect(result.result_message).to include('never able to successfully obtain additional FHIR data')
   end
 
   it 'fails when all additional data requests returned a non-2xx status' do
@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
     create_data_fetch_request(response_body: organization_resource, status: 404)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/never able to successfully obtain additional FHIR data/)
+    expect(result.result_message).to include('never able to successfully obtain additional FHIR data')
   end
 
   it 'fails when all additional data requests returned an empty Bundle' do
@@ -90,7 +90,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
     create_data_fetch_request(response_body: { 'resourceType' => 'Bundle', 'entry' => [] })
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/never able to successfully obtain additional FHIR data/)
+    expect(result.result_message).to include('never able to successfully obtain additional FHIR data')
   end
 
   it 'fails when all additional data requests returned non-FHIR response bodies' do
@@ -98,7 +98,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
     create_data_fetch_request(response_body: 'not valid json or fhir')
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/never able to successfully obtain additional FHIR data/)
+    expect(result.result_message).to include('never able to successfully obtain additional FHIR data')
   end
 
   it 'passes when at least one of multiple hook requests has successful additional data' do

@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoReasonTest do
     result = run(runnable, coverage_info: [coverage_info_system_action(covered: other_coverage_code)].to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all coverage info extensions/)
+    expect(result.result_message).to include('Not all coverage info extensions')
 
     expect(entity_result_message)
       .to match(/Coverage should be `#{expected_coverage_code}`, but found `#{other_coverage_code}`/)
@@ -70,7 +70,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoReasonTest do
     result = run(runnable, coverage_info: [coverage_info_system_action(reason: other_reason_code)].to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all coverage info extensions/)
+    expect(result.result_message).to include('Not all coverage info extensions')
 
     expect(entity_result_message)
       .to match(/Coverage reason should be `#{expected_reason_code}`, but found `#{other_reason_code}`/)
@@ -90,8 +90,8 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoReasonTest do
     result = run(runnable, coverage_info: [coverage_info_system_action(reason_text: nil)].to_json)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all coverage info extensions/)
+    expect(result.result_message).to include('Not all coverage info extensions')
 
-    expect(entity_result_message).to match(/contains no additional details in `text` field/)
+    expect(entity_result_message).to include('contains no additional details in `text` field')
   end
 end

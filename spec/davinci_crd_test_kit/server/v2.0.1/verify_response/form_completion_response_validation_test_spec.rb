@@ -39,25 +39,25 @@ RSpec.describe DaVinciCRDTestKit::V201::FormCompletionResponseValidationTest do
   it 'skips if valid_cards_with_suggestions not present' do
     result = run(runnable, valid_system_actions: [].to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_cards_with_suggestions' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_cards_with_suggestions' is nil, skipping test")
   end
 
   it 'skips if valid_system_actions not present' do
     result = run(runnable, valid_cards_with_suggestions: cards_with_suggestions.to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_system_actions' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_system_actions' is nil, skipping test")
   end
 
   it 'fails if valid_cards_with_suggestions is not valid json' do
     result = run(runnable, valid_cards_with_suggestions: '[[', valid_system_actions: [].to_json)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'fails if valid_system_actions is not valid json' do
     result = run(runnable, valid_cards_with_suggestions: [].to_json, valid_system_actions: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'skips if no request form completion card or system action present' do
@@ -66,6 +66,6 @@ RSpec.describe DaVinciCRDTestKit::V201::FormCompletionResponseValidationTest do
 
     result = run(runnable, valid_cards_with_suggestions: dup_cards.to_json, valid_system_actions: [].to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/does not contain any Request Form Completion cards or system actions/)
+    expect(result.result_message).to include('does not contain any Request Form Completion cards or system actions')
   end
 end

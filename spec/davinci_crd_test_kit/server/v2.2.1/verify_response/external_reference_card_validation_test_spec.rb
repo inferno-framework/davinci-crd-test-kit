@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ExternalReferenceCardValidationTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook responses/)
+    expect(result.result_message).to include('No successful hook responses')
   end
 
   it 'skips if no External Reference card present' do
@@ -69,7 +69,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ExternalReferenceCardValidationTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any External Reference cards/)
+    expect(result.result_message).to include('do not contain any External Reference cards')
   end
 
   it 'fails if the External Reference card is not valid' do
@@ -95,7 +95,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ExternalReferenceCardValidationTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all External Reference/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all External Reference')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 end

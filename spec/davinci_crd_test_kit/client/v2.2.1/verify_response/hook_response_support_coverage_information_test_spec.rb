@@ -35,7 +35,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientHookResponseSupportCoverageInforma
 
       result = run(runnable)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Support for the Coverage Information response type not demonstrated/)
+      expect(result.result_message).to include('Support for the Coverage Information response type not demonstrated')
     end
 
     it 'passes when a coverage information action is present' do

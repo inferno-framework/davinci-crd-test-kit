@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V221::InstructionsCardReceivedTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook responses/)
+    expect(result.result_message).to include('No successful hook responses')
   end
 
   it 'skips if no Instructions card present' do
@@ -69,7 +69,7 @@ RSpec.describe DaVinciCRDTestKit::V221::InstructionsCardReceivedTest do
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any Instructions cards/)
+    expect(result.result_message).to include('do not contain any Instructions cards')
   end
 
   it 'fails if the Instructions card is not valid' do
@@ -95,7 +95,7 @@ RSpec.describe DaVinciCRDTestKit::V221::InstructionsCardReceivedTest do
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Instructions/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Instructions')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 end
