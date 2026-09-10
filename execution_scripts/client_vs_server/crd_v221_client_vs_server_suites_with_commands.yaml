@@ -118,6 +118,7 @@ steps:
       runnable: 3.1
     next_poll_session: server-full
     action_description: Run Server Group 3.1 Hook Tests > appointment-book (Full)
+    timeout: 300
 
   - state_description: Wait at Server test 3.1.1.01 (Full)
     session: server-full
@@ -125,6 +126,7 @@ steps:
     last_completed: 3.1.1.01
     action: WAIT
     action_description: Wait while the requests are sent
+    timeout: 300
 
   - state_description: Finished Server Group 3.1 Hook Tests > appointment-book (Full)
     session: server-full
