@@ -1,0 +1,577 @@
+sessions:
+  - suite: crd_client_v221
+    name: client
+    preset: inferno-crd-server-suite-v221
+    suite_options:
+      us_core_version: us_core_3
+  - suite: crd_server_v221
+    name: server-full
+    preset: inferno-crd-client-suite-v221
+  - suite: crd_server_v221
+    name: server-subset
+    preset: inferno-crd-client-suite-prefetch-subset-v221
+  - suite: crd_server_v221
+    name: server-full-additional
+    preset: inferno-crd-client-suite-v221
+  - suite: crd_server_v221
+    name: server-subset-additional
+    preset: inferno-crd-client-suite-prefetch-subset-v221
+
+# normalized_strings:
+  # - replacement: <UUID>
+  # pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+
+steps:
+  - state_description: client session created
+    session: client
+    status: created
+    start_run:
+      session: client
+      runnable: 1.1
+    action_description: Run Client Group 1.1 Client Registration
+
+  - state_description: Wait at Client test 1.1.02 (attestation)
+    session: client
+    status: waiting
+    last_completed: 1.1.02
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: GET the attestation URL
+
+  - state_description: Finished Client Group 1.1 Client Registration
+    session: client
+    status: done
+    last_completed: 1.1
+    start_run:
+      session: server-full
+      runnable: 1
+    next_poll_session: server-full
+    action_description: Run Server Group 1 Discovery (Full)
+
+  #############################################################
+  # Server Discovery (full and subset sessions)
+  #############################################################
+
+  - state_description: Finished Server Group 1 Discovery (Full)
+    session: server-full
+    status: done
+    last_completed: 1
+    start_run:
+      session: server-full-additional
+      runnable: 1
+    next_poll_session: server-full-additional
+    action_description: Run Server Group 1 Discovery (Full Additional)
+
+  - state_description: Finished Server Group 1 Discovery (Full Additional)
+    session: server-full-additional
+    status: done
+    last_completed: 1
+    start_run:
+      session: server-subset
+      runnable: 1
+    next_poll_session: server-subset
+    action_description: Run Server Group 1 Discovery (Subset)
+
+  - state_description: Finished Server Group 1 Discovery (Subset)
+    session: server-subset
+    status: done
+    last_completed: 1
+    start_run:
+      session: server-subset-additional
+      runnable: 1
+    next_poll_session: server-subset-additional
+    action_description: Run Server Group 1 Discovery (Subset Additional)
+    
+  - state_description: Finished Server Group 1 Discovery (Subset Additional)
+    session: server-subset-additional
+    status: done
+    last_completed: 1
+    start_run:
+      session: client
+      runnable: 1.2.1
+    next_poll_session: client
+    action_description: Run Client Group 1.2.1 Hooks > appointment-book
+
+  #############################################################
+  # Appointment Book
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.1.1.01 Requests received for appointment-book hook
+    session: client
+    status: waiting
+    last_completed: 1.2.1.1.01
+    start_run:
+      session: server-full
+      runnable: 3.1
+    next_poll_session: server-full
+    action_description: Run Server Group 3.1 Hook Tests > appointment-book (Full)
+
+  - state_description: Wait at Server test 3.1.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.1.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.1 Hook Tests > appointment-book (Full)
+    session: server-full
+    status: done
+    last_completed: 3.1
+    start_run:
+      session: server-subset
+      runnable: 3.1
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.1 Hook Tests > appointment-book (Subset)
+
+  - state_description: Wait at Server test 3.1.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.1.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.1 Hook Tests > appointment-book (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.1
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that appointment-book invocations are complete
+
+  - state_description: Wait at Client test 1.2.1.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.1.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.1 appointment-book
+    session: client
+    status: done
+    last_completed: 1.2.1
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.2.2
+    next_poll_session: client
+    action_description: Run Client Group 1.2.2 Hooks > encounter-start
+
+  #############################################################
+  # Encounter Start
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.2.1.01 Requests received for encounter-start hook
+    session: client
+    status: waiting
+    last_completed: 1.2.2.1.01
+    start_run:
+      session: server-full
+      runnable: 3.2
+    next_poll_session: server-full
+    action_description: Run Server Group 3.2 Hook Tests > encounter-start (Full)
+
+  - state_description: Wait at Server test 3.2.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.2.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.2 Hook Tests > encounter-start (Full)
+    session: server-full
+    status: done
+    last_completed: 3.2
+    start_run:
+      session: server-subset
+      runnable: 3.2
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.2 Hook Tests > encounter-start (Subset)
+
+  - state_description: Wait at Server test 3.2.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.2.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.2 Hook Tests > encounter-start (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.2
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that encounter-start invocations are complete
+
+  - state_description: Wait at Client test 1.2.2.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.2.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.2 encounter-start
+    session: client
+    status: done
+    last_completed: 1.2.2
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.2.3
+    next_poll_session: client
+    action_description: Run Client Group 1.2.3 Hooks > order-select
+
+  #############################################################
+  # Order Select
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.3.1.01 Requests received for order-select hook
+    session: client
+    status: waiting
+    last_completed: 1.2.3.1.01
+    start_run:
+      session: server-full
+      runnable: 3.3
+    next_poll_session: server-full
+    action_description: Run Server Group 3.3 Hook Tests > order-select (Full)
+
+  - state_description: Wait at Server test 3.3.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.3.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.3 Hook Tests > order-select (Full)
+    session: server-full
+    status: done
+    last_completed: 3.3
+    start_run:
+      session: server-subset
+      runnable: 3.3
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.3 Hook Tests > order-select (Subset)
+
+  - state_description: Wait at Server test 3.3.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.3.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.3 Hook Tests > order-select (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.3
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that order-select invocations are complete
+
+  - state_description: Wait at Client test 1.2.3.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.3.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.3 order-select
+    session: client
+    status: done
+    last_completed: 1.2.3
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.2.4
+    next_poll_session: client
+    action_description: Run Client Group 1.2.4 Hooks > order-sign
+
+  #############################################################
+  # Order Sign
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.4.1.01 Requests received for order-select hook
+    session: client
+    status: waiting
+    last_completed: 1.2.4.1.01
+    start_run:
+      session: server-full
+      runnable: 3.4
+    next_poll_session: server-full
+    action_description: Run Server Group 3.4 Hook Tests > order-sign (Full)
+
+  - state_description: Wait at Server test 3.4.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.4.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.4 Hook Tests > order-sign (Full)
+    session: server-full
+    status: done
+    last_completed: 3.4
+    start_run:
+      session: server-subset
+      runnable: 3.4
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.4 Hook Tests > order-sign (Subset)
+
+  - state_description: Wait at Server test 3.4.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.4.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.4 Hook Tests > order-sign (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.4
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that order-sign invocations are complete
+
+  - state_description: Wait at Client test 1.2.4.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.4.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.4 order-sign
+    session: client
+    status: done
+    last_completed: 1.2.4
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.2.5
+    next_poll_session: client
+    action_description: Run Client Group 1.2.5 Hooks > order-dispatch
+
+  #############################################################
+  # Order Dispatch
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.5.1.01 Requests received for order-dispatch hook
+    session: client
+    status: waiting
+    last_completed: 1.2.5.1.01
+    start_run:
+      session: server-full
+      runnable: 3.5
+    next_poll_session: server-full
+    action_description: Run Server Group 3.5 Hook Tests > order-dispatch (Full)
+
+  - state_description: Wait at Server test 3.5.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.5.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.5 Hook Tests > order-dispatch (Full)
+    session: server-full
+    status: done
+    last_completed: 3.5
+    start_run:
+      session: server-subset
+      runnable: 3.5
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.5 Hook Tests > order-dispatch (Subset)
+
+  - state_description: Wait at Server test 3.5.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.5.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.5 Hook Tests > order-dispatch (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.5
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that order-dispatch invocations are complete
+
+  - state_description: Wait at Client test 1.2.5.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.5.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.5 order-dispatch
+    session: client
+    status: done
+    last_completed: 1.2.5
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.2.6
+    next_poll_session: client
+    action_description: Run Client Group 1.2.6 Hooks > encounter-discharge
+
+  #############################################################
+  # Encounter Discharge
+  #############################################################
+
+  - state_description: Wait at Client test 1.2.6.1.01 Requests received for encounter-discharge hook
+    session: client
+    status: waiting
+    last_completed: 1.2.6.1.01
+    start_run:
+      session: server-full
+      runnable: 3.6
+    next_poll_session: server-full
+    action_description: Run Server Group 3.6 Hook Tests > encounter-discharge (Full)
+
+  - state_description: Wait at Server test 3.6.1.01 (Full)
+    session: server-full
+    status: waiting
+    last_completed: 3.6.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.6 Hook Tests > encounter-discharge (Full)
+    session: server-full
+    status: done
+    last_completed: 3.6
+    start_run:
+      session: server-subset
+      runnable: 3.6
+    next_poll_session: server-subset
+    action_description: Run Server Group 3.6 Hook Tests > encounter-discharge (Subset)
+
+  - state_description: Wait at Server test 3.6.1.01 (Subset)
+    session: server-subset
+    status: waiting
+    last_completed: 3.6.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.6 Hook Tests > encounter-discharge (Subset)
+    session: server-subset
+    status: done
+    last_completed: 3.6
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that encounter-discharge invocations are complete
+
+  - state_description: Wait at Client test 1.2.6.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.6.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 300 # validator could need to warm up
+
+  - state_description: Finished Client Group 1.2.6 encounter-discharge
+    session: client
+    status: done
+    last_completed: 1.2.6
+    timeout: 300 # validator could need to warm up
+    start_run:
+      session: client
+      runnable: 1.4
+    next_poll_session: client
+    action_description: Run Client Group 1.4 Cross Hook
+
+  #############################################################
+  # Cross Hook (Additional Requests)
+  #############################################################
+
+  - state_description: Wait at Client test 1.4.1.1.01 Client invokes any hook
+    session: client
+    status: waiting
+    last_completed: 1.4.1.1.01
+    start_run:
+      session: server-full-additional
+      runnable: 3.2
+    next_poll_session: server-full-additional
+    action_description: Run Server Group 3.2 Hook Tests > encounter-start (Full Additional)
+
+  - state_description: Wait at Server test 3.2.1.01 (Full Additional)
+    session: server-full-additional
+    status: waiting
+    last_completed: 3.2.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.2 Hook Tests > encounter-start (Full Additional)
+    session: server-full-additional
+    status: done
+    last_completed: 3.2
+    start_run:
+      session: server-subset-additional
+      runnable: 3.2
+    next_poll_session: server-subset-additional
+    action_description: Run Server Group 3.2 Hook Tests > encounter-start (Subset Additional)
+
+  - state_description: Wait at Server test 3.2.1.01 (Subset Additional)
+    session: server-subset-additional
+    status: waiting
+    last_completed: 3.2.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.2 Hook Tests > encounter-start (Subset Additional)
+    session: server-subset-additional
+    status: done
+    last_completed: 3.2
+    start_run:
+      session: server-full-additional
+      runnable: 3.6
+    next_poll_session: server-full-additional
+    action_description: Run Server Group 3.6 Hook Tests > encounter-discharge (Full Additional)
+
+  - state_description: Wait at Server test 3.6.1.01 (Full Additional)
+    session: server-full-additional
+    status: waiting
+    last_completed: 3.6.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.6 Hook Tests > encounter-discharge (Full Additional)
+    session: server-full-additional
+    status: done
+    last_completed: 3.6
+    start_run:
+      session: server-subset-additional
+      runnable: 3.6
+    next_poll_session: server-subset-additional
+    action_description: Run Server Group 3.6 Hook Tests > encounter-discharge (Subset Additional)
+
+  - state_description: Wait at Server test 3.6.1.01 (Subset Additional)
+    session: server-subset-additional
+    status: waiting
+    last_completed: 3.6.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+
+  - state_description: Finished Server Group 3.6 Hook Tests > encounter-discharge (Subset Additional)
+    session: server-subset-additional
+    status: done
+    last_completed: 3.6
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that additional invocations are complete
+
+  - state_description: Wait at Client test 1.4.1.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.4.1.2.01
+    timeout: 300 # validator could need to warm up
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+
+  - state_description: Finished Client Group 1.4 encounter-discharge
+    session: client
+    status: done
+    last_completed: 1.4
+    action: END_SCRIPT
+    action_description: Script Completed
