@@ -26,6 +26,7 @@ module DaVinciCRDTestKit
                             'cds-hooks_3.0.0-ballot@192', 'cds-hooks_3.0.0-ballot@196', 'cds-hooks_3.0.0-ballot@203'
 
       REQUIRED_CLAIMS = ['iss', 'aud', 'exp', 'iat', 'jti'].freeze
+      CLOCK_SKEW_LEEWAY = 60
 
       def required_claims
         REQUIRED_CLAIMS.dup
@@ -36,6 +37,17 @@ module DaVinciCRDTestKit
       def public_hook_url(request)
         hook_suffix = URI.parse(request.url).path.delete_prefix(URI.parse(inferno_base_url).path)
         inferno_base_url + hook_suffix
+      end
+
+      # `exp` should be judged against when the JWT was received, not against whenever this
+      # test happens to run (which can be much later if the suite runs slowly). ruby-jwt only
+      # exposes a `leeway` knob for this, so grow the leeway to cover however long has elapsed
+      # since the request came in, plus a small buffer for ordinary clock skew.
+      def exp_leeway_for(request)
+        return CLOCK_SKEW_LEEWAY unless request&.created_at
+
+        elapsed_since_request = [Time.now.to_i - request.created_at.to_i, 0].max
+        elapsed_since_request + CLOCK_SKEW_LEEWAY
       end
 
       input :auth_tokens,
@@ -79,7 +91,7 @@ module DaVinciCRDTestKit
               JWT::JWK.import(jwk).public_key,
               true,
               algorithms: [alg],
-              exp_leeway: 60,
+              exp_leeway: exp_leeway_for(request),
               iss: cds_jwt_iss,
               aud: public_hook_url(request),
               verify_not_before: false,
