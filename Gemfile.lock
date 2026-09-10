@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     davinci_crd_test_kit (0.14.2)
-      inferno_core (~> 1.4, >= 1.4.3)
+      inferno_core (~> 1.4, >= 1.4.4)
       jwt (~> 3.2)
       smart_app_launch_test_kit (~> 1.0, >= 1.0.2)
       tls_test_kit (~> 1.0)
@@ -57,7 +57,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.6.2)
-    domain_name (0.6.20260829)
+    domain_name (0.6.20260902)
     dotenv (2.8.1)
     drb (2.2.3)
     dry-auto_inject (1.0.1)
@@ -159,7 +159,7 @@ GEM
       mutex_m
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    inferno_core (1.4.3)
+    inferno_core (1.4.4)
       activesupport (~> 7.2.3.1)
       base62-rb (= 0.3.1)
       blueprinter (= 0.25.2)
