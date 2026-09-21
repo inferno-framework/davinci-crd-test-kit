@@ -82,16 +82,11 @@ module DaVinciCRDTestKit
           next { kind: :unsupported_type, title:, resource_type: profile[:resource_type] } if resources.blank?
 
           missing = missing_must_support_elements(resources, nil, metadata:)
-          missing = remove_must_support_false_positives(missing, resources, profile[:resource_type])
           next if missing.blank?
 
           { kind: :unobserved_elements, title:, resource_type: profile[:resource_type],
             count: resources.length, missing: }
         end
-      end
-
-      def remove_must_support_false_positives(missing, _resources, _resource_type)
-        missing
       end
 
       def log_info_messages(unobserved)
