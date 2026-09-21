@@ -143,7 +143,7 @@ potentially only remaining active during the hook invocation itself. Since the F
 outside of a hook invocation and are long-running due to their comprehensive nature, the token provided
 on in the hook request may not be usable for these tests. If the token is not usable, testers
 may override the token and provide an appropriate token (and other details such as a refresh token and corresponding
-endpoints) in the "OAuth Credentials" input of the the FHIR API tests. Note that the token
+endpoints) in the "OAuth Credentials" input of the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
 
 ## Interpreting Results
@@ -162,19 +162,139 @@ With those caveats, a passing execution of this suite would include:
   - 1.4 Long-running Hook Request
   - 2 FHIR API
 
-## Demonstration Execution
+## Demonstration Executions
 
-If you would like to try out the order-sign hook invocation tests against
-[the public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
-you can do so using the following steps. Note that this reference implementation has
-not been updated for the 2.2.1 version of the CRD IG so many failures are expected during this
-execution. However, it can give you a sense for what executing the Inferno tests against a 
-client system will look like.
+To see how executing these tests against a real system works in practice, you
+can execute these tests against one of the following public reference implementations.
+
+NOTES:
+- The reference implementation will need to make requests to Inferno, meaning that these
+  demonstrations will most easily be run using the publicly-hosted tests on `inferno.healthit.gov`
+  against the publicly-hosted reference implementation. You can also choose to run both
+  Inferno and the reference implementation locally.
+- When executing on `inferno.healthit.gov`, know that a fixed session identifier is used to
+  recognize incoming requests, so if multiple people are running a particular demonstration
+  on `inferno.healthit.gov` at the same time, results will be unpredictable as the sessions
+  compete to associate requests. If you are seeing odd behavior, consider trying again at
+  another time.
+
+### Da Vinci BR Provider reference implementation
+
+The [Da Vinci BR Provider](https://br-provider.davinci.hl7.org/) reference implementation is
+actively maintained and can be used to demonstrate most of the CRD hooks. The following
+partial test run is not expected to fully pass, but demonstrates the steps needed in
+a realistic UI to interact with the Inferno CRD client tests.
+
+1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using any "US Core Version".
+1. Select the "Da Vinci BR Provider Reference Implementation" option from the Preset dropdown in the upper left.
+1. In a separate tab, navigate to https://br-provider.davinci.hl7.org/ and login (no password
+   needed) as a practitioner (any).
+1. Configure the connection to Inferno's simulated CRD server by:
+   1. Clicking the gear icon in the upper right to open the settings dialog.
+   1. Select the "Payor" tab
+   1. Use the "Server" dropdown to select the "Custom" option.
+   1. In the "CDS Services URL" input, put `https://inferno.healthit.gov/suites/custom/crd_client_v221/cds-services`.
+   1. Click the "Bypass payor-handled check" box.
+   1. Click the "Save" button and close the dialog to complete the setup.
+1. Select a patient (any) to open their chart.
+1. In the Inferno tab, run group "1.2.2 encounter-start" without any changes to the inputs.
+   When the dialog appears indicating Inferno is ready to receive requests, return to the
+   br-provider tab.
+1. Click the "Start Encounter" button in the far upper right of the chart window. This will
+   trigger hook requests and within a few seconds, you should see some cards displayed within
+   the frame on the right.
+1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
+   a few moments to analyze the interactions and check them for conformance. After it has done
+   so, a new dialog will appear asking the tester to confirm that the returned responses
+   were displayed or otherwise made available to the user appropriately, including
+   a instructions card, a external reference card, and the coverage-information system action.
+   Determining the right response is a judgement call, but return to the br-provider tab
+   and decide what you see and make the corresponding attestation in Inferno. At the time of
+   this writing, only the two cards were clearly displayed, but the coverage-information
+   system action was not.
+1. In Inferno, run group "1.2.3 order-select" without any changes to the inputs.
+   When the dialog appears indicating Inferno is ready to receive requests, return to the
+   br-provider tab.
+1. Select an order (any) from the "Add Order" dropdown and click the "+ Add" button to the right
+   of the dropdown. This will trigger hook requests and within a few seconds, you should see
+   updated cards displayed in the frame at the right.
+1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
+   a few moments to analyze the interactions and check them for conformance. After it has done
+   so, a new dialog will appear asking the tester to confirm that the returned responses
+   were displayed or otherwise made available to the user appropriately, including
+   a instructions card, a external reference card, and the coverage-information system action.
+   Determining the right response is a judgement call, but return to the br-provider tab
+   and decide what you see and make the corresponding attestation in Inferno. At the time of
+   this writing, only the two cards were clearly displayed, but the coverage-information
+   system action was not.
+1. In Inferno, run group "1.2.4 order-sign" without any changes to the inputs.
+   When the dialog appears indicating Inferno is ready to receive requests, return to the
+   br-provider tab.
+1. Click the "Sign all Orders" button at the bottom of the chart frame (scroll down). On the
+   next screen, click the "Confirm & Sign" button. This will trigger hook requests and
+   within a few seconds, you should see updated cards displayed in the frame at the right.
+1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
+   a few moments to analyze the interactions and check them for conformance. After it has done
+   so, a new dialog will appear asking the tester to confirm that the returned responses
+   were displayed or otherwise made available to the user appropriately, including
+   a instructions card, a external reference card, and the coverage-information system action.
+   Determining the right response is a judgement call, but return to the br-provider tab
+   and decide what you see and make the corresponding attestation in Inferno. At the time of
+   this writing, the two cards were clearly displayed, and the details from the coverage-information
+   system action (e.g., "covered" indication) were displayed with the list of linked orders.
+1. In Inferno, run group "1.2.5 order-dispatch" without any changes to the inputs.
+   When the dialog appears indicating Inferno is ready to receive requests, return to the
+   br-provider tab.
+1. Click the "Dispatch Orders" button within the "Linked Orders" box. This will trigger
+   hook requests and within a few seconds, you should see updated cards displayed in the
+   frame at the right.
+1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
+   a few moments to analyze the interactions and check them for conformance. After it has done
+   so, a new dialog will appear asking the tester to confirm that the returned responses
+   were displayed or otherwise made available to the user appropriately, including
+   a instructions card, a external reference card, and the coverage-information system action.
+   Determining the right response is a judgement call, but return to the br-provider tab
+   and decide what you see and make the corresponding attestation in Inferno. At the time of
+   this writing, the two cards were clearly displayed, and the details from the coverage-information
+   system action (e.g., "covered" indication) were displayed with the list of linked orders.
+1. In Inferno, run group "1.2.6 encounter-discharge" without any changes to the inputs.
+   When the dialog appears indicating Inferno is ready to receive requests, return to the
+   br-provider tab.
+1. Click the "Finish Encounter" button at the bottom of the chart frame. This will trigger
+   hook requests though the results won't be displayed even once the page is fully loaded.
+1. In the Inferno tab, click the link in the dialog to continue the tests. Inferno will take
+   a few moments to analyze the interactions and check them for conformance. After it has done
+   so, a new dialog will appear asking the tester to confirm that the returned responses
+   were displayed or otherwise made available to the user appropriately, including
+   a instructions card, a external reference card, and the coverage-information system action.
+   Determining the right response is a judgement call, but return to the br-provider tab
+   and decide what you see and make the corresponding attestation in Inferno. At the time of
+   this writing, no card details were displayed, but the systemAction details are still available
+   with the order.
+
+Those instructions demonstrate the bulk of the CRD ordering workflow. Not all tests are
+expected to pass. You can also
+- Login as a patient to schedule an appointment and verify the appointment-book hook behavior
+  against Inferno.
+- Use the options to specify [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses),
+  e.g., to demonstrate changing coverage-information details for the order across
+  different hooks or different orders.
+- Execute some of the other scenario tests in Inferno and trigger a request from the
+  reference implementation.
+
+### crd-request-generator reference implementation (old)
+
+The old [crd-request-generator public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
+supports the order-sign hook and can be used to demonstrate suite execution with the
+following steps. Note that this reference implementation has not been updated for the
+2.2.1 version of the CRD IG so many failures are expected during this execution. However,
+it can give you a sense for what executing the Inferno tests against a client system will
+look like.
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using the default "US Core Version",
    which will not be used.
-1. Select the "CRD Request Generator RI" option from the Preset dropdown in the upper left.
-1. Select the "1.2.6 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
+1. Select the "CRD Request Generator Reference Implementation" option from the Preset dropdown in the upper left.
+1. Select the "1.2.4 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
 1. Select the response types Inferno should respond with under the **Response types to return
    from order-sign hook requests** input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be

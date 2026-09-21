@@ -82,9 +82,7 @@ module DaVinciCRDTestKit
           'When responding, Inferno will evaluate the provided [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses) ' \
             "from the **Custom response template for #{hook_slug} hook requests** input " \
             'against the incoming request to create a response.'
-          # rubocop:enable Layout/LineLength
         else
-          # rubocop:disable Layout/LineLength
           'When responding, Inferno will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
             'the following response types using the incoming request: ' \
             "\n            - #{selected_response_types_string}"

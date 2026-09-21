@@ -15,18 +15,18 @@ RSpec.describe DaVinciCRDTestKit::V201::LaunchSmartAppCardValidationTest do
   it 'skips if valid_cards_with_links not present' do
     result = run(runnable)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'valid_cards_with_links' is nil, skipping test/)
+    expect(result.result_message).to include("'valid_cards_with_links' is nil, skipping test")
   end
 
   it 'fails if valid_cards_with_links is not json' do
     result = run(runnable, valid_cards_with_links: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'skips if no Launch SMART App card present' do
     result = run(runnable, valid_cards_with_links: [].to_json)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/does not contain any Launch SMART App cards/)
+    expect(result.result_message).to include('does not contain any Launch SMART App cards')
   end
 end

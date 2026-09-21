@@ -85,9 +85,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
                        cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(
-      /\(Request 2\) Unexpected response status: expected 200, but received/
-    )
+    expect(entity_result_message.message)
+      .to include('(Request 2) Unexpected response status: expected 200, but received')
     expect(jwks_request).to have_been_made.times(2)
     expect(session_output(:crd_jwks_keys_json).length).to eq(2)
     expect(session_output(:crd_jwks_keys_json).last).to be_nil
@@ -120,7 +119,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     result = run(test, auth_token_headers_json: [token_header_no_jku.to_json],
                        cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received/)
+    expect(entity_result_message.message).to include('Unexpected response status: expected 200, but received')
     expect(jwks_request).to have_been_made
   end
 
@@ -147,7 +146,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Unexpected response status: expected 200, but received/)
+    expect(entity_result_message.message).to include('Unexpected response status: expected 200, but received')
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
@@ -158,7 +157,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/Fetched jku url response contains invalid JSON\./)
+    expect(entity_result_message.message).to include('Fetched jku url response contains invalid JSON.')
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
@@ -169,7 +168,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/JWKS `keys` field must be an array/)
+    expect(entity_result_message.message).to include('JWKS `keys` field must be an array')
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
@@ -180,7 +179,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/The JWK set returned contains no public keys/)
+    expect(entity_result_message.message).to include('The JWK set returned contains no public keys')
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
@@ -191,9 +190,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(
-      /`kid` field must be present in each key if JWKS contains multiple keys/
-    )
+    expect(entity_result_message.message)
+      .to include('`kid` field must be present in each key if JWKS contains multiple keys')
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end
@@ -203,7 +201,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       .to_return(status: 200, body: jwks_hash_dup_kids.to_json)
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/`kid` must be unique within the client's JWK Set\./)
+    expect(entity_result_message.message).to include("`kid` must be unique within the client's JWK Set.")
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end

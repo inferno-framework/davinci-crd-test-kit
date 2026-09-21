@@ -34,7 +34,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientUnknownContentAttestationTest, :re
     result = run(test)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/no hook requests sent during the previous wait/)
+    expect(result.result_message).to include('no hook requests sent during the previous wait')
   end
 
   it 'skips when no coverage information system action was returned' do
@@ -45,7 +45,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientUnknownContentAttestationTest, :re
     result = run(test)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/no coverage information system action was returned/)
+    expect(result.result_message).to include('no coverage information system action was returned')
   end
 
   it 'enters wait state and lists the unknown content returned' do
@@ -54,8 +54,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientUnknownContentAttestationTest, :re
     result = run(test)
 
     expect(result.result).to eq('wait')
-    expect(result.result_message).to match(/System action element name: `qwertyuiopasdfgh`/)
-    expect(result.result_message).to match(/Response extension name: `poiuytrewqlkjhgf`/)
+    expect(result.result_message).to include('System action element name: `qwertyuiopasdfgh`')
+    expect(result.result_message).to include('Response extension name: `poiuytrewqlkjhgf`')
   end
 
   it 'passes when the user attests true' do

@@ -72,11 +72,10 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Authorization'
-        test from: :crd_v201_decode_auth_token
-        test from: :crd_v201_retrieve_jwks
-        test from: :crd_v201_token_header
-        test from: :crd_v201_token_payload
+        title 'Verify Response Handling'
+
+        test from: :crd_v201_inferno_response_validation
+        test from: :crd_v201_card_display_attest_test
       end
 
       group do
@@ -108,10 +107,11 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Verify Response Handling'
-
-        test from: :crd_v201_inferno_response_validation
-        test from: :crd_v201_card_display_attest_test
+        title 'Verify Authorization'
+        test from: :crd_v201_decode_auth_token
+        test from: :crd_v201_retrieve_jwks
+        test from: :crd_v201_token_header
+        test from: :crd_v201_token_payload
       end
     end
   end

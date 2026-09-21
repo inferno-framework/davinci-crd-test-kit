@@ -30,7 +30,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationMustSupportTest do
     result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Coverage Information system action support not demonstrated/)
+    expect(result.result_message).to include('Coverage Information system action support not demonstrated')
   end
 
   it 'fails when some must support elements are missing across all hook responses' do

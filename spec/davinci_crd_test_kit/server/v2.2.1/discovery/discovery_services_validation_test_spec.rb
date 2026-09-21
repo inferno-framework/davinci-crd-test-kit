@@ -47,7 +47,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/does not contain/)
+    expect(result.result_message).to include('does not contain')
   end
 
   it 'fails when the davinci-crd.version extension is not an Array' do
@@ -59,7 +59,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/is not of type Array/)
+    expect(result.result_message).to include('is not of type Array')
   end
 
   it 'fails when the davinci-crd.version extension is empty' do
@@ -71,7 +71,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/is empty/)
+    expect(result.result_message).to include('is empty')
   end
 
   it 'fails when the davinci-crd.version extension contains non-string values' do
@@ -83,7 +83,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/contains non-string values/)
+    expect(result.result_message).to include('contains non-string values')
   end
 
   it 'fails when the davinci-crd.version extension contains in improperly formatted version' do
@@ -95,7 +95,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     result = run(runnable, cds_services:)
 
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/invalid version strings/)
+    expect(result.result_message).to include('invalid version strings')
   end
 
   it 'does not apply CRD-specific discovery requirements to ignored services' do
@@ -111,7 +111,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryServicesValidationTest do
     expect(session_data_repo.load(test_session_id: test_session.id, name: 'appointment_book_service_ids'))
       .to eq('appointment-book-service')
     expect(entity_result_messages.find { |message| message.type == 'info' }&.message)
-      .to match(/Ignoring service `non-crd-appointment-book-service`/)
+      .to include('Ignoring service `non-crd-appointment-book-service`')
   end
 
   it 'accepts comma separated ignored service ids' do

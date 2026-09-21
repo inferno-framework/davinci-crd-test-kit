@@ -118,8 +118,8 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Coverage-info configuration responses were not valid/)
-    expect(entity_result_messages.map(&:message).join(' ')).to match(/included coverage-info content/)
+    expect(result.result_message).to include('Coverage-info configuration responses were not valid')
+    expect(entity_result_messages.map(&:message).join(' ')).to include('included coverage-info content')
   end
 
   it 'skips if no coverage-info disabled follow-up request was made for primary hooks' do
@@ -128,7 +128,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/response contained coverage-info content to suppress/)
+    expect(result.result_message).to include('response contained coverage-info content to suppress')
   end
 
   it 'omits if no coverage-info disabled follow-up request was made for secondary hooks' do
@@ -139,6 +139,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInfoConfigurationTest do
     result = run(runnable)
 
     expect(result.result).to eq('omit')
-    expect(result.result_message).to match(/response contained coverage-info content to suppress/)
+    expect(result.result_message).to include('response contained coverage-info content to suppress')
   end
 end

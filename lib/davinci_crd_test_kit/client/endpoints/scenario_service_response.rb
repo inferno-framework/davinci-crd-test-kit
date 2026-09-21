@@ -9,10 +9,6 @@ module DaVinciCRDTestKit
       response_body
     end
 
-    def build_self_pay_hook_response
-      build_coverage_information_hook_response
-    end
-
     def build_coverage_information_hook_response
       response_body = { 'cards' => [] }
       system_actions = coverage_information_system_actions

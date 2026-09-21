@@ -37,7 +37,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
       result = run(runnable, coverage_info: [dup_action].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/different coverage-assertion-ids/)
+      expect(entity_result_message.message).to include('different coverage-assertion-ids')
     end
 
     it 'fails if satisfied-pa-ids are distinct' do
@@ -49,7 +49,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
       result = run(runnable, coverage_info: [dup_action].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/different satisfied-pa-ids/)
+      expect(entity_result_message.message).to include('different satisfied-pa-ids')
     end
   end
 
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
       result = run(runnable, coverage_info: [dup_action].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/SHALL have distinct coverage-assertion-ids/)
+      expect(entity_result_message.message).to include('SHALL have distinct coverage-assertion-ids')
     end
 
     it 'fails if satisfied-pa-ids are the same across coverages' do
@@ -92,20 +92,20 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
       result = run(runnable, coverage_info: [dup_action].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(/SHALL have distinct satisfied-pa-ids/)
+      expect(entity_result_message.message).to include('SHALL have distinct satisfied-pa-ids')
     end
   end
 
   it 'skips if coverage_info_system_actions not provided' do
     result = run(runnable)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/'coverage_info' is nil, skipping test/)
+    expect(result.result_message).to include("'coverage_info' is nil, skipping test")
   end
 
   it 'fails if coverage_info input is not valid json' do
     result = run(runnable, coverage_info: '[[')
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Invalid JSON/)
+    expect(result.result_message).to include('Invalid JSON')
   end
 
   it 'fails if a coverage info system action type is missing' do
@@ -114,7 +114,7 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
     result = run(runnable, coverage_info: [dup_action].to_json)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/`type` field is missing/)
+    expect(entity_result_message.message).to include('`type` field is missing')
   end
 
   it 'fails if a coverage info system action type is not update' do
@@ -123,6 +123,6 @@ RSpec.describe DaVinciCRDTestKit::V201::CoverageInformationSystemActionValidatio
 
     result = run(runnable, coverage_info: [dup_action].to_json)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/`type` must be `update`/)
+    expect(entity_result_message.message).to include('`type` must be `update`')
   end
 end

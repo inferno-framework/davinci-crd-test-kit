@@ -71,11 +71,10 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Authorization'
-        test from: :crd_v221_decode_auth_token
-        test from: :crd_v221_retrieve_jwks
-        test from: :crd_v221_token_header
-        test from: :crd_v221_token_payload
+        title 'Response Handling'
+
+        test from: :crd_v221_card_display_attest_test
+        test from: :crd_v221_inferno_response_validation
       end
 
       group do
@@ -100,10 +99,11 @@ module DaVinciCRDTestKit
       end
 
       group do
-        title 'Response Handling'
-
-        test from: :crd_v221_inferno_response_validation
-        test from: :crd_v221_card_display_attest_test
+        title 'Authorization'
+        test from: :crd_v221_decode_auth_token
+        test from: :crd_v221_retrieve_jwks
+        test from: :crd_v221_token_header
+        test from: :crd_v221_token_payload
       end
     end
   end

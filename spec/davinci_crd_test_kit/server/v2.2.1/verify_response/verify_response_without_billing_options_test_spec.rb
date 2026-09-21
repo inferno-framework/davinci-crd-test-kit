@@ -42,7 +42,7 @@ RSpec.describe DaVinciCRDTestKit::V221::VerifyResponseWithoutBillingOptionsTest 
     result = run(runnable)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No requests were made/)
+    expect(result.result_message).to include('No requests were made')
   end
 
   it 'skips if no successful requests were made' do
@@ -70,7 +70,7 @@ RSpec.describe DaVinciCRDTestKit::V221::VerifyResponseWithoutBillingOptionsTest 
     result = run(runnable)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/were unsuccessful/)
+    expect(result.result_message).to include('were unsuccessful')
   end
 
   it 'skips if all successful requests contain the billing options extension' do
@@ -121,6 +121,6 @@ RSpec.describe DaVinciCRDTestKit::V221::VerifyResponseWithoutBillingOptionsTest 
     result = run(runnable)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/All successful requests included the billing options extension/)
+    expect(result.result_message).to include('All successful requests included the billing options extension')
   end
 end

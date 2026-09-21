@@ -365,8 +365,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestPrefetchEqualsQueriedTest do
         expect(result.result).to eq('fail')
         expect(user_resource_request).to have_been_made.twice
         expect(result.result_message).to match(/Prefetched data does not match the requested queries./)
-        expect(entity_result_message(test)).to match(/Request 1/)
-        expect(entity_result_message(test)).to match(/Request 2/)
+        expect(entity_result_message(test)).to include('Request 1')
+        expect(entity_result_message(test)).to include('Request 2')
       end
     end
   end

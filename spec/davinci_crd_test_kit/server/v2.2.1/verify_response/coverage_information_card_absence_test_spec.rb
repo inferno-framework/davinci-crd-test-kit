@@ -181,8 +181,8 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Coverage Information cards/)
-    expect(entity_result_messages.map(&:message).join(' ')).to match(/suggestion action/)
+    expect(result.result_message).to include('Coverage Information cards')
+    expect(entity_result_messages.map(&:message).join(' ')).to include('suggestion action')
   end
 
   it 'fails when a card suggestion only contains a partial coverage-information extension update' do
@@ -196,7 +196,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     result = run(runnable)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Coverage Information cards/)
+    expect(result.result_message).to include('Coverage Information cards')
   end
 
   it 'skips when all responses are unsuccessful' do
@@ -210,6 +210,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationCardAbsenceTest do
     result = run(runnable)
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/All service requests were unsuccessful/)
+    expect(result.result_message).to include('All service requests were unsuccessful')
   end
 end
