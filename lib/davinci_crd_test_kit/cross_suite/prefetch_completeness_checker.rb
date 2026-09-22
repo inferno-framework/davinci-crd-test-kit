@@ -45,9 +45,13 @@ module DaVinciCRDTestKit
     # -----------------------------------------------------------------------
 
     def prefetched_resource_present?(relative_reference)
-      return false if base_fhir_server.blank? || relative_reference.blank?
+      prefetched_resource(relative_reference).present?
+    end
 
-      prefetched_resources.key?("#{base_fhir_server}#{relative_reference}")
+    def prefetched_resource(relative_reference)
+      return if base_fhir_server.blank? || relative_reference.blank?
+
+      prefetched_resources["#{base_fhir_server}#{relative_reference}"]
     end
 
     # -----------------------------------------------------------------------
