@@ -11,9 +11,9 @@ module DaVinciCRDTestKit
       description %(
         This test compares the FHIR reads that Inferno made, during hook processing, of the
         **Target Resource Reference** using the access token supplied in each of the full-access and
-        limited-access hook requests. For this test to pass, the full-access read must succeed
-        (HTTP 2xx) and return the expected resource, and the limited-access read must be denied with
-        an HTTP status of exactly 401, 403, or 404.
+        limited-access hook requests. For this test to pass, the full-access read must return the
+        target resource and the limited-access read must not. The manner in which the limited-access
+        read is denied is not checked, as the specification does not require a particular approach.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@63', 'cds-hooks_3.0.0-ballot@64',
@@ -22,8 +22,6 @@ module DaVinciCRDTestKit
       input :access_level_target_reference,
             title: 'Target Resource Reference',
             locked: true
-
-      VALID_DENIAL_STATUSES = [401, 403, 404].freeze
 
       def target_fetch_request(hook_requests)
         hook_instance = JSON.parse(hook_requests.first.request_body)['hookInstance']
@@ -37,6 +35,13 @@ module DaVinciCRDTestKit
         FHIR.from_contents(body)
       rescue StandardError
         nil
+      end
+
+      def target_resource_returned?(fetch_request)
+        expected_type, expected_id = access_level_target_reference.split('/')
+        resource = parse_fhir_resource(fetch_request.response_body)
+
+        resource.present? && resource.resourceType == expected_type && resource.id == expected_id
       end
 
       run do
@@ -69,27 +74,18 @@ module DaVinciCRDTestKit
           )
         end
 
-        unless full_fetch.status.to_s.starts_with?('2')
+        unless target_resource_returned?(full_fetch)
           add_message('error',
-                      "The full-access read of `#{access_level_target_reference}` failed with status " \
-                      "#{full_fetch.status}, but was expected to succeed.")
+                      "The full-access read of `#{access_level_target_reference}` did not return that " \
+                      "resource (HTTP #{full_fetch.status}), but the full-access user is expected to be " \
+                      'able to read it.')
         end
 
-        expected_type, expected_id = access_level_target_reference.split('/')
-        full_resource = parse_fhir_resource(full_fetch.response_body)
-        resource_matches = full_resource.present? && full_resource.resourceType == expected_type &&
-                           full_resource.id == expected_id
-        unless resource_matches
+        if target_resource_returned?(limited_fetch)
           add_message('error',
-                      "The full-access read of `#{access_level_target_reference}` succeeded, but did not " \
-                      'return the expected resource.')
-        end
-
-        unless VALID_DENIAL_STATUSES.include?(limited_fetch.status.to_i)
-          add_message('error',
-                      "The limited-access read of `#{access_level_target_reference}` returned status " \
-                      "#{limited_fetch.status}, but access should have been denied with one of " \
-                      "#{VALID_DENIAL_STATUSES.join(', ')}.")
+                      "The limited-access read of `#{access_level_target_reference}` returned that " \
+                      "resource (HTTP #{limited_fetch.status}), but access is expected to be denied for " \
+                      'the limited-access user.')
         end
 
         assert_no_error_messages("Access to `#{access_level_target_reference}` was not correctly scoped to " \

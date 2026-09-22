@@ -12,6 +12,10 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
   let(:limited_instance) { 'limited-instance' }
   let(:matching_resource) { { 'resourceType' => 'Observation', 'id' => '123' } }
   let(:different_resource) { { 'resourceType' => 'Observation', 'id' => '456' } }
+  let(:denial_outcome) do
+    { 'resourceType' => 'OperationOutcome',
+      'issue' => [{ 'severity' => 'error', 'code' => 'forbidden' }] }
+  end
 
   def create_hook_request(tag, instance)
     repo_create(
@@ -62,8 +66,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     expect(result.result_message).to include('Limited-access hook request was not successful')
   end
 
-  [401, 403, 404].each do |denial_status|
-    it "passes when the full-access read succeeds and the limited-access read is denied with #{denial_status}" do
+  [401, 403, 404, 500].each do |denial_status|
+    it "passes when the limited-access read withholds the resource with a #{denial_status}" do
       create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
       create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
       create_target_fetch(full_instance, status: 200, response_body: matching_resource)
@@ -71,6 +75,24 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
       expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
     end
+  end
+
+  it 'passes when the limited-access read returns an OperationOutcome with a 200' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+    create_target_fetch(full_instance, status: 200, response_body: matching_resource)
+    create_target_fetch(limited_instance, status: 200, response_body: denial_outcome)
+
+    expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
+  end
+
+  it 'passes when the limited-access read returns a different resource' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+    create_target_fetch(full_instance, status: 200, response_body: matching_resource)
+    create_target_fetch(limited_instance, status: 200, response_body: different_resource)
+
+    expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
   end
 
   it 'errors when Inferno never attempted a full-access read of the target resource' do
@@ -93,7 +115,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     expect(result.result_message).to include('not performed during the limited-access hook request')
   end
 
-  it 'fails when the full-access read itself failed' do
+  it 'fails when the full-access read was itself denied' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
     create_target_fetch(full_instance, status: 404)
@@ -101,7 +123,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/full-access read.*failed/)
+    expect(error_messages(result)).to include('did not return that resource')
   end
 
   it 'fails when the full-access read succeeded but returned a different resource than requested' do
@@ -112,7 +134,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('did not return the expected resource')
+    expect(error_messages(result)).to include('did not return that resource')
   end
 
   it 'fails when the full-access read returns the correct id but the wrong resource type' do
@@ -124,7 +146,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('did not return the expected resource')
+    expect(error_messages(result)).to include('did not return that resource')
   end
 
   it 'fails when the limited-access read succeeded instead of being denied' do
@@ -135,19 +157,18 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('access should have been denied')
+    expect(error_messages(result)).to include('returned that resource')
   end
 
-  [301, 500].each do |unexpected_status|
-    it "fails when the limited-access read returns an unexpected status of #{unexpected_status}" do
-      create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
-      create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
-      create_target_fetch(full_instance, status: 200, response_body: matching_resource)
-      create_target_fetch(limited_instance, status: unexpected_status)
+  it 'reports both problems when neither read is scoped as expected' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+    create_target_fetch(full_instance, status: 403)
+    create_target_fetch(limited_instance, status: 200, response_body: matching_resource)
 
-      result = run(test, access_level_target_reference: target_reference)
-      expect(result.result).to eq('fail')
-      expect(error_messages(result)).to include('access should have been denied')
-    end
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('did not return that resource')
+    expect(error_messages(result)).to include('returned that resource')
   end
 end
