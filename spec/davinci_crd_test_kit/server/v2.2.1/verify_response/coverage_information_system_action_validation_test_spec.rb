@@ -100,7 +100,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/changed outside the coverage-information extension/)
+    expect(entity_result_message.message).to include('changed outside the coverage-information extension')
   end
 
   it 'fails when a non-coverage-information extension changes' do
@@ -116,7 +116,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to match(/changed outside the coverage-information extension/)
+    expect(entity_result_message.message).to include('changed outside the coverage-information extension')
   end
 
   it 'passes when resolving the original order-dispatch resource from the mock EHR bundle' do
@@ -204,7 +204,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook responses/)
+    expect(result.result_message).to include('No successful hook responses')
   end
 
   it 'skips if no Coverage Information actions present' do
@@ -224,7 +224,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any Coverage Information system actions/)
+    expect(result.result_message).to include('do not contain any Coverage Information system actions')
   end
 
   it 'fails if the Coverage Information action is not valid' do
@@ -251,7 +251,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CoverageInformationSystemActionValidatio
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Coverage Information/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Coverage Information')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 end

@@ -219,7 +219,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
-        .to match(/FHIRPath service error while generating custom response/)
+        .to include('FHIRPath service error while generating custom response')
     end
 
     it 'returns a 500 error when the FHIRPath service fails during resource selection criteria evaluation' do
@@ -246,7 +246,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
-        .to match(/FHIRPath service error while generating custom response/)
+        .to include('FHIRPath service error while generating custom response')
     end
 
     it 'returns a 500 error when no template is provided' do
@@ -268,7 +268,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
-        .to match(/No custom template provided for custom Inferno CRD response/)
+        .to include('No custom template provided for custom Inferno CRD response')
     end
 
     it 'returns 400 when bad json specified in the input' do
@@ -292,7 +292,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
-        .to match(/Invalid template provided for custom Inferno CRD response: invalid JSON/)
+        .to include('Invalid template provided for custom Inferno CRD response: invalid JSON')
     end
 
     it 'returns success and updates the uuid on the card when present' do

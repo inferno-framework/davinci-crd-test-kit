@@ -28,6 +28,6 @@ RSpec.describe DaVinciCRDTestKit::V201::InstructionsCardReceivedAcrossHooksTest 
     run(runnable_within, order_dispatch_valid_cards: [].to_json, base_url:)
     result = run(runnable_across)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/None of the hooks invoked returned a valid Instructions card/)
+    expect(result.result_message).to include('None of the hooks invoked returned a valid Instructions card')
   end
 end

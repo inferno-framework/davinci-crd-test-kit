@@ -40,6 +40,6 @@ RSpec.describe DaVinciCRDTestKit::V221::InfernoResponseValidationTest do
     result = run(order_sign_test)
 
     expect(result.result).to eq('fail')
-    expect(first_error_message.message).to match(/`summary` is over the 140-character limit/)
+    expect(first_error_message.message).to include('`summary` is over the 140-character limit')
   end
 end

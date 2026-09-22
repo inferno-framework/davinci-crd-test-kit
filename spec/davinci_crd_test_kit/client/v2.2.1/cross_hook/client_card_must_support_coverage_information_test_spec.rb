@@ -38,7 +38,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCardMustSupportCoverageInformation
     it 'skips when no hook requests have been received' do
       result = run(runnable)
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No hook requests received/)
+      expect(result.result_message).to include('No hook requests received')
     end
 
     it 'fails when no coverage information actions are found' do
@@ -52,7 +52,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCardMustSupportCoverageInformation
 
       result = run(runnable)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Support for the Coverage Information response type not demonstrated/)
+      expect(result.result_message).to include('Support for the Coverage Information response type not demonstrated')
     end
 
     it 'fails when some must support elements are missing' do

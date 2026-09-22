@@ -87,7 +87,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No hook requests found/)
+      expect(result.result_message).to include('No hook requests found')
     end
   end
 
@@ -101,7 +101,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No coverage-info responses found/)
+      expect(result.result_message).to include('No coverage-info responses found')
     end
 
     it 'skips when coverage-info actions exist but target resource type is not in the capability statement' do
@@ -114,7 +114,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No coverage-info responses found/)
+      expect(result.result_message).to include('No coverage-info responses found')
       expect(result_messages.map(&:message))
         .to include(match(/#{device_request_resource_type}.*not supported/))
     end
@@ -137,7 +137,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No coverage-info responses found/)
+      expect(result.result_message).to include('No coverage-info responses found')
     end
 
     it 'skips when the response body has no systemActions key' do
@@ -154,7 +154,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('skip')
-      expect(result.result_message).to match(/No coverage-info responses found/)
+      expect(result.result_message).to include('No coverage-info responses found')
     end
   end
 
@@ -191,7 +191,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Not all coverage-information extensions stored/)
+      expect(result.result_message).to include('Not all coverage-information extensions stored')
     end
 
     it 'fails with an error message when the coverage-information extension is absent from the stored resource' do
@@ -202,7 +202,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Not all coverage-information extensions stored/)
+      expect(result.result_message).to include('Not all coverage-information extensions stored')
     end
 
     it 'fails with an error message when the stored coverage-information extension differs from the hook response' do
@@ -215,8 +215,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Not all coverage-information extensions stored/)
-      expect(result_messages.map(&:message)).to include(match(/'covered'/))
+      expect(result.result_message).to include('Not all coverage-information extensions stored')
+      expect(result_messages.map(&:message)).to include(include("'covered'"))
     end
 
     it 'passes when the coverage-information extension sub-elements are stored in a different order' do
@@ -248,7 +248,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Not all coverage-information extensions stored/)
+      expect(result.result_message).to include('Not all coverage-information extensions stored')
     end
 
     it 'fails when the stored resource has more coverage-information extensions than were sent' do
@@ -265,7 +265,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result = run(test, server_endpoint:, smart_auth_info:)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Not all coverage-information extensions stored/)
+      expect(result.result_message).to include('Not all coverage-information extensions stored')
     end
 
     it 'passes when the stored resource has additional non-coverage-info extensions' do
@@ -355,7 +355,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
 
       expect(result.result).to eq('skip')
       expect(result_messages.map(&:message))
-        .to include(match(/Multiple coverage-information extensions/))
+        .to include(include('Multiple coverage-information extensions'))
     end
   end
 
@@ -407,7 +407,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
 
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include(match(/'coverage-assertion-id'/))
+      expect(result_messages.map(&:message)).to include(include("'coverage-assertion-id'"))
     end
   end
 

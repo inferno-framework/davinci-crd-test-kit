@@ -104,9 +104,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestRequiredFieldsTest do
       create_appointment_hook_request(body: invalid_hook_request, auth_header: "Bearer #{token}")
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /Request 2: Hook request did not contain required field: `context`/
-      )
+      expect(entity_result_message.message)
+        .to include('Request 2: Hook request did not contain required field: `context`')
     end
 
     it 'skips if no appointment-book request can be found' do
@@ -150,9 +149,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestRequiredFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /Request 1: Hook request did not contain required field: `context`/
-      )
+      expect(entity_result_message.message)
+        .to include('Request 1: Hook request did not contain required field: `context`')
     end
 
     it 'fails if hook request hookInstance is not a uuid' do
@@ -193,9 +191,8 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestRequiredFieldsTest do
 
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to match(
-        /Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is/
-      )
+      expect(entity_result_message.message)
+        .to include('Missing `fhirServer` field: If `fhirAuthorization` is provided, this field is')
     end
   end
 end

@@ -81,7 +81,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: '',
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/No Inferno Payer Organization id configured/)
+    expect(result_messages.map(&:message).join).to include('No Inferno Payer Organization id configured')
   end
 
   it 'fails when subset_prefetch_service_organization_id is blank and subset endpoint requests are received' do
@@ -99,7 +99,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: '')
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/No Inferno Payer Organization id configured/)
+    expect(result_messages.map(&:message).join).to include('No Inferno Payer Organization id configured')
   end
 
   it 'skips when no hook requests received' do
@@ -114,7 +114,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('pass')
-    expect(result_messages.map(&:message).join).to match(/Request has no coverage/)
+    expect(result_messages.map(&:message).join).to include('Request has no coverage')
   end
 
   it 'passes when coverage payer matches the expected organization and passes validation' do
@@ -135,7 +135,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/Coverage has no payer reference/)
+    expect(result_messages.map(&:message).join).to include('Coverage has no payer reference')
   end
 
   it 'fails when Inferno did not successfully retrieve the payer during hook processing' do
@@ -144,7 +144,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/failed to retrieve the Coverage's payer/)
+    expect(result_messages.map(&:message).join).to include("failed to retrieve the Coverage's payer")
   end
 
   it 'fails when the payer fetch request returned a non-2xx status' do
@@ -153,7 +153,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/failed to retrieve the Coverage's payer/)
+    expect(result_messages.map(&:message).join).to include("failed to retrieve the Coverage's payer")
   end
 
   it 'fails when the payer fetch response is not valid FHIR' do
@@ -162,7 +162,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/returned invalid FHIR data/)
+    expect(result_messages.map(&:message).join).to include('returned invalid FHIR data')
   end
 
   it 'fails when the payer resource is not an Organization' do
@@ -172,7 +172,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/Payer for the Coverage is not an Organization/)
+    expect(result_messages.map(&:message).join).to include('Payer for the Coverage is not an Organization')
   end
 
   it 'fails when payer organization id does not match expected' do
@@ -182,7 +182,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
+    expect(result_messages.map(&:message).join).to include('Payer for the Coverage has the wrong id')
   end
 
   it 'fails when the payer resource does not conform to the CRD Organization profile' do
@@ -195,7 +195,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/does not conform to profile/)
+    expect(result_messages.map(&:message).join).to include('does not conform to profile')
   end
 
   it 'includes individual validator issues that are not filtered' do
@@ -211,7 +211,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to match(/Unfiltered issue/)
+    expect(result_messages.map(&:message).join).to include('Unfiltered issue')
   end
 
   it 'does not include validator issues marked as filtered' do
@@ -227,7 +227,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message).join).to_not match(/Filtered out issue/)
+    expect(result_messages.map(&:message).join).to_not include('Filtered out issue')
   end
 
   it 'includes request number in error message for the failing request' do
@@ -302,7 +302,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
       result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                          subset_prefetch_service_organization_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
+      expect(result_messages.map(&:message).join).to include('Payer for the Coverage has the wrong id')
     end
 
     it 'does not use complete_prefetch_service_organization_id for subset endpoint requests' do
@@ -313,7 +313,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
       result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                          subset_prefetch_service_organization_id: subset_payer_org_id)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to match(/Payer for the Coverage has the wrong id/)
+      expect(result_messages.map(&:message).join).to include('Payer for the Coverage has the wrong id')
     end
   end
 

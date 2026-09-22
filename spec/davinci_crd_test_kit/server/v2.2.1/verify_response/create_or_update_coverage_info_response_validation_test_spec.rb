@@ -60,7 +60,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CreateOrUpdateCoverageInfoResponseValida
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/No successful hook responses/)
+    expect(result.result_message).to include('No successful hook responses')
   end
 
   it 'skips if no Update Coverage card present' do
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CreateOrUpdateCoverageInfoResponseValida
     result = run(runnable, invoked_hook: 'order-sign')
 
     expect(result.result).to eq('skip'), result.result_message
-    expect(result.result_message).to match(/do not contain any Update Coverage Records/)
+    expect(result.result_message).to include('do not contain any Update Coverage Records')
   end
 
   it 'fails if a Update Coverage card is not valid' do
@@ -104,8 +104,8 @@ RSpec.describe DaVinciCRDTestKit::V221::CreateOrUpdateCoverageInfoResponseValida
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Update Coverage Records/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Update Coverage Records')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 
   it 'fails if a Update Coverage systemAction is not valid' do
@@ -131,7 +131,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CreateOrUpdateCoverageInfoResponseValida
     )
     result = run(runnable, invoked_hook: 'order-sign')
     expect(result.result).to eq('fail'), result.result_message
-    expect(result.result_message).to match(/Not all Update Coverage Records/)
-    expect(entity_result_message.message).to match(/ERROR MESSAGE/)
+    expect(result.result_message).to include('Not all Update Coverage Records')
+    expect(entity_result_message.message).to include('ERROR MESSAGE')
   end
 end

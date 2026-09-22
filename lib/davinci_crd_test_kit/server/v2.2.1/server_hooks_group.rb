@@ -19,10 +19,10 @@ module DaVinciCRDTestKit
         The supported hooks include:
         - [appointment-book](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#appointment-book)
         - [encounter-start](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-start)
-        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
         - [order-select](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-select)
-        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
         - [order-sign](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-sign)
+        - [order-dispatch](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#order-dispatch)
+        - [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#encounter-discharge)
 
         The [CRD STU2 IG section on Supported Hooks](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html#supported-hooks)
         states that "CRD Servers conforming to this implementation guide
@@ -59,13 +59,13 @@ module DaVinciCRDTestKit
             optional: true
       group from: :crd_v221_server_encounter_start,
             optional: true
-      group from: :crd_v221_server_encounter_discharge,
-            optional: true
       group from: :crd_v221_server_order_select,
+            optional: true
+      group from: :crd_v221_server_order_sign,
             optional: true
       group from: :crd_v221_server_order_dispatch,
             optional: true
-      group from: :crd_v221_server_order_sign,
+      group from: :crd_v221_server_encounter_discharge,
             optional: true
       group from: :crd_v221_server_required_card_response_validation
     end
