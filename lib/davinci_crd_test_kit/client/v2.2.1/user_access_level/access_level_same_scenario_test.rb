@@ -17,9 +17,6 @@ module DaVinciCRDTestKit
       )
       simulation_verification
 
-      # order-select/order-sign reference their orders via context.draftOrders; order-dispatch
-      # references a single order via context.order; appointment-book references its appointment(s)
-      # via context.appointments; encounter-start/encounter-discharge reference a single encounter id.
       def primary_context_ids(body)
         case body['hook']
         when 'appointment-book'

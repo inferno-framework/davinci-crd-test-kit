@@ -17,7 +17,6 @@ module DaVinciCRDTestKit
   UNKNOWN_CONTENT_GROUP_TAG = 'unknown_content_request'.freeze
   SELF_PAY_GROUP_TAG = 'self_pay_request'.freeze
   MULTIPLE_PAYERS_GROUP_TAG = 'multiple_payers_request'.freeze
-  # ID-216: User Access Level Scoping scenario
   ACCESS_LEVEL_FULL_GROUP_TAG = 'access-level-full'.freeze
   ACCESS_LEVEL_LIMITED_GROUP_TAG = 'access-level-limited'.freeze
   ACCESS_LEVEL_TARGET_FETCH_TAG = 'access_level_target'.freeze

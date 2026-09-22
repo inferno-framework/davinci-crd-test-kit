@@ -9,7 +9,6 @@ module DaVinciCRDTestKit
       hook_card_response
     end
 
-    # ID-216: bypasses tester response-configuration inputs (selected_response_types/custom template).
     def build_access_level_hook_response
       response_body = { 'cards' => [] }
       return response_body unless patient_coverage.present?

@@ -22,7 +22,6 @@ module DaVinciCRDTestKit
         or checked for conformance in this test. The test will automatically continue once Inferno
         has received a single valid hook request.
       )
-      config options: { accepts_multiple_requests: false }
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',

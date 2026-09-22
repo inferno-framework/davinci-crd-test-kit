@@ -28,8 +28,6 @@ module DaVinciCRDTestKit
 
       input_order :access_level_target_reference
 
-      # each instance configures its own crd_interaction_group tag so the two runs' hook requests
-      # (and the FHIR reads triggered by them) can be told apart during analysis.
       test from: :crd_v221_access_level_receive_request, id: :crd_v221_access_level_receive_request_full do
         title 'Client invokes a hook as a full-access user'
         config options: {

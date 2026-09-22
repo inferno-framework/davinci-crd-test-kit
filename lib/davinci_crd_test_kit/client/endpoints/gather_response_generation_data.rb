@@ -359,7 +359,6 @@ module DaVinciCRDTestKit
       request_parent_locations
     end
 
-    # ID-216: tags the fetch so AccessLevelApiAccessTest can find it via ACCESS_LEVEL_TARGET_FETCH_TAG.
     def request_access_level_target
       return if access_level_target_reference.blank?
 

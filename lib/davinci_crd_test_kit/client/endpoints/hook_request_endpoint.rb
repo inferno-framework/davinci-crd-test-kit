@@ -254,6 +254,10 @@ module DaVinciCRDTestKit
       test.config.options[:crd_interaction_group] == MULTIPLE_PAYERS_GROUP_TAG
     end
 
+    def user_access_level_group?
+      [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
+    end
+
     def long_running_pause_time
       JSON.parse(result.input_json)
         .find { |input| input['name'].include?('long_running_pause_time') }
@@ -269,14 +273,6 @@ module DaVinciCRDTestKit
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
-    end
-
-    # -----------------------
-    # ID-216: User Access Level Scoping handling
-    # -----------------------
-
-    def user_access_level_group?
-      [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
     end
   end
 end
