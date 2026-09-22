@@ -58,8 +58,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
                        subset_prefetch_service_organization_id: 'org-subset')
 
     expect(result.result).to eq('wait')
-    expect(result.result_message).to match(/payer Organization id: `org-complete`/)
-    expect(result.result_message).to match(/payer Organization id: `org-subset`/)
+    expect(result.result_message).to include('payer Organization id: `org-complete`')
+    expect(result.result_message).to include('payer Organization id: `org-subset`')
   end
 
   it 'passes when the tester clicks the continuation link' do
@@ -97,6 +97,26 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
     expect(result.result).to eq('wait')
   end
 
+  it 'tags requests with the multiple payers group tag even when the request is invalid' do
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint)
+      .to receive(:hook_instance_already_used?).and_return(true)
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint)
+      .to receive(:interaction_group_tag).and_return(DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG)
+
+    result = run(test, cds_jwt_iss: example_client_url)
+    expect(result.result).to eq('wait')
+
+    post_hook_request
+
+    expect(last_response.status).to eq(400)
+    result = results_repo.find(result.id)
+    expect(result.result).to eq('wait')
+
+    tagged_requests = Inferno::Repositories::Requests.new
+      .tagged_requests(test_session.id, [DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG])
+    expect(tagged_requests.length).to eq(1)
+  end
+
   it 'returns coverage information system actions and no cards' do
     run(test, cds_jwt_iss: example_client_url)
     post_hook_request
@@ -129,7 +149,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
     post_hook_request
 
     expect(last_response).to be_server_error
-    expect(last_response.body).to match(/is not associated with a waiting session/)
+    expect(last_response.body).to include('is not associated with a waiting session')
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end

@@ -24,9 +24,10 @@ module DaVinciCRDTestKit
         secondary' payers. During this test, Inferno verifies that the client made one or two hook
         requests when the tester performed a workflow for a patient with two payer coverages during
         the previous test. If a single request was received, it must not disable coverage
-        information. If two requests were received, each must have been made to a different payer,
-        they must be the same except for their coverage details, and exactly one of them must
-        disable coverage information using the `davinci-crd.configuration` extension.
+        information responses. If two requests were received, each must have been made to a service
+        associated with a different payer, they must be the same except for their coverage details,
+        and exactly one of them must disable coverage information using the `coverage-info` key
+        in the `davinci-crd.configuration` extension.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-28', 'hl7.fhir.us.davinci-crd_2.2.1@dev-30'

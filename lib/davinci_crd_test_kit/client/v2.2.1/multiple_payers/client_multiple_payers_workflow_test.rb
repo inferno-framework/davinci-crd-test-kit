@@ -8,17 +8,16 @@ module DaVinciCRDTestKit
       id :crd_v221_client_multiple_payers_workflow
       title 'Client performs a workflow for a patient with multiple payer coverages'
       description %(
-        During this test, the tester will perform a workflow that triggers hook invocation for a
-        patient that has two active coverages associated with two different payers, each associated
-        with one of Inferno's simulated CRD servers. The client is expected to solicit coverage
-        information from only the payer associated with the coverage most likely to be primary and
-        may also invoke the hook on the other payer with coverage information disabled. Inferno will
-        return a fixed [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-        containing only a coverage information system action, which is omitted for requests that
-        disable coverage information through the `davinci-crd.configuration` extension, and testers
-        cannot change the response that is returned. Inferno will wait until the tester acknowledges
-        that all hook requests triggered by the workflow have been sent, and the next test will
-        verify that the client solicited coverage information from only one payer.
+        During this test, the tester will perform a workflow that triggers hook invocations for a
+        request on a patient that has two active coverages associated with two different payers,
+        each associated with one of Inferno's simulated CRD servers. The client is expected to solicit
+        coverage information from only the payer associated with the coverage most likely to be primary
+        and may also invoke the hook on the other payer with coverage information disabled using
+        the `coverage-info` key within the `davinci-crd.configuration` extension. Inferno will return
+        at most a fixed [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+        containing only a coverage information system action, but not if the hook request disables
+        coverage information responses through the configuration extension. Inferno will wait until
+        the tester acknowledges that all hook requests triggered by the workflow have been sent.
       )
 
       input :cds_jwt_iss,
@@ -59,11 +58,13 @@ module DaVinciCRDTestKit
         " (payer Organization id: `#{organization_id}`)"
       end
 
-      def service_endpoint_details
-        complete_note = payer_organization_note(complete_prefetch_service_organization_id)
-        subset_note = payer_organization_note(subset_prefetch_service_organization_id)
-        "- Complete Prefetch: `#{discovery_url}`#{complete_note}\n            " \
-          "- Subset Prefetch: `#{prefetch_subset_discovery_url}`#{subset_note}"
+      def complete_prefetch_endpoint_details
+        "- Complete Prefetch: `#{discovery_url}`#{payer_organization_note(complete_prefetch_service_organization_id)}"
+      end
+
+      def subset_prefetch_endpoint_details
+        "- Subset Prefetch: `#{prefetch_subset_discovery_url}`" \
+          "#{payer_organization_note(subset_prefetch_service_organization_id)}"
       end
 
       run do
@@ -81,7 +82,8 @@ module DaVinciCRDTestKit
             different payers, each the payer associated with one of the two Inferno simulated
             CRD servers discoverable at the following endpoints:
 
-            #{service_endpoint_details}
+            #{complete_prefetch_endpoint_details}
+            #{subset_prefetch_endpoint_details}
 
             For Inferno to recognize these requests and associate them with this session,
             the authentication JWT sent as a Bearer token in the Authorization header

@@ -82,7 +82,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
     result = run(test)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/did not receive any hook requests/)
+    expect(result.result_message).to include('did not receive any hook requests')
   end
 
   it 'fails when more than two hook requests were received' do
@@ -95,7 +95,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
     result = run(test)
 
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/expected at most one for each of the two payers/)
+    expect(result.result_message).to include('expected at most one for each of the two payers')
   end
 
   it 'passes when a single request solicits coverage information' do

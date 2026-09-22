@@ -7,15 +7,17 @@ module DaVinciCRDTestKit
       title 'Multiple Payers'
       id :crd_v221_client_multiple_payers_hook
       description <<~DESCRIPTION
-        The CRD IG constrains how clients invoke hooks when a patient has multiple active coverages
-        that could be relevant to the current action: clients must select from those coverages which
-        is most likely to be primary and solicit coverage information from only that one payer, and
-        if they invoke CRD on other payers, response types that return coverage information must be
-        disabled for those 'likely secondary' payers. During this scenario the tester will perform a
-        workflow that triggers hook invocation for a patient that has two coverages associated with
-        two different payers, each associated with one of Inferno's simulated CRD servers, and
-        Inferno will verify that the requests it receives solicit coverage information from only one
-        of them.
+        The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#hook-invocation-for-multi-coverage-patients)
+        that clients request coverage information details from at most one payer for each request.
+        During this scenario the tester will perform a workflow that triggers a hook invocation
+        for a patient that has two coverages each associated with a payer tied to a different Inferno
+        simulated CRD endpoint. Inferno will verify that the hook requests it receives solicit coverage
+        information from only one of them. This can be accomplished by either making a hook request
+        to only the payer associated with the primary coverage, or by making a hook request
+        to both and explicitly disabling the return of coverage information details on the request to
+        the payer associated with the secondary coverage using the [configuration option
+        extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-5)
+        which payers are required to support.
 
         Hook requests made during these tests will not be checked for conformance
         or included in the cross-hook analyses around must support and other coverage requirements.

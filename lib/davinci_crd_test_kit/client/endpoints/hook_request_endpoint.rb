@@ -182,8 +182,9 @@ module DaVinciCRDTestKit
           [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag]
         end
 
-      # the self-pay scenario checks for the absence of requests, so even invalid requests must carry the group tag
-      tags << interaction_group_tag if self_pay_group?
+      # the self-pay scenario checks for the absence of requests and the multiple payers scenario checks
+      # all requests made, so even invalid requests must carry the group tag
+      tags << interaction_group_tag if self_pay_group? || multiple_payers_group?
 
       tags.uniq.compact
     end
