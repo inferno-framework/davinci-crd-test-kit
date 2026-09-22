@@ -48,18 +48,18 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
       .messages.map(&:message).join("\n")
   end
 
-  it 'skips when no full-access hook request has been received' do
+  it 'skips when the full-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No full-access hook request/)
+    expect(result.result_message).to match(/Full-access hook request was not successful/)
   end
 
-  it 'skips when no limited-access hook request has been received' do
+  it 'skips when the limited-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No limited-access hook request/)
+    expect(result.result_message).to match(/Limited-access hook request was not successful/)
   end
 
   it 'passes when both requests reference the same hook, patient, and draft orders' do

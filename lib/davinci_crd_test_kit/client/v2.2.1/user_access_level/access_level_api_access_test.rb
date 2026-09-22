@@ -44,9 +44,9 @@ module DaVinciCRDTestKit
         limited_hook_requests = load_tagged_requests(ACCESS_LEVEL_LIMITED_GROUP_TAG)
 
         skip_if full_hook_requests.blank?,
-                'No full-access hook request received - run the previous interaction tests first.'
+                'Full-access hook request was not successful. Check the response for details and re-try.'
         skip_if limited_hook_requests.blank?,
-                'No limited-access hook request received - run the previous interaction tests first.'
+                'Limited-access hook request was not successful. Check the response for details and re-try.'
 
         full_fetch = target_fetch_request(full_hook_requests)
         limited_fetch = target_fetch_request(limited_hook_requests)

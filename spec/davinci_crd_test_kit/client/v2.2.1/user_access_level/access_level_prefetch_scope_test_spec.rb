@@ -34,20 +34,20 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     { 'hook' => 'order-sign', 'hookInstance' => hook_instance, 'prefetch' => prefetch }
   end
 
-  it 'skips when no full-access hook request has been received' do
+  it 'skips when the full-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG,
                         hook_body(hook_instance: 'limited-instance'))
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No full-access hook request/)
+    expect(result.result_message).to match(/Full-access hook request was not successful/)
   end
 
-  it 'skips when no limited-access hook request has been received' do
+  it 'skips when the limited-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
                         hook_body(hook_instance: 'full-instance'))
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/No limited-access hook request/)
+    expect(result.result_message).to match(/Limited-access hook request was not successful/)
   end
 
   it 'passes when the target resource is present in the full prefetch and absent from the limited prefetch' do
