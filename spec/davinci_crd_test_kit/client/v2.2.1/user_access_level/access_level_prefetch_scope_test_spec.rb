@@ -30,8 +30,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     )
   end
 
-  def hook_body(hook_instance:, prefetch: {})
-    { 'hook' => 'order-sign', 'hookInstance' => hook_instance, 'prefetch' => prefetch }
+  def hook_body(hook_instance:, prefetch: {}, fhir_server: 'https://example.com/fhir')
+    { 'hook' => 'order-sign', 'hookInstance' => hook_instance, 'fhirServer' => fhir_server,
+      'prefetch' => prefetch }
   end
 
   it 'skips when the full-access hook request was not successful' do
@@ -70,6 +71,19 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
   end
 
+  it 'passes when the target resource is identified by a Bundle entry fullUrl for the full run only' do
+    full_bundle = { 'resourceType' => 'Bundle',
+                    'entry' => [{ 'fullUrl' => "https://example.com/fhir/#{target_reference}",
+                                  'resource' => target_resource }] }
+    full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observations' => full_bundle })
+    limited_body = hook_body(hook_instance: 'limited-instance',
+                             prefetch: { 'observations' => { 'resourceType' => 'Bundle', 'entry' => [] } })
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
+
+    expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
+  end
+
   it 'fails when the target resource is present in both the full and limited prefetch' do
     full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource })
     limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => target_resource })
@@ -91,6 +105,22 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     # Observation/1234 must not be treated as a match for Observation/123 in the limited prefetch,
     # so the strict presence/absence check should still pass.
     expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
+  end
+
+  it 'falls back to attestation when the hook request does not identify a FHIR server' do
+    allow(SecureRandom).to receive(:hex).and_return(known_token)
+    full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource },
+                          fhir_server: nil)
+    limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => target_resource },
+                             fhir_server: nil)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
+
+    # without a fhirServer the prefetched resources have no absolute url to be matched against,
+    # so presence cannot be established and the tester is asked to attest instead
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('wait')
+    expect(result.result_message).to include('I attest')
   end
 
   context 'when the target resource is not present in the full-access prefetch' do

@@ -1,6 +1,7 @@
 require_relative '../../tagged_request_load_helper'
 require_relative '../client_urls'
 require_relative '../../../cross_suite/tags'
+require_relative '../../../cross_suite/prefetch_completeness_checker'
 
 module DaVinciCRDTestKit
   module V221
@@ -28,19 +29,7 @@ module DaVinciCRDTestKit
       output :attest_false_url
 
       def prefetch_contains_reference?(request_body, reference)
-        request_body['prefetch'].to_h.values.any? do |prefetched|
-          next false unless prefetched.is_a?(Hash)
-
-          if prefetched['resourceType'] == 'Bundle'
-            prefetched['entry'].to_a.any? { |entry| entry_matches_reference?(entry['resource'], reference) }
-          else
-            entry_matches_reference?(prefetched, reference)
-          end
-        end
-      end
-
-      def entry_matches_reference?(resource, reference)
-        resource.is_a?(Hash) && "#{resource['resourceType']}/#{resource['id']}" == reference
+        PrefetchCompletenessChecker.new(request_body, nil, nil).prefetched_resource_present?(reference)
       end
 
       run do
