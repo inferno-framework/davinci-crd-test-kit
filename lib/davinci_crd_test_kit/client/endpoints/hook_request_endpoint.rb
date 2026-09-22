@@ -135,10 +135,8 @@ module DaVinciCRDTestKit
     def hook_response
       if unknown_content_group?
         build_unknown_content_hook_response
-      elsif self_pay_group? || long_running_group? || multiple_payers_group?
+      elsif fixed_coverage_information_group?
         build_coverage_information_hook_response
-      elsif user_access_level_group?
-        build_access_level_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
       else
@@ -256,6 +254,11 @@ module DaVinciCRDTestKit
 
     def user_access_level_group?
       [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
+    end
+
+    # scenarios that ignore the tester's response configuration and always return coverage information
+    def fixed_coverage_information_group?
+      self_pay_group? || long_running_group? || multiple_payers_group? || user_access_level_group?
     end
 
     def long_running_pause_time
