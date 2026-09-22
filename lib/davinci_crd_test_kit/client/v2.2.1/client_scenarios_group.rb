@@ -1,6 +1,7 @@
 require_relative 'client_long_running_hook_group'
 require_relative 'client_unknown_content_hook_group'
 require_relative 'client_self_pay_hook_group'
+require_relative 'client_multiple_payers_hook_group'
 
 module DaVinciCRDTestKit
   module V221
@@ -21,6 +22,7 @@ module DaVinciCRDTestKit
       group from: :crd_v221_client_long_running_hook
       group from: :crd_v221_client_unknown_content_hook
       group from: :crd_v221_client_self_pay_hook
+      group from: :crd_v221_client_multiple_payers_hook
     end
   end
 end

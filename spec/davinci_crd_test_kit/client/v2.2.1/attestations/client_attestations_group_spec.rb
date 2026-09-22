@@ -17,8 +17,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
       'hl7.fhir.us.davinci-crd_2.2.1@hook-7',
       'hl7.fhir.us.davinci-crd_2.2.1@hook-8',
       'hl7.fhir.us.davinci-crd_2.2.1@resp-48',
-      'hl7.fhir.us.davinci-crd_2.2.1@dev-28',
-      'hl7.fhir.us.davinci-crd_2.2.1@dev-30',
       'hl7.fhir.us.davinci-crd_2.2.1@dev-32',
       'cds-hooks_3.0.0-ballot@51',
       'hl7.fhir.us.davinci-crd_2.2.1@found-37',
