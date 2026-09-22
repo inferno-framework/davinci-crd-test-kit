@@ -172,6 +172,18 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
   end
 
+  describe 'when a resource cannot be read' do
+    it 'fails instead of asking the tester to attest the type is unsupported' do
+      create_request(hook_request_body(prefetch: { patient: { resourceType: 'Patinet', id: 'p1' } }))
+
+      result = run(test_for([{ resource_type: 'Patient', supporting_profile: true,
+                               profile_keys: ['patient'] }]))
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('could not read 1 item(s)')
+    end
+  end
+
   describe 'resource location within the request' do
     it 'finds resources carried only in prefetch' do
       create_request(hook_request_body(prefetch: { orders: complete_service_request }))

@@ -40,22 +40,23 @@ module DaVinciCRDTestKit
         { id: :crd_v221_communication_request_must_support, requirements: [CONF_3, HOOK_3],
           profiles: [{ resource_type: 'CommunicationRequest', profile_keys: ['communication_request'] }] },
         { id: :crd_v221_appointment_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Appointment', title: 'CRD Appointment',
+          profiles: [{ resource_type: 'Appointment', title: 'CRD Appointment', supporting_profile: true,
                        profile_keys: %w[appointment_with_order appointment_without_order] }] },
         { id: :crd_v221_encounter_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Encounter', profile_keys: ['encounter'] }] },
+          profiles: [{ resource_type: 'Encounter', supporting_profile: true, profile_keys: ['encounter'] }] },
         { id: :crd_v221_coverage_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Coverage', profile_keys: ['coverage'] }] },
+          profiles: [{ resource_type: 'Coverage', supporting_profile: true, profile_keys: ['coverage'] }] },
         { id: :crd_v221_location_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Location', profile_keys: ['location'] }] },
+          profiles: [{ resource_type: 'Location', supporting_profile: true, profile_keys: ['location'] }] },
         { id: :crd_v221_organization_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Organization', profile_keys: ['organization'] }] },
+          profiles: [{ resource_type: 'Organization', supporting_profile: true, profile_keys: ['organization'] }] },
         { id: :crd_v221_patient_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Patient', profile_keys: ['patient'] }] },
+          profiles: [{ resource_type: 'Patient', supporting_profile: true, profile_keys: ['patient'] }] },
         { id: :crd_v221_practitioner_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Practitioner', profile_keys: ['practitioner'] }] },
+          profiles: [{ resource_type: 'Practitioner', supporting_profile: true, profile_keys: ['practitioner'] }] },
         { id: :crd_v221_practitioner_role_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'PractitionerRole', profile_keys: ['practitioner_role'] }] }
+          profiles: [{ resource_type: 'PractitionerRole', supporting_profile: true,
+                       profile_keys: ['practitioner_role'] }] }
       ].freeze
 
       TEST_DEFINITIONS.each do |definition|

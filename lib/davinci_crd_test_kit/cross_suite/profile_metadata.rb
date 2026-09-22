@@ -4,11 +4,6 @@ module DaVinciCRDTestKit
   # Must support metadata for a single CRD profile, loaded from the YAML under `cross_suite/generated`
   # that {DaVinciCRDTestKit::Generator::MustSupportMetadataGenerator} writes.
   class ProfileMetadata < Inferno::DSL::ProfileMetadata
-    attribute :name
-    attribute :version
-    attribute :reformatted_version
-    attribute :title
-
     GENERATED_DIRECTORY = File.join(__dir__, 'generated').freeze
 
     class << self

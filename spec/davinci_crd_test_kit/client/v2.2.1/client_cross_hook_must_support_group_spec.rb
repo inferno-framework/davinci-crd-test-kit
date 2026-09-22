@@ -94,6 +94,19 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
 
       expect(definition_ids).to include(*supporting_ids.map(&:to_s))
     end
+
+    it 'flags every non request type as a supporting profile' do
+      request_type_ids = ['crd_v221_vision_prescription_must_support', 'crd_v221_service_request_must_support',
+                          'crd_v221_nutrition_order_must_support', 'crd_v221_medication_request_must_support',
+                          'crd_v221_device_request_must_support', 'crd_v221_communication_request_must_support']
+
+      described_class::TEST_DEFINITIONS.each do |definition|
+        expected = !request_type_ids.include?(definition[:id].to_s)
+        flagged = definition[:profiles].all? { |profile| profile[:supporting_profile] == true }
+
+        expect(flagged).to eq(expected), "#{definition[:id]} supporting_profile flag is #{flagged}"
+      end
+    end
   end
 
   describe 'descriptions' do

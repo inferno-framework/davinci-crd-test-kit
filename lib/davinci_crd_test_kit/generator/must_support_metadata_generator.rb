@@ -18,6 +18,9 @@ module DaVinciCRDTestKit
         }
       }.freeze
 
+      # Request profiles that CRD substantially extends use :differential, since the inherited
+      # US Core elements are already covered by the FHIR API group. Everything else uses
+      # :snapshot so the full must support set is checked.
       PROFILES = {
         '2.2.1' => [
           # Request types.

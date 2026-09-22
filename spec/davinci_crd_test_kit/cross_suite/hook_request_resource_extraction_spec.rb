@@ -141,5 +141,44 @@ RSpec.describe DaVinciCRDTestKit::HookRequestResourceExtraction do
       expect(extraction.fhir_resources_by_type([])).to eq({})
       expect(extraction.fhir_resources_by_type(nil)).to eq({})
     end
+
+    describe 'dropped resources' do
+      it 'records a request body that is not valid JSON' do
+        dropped = []
+        extraction.fhir_resources_by_type([request_double('not json')], dropped:)
+
+        expect(dropped).to eq([{ reason: :unparsable_body }])
+      end
+
+      it 'records a resource whose resourceType is not a FHIR resource' do
+        body = { 'prefetch' => { 'patient' => { 'resourceType' => 'Patinet', 'id' => 'p1' } } }.to_json
+        request = request_double(body)
+        dropped = []
+
+        grouped = extraction.fhir_resources_by_type([request], dropped:)
+
+        expect(grouped).to eq({})
+        expect(dropped).to eq([{ reason: :unreadable_resource, resource_type: 'Patinet' }])
+      end
+
+      it 'does not hide a dropped resource behind an absent resource type' do
+        requests = [request_double({ 'prefetch' => { 'patient' => { 'resourceType' => 'Patinet' } } }.to_json)]
+        dropped = []
+
+        grouped = extraction.fhir_resources_by_type(requests, dropped:)
+
+        expect(grouped['Patient']).to be_nil
+        expect(dropped.length).to eq(1)
+      end
+
+      it 'records nothing when every resource reads cleanly' do
+        request = request_double({ 'prefetch' => { 'patient' => resource('Patient', 'p1') } }.to_json)
+        dropped = []
+
+        extraction.fhir_resources_by_type([request], dropped:)
+
+        expect(dropped).to be_empty
+      end
+    end
   end
 end

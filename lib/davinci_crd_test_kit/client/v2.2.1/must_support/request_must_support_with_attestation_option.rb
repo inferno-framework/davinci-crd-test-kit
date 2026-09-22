@@ -63,8 +63,30 @@ module DaVinciCRDTestKit
           Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [CROSS_HOOK_ANALYSIS_TAG])
       end
 
+      def dropped_resources
+        @dropped_resources ||= []
+      end
+
       def resources_by_type
-        @resources_by_type ||= fhir_resources_by_type(must_support_requests)
+        @resources_by_type ||= fhir_resources_by_type(must_support_requests, dropped: dropped_resources)
+      end
+
+      def check_for_dropped_resources
+        dropped_resources.each do |entry|
+          add_message('error', dropped_resource_message(entry))
+        end
+
+        assert dropped_resources.blank?,
+               "Inferno could not read #{dropped_resources.length} item(s) in the hook requests made " \
+               'by the client system. See Messages for details.'
+      end
+
+      def dropped_resource_message(entry)
+        if entry[:reason] == :unparsable_body
+          'Could not parse the body of a hook request as JSON.'
+        else
+          "Could not read a #{entry[:resource_type].presence || 'resource'} found in a hook request."
+        end
       end
 
       def ig_version
@@ -79,7 +101,10 @@ module DaVinciCRDTestKit
 
           # `missing_must_support_elements` returns nil rather than the full list when handed no
           # resources, so an absent resource type has to be caught before calling it.
-          next { kind: :unsupported_type, title:, resource_type: profile[:resource_type] } if resources.blank?
+          if resources.blank?
+            next { kind: :unsupported_type, title:, resource_type: profile[:resource_type],
+                   supporting_profile: profile[:supporting_profile] }
+          end
 
           missing = missing_must_support_elements(resources, nil, metadata:)
           next if missing.blank?
@@ -133,6 +158,8 @@ module DaVinciCRDTestKit
       end
 
       def unsupported_type_section(entry)
+        return supporting_profile_section(entry) if entry[:supporting_profile]
+
         <<~SECTION.chomp
           Inferno did not observe any `#{entry[:resource_type]}` resources in the hook requests made by
           the client system, in either the hook `context` or the `prefetch`.
@@ -143,11 +170,27 @@ module DaVinciCRDTestKit
         SECTION
       end
 
+      def supporting_profile_section(entry)
+        <<~SECTION.chomp
+          Inferno did not observe any `#{entry[:resource_type]}` resources in the hook requests made by
+          the client system, in either the hook `context` or the `prefetch`.
+
+          `#{entry[:resource_type]}` is referenced from within CRD requests rather than being a request
+          type itself, so this is unexpected. Confirm that the hook requests sent so far were expected
+          to include #{entry[:title]} data.
+
+          Attest that the client system does not populate `#{entry[:resource_type]}` data in its CRD
+          hook requests. If it should have, cancel this attestation, send further requests that include
+          it, and re-run this group.
+        SECTION
+      end
+
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
 
         unobserved = gather_unobserved
         log_info_messages(unobserved)
+        check_for_dropped_resources
         pass 'All must support elements were observed.' if unobserved.blank?
 
         identifier = SecureRandom.hex(32)
