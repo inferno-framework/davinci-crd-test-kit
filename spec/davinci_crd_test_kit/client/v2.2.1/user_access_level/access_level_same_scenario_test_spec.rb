@@ -52,14 +52,14 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Full-access hook request was not successful/)
+    expect(result.result_message).to include('Full-access hook request was not successful')
   end
 
   it 'skips when the limited-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
     result = run(test)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Limited-access hook request was not successful/)
+    expect(result.result_message).to include('Limited-access hook request was not successful')
   end
 
   it 'passes when both requests reference the same hook, patient, and draft orders' do
@@ -81,7 +81,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/must invoke the same hook/)
+    expect(error_messages(result)).to include('must invoke the same hook')
     expect(error_messages(result)).to include("'order-sign' hook")
     expect(error_messages(result)).to include("'order-select' hook")
   end
@@ -92,7 +92,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/different patients/)
+    expect(error_messages(result)).to include('different patients')
     expect(error_messages(result)).to include('"pat-1"')
     expect(error_messages(result)).to include('"pat-2"')
   end
@@ -103,7 +103,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/do not reference the same order/)
+    expect(error_messages(result)).to include('do not reference the same order')
     expect(error_messages(result)).to include('MedicationRequest/med-1')
     expect(error_messages(result)).to include('MedicationRequest/med-2')
   end
@@ -154,7 +154,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_encounter_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/do not reference the same order/)
+    expect(error_messages(result)).to include('do not reference the same order')
     expect(error_messages(result)).to include('enc-1')
     expect(error_messages(result)).to include('enc-2')
   end
@@ -178,6 +178,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
     result = run(test)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Unable to parse/)
+    expect(result.result_message).to include('Unable to parse')
   end
 end

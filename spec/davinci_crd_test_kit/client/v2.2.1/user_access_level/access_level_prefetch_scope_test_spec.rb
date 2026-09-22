@@ -39,7 +39,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
                         hook_body(hook_instance: 'limited-instance'))
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Full-access hook request was not successful/)
+    expect(result.result_message).to include('Full-access hook request was not successful')
   end
 
   it 'skips when the limited-access hook request was not successful' do
@@ -47,7 +47,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
                         hook_body(hook_instance: 'full-instance'))
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Limited-access hook request was not successful/)
+    expect(result.result_message).to include('Limited-access hook request was not successful')
   end
 
   it 'passes when the target resource is present in the full prefetch and absent from the limited prefetch' do
@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/present in both/)
+    expect(result.result_message).to include('present in both')
   end
 
   it 'does not match a prefetched resource with the same type but a merely similar id' do
@@ -106,7 +106,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     it 'enters a wait state prompting the tester to attest' do
       result = run(test, access_level_target_reference: target_reference)
       expect(result.result).to eq('wait')
-      expect(result.result_message).to match(/I attest/)
+      expect(result.result_message).to include('I attest')
       expect(result.result_message).to match(/#{Regexp.escape(target_reference)}/)
     end
 
@@ -139,7 +139,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('wait')
-    expect(result.result_message).to_not match(/present in both/)
+    expect(result.result_message).to_not include('present in both')
   end
 
   it 'fails when a hook request body is not valid JSON' do
@@ -159,6 +159,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to match(/Unable to parse/)
+    expect(result.result_message).to include('Unable to parse')
   end
 end

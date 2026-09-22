@@ -52,14 +52,14 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Full-access hook request was not successful/)
+    expect(result.result_message).to include('Full-access hook request was not successful')
   end
 
   it 'skips when the limited-access hook request was not successful' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match(/Limited-access hook request was not successful/)
+    expect(result.result_message).to include('Limited-access hook request was not successful')
   end
 
   [401, 403, 404].each do |denial_status|
@@ -80,7 +80,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('error')
-    expect(result.result_message).to match(/not performed during the full-access hook request/)
+    expect(result.result_message).to include('not performed during the full-access hook request')
   end
 
   it 'errors when Inferno never attempted a limited-access read of the target resource' do
@@ -90,7 +90,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('error')
-    expect(result.result_message).to match(/not performed during the limited-access hook request/)
+    expect(result.result_message).to include('not performed during the limited-access hook request')
   end
 
   it 'fails when the full-access read itself failed' do
@@ -112,7 +112,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/did not return the expected resource/)
+    expect(error_messages(result)).to include('did not return the expected resource')
   end
 
   it 'fails when the full-access read returns the correct id but the wrong resource type' do
@@ -124,7 +124,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/did not return the expected resource/)
+    expect(error_messages(result)).to include('did not return the expected resource')
   end
 
   it 'fails when the limited-access read succeeded instead of being denied' do
@@ -135,7 +135,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to match(/access should have been denied/)
+    expect(error_messages(result)).to include('access should have been denied')
   end
 
   [301, 500].each do |unexpected_status|
@@ -147,7 +147,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
 
       result = run(test, access_level_target_reference: target_reference)
       expect(result.result).to eq('fail')
-      expect(error_messages(result)).to match(/access should have been denied/)
+      expect(error_messages(result)).to include('access should have been denied')
     end
   end
 end
