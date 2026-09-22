@@ -32,6 +32,13 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
     )
   end
 
+  def result_messages
+    results_repo.current_results_for_test_session_and_runnables(test_session.id, [test])
+      .first
+      .messages
+      .map(&:message)
+  end
+
   def post_hook_request(hook_instance: nil, extension: nil)
     body['hookInstance'] = hook_instance if hook_instance.present?
     body['extension'] = extension if extension.present?
@@ -140,6 +147,26 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
     response_body = JSON.parse(last_response.body)
     expect(response_body['cards']).to eq([])
     expect(response_body['systemActions']).to be_nil
+  end
+
+  it 'warns when coverage information cannot be returned for a request that allows it' do
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:patient_coverage).and_return(nil)
+
+    run(test, cds_jwt_iss: example_client_url)
+    post_hook_request
+
+    expect(last_response).to be_ok
+    expect(result_messages).to include(a_string_matching(/Unable to return a coverage information system action/))
+  end
+
+  it 'does not warn about missing coverage information when the request disables it' do
+    allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:patient_coverage).and_return(nil)
+
+    run(test, cds_jwt_iss: example_client_url)
+    post_hook_request(extension: { 'davinci-crd.configuration' => { 'coverage-info' => false } })
+
+    expect(last_response).to be_ok
+    expect(result_messages).to be_empty
   end
 
   it 'waits and responds with 500 if jwt `iss` claim mismatches the given `iss`' do

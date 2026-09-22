@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
 
       if system_actions.present?
         response_body['systemActions'] = system_actions
-      else
+      elsif !coverage_info_disabled?
         create_missing_coverage_information_message
       end
 
