@@ -5,6 +5,8 @@ services:
       context: ./
     volumes:
       - ./data:/opt/inferno/data
+    environment:
+      CRD_SERVER_MACHINE_KEY: ${CRD_SERVER_MACHINE_KEY:-}
     depends_on:
       - hl7_validator_service
   worker:
@@ -12,6 +14,8 @@ services:
       context: ./
     volumes:
       - ./data:/opt/inferno/data
+    environment:
+      CRD_SERVER_MACHINE_KEY: ${CRD_SERVER_MACHINE_KEY:-}
     command: bundle exec sidekiq -r ./worker.rb
     depends_on:
       - redis

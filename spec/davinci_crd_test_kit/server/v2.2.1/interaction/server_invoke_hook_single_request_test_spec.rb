@@ -8,7 +8,6 @@ RSpec.describe DaVinciCRDTestKit::V221::InvokeHookSingleTest do
   let(:base_url) { 'http://example.com' }
   let(:inferno_base_url) { 'http://inferno.com' }
   let(:service_ids) { 'order-sign-service' }
-  let(:encryption_method) { 'ES384' }
   let(:mock_ehr_bundle) { FHIR::Bundle.new(type: 'collection').to_json }
   let(:service_request_body) do
     {
@@ -30,7 +29,7 @@ RSpec.describe DaVinciCRDTestKit::V221::InvokeHookSingleTest do
   it 'skips when multiple request bodies are provided' do
     request_bodies = [service_request_body, service_request_body.deep_dup].to_json
 
-    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+    result = run(runnable, base_url:, inferno_base_url:, service_ids:,
                            service_request_bodies: request_bodies, mock_ehr_bundle:)
 
     expect(result.result).to eq('skip')

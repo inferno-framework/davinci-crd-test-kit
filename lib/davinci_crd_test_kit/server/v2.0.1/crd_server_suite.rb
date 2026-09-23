@@ -1,4 +1,3 @@
-require_relative '../jwt_helper'
 require_relative '../endpoints/jwk_set_endpoint_handler'
 require_relative 'server_discovery_group'
 require_relative 'server_demonstrate_hook_response_group'

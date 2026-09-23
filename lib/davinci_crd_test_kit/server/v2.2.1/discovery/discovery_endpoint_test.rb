@@ -1,3 +1,5 @@
+require_relative '../../anterior_workspace_token'
+
 module DaVinciCRDTestKit
   module V221
     class DiscoveryEndpointTest < Inferno::Test
@@ -17,7 +19,7 @@ module DaVinciCRDTestKit
         It only checks to see if the RESTful interaction is supported and returns a valid JSON object.
       )
 
-      input_order :base_url, :authentication_required, :encryption_method, :jwks_kid
+      input_order :base_url, :authentication_required
       input :base_url
       input :authentication_required,
             title: 'Discovery endpoint requires authentication?',
@@ -35,34 +37,6 @@ module DaVinciCRDTestKit
                 }
               ]
             }
-      input :encryption_method,
-            title: 'JWT Signing Algorithm',
-            description: <<~DESCRIPTION,
-              CDS Hooks recommends ES384 and RS384 for JWT signature verification.
-              Select which method to use.
-            DESCRIPTION
-            type: 'radio',
-            default: 'ES384',
-            options: {
-              list_options: [
-                {
-                  label: 'ES384',
-                  value: 'ES384'
-                },
-                {
-                  label: 'RS384',
-                  value: 'RS384'
-                }
-              ]
-            }
-      input :jwks_kid,
-            title: 'CDS Services JWKS kid',
-            description: <<~DESCRIPTION,
-              The key ID of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint
-              requiring authentication.
-              Defaults to the first JWK in the list if no kid is supplied.
-            DESCRIPTION
-            optional: true
       output :cds_services
 
       run do
@@ -70,14 +44,7 @@ module DaVinciCRDTestKit
         headers = { 'Accept' => 'application/json' }
 
         if authentication_required == 'yes'
-          token = JwtHelper.build(
-            aud: discovery_url,
-            iss: inferno_base_url,
-            jku: "#{inferno_base_url}/jwks.json",
-            kid: jwks_kid,
-            encryption_method:
-          )
-          headers['Authorization'] = "Bearer #{token}"
+          headers['Authorization'] = AnteriorWorkspaceToken.authorization_header(discovery_url)
         end
         get(discovery_url, headers:, tags: [DISCOVERY_TAG])
         assert_response_status(200)
