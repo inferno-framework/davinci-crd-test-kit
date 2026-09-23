@@ -1,0 +1,53 @@
+---
+:resource: Appointment
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-with-order
+:profile_name: CRD Appointment with Order
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Appointment.basedOn.extension:AlternateReference
+    :slice_name: AlternateReference
+    :path: basedOn.extension
+    :url: http://hl7.org/fhir/StructureDefinition/alternate-reference
+    :modifier_extension: false
+  :slices:
+  - :slice_id: Appointment.participant:Patient
+    :slice_name: Patient
+    :path: participant
+    :discriminator:
+      :type: unsupported
+      :path: type
+  - :slice_id: Appointment.participant:PrimaryPerformer
+    :slice_name: PrimaryPerformer
+    :path: participant
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: PPRF
+      :system: http://terminology.hl7.org/CodeSystem/v3-ParticipationType
+  :elements:
+  - :path: basedOn
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest
+  - :path: contained
+  - :path: end
+  - :path: participant.actor
+    :types:
+    - Reference
+  - :path: participant.status
+  - :path: participant:Patient.actor
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+  - :path: participant:Patient.status
+  - :path: participant:PrimaryPerformer.actor
+    :types:
+    - Reference
+  - :path: participant:PrimaryPerformer.status
+  - :path: requestedPeriod
+  - :path: start
+  - :path: status
+  :recursive_elements: []

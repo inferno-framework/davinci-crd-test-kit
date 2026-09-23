@@ -1,0 +1,26 @@
+---
+:resource: Location
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location
+:profile_name: CRD Location
+:profile_version: 2.2.1
+:must_supports:
+  :extensions: []
+  :slices: []
+  :elements:
+  - :path: address
+  - :path: address.city
+  - :path: address.line
+  - :path: address.postalCode
+  - :path: address.state
+  - :path: address.type
+  - :path: identifier
+  - :path: managingOrganization
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization
+  - :path: name
+  - :path: status
+  - :path: telecom
+  - :path: type
+  :recursive_elements: []

@@ -3,9 +3,7 @@ require_relative 'attestations/client_authorized_scope_attestation_test'
 require_relative 'attestations/client_coverage_based_invocation_attestation_test'
 require_relative 'attestations/client_data_element_expectations_attestation_test'
 require_relative 'attestations/client_hook_invocation_logging_attestation_test'
-require_relative 'attestations/client_must_support_exposure_attestation_test'
 require_relative 'attestations/client_must_support_use_attestation_test'
-require_relative 'attestations/client_order_sign_support_attestation_test'
 require_relative 'attestations/client_prefetch_key_omission_attestation_test'
 require_relative 'attestations/client_resource_identifiers_attestation_test'
 require_relative 'attestations/client_response_case_distinction_attestation_test'
@@ -36,12 +34,10 @@ module DaVinciCRDTestKit
       test from: :crd_v221_response_case_distinction_attestation
       test from: :crd_v221_data_element_expectations_attestation
       test from: :crd_v221_resource_identifiers_attestation
-      test from: :crd_v221_must_support_exposure_attestation
       test from: :crd_v221_workflow_integration_attestation
       test from: :crd_v221_coverage_based_invocation_attestation
       test from: :crd_v221_prefetch_key_omission_attestation
       test from: :crd_v221_hook_invocation_logging_attestation
-      test from: :crd_v221_order_sign_support_attestation
       test from: :crd_v221_authorized_scope_attestation
       test from: :crd_v221_must_support_use_attestation
     end

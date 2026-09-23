@@ -1,0 +1,28 @@
+---
+:resource: Patient
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+:profile_name: CRD Patient
+:profile_version: 2.2.1
+:must_supports:
+  :extensions: []
+  :slices: []
+  :elements:
+  - :path: address
+  - :path: address.city
+  - :path: address.country
+  - :path: address.line
+  - :path: address.postalCode
+  - :path: address.state
+  - :path: birthDate
+  - :path: communication.language
+  - :path: gender
+  - :path: identifier
+  - :path: identifier.system
+  - :path: identifier.value
+  - :path: name
+  - :path: name.family
+  - :path: name.given
+  - :path: telecom.system
+  - :path: telecom.use
+  - :path: telecom.value
+  :recursive_elements: []
