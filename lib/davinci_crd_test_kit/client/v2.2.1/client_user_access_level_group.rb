@@ -10,18 +10,21 @@ module DaVinciCRDTestKit
       title 'User Access Level Scoping'
       id :crd_v221_client_user_access_level
       description <<~DESCRIPTION
-        This group verifies that access to payer data exposed to a CDS Service during hook
-        invocation is scoped to the authorized access level of the EHR user, rather than relying
-        solely on attestation. Testers will place the same order, appointment, or encounter twice:
-        once as an EHR user with full access, and again as an EHR user with limited access, and
-        provide a reference to a resource that the full-access user is expected to be able to read
-        and the limited-access user is expected to be denied. Inferno will use the access token
-        supplied in each hook request to read that resource and will compare the two runs to
-        confirm that FHIR API access - and, where the tester's data supports it, prefetch data -
-        differs according to the user's access level.
+        This group verifies that access to client data during a CDS Service hook invocation
+        is scoped to the authorized access level of the EHR user when the hook is
+        invoked. Testers will invoke a hook twice, each time with consistent content (e.g., an
+        order for the same service): once as an EHR user with full access, and again as an
+        EHR user with limited access. Testers will provide a reference to a resource that the
+        full-access user is expected to be able to access while the limited-access user cannot.
+        Inferno will use the access token supplied in each hook request to read that resource and
+        will compare the two runs to confirm that data available to the payer differs according to
+        the user's access level, both in provided prefetch data and in what can be retrieved using
+        the access token provided in the hook request.
 
-        Hook requests made during these tests will not be checked for conformance or included in
-        the cross-hook analyses around must support and other coverage requirements.
+        Hook requests made during these tests will not be checked for conformance beyond scenario
+        requirements for confirming that both hook requests contain consistent content. The requests
+        will not be included in the cross-hook analyses around must support and other coverage
+        requirements.
       DESCRIPTION
 
       run_as_group

@@ -269,13 +269,17 @@ module DaVinciCRDTestKit
 
     # end the wait immediately after the scenario request returns
     # pause for long-running requests here because update_result runs before response generation
-    # the multiple payers scenario is excluded so that the wait continues until the tester
-    # acknowledges that all requests have been sent, since more than one request may be made
     def update_result
-      return unless long_running_group? || unknown_content_group? || self_pay_group? || user_access_level_group?
+      return unless continue_after_one_hook_request?
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
+    end
+
+    # the multiple payers scenario is excluded so that the wait continues until the tester
+    # acknowledges that all requests have been sent, since more than one request may be made
+    def continue_after_one_hook_request?
+      long_running_group? || unknown_content_group? || self_pay_group? || user_access_level_group?
     end
   end
 end
