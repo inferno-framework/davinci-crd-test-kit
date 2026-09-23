@@ -18,40 +18,27 @@ module DaVinciCRDTestKit
         }
       }.freeze
 
-      # Request profiles that CRD substantially extends use :differential, since the inherited
-      # US Core elements are already covered by the FHIR API group. Everything else uses
-      # :snapshot so the full must support set is checked.
+      ELEMENT_SCOPE = :snapshot
+
       PROFILES = {
         '2.2.1' => [
           # Request types.
-          { key: 'vision_prescription', package: :crd, id: 'profile-visionprescription',
-            element_scope: :snapshot },
-          { key: 'service_request', package: :crd, id: 'profile-servicerequest',
-            element_scope: :differential },
-          { key: 'nutrition_order', package: :crd, id: 'profile-nutritionorder',
-            element_scope: :snapshot },
-          { key: 'medication_request', package: :crd, id: 'profile-medicationrequest',
-            element_scope: :differential },
-          { key: 'device_request', package: :crd, id: 'profile-devicerequest',
-            element_scope: :snapshot },
-          { key: 'communication_request', package: :crd, id: 'profile-communicationrequest',
-            element_scope: :snapshot },
-          { key: 'appointment_with_order', package: :crd, id: 'profile-appointment-with-order',
-            element_scope: :snapshot },
-          { key: 'appointment_without_order', package: :crd, id: 'profile-appointment-no-order',
-            element_scope: :snapshot },
-          { key: 'encounter', package: :crd, id: 'profile-encounter',
-            element_scope: :differential },
+          { key: 'vision_prescription', package: :crd, id: 'profile-visionprescription' },
+          { key: 'service_request', package: :crd, id: 'profile-servicerequest' },
+          { key: 'nutrition_order', package: :crd, id: 'profile-nutritionorder' },
+          { key: 'medication_request', package: :crd, id: 'profile-medicationrequest' },
+          { key: 'device_request', package: :crd, id: 'profile-devicerequest' },
+          { key: 'communication_request', package: :crd, id: 'profile-communicationrequest' },
+          { key: 'appointment_with_order', package: :crd, id: 'profile-appointment-with-order' },
+          { key: 'appointment_without_order', package: :crd, id: 'profile-appointment-no-order' },
+          { key: 'encounter', package: :crd, id: 'profile-encounter' },
           # Supporting profiles.
-          { key: 'coverage', package: :crd, id: 'profile-coverage', element_scope: :snapshot },
-          { key: 'location', package: :crd, id: 'profile-location', element_scope: :snapshot },
-          { key: 'organization', package: :crd, id: 'profile-organization',
-            element_scope: :snapshot },
-          { key: 'patient', package: :crd, id: 'profile-patient', element_scope: :snapshot },
-          { key: 'practitioner', package: :crd, id: 'profile-practitioner',
-            element_scope: :snapshot },
-          { key: 'practitioner_role', package: :hrex, id: 'hrex-practitionerrole',
-            element_scope: :snapshot }
+          { key: 'coverage', package: :crd, id: 'profile-coverage' },
+          { key: 'location', package: :crd, id: 'profile-location' },
+          { key: 'organization', package: :crd, id: 'profile-organization' },
+          { key: 'patient', package: :crd, id: 'profile-patient' },
+          { key: 'practitioner', package: :crd, id: 'profile-practitioner' },
+          { key: 'practitioner_role', package: :hrex, id: 'hrex-practitionerrole' }
         ]
       }.freeze
 
@@ -82,8 +69,8 @@ module DaVinciCRDTestKit
         profile = ig.profiles.find { |candidate| candidate.id == config[:id] }
         raise "Profile #{config[:id]} not found in the #{config[:package]} package" if profile.nil?
 
-        elements = profile.send(config[:element_scope])&.element
-        raise "Profile #{config[:id]} has no #{config[:element_scope]} elements" if elements.blank?
+        elements = profile.send(ELEMENT_SCOPE)&.element
+        raise "Profile #{config[:id]} has no #{ELEMENT_SCOPE} elements" if elements.blank?
 
         extractor =
           Inferno::DSL::MustSupportMetadataExtractor.new(elements, profile, profile.type, ig)
