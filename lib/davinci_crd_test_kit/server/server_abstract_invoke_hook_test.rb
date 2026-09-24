@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
 
         The test is deemed successful if the CRD server returns a 200 HTTP response for all requests.
       )
-    input_order :base_url, :encryption_method, :jwks_kid
+    input_order :base_url
     input :base_url
     input :service_ids,
           description: %(
@@ -39,33 +39,6 @@ module DaVinciCRDTestKit
           optional: true,
           type: 'textarea',
           description: 'To send multiple requests, provide as a JSON list, e.g., [json_body_1, json_body_2].'
-    input :encryption_method,
-          title: 'JWT Signing Algorithm',
-          description: <<~DESCRIPTION,
-            CDS Hooks recommends ES384 and RS384 for JWT signature verification.
-            Select which method to use.
-          DESCRIPTION
-          type: 'radio',
-          options: {
-            list_options: [
-              {
-                label: 'ES384',
-                value: 'ES384'
-              },
-              {
-                label: 'RS384',
-                value: 'RS384'
-              }
-            ]
-          }
-    input :jwks_kid,
-          title: 'CDS Services JWKS kid',
-          description: <<~DESCRIPTION,
-            The key ID of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint
-            requiring authentication.
-            Defaults to the first JWK in the list if no kid is supplied.
-          DESCRIPTION
-          optional: true
     input :mock_ehr_bundle,
           title: 'Mock EHR Data',
           description: <<~DESCRIPTION,
@@ -135,8 +108,8 @@ module DaVinciCRDTestKit
         payloads,
         service_endpoint,
         inferno_base_url,
-        jwks_kid,
-        encryption_method,
+        nil,
+        nil,
         tested_hook_name,
         continuation_url,
         failure_url,

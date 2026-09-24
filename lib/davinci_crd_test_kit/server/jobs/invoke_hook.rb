@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../anterior_workspace_token'
 require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/base_urls'
 require_relative '../../cross_suite/cards_identification'
@@ -15,14 +16,12 @@ module DaVinciCRDTestKit
 
       sidekiq_options retry: false
 
-      def perform(test_session_id, request_bodies, service_endpoint, inferno_base_url, jwks_kid,
-                  encryption_method, request_tag, continuation_url, failure_url, acknowledge_before_continuing,
+      def perform(test_session_id, request_bodies, service_endpoint, inferno_base_url, _jwks_kid,
+                  _encryption_method, request_tag, continuation_url, failure_url, acknowledge_before_continuing,
                   coverage_info_configuration_supported)
         @test_session_id = test_session_id
         @service_endpoint = service_endpoint
         @inferno_base_url = inferno_base_url
-        @jwks_kid = jwks_kid
-        @encryption_method = encryption_method
         @request_tag = request_tag
         @continuation_url = continuation_url
         @failure_url = failure_url
@@ -105,14 +104,10 @@ module DaVinciCRDTestKit
       end
 
       def send_hook_invocation(request_body, extra_tags = [])
-        token = JwtHelper.build(
-          aud: @service_endpoint,
-          iss: @inferno_base_url,
-          jku: "#{@inferno_base_url}/jwks.json",
-          kid: @jwks_kid,
-          encryption_method: @encryption_method
-        )
-        headers = { 'Content-type' => 'application/json', 'Authorization' => "Bearer #{token}" }
+        headers = {
+          'Content-type' => 'application/json',
+          'Authorization' => AnteriorWorkspaceToken.authorization_header(@service_endpoint)
+        }
         response = invoke_hook(request_body, headers)
         persist_hook_request(response, [@request_tag] + extra_tags, headers)
         response
