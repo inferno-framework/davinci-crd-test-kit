@@ -18,7 +18,6 @@ module DaVinciCRDTestKit
         in the full-access request's prefetch, the tester attests whether prefetch data can be
         limited by the user's access level for resources of that kind.
       )
-      attestation
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@42'
 
