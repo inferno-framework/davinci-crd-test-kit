@@ -9,7 +9,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
   let(:patient_id) { 'pat-1' }
   let(:fhir_server) { 'https://example.org/fhir' }
-  let(:draft_order) { { 'resourceType' => 'MedicationRequest', 'id' => 'med-1' } }
+  let(:draft_order) { med_order('med-1', '1049502') }
 
   let(:full_body) do
     {
@@ -57,10 +57,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
   def error_messages(result)
     messages_of_type(result, 'error')
-  end
-
-  def warning_messages(result)
-    messages_of_type(result, 'warning')
   end
 
   # -- resource builders -------------------------------------------------------------------------
@@ -166,7 +162,34 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
                              'context' => { 'patientId' => patient_id } }
     result = run_both(body_without_context, body_without_context.merge('hookInstance' => 'limited-instance'))
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('could not identify the order, appointment, or encounter')
+    expect(error_messages(result)).to include('did not provide a Bundle of resources in `context.draftOrders`')
+  end
+
+  it 'fails when the encounter id is not a FHIR id' do
+    full = encounter_start_body('full-instance', 'https://example.org/fhir/Encounter/enc-1')
+    limited = encounter_start_body('limited-instance', 'enc-1')
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('which is not a FHIR id')
+  end
+
+  it 'fails when dispatched orders are not relative references' do
+    full = order_dispatch_body('full-instance', ['https://example.org/fhir/ServiceRequest/sr-1'])
+    limited = order_dispatch_body('limited-instance', ['ServiceRequest/sr-1'])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('are not relative references')
+  end
+
+  it 'fails when a draft order bundle entry has no resourceType or id' do
+    full = order_sign_body('full-instance', [{ 'resourceType' => 'MedicationRequest' }])
+    limited = order_sign_body('limited-instance', [med_order('med-2', '1049502')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('without a resourceType and id')
   end
 
   it 'fails when a hook request body is not valid JSON' do
@@ -190,9 +213,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('whose details also differ')
-    expect(error_messages(result)).to include('MedicationRequest/med-1')
-    expect(error_messages(result)).to include('MedicationRequest/med-2')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('1049502')
+    expect(error_messages(result)).to include('9999999')
   end
 
   it 'matches orders that point to a medication instance rather than carrying a code' do
@@ -206,14 +229,13 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(run_both(full, limited).result).to eq('pass')
   end
 
-  it 'warns without failing when the draft orders differ and carry no comparable details' do
+  it 'fails when a draft order carries no comparable details' do
     full = order_sign_body('full-instance', [{ 'resourceType' => 'MedicationRequest', 'id' => 'med-1' }])
-    limited = order_sign_body('limited-instance', [{ 'resourceType' => 'MedicationRequest', 'id' => 'med-2' }])
+    limited = order_sign_body('limited-instance', [med_order('med-2', '1049502')])
 
     result = run_both(full, limited)
-    expect(result.result).to eq('pass')
-    expect(warning_messages(result)).to include('could not compare their details')
-    expect(warning_messages(result)).to include('MedicationRequest/med-1')
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('does not describe MedicationRequest/med-1 in enough detail')
   end
 
   # -- appointment-book --------------------------------------------------------------------------
@@ -239,14 +261,15 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('whose details also differ')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
   end
 
   # -- encounter hooks ---------------------------------------------------------------------------
 
-  it 'passes for encounter-start requests that reference the same encounter' do
-    full = encounter_start_body('full-instance', 'enc-1')
-    limited = encounter_start_body('limited-instance', 'enc-1')
+  it 'passes for encounter-start requests that reference the same prefetched encounter' do
+    prefetch = { 'encounter' => encounter('enc-1', 'AMB', '2026-09-22T09:00:00Z') }
+    full = encounter_start_body('full-instance', 'enc-1', prefetch:)
+    limited = encounter_start_body('limited-instance', 'enc-1', prefetch:)
 
     expect(run_both(full, limited).result).to eq('pass')
   end
@@ -268,26 +291,36 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('whose details also differ')
-    expect(error_messages(result)).to include('Encounter/enc-1')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('AMB')
+    expect(error_messages(result)).to include('IMP')
   end
 
-  it 'warns without failing when the encounters differ and were not prefetched' do
+  it 'fails when the encounters were not provided in the prefetch data' do
     full = encounter_start_body('full-instance', 'enc-1')
     limited = encounter_start_body('limited-instance', 'enc-2')
 
     result = run_both(full, limited)
-    expect(result.result).to eq('pass')
-    expect(warning_messages(result)).to include('could not compare their details')
-    expect(warning_messages(result)).to include('Encounter/enc-1')
-    expect(warning_messages(result)).to include('Encounter/enc-2')
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('did not provide Encounter/enc-1 in its prefetch data')
+    expect(error_messages(result)).to include('did not provide Encounter/enc-2 in its prefetch data')
+  end
+
+  it 'fails when the same encounter is referenced but was not prefetched' do
+    full = encounter_start_body('full-instance', 'enc-1')
+    limited = encounter_start_body('limited-instance', 'enc-1')
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('in its prefetch data')
   end
 
   # -- order-dispatch ----------------------------------------------------------------------------
 
-  it 'passes for order-dispatch requests that dispatch the same orders' do
-    full = order_dispatch_body('full-instance', ['ServiceRequest/sr-1'])
-    limited = order_dispatch_body('limited-instance', ['ServiceRequest/sr-1'])
+  it 'passes for order-dispatch requests that dispatch the same prefetched orders' do
+    prefetch = { 'order' => service_order('sr-1', '24623002') }
+    full = order_dispatch_body('full-instance', ['ServiceRequest/sr-1'], prefetch:)
+    limited = order_dispatch_body('limited-instance', ['ServiceRequest/sr-1'], prefetch:)
 
     expect(run_both(full, limited).result).to eq('pass')
   end
@@ -309,7 +342,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('whose details also differ')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
   end
 
   it 'does not read order-dispatch context from the v2.0.1 `order` field' do
@@ -319,6 +352,6 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('could not identify the order, appointment, or encounter')
+    expect(error_messages(result)).to include('did not provide `context.dispatchedOrders`')
   end
 end
