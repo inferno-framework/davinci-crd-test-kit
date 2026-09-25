@@ -154,10 +154,15 @@ In the 2.2.1 version of the CRD IG, clients are [required to support prefetch](h
 and to be able to provide the complete minimal data set via this mechanism. Inferno therefore assumes
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
 during a hook invocation. However, clients are still required to allow servers to access data via FHIR
-APIs. Inferno will request during a hook invocation FHIR resources outside the standard prefetch data
+APIs. During a hook invocation, Inferno will use the provided `fhirServer` and
+`fhirAuthorization.access_token` to request resources outside the standard prefetch data
 set that it needs to validate other requirements, including
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.
 - Parent Location resources of those provided via prefetch via the `partOf` element.
+
+During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
+tester-specified resource. Whereas the other resources listed above must be accessible, Inferno
+will expect this resource to be available only during the hook request made by the full-access user.
 
 #### Multiple Service Endpoints
 
@@ -208,3 +213,6 @@ Specific general limitations across all versions include:
   and workarounds have been added to the test kit. If you identify an error
   reported by Inferno that you believe is inaccurate, please report it
   using [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
+- Inferno does not simulate access levels during the "User Access Level Scoping" scenario. It
+  reads the target resource during each hook request and compares the results, so the difference
+  in access must be enforced by the system under test.

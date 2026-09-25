@@ -17,6 +17,9 @@ module DaVinciCRDTestKit
   UNKNOWN_CONTENT_GROUP_TAG = 'unknown_content_request'.freeze
   SELF_PAY_GROUP_TAG = 'self_pay_request'.freeze
   MULTIPLE_PAYERS_GROUP_TAG = 'multiple_payers_request'.freeze
+  ACCESS_LEVEL_FULL_GROUP_TAG = 'access-level-full'.freeze
+  ACCESS_LEVEL_LIMITED_GROUP_TAG = 'access-level-limited'.freeze
+  ACCESS_LEVEL_TARGET_FETCH_TAG = 'access_level_target'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze

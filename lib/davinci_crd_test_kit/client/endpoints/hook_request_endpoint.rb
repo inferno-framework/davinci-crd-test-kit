@@ -115,6 +115,7 @@ module DaVinciCRDTestKit
         request_coverage
       elsif ig_version == 'v221'
         request_additional_fhir_data
+        request_access_level_target if user_access_level_group?
       end
       response_body = apply_hook_configuration(hook_response)
       return unless response_body.present?
@@ -134,7 +135,7 @@ module DaVinciCRDTestKit
     def hook_response
       if unknown_content_group?
         build_unknown_content_hook_response
-      elsif self_pay_group? || long_running_group? || multiple_payers_group?
+      elsif fixed_coverage_information_group?
         build_coverage_information_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
@@ -251,6 +252,15 @@ module DaVinciCRDTestKit
       test.config.options[:crd_interaction_group] == MULTIPLE_PAYERS_GROUP_TAG
     end
 
+    def user_access_level_group?
+      [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
+    end
+
+    # scenarios that ignore the tester's response configuration and always return coverage information
+    def fixed_coverage_information_group?
+      self_pay_group? || long_running_group? || multiple_payers_group? || user_access_level_group?
+    end
+
     def long_running_pause_time
       JSON.parse(result.input_json)
         .find { |input| input['name'].include?('long_running_pause_time') }
@@ -259,13 +269,17 @@ module DaVinciCRDTestKit
 
     # end the wait immediately after the scenario request returns
     # pause for long-running requests here because update_result runs before response generation
-    # the multiple payers scenario is excluded so that the wait continues until the tester
-    # acknowledges that all requests have been sent, since more than one request may be made
     def update_result
-      return unless long_running_group? || unknown_content_group? || self_pay_group?
+      return unless continue_after_one_hook_request?
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
+    end
+
+    # the multiple payers scenario is excluded so that the wait continues until the tester
+    # acknowledges that all requests have been sent, since more than one request may be made
+    def continue_after_one_hook_request?
+      long_running_group? || unknown_content_group? || self_pay_group? || user_access_level_group?
     end
   end
 end

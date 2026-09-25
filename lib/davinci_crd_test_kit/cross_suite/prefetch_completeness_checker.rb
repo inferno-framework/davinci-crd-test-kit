@@ -41,6 +41,20 @@ module DaVinciCRDTestKit
     end
 
     # -----------------------------------------------------------------------
+    # Prefetched Resource Presence Checking
+    # -----------------------------------------------------------------------
+
+    def prefetched_resource_present?(relative_reference)
+      prefetched_resource(relative_reference).present?
+    end
+
+    def prefetched_resource(relative_reference)
+      return if base_fhir_server.blank? || relative_reference.blank?
+
+      prefetched_resources["#{base_fhir_server}#{relative_reference}"]
+    end
+
+    # -----------------------------------------------------------------------
     # Complete vs Subset Prefetch Difference Checking
     # -----------------------------------------------------------------------
 
@@ -381,18 +395,20 @@ module DaVinciCRDTestKit
     def extract_prefetched_resource_instance(resource_instance)
       return unless resource_instance['id'].present? &&
                     resource_instance['resourceType'].present? &&
-                    hook_request['fhirServer'].present?
+                    base_fhir_server.present?
 
-      fhir_server =
-        if hook_request['fhirServer'].ends_with?('/')
-          hook_request['fhirServer']
-        else
-          "#{hook_request['fhirServer']}/"
-        end
-      key = "#{fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
+      key = "#{base_fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
       return if prefetched_resources.key?(key)
 
       prefetched_resources[key] = resource_instance
+    end
+
+    # ends with a slash so that relative references can be appended to form the
+    # absolute urls that prefetched resources are indexed by
+    def base_fhir_server
+      return if hook_request['fhirServer'].blank?
+
+      @base_fhir_server ||= "#{hook_request['fhirServer'].chomp('/')}/"
     end
 
     # -------------------------------------------------------------------------
