@@ -2,12 +2,14 @@ require_relative '../../tagged_request_load_helper'
 require_relative '../client_urls'
 require_relative '../../../cross_suite/tags'
 require_relative '../../../cross_suite/prefetch_completeness_checker'
+require_relative 'access_level_target_reference'
 
 module DaVinciCRDTestKit
   module V221
     class AccessLevelPrefetchScopeTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include ClientURLs
+      include AccessLevelTargetReference
 
       id :crd_v221_access_level_prefetch_scope
       title 'Prefetched data access is scoped to the EHR user'
@@ -39,6 +41,8 @@ module DaVinciCRDTestKit
                 'Full-access hook request was not successful. Check the response for details and re-try.'
         skip_if limited_requests.blank?,
                 'Limited-access hook request was not successful. Check the response for details and re-try.'
+
+        assert_target_reference_valid
 
         full_body = JSON.parse(full_requests.first.request_body)
         limited_body = JSON.parse(limited_requests.first.request_body)

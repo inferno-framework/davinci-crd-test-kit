@@ -17,14 +17,21 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
       'issue' => [{ 'severity' => 'error', 'code' => 'forbidden' }] }
   end
 
-  def create_hook_request(tag, instance)
+  def hook_body(instance, fhir_server: 'https://example.com/fhir', access_token: 'token-abc')
+    body = { 'hook' => 'order-sign', 'hookInstance' => instance }
+    body['fhirServer'] = fhir_server if fhir_server
+    body['fhirAuthorization'] = { 'access_token' => access_token } if access_token
+    body
+  end
+
+  def create_hook_request(tag, instance, body: nil)
     repo_create(
       :request,
       direction: 'incoming',
       url: 'https://example.com/cds-services/order-sign-service',
       result:,
       test_session_id: test_session.id,
-      request_body: { 'hook' => 'order-sign', 'hookInstance' => instance }.to_json,
+      request_body: (body || hook_body(instance)).to_json,
       status: 200,
       headers: [],
       tags: [tag]
@@ -64,6 +71,35 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('skip')
     expect(result.result_message).to include('Limited-access hook request was not successful')
+  end
+
+  it 'fails when the target resource reference is not a relative reference' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+
+    result = run(test, access_level_target_reference: 'https://example.com/fhir/Observation/123')
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('is not a relative reference')
+  end
+
+  it 'fails when a hook request did not provide a fhirServer' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance,
+                        body: hook_body(full_instance, fhir_server: nil))
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('full-access hook request did not include `fhirServer`')
+  end
+
+  it 'fails when a hook request did not provide an access token' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance,
+                        body: hook_body(limited_instance, access_token: nil))
+
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('`fhirAuthorization.access_token`')
   end
 
   [401, 403, 404, 500].each do |denial_status|

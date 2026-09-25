@@ -1,5 +1,6 @@
 require_relative '../client_urls'
 require_relative '../../../cross_suite/tags'
+require_relative 'access_level_target_reference'
 
 module DaVinciCRDTestKit
   module V221
@@ -7,6 +8,7 @@ module DaVinciCRDTestKit
     # distinct `crd_interaction_group` tag (full vs limited) via `config`.
     class AccessLevelReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include AccessLevelTargetReference
 
       id :crd_v221_access_level_receive_request
       title 'Client invokes a hook as an EHR user'
@@ -39,6 +41,8 @@ module DaVinciCRDTestKit
       end
 
       run do
+        assert_target_reference_valid
+
         identifier = cds_jwt_iss
         wait(
           identifier:,

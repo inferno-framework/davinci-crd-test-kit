@@ -59,6 +59,13 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelReceiveRequestTest, :request 
     expect(result.result).to eq('wait')
   end
 
+  it 'fails without waiting when the target resource reference is not relative' do
+    result = run(test, cds_jwt_iss: example_client_url,
+                       access_level_target_reference: 'https://example.com/fhir/Observation/123')
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('is not a relative reference')
+  end
+
   it 'passes immediately after a single valid hook request, without pausing' do
     expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to_not receive(:sleep)
 

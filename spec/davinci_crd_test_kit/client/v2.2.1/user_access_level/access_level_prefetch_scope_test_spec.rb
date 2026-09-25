@@ -51,6 +51,16 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     expect(result.result_message).to include('Limited-access hook request was not successful')
   end
 
+  it 'fails when the target resource reference is not a relative reference' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, hook_body(hook_instance: 'full-instance'))
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG,
+                        hook_body(hook_instance: 'limited-instance'))
+
+    result = run(test, access_level_target_reference: 'Observation')
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('is not a relative reference')
+  end
+
   it 'passes when the target resource is present in the full prefetch and absent from the limited prefetch' do
     full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource })
     limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => other_resource })
