@@ -28,6 +28,10 @@ module DaVinciCRDTestKit
       ORDER_REFERENCE_FIELDS = ['medicationReference', 'codeReference'].freeze
       RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]*/[A-Za-z0-9\-.]{1,64}\z}
       FHIR_ID_PATTERN = /\A[A-Za-z0-9\-.]{1,64}\z/
+      PARTICIPATION_TYPE_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'.freeze
+      PRIMARY_PERFORMER_CODE = 'PPRF'.freeze
+      COMMUNICATION_PAYLOAD_CONTENT_EXTENSION =
+        'http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content'.freeze
 
       def malformed_request(role, detail)
         add_message('error',
@@ -152,22 +156,75 @@ module DaVinciCRDTestKit
         case resource['resourceType']
         when 'Appointment' then appointment_content(resource)
         when 'Encounter' then encounter_content(resource)
+        when 'CommunicationRequest' then communication_request_content(resource)
+        when 'NutritionOrder' then nutrition_order_content(resource)
+        when 'VisionPrescription' then vision_prescription_content(resource)
         else order_content(resource)
         end
       end
 
+      # request content comes from the tester, so walk it without assuming any element's type
+      def nested(value, *keys)
+        keys.reduce(value) { |element, key| element.is_a?(Hash) ? element[key] : nil }
+      end
+
       def order_content(resource)
         codes = ORDER_CODE_FIELDS.flat_map { |field| codeable_concept_codes(resource[field]) }
-        references = ORDER_REFERENCE_FIELDS.filter_map { |field| resource.dig(field, 'reference') }
+        references = ORDER_REFERENCE_FIELDS.filter_map { |field| nested(resource, field, 'reference') }
 
         (codes + references).sort.presence
       end
 
+      # at least one primary performer is required, while the appointment's type and date are not
       def appointment_content(resource)
-        types = Array.wrap(resource['serviceType']).flat_map { |type| codeable_concept_codes(type) } +
-                codeable_concept_codes(resource['appointmentType'])
+        Array.wrap(resource['participant'])
+          .select { |participant| primary_performer?(participant) }
+          .filter_map { |participant| nested(participant, 'actor', 'reference') }
+          .sort.presence
+      end
 
-        types.sort.presence
+      def primary_performer?(participant)
+        return false unless participant.is_a?(Hash)
+
+        Array.wrap(participant['type']).any? do |type|
+          codeable_concept_codes(type).include?("#{PARTICIPATION_TYPE_SYSTEM}|#{PRIMARY_PERFORMER_CODE}")
+        end
+      end
+
+      # the code is carried by an R5 extension on the payload rather than by an element
+      def communication_request_content(resource)
+        Array.wrap(resource['payload']).flat_map do |payload|
+          Array.wrap(nested(payload, 'extension'))
+            .select { |extension| nested(extension, 'url') == COMMUNICATION_PAYLOAD_CONTENT_EXTENSION }
+            .flat_map { |extension| codeable_concept_codes(extension['valueCodeableConcept']) }
+        end.sort.presence
+      end
+
+      # no single element defines the order, so combine the optional ones that describe the diet
+      def nutrition_order_content(resource)
+        codes =
+          Array.wrap(resource['foodPreferenceModifier']).flat_map { |item| codeable_concept_codes(item) } +
+          Array.wrap(resource['excludeFoodModifier']).flat_map { |item| codeable_concept_codes(item) } +
+          Array.wrap(nested(resource, 'oralDiet', 'type')).flat_map { |item| codeable_concept_codes(item) } +
+          Array.wrap(resource['supplement']).flat_map { |item| codeable_concept_codes(nested(item, 'type')) } +
+          codeable_concept_codes(nested(resource, 'enteralFormula', 'baseFormulaType'))
+
+        codes.sort.presence
+      end
+
+      def vision_prescription_content(resource)
+        specifications = Array.wrap(resource['lensSpecification'])
+        return if specifications.blank?
+
+        contents = specifications.map do |specification|
+          product = codeable_concept_codes(nested(specification, 'product'))
+          eye = nested(specification, 'eye')
+          next if product.blank? || eye.blank?
+
+          "#{eye}|#{product.sort.join(',')}"
+        end
+
+        contents.any?(&:blank?) ? nil : contents.sort
       end
 
       def encounter_content(resource)

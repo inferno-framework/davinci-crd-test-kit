@@ -73,10 +73,37 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
       'code' => { 'coding' => [{ 'system' => 'http://snomed.info/sct', 'code' => code }] } }
   end
 
-  def appointment(id, service_code, start)
+  def appointment(id, performer_reference)
     { 'resourceType' => 'Appointment', 'id' => id,
-      'serviceType' => [{ 'coding' => [{ 'system' => 'http://example.org/service', 'code' => service_code }] }],
-      'start' => start }
+      'serviceType' => [{ 'coding' => [{ 'system' => 'http://example.org/service', 'code' => 'wellness' }] }],
+      'participant' => [
+        { 'actor' => { 'reference' => "Patient/#{patient_id}" } },
+        { 'type' => [{ 'coding' => [{ 'system' => 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
+                                      'code' => 'PPRF' }] }],
+          'actor' => { 'reference' => performer_reference } }
+      ] }
+  end
+
+  def communication_request(id, code)
+    { 'resourceType' => 'CommunicationRequest', 'id' => id,
+      'payload' => [{ 'extension' => [
+        { 'url' => 'http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content',
+          'valueCodeableConcept' => { 'coding' => [{ 'system' => 'http://snomed.info/sct', 'code' => code }] } }
+      ] }] }
+  end
+
+  def nutrition_order(id, diet_code)
+    { 'resourceType' => 'NutritionOrder', 'id' => id,
+      'oralDiet' => { 'type' => [{ 'coding' => [{ 'system' => 'http://snomed.info/sct', 'code' => diet_code }] }] } }
+  end
+
+  def vision_prescription(id, product_code, eye)
+    { 'resourceType' => 'VisionPrescription', 'id' => id,
+      'lensSpecification' => [
+        { 'product' => { 'coding' => [{ 'system' => 'http://terminology.hl7.org/CodeSystem/ex-visionprescriptionproduct',
+                                        'code' => product_code }] },
+          'eye' => eye }
+      ] }
   end
 
   def encounter(id, class_code, start)
@@ -241,23 +268,85 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
   # -- appointment-book --------------------------------------------------------------------------
 
   it 'passes for appointment-book requests that reference the same appointment' do
-    appt = appointment('apt-1', 'wellness', '2026-09-22T09:00:00Z')
+    appt = appointment('apt-1', 'Practitioner/prac-1')
     full = appointment_book_body('full-instance', [appt])
     limited = appointment_book_body('limited-instance', [appt])
 
     expect(run_both(full, limited).result).to eq('pass')
   end
 
-  it 'passes when the appointments differ but share a service type and date' do
-    full = appointment_book_body('full-instance', [appointment('apt-1', 'wellness', '2026-09-22T09:00:00Z')])
-    limited = appointment_book_body('limited-instance', [appointment('apt-2', 'wellness', '2026-09-22T14:30:00Z')])
+  it 'passes when the appointments differ but share a primary performer' do
+    full = appointment_book_body('full-instance', [appointment('apt-1', 'Practitioner/prac-1')])
+    limited = appointment_book_body('limited-instance', [appointment('apt-2', 'Practitioner/prac-1')])
 
     expect(run_both(full, limited).result).to eq('pass')
   end
 
-  it 'fails when the appointments differ in service type' do
-    full = appointment_book_body('full-instance', [appointment('apt-1', 'wellness', '2026-09-22T09:00:00Z')])
-    limited = appointment_book_body('limited-instance', [appointment('apt-2', 'surgery', '2026-09-22T09:00:00Z')])
+  it 'fails when the appointments have different primary performers' do
+    full = appointment_book_body('full-instance', [appointment('apt-1', 'Practitioner/prac-1')])
+    limited = appointment_book_body('limited-instance', [appointment('apt-2', 'Practitioner/prac-2')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('Practitioner/prac-1')
+  end
+
+  it 'ignores appointment participants that are not the primary performer' do
+    without_performer = { 'resourceType' => 'Appointment', 'id' => 'apt-1',
+                          'participant' => [{ 'actor' => { 'reference' => "Patient/#{patient_id}" } }] }
+    full = appointment_book_body('full-instance', [without_performer])
+    limited = appointment_book_body('limited-instance', [appointment('apt-2', 'Practitioner/prac-1')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('does not describe Appointment/apt-1 in enough detail')
+  end
+
+  # -- other order types -------------------------------------------------------------------------
+
+  it 'matches CommunicationRequests on the code carried by the payload extension' do
+    full = order_sign_body('full-instance', [communication_request('com-1', '306206005')])
+    limited = order_sign_body('limited-instance', [communication_request('com-2', '306206005')])
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
+  it 'fails when CommunicationRequest payload codes differ' do
+    full = order_sign_body('full-instance', [communication_request('com-1', '306206005')])
+    limited = order_sign_body('limited-instance', [communication_request('com-2', '409073007')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+  end
+
+  it 'matches NutritionOrders on the codes that describe the diet' do
+    full = order_sign_body('full-instance', [nutrition_order('nut-1', '435801000124108')])
+    limited = order_sign_body('limited-instance', [nutrition_order('nut-2', '435801000124108')])
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
+  it 'fails when NutritionOrder diet codes differ' do
+    full = order_sign_body('full-instance', [nutrition_order('nut-1', '435801000124108')])
+    limited = order_sign_body('limited-instance', [nutrition_order('nut-2', '437421000124105')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+  end
+
+  it 'matches VisionPrescriptions on the lens product and eye' do
+    full = order_sign_body('full-instance', [vision_prescription('vis-1', 'lens', 'right')])
+    limited = order_sign_body('limited-instance', [vision_prescription('vis-2', 'lens', 'right')])
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
+  it 'fails when a VisionPrescription is for the other eye' do
+    full = order_sign_body('full-instance', [vision_prescription('vis-1', 'lens', 'right')])
+    limited = order_sign_body('limited-instance', [vision_prescription('vis-2', 'lens', 'left')])
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
