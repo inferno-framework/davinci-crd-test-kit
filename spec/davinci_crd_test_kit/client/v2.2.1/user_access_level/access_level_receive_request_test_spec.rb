@@ -59,6 +59,54 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelReceiveRequestTest, :request 
     expect(result.result).to eq('wait')
   end
 
+  it 'describes the service endpoints and the required iss claim in the wait dialog' do
+    result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+    expect(result.result_message).to include('Complete Prefetch')
+    expect(result.result_message).to include('Subset Prefetch')
+    expect(result.result_message).to include(example_client_url)
+  end
+
+  describe 'the limited-access run' do
+    let(:test) do
+      Class.new(described_class) do
+        config(options: { crd_interaction_group: DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG })
+      end
+    end
+
+    let(:full_access_result) { repo_create(:result, test_session_id: test_session.id) }
+
+    let(:full_access_request) do
+      repo_create(
+        :request,
+        direction: 'incoming',
+        url: appointment_book_url,
+        result: full_access_result,
+        test_session_id: test_session.id,
+        request_body: body.to_json,
+        status: 200,
+        headers: [],
+        tags: [DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG]
+      )
+    end
+
+    before { allow(test).to receive(:suite).and_return(suite) }
+
+    it 'skips when the full-access hook request was not successful' do
+      result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('Full-access hook request was not successful')
+    end
+
+    it 'waits when the full-access hook request was received' do
+      full_access_request
+      result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+      expect(result.result).to eq('wait')
+    end
+  end
+
   it 'fails without waiting when the target resource reference is not relative' do
     result = run(test, cds_jwt_iss: example_client_url,
                        access_level_target_reference: 'https://example.com/fhir/Observation/123')

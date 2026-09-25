@@ -1,4 +1,5 @@
 require_relative '../client_urls'
+require_relative '../../tagged_request_load_helper'
 require_relative '../../../cross_suite/tags'
 require_relative 'access_level_target_reference'
 
@@ -8,6 +9,7 @@ module DaVinciCRDTestKit
     # distinct `crd_interaction_group` tag (full vs limited) via `config`.
     class AccessLevelReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_receive_request
@@ -36,12 +38,23 @@ module DaVinciCRDTestKit
               full-access user and denied to the limited-access user.
             )
 
+      def limited_access_run?
+        crd_interaction_group == ACCESS_LEVEL_LIMITED_GROUP_TAG
+      end
+
       def access_level_role
-        config.options[:crd_interaction_group] == ACCESS_LEVEL_FULL_GROUP_TAG ? 'full-access' : 'limited-access'
+        crd_interaction_group == ACCESS_LEVEL_FULL_GROUP_TAG ? 'full-access' : 'limited-access'
       end
 
       run do
         assert_target_reference_valid
+
+        # the limited-access run is only meaningful alongside a successful full-access one, so don't
+        # make the tester stage a second workflow that cannot be evaluated
+        if limited_access_run?
+          skip_if load_tagged_requests(ACCESS_LEVEL_FULL_GROUP_TAG).blank?,
+                  'Full-access hook request was not successful. Check the response for details and re-try.'
+        end
 
         identifier = cds_jwt_iss
         wait(
@@ -49,11 +62,22 @@ module DaVinciCRDTestKit
           message: %(
             **Invoke a hook as a #{access_level_role} user**:
 
-            Invoke any supported hook while signed in as a **#{access_level_role}** user, for the
-            same order, appointment, or encounter used for the other user role in this scenario.
-            Inferno will attempt to read `#{access_level_target_reference}` and will return a mocked
-            coverage-information response. This test will automatically continue once Inferno has
-            received a single valid hook request.
+            Invoke any supported hook, while signed in as a **#{access_level_role}** user, on one of
+            the two Inferno simulated CRD servers discoverable at the following endpoints:
+
+            - Complete Prefetch: `#{discovery_url}`
+            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+
+            For Inferno to recognize these requests and associate them with this session,
+            the authentication JWT sent as a Bearer token in the Authorization header
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
+            will automatically continue once Inferno has received a request and returned
+            a response.
+
+            Invoke the hook for the same order, appointment, or encounter used for the other user
+            role in this scenario. Inferno will use the access token in the request to attempt to
+            read `#{access_level_target_reference}` and will return a mocked coverage-information
+            response.
           )
         )
       end
