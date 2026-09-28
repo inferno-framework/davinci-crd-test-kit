@@ -1,11 +1,13 @@
 require_relative '../../tagged_request_load_helper'
 require_relative '../../../cross_suite/tags'
 require_relative '../../../cross_suite/prefetch_completeness_checker'
+require_relative 'access_level_target_reference'
 
 module DaVinciCRDTestKit
   module V221
     class AccessLevelSameScenarioTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include AccessLevelTargetReference
 
       id :crd_v221_access_level_same_scenario
       title 'Full-access and limited-access requests represent the same scenario'
@@ -14,8 +16,8 @@ module DaVinciCRDTestKit
         scenario and confirms that they invoke the same hook for the same patient, with the same
         content. Systems do not always allow the same workflow action to be repeated, so rather
         than requiring that both runs reference the same resources, Inferno compares the details of
-        the resources they do reference: the codes of the order(s), or the type of the appointment
-        or encounter.
+        the resources they do reference: the codes of the order(s), the primary performer of the
+        appointment, or the class and type of the encounter.
 
         Where a hook provides only a reference to those resources, Inferno takes their details from
         the prefetch data, which its services always request. If a request does not contain enough
@@ -26,7 +28,6 @@ module DaVinciCRDTestKit
 
       ORDER_CODE_FIELDS = ['code', 'medicationCodeableConcept', 'codeCodeableConcept'].freeze
       ORDER_REFERENCE_FIELDS = ['medicationReference', 'codeReference'].freeze
-      RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]*/[A-Za-z0-9\-.]{1,64}\z}
       FHIR_ID_PATTERN = /\A[A-Za-z0-9\-.]{1,64}\z/
       PARTICIPATION_TYPE_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'.freeze
       PRIMARY_PERFORMER_CODE = 'PPRF'.freeze
@@ -76,7 +77,7 @@ module DaVinciCRDTestKit
           return malformed_request(role, 'did not provide `context.dispatchedOrders` as a list')
         end
 
-        invalid = orders.reject { |order| order.is_a?(String) && order.match?(RELATIVE_REFERENCE_PATTERN) }
+        invalid = orders.reject { |order| order.is_a?(String) && order.match?(TARGET_REFERENCE_PATTERN) }
         if invalid.present?
           return malformed_request(role, 'provided `context.dispatchedOrders` entries that are not relative ' \
                                          "references: #{invalid.map(&:inspect).join(', ')}")
@@ -102,7 +103,8 @@ module DaVinciCRDTestKit
       def bundle_resources(bundle)
         return [] unless bundle.is_a?(Hash) && bundle['entry'].is_a?(Array)
 
-        bundle['entry'].map { |entry| entry['resource'] }.select { |resource| resource.is_a?(Hash) }
+        bundle['entry'].select { |entry| entry.is_a?(Hash) }
+          .map { |entry| entry['resource'] }.select { |resource| resource.is_a?(Hash) }
       end
 
       # order and appointment hooks carry the resources themselves, while encounter and
@@ -290,6 +292,10 @@ module DaVinciCRDTestKit
 
         full_body = JSON.parse(full_requests.first.request_body)
         limited_body = JSON.parse(limited_requests.first.request_body)
+
+        assert full_body['context'].is_a?(Hash) && limited_body['context'].is_a?(Hash),
+               'A hook request did not provide an object in `context`, so Inferno could not confirm ' \
+               'that both runs represent the same scenario.'
 
         check_same_patient(full_body, limited_body)
         # comparing content across two different hooks is not meaningful

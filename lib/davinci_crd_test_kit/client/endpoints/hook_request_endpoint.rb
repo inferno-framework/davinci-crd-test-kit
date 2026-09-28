@@ -114,8 +114,8 @@ module DaVinciCRDTestKit
         send(:"gather_#{requested_hook&.gsub('-', '_')}_data")
         request_coverage
       elsif ig_version == 'v221'
-        request_additional_fhir_data
         request_access_level_target if user_access_level_group?
+        request_additional_fhir_data
       end
       response_body = apply_hook_configuration(hook_response)
       return unless response_body.present?

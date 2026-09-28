@@ -219,6 +219,57 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(error_messages(result)).to include('without a resourceType and id')
   end
 
+  it 'resolves prefetched orders whose Bundle fullUrl is rooted elsewhere than the fhirServer' do
+    searchset = lambda do |order|
+      { 'resourceType' => 'Bundle', 'type' => 'searchset',
+        'entry' => [{ 'fullUrl' => "https://ehr.example.com/fhir/r4/ServiceRequest/#{order['id']}",
+                      'resource' => order }] }
+    end
+    full = order_dispatch_body('full-instance', ['ServiceRequest/sr-1'],
+                               prefetch: { 'serviceRequests' => searchset.call(service_order('sr-1', '24623002')) })
+    limited = order_dispatch_body('limited-instance', ['ServiceRequest/sr-2'],
+                                  prefetch: { 'serviceRequests' => searchset.call(service_order('sr-2', '24623002')) })
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
+  context 'with a body whose elements are not the expected types' do
+    it 'fails rather than raising when context is not an object' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502')]).merge('context' => [])
+      result = run_both(full, limited_body)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('did not provide an object in `context`')
+    end
+
+    it 'fails rather than raising when a draft order entry is null' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502')])
+      full['context']['draftOrders']['entry'] = [nil]
+      result = run_both(full, limited_body)
+
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('did not provide a Bundle of resources')
+    end
+
+    it 'fails rather than raising when prefetch is not an object' do
+      full = encounter_start_body('full-instance', 'enc-1').merge('prefetch' => 'none')
+      limited = encounter_start_body('limited-instance', 'enc-1').merge('prefetch' => 'none')
+      result = run_both(full, limited)
+
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('in its prefetch data')
+    end
+
+    it 'fails rather than raising when fhirServer is not a string' do
+      full = encounter_start_body('full-instance', 'enc-1').merge('fhirServer' => 42)
+      limited = encounter_start_body('limited-instance', 'enc-1').merge('fhirServer' => 42)
+      result = run_both(full, limited)
+
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('in its prefetch data')
+    end
+  end
+
   it 'fails when a hook request body is not valid JSON' do
     result = run_both('not valid json', limited_body)
     expect(result.result).to eq('fail')
@@ -363,7 +414,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(run_both(full, limited).result).to eq('pass')
   end
 
-  it 'passes when the encounters differ but the prefetched encounters share a class and date' do
+  it 'passes when the encounters differ but the prefetched encounters share a class' do
     full = encounter_start_body('full-instance', 'enc-1',
                                 prefetch: { 'encounter' => encounter('enc-1', 'AMB', '2026-09-22T09:00:00Z') })
     limited = encounter_start_body('limited-instance', 'enc-2',

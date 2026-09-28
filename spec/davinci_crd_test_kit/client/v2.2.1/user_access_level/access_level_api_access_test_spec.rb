@@ -185,6 +185,17 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelApiAccessTest do
     expect(error_messages(result)).to include('did not return that resource')
   end
 
+  it 'fails when the limited-access read never received a response' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)
+    create_target_fetch(full_instance, status: 200, response_body: matching_resource)
+    create_target_fetch(limited_instance, status: nil)
+
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('did not receive a response')
+  end
+
   it 'fails when the limited-access read succeeded instead of being denied' do
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_instance)
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_instance)

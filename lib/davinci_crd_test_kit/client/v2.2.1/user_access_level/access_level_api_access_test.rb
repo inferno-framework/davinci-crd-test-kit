@@ -29,8 +29,6 @@ module DaVinciCRDTestKit
         hook_instance = JSON.parse(hook_requests.first.request_body)['hookInstance']
         load_tagged_requests(TagMethods.hook_instance_data_fetch_tag(hook_instance), ACCESS_LEVEL_TARGET_FETCH_TAG)
           .first
-      rescue JSON::ParserError
-        nil
       end
 
       def check_fhir_access_elements(hook_request, role)
@@ -104,7 +102,11 @@ module DaVinciCRDTestKit
                       'able to read it.')
         end
 
-        if target_resource_returned?(limited_fetch)
+        if limited_fetch.status.blank?
+          add_message('error',
+                      "The limited-access read of `#{access_level_target_reference}` did not receive a " \
+                      'response, so Inferno could not determine whether access was denied.')
+        elsif target_resource_returned?(limited_fetch)
           add_message('error',
                       "The limited-access read of `#{access_level_target_reference}` returned that " \
                       "resource (HTTP #{limited_fetch.status}), but access is expected to be denied for " \

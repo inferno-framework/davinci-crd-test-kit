@@ -31,22 +31,22 @@ module DaVinciCRDTestKit
 
       input_order :access_level_target_reference
 
+      config(
+        options: {
+          hook_name: ANY_HOOK_TAG,
+          include_in_cross_hook_analysis: false
+        }
+      )
+
+      # only the interaction group differs, so that the two runs' requests can be told apart
       test from: :crd_v221_access_level_receive_request, id: :crd_v221_access_level_receive_request_full do
         title 'Client invokes a hook as a full-access user'
-        config options: {
-          crd_interaction_group: ACCESS_LEVEL_FULL_GROUP_TAG,
-          include_in_cross_hook_analysis: false,
-          hook_name: ANY_HOOK_TAG
-        }
+        config options: { crd_interaction_group: ACCESS_LEVEL_FULL_GROUP_TAG }
       end
 
       test from: :crd_v221_access_level_receive_request, id: :crd_v221_access_level_receive_request_limited do
         title 'Client invokes the same hook as a limited-access user'
-        config options: {
-          crd_interaction_group: ACCESS_LEVEL_LIMITED_GROUP_TAG,
-          include_in_cross_hook_analysis: false,
-          hook_name: ANY_HOOK_TAG
-        }
+        config options: { crd_interaction_group: ACCESS_LEVEL_LIMITED_GROUP_TAG }
       end
 
       test from: :crd_v221_access_level_same_scenario
