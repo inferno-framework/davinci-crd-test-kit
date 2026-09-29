@@ -1,6 +1,9 @@
+require_relative '../../docker_host_origin'
+
 module DaVinciCRDTestKit
   module V221
     class DiscoveryEndpointTest < Inferno::Test
+      include DaVinciCRDTestKit::DockerHostOrigin
       title 'Server returns a discovery response'
       id :crd_v221_discovery_endpoint_test
       description %(
@@ -17,68 +20,17 @@ module DaVinciCRDTestKit
         It only checks to see if the RESTful interaction is supported and returns a valid JSON object.
       )
 
-      input_order :base_url, :authentication_required, :encryption_method, :jwks_kid
+      input_order :base_url, :workspace_bearer
       input :base_url
-      input :authentication_required,
-            title: 'Discovery endpoint requires authentication?',
-            type: 'radio',
-            default: 'no',
-            options: {
-              list_options: [
-                {
-                  label: 'No',
-                  value: 'no'
-                },
-                {
-                  label: 'Yes',
-                  value: 'yes'
-                }
-              ]
-            }
-      input :encryption_method,
-            title: 'JWT Signing Algorithm',
-            description: <<~DESCRIPTION,
-              CDS Hooks recommends ES384 and RS384 for JWT signature verification.
-              Select which method to use.
-            DESCRIPTION
-            type: 'radio',
-            default: 'ES384',
-            options: {
-              list_options: [
-                {
-                  label: 'ES384',
-                  value: 'ES384'
-                },
-                {
-                  label: 'RS384',
-                  value: 'RS384'
-                }
-              ]
-            }
-      input :jwks_kid,
-            title: 'CDS Services JWKS kid',
-            description: <<~DESCRIPTION,
-              The key ID of the JWKS private key to use for signing the JWTs when invoking a CDS service endpoint
-              requiring authentication.
-              Defaults to the first JWK in the list if no kid is supplied.
-            DESCRIPTION
-            optional: true
+      input :workspace_bearer
       output :cds_services
 
       run do
         discovery_url = "#{base_url.chomp('/')}/cds-services"
-        headers = { 'Accept' => 'application/json' }
-
-        if authentication_required == 'yes'
-          token = JwtHelper.build(
-            aud: discovery_url,
-            iss: inferno_base_url,
-            jku: "#{inferno_base_url}/jwks.json",
-            kid: jwks_kid,
-            encryption_method:
-          )
-          headers['Authorization'] = "Bearer #{token}"
-        end
+        headers = {
+          'Accept' => 'application/json',
+          'Authorization' => "Bearer #{workspace_bearer}"
+        }.merge(docker_host_origin_headers(discovery_url))
         get(discovery_url, headers:, tags: [DISCOVERY_TAG])
         assert_response_status(200)
         assert_valid_json(request.response_body)

@@ -15,13 +15,13 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   let(:base_url) { 'http://example.org' }
   let(:discovery_url) { 'http://example.com/cds-services' }
   let(:inferno_base_url) { 'http://inferno.com' }
+  let(:workspace_bearer) { 'workspace-token' }
   let(:service_ids) { 'appointment-book-service' }
   let(:service_request_body) do
     json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'appointment_book_hook_request.json'))
     JSON.parse(json)
   end
   let(:service_request_bodies) { [service_request_body].to_json }
-  let(:encryption_method) { 'ES384' }
   # A Patient with known, searchable field values.
   let(:patient) do
     FHIR::Patient.new(
@@ -85,7 +85,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   # Starts a waiting test run and issues a GET search request against the mock EHR.
   # Returns the parsed FHIR Bundle response.
   def search(endpoint_path, params = {})
-    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:, service_request_bodies:,
+    result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:, service_request_bodies:,
                            mock_ehr_bundle: bundle)
     expect(result.result).to eq('wait')
     header 'Authorization', "Bearer #{token}"
@@ -104,7 +104,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   # Like search but returns only the self-link URL without asserting it matches
   # the full request URL — needed when unsupported params should be excluded.
   def self_link_for_search(endpoint_path, params = {})
-    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+    result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:,
                            service_request_bodies:, mock_ehr_bundle: bundle)
     expect(result.result).to eq('wait')
     header 'Authorization', "Bearer #{token}"
@@ -641,7 +641,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication)
       med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication_dispense)
 
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+      result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:,
                              service_request_bodies:, mock_ehr_bundle: med_bundle.to_json)
       expect(result.result).to eq('wait')
       header 'Authorization', "Bearer #{token}"
@@ -665,7 +665,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       prov_bundle.entry << FHIR::Bundle::Entry.new(resource: encounter)
       prov_bundle.entry << FHIR::Bundle::Entry.new(resource: provenance)
 
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+      result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:,
                              service_request_bodies:, mock_ehr_bundle: prov_bundle.to_json)
       expect(result.result).to eq('wait')
       header 'Authorization', "Bearer #{token}"
@@ -933,7 +933,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   # =========================================================================
   describe 'authorization' do
     it 'returns an error when the Authorization header is missing' do
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+      result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:,
                              service_request_bodies:, mock_ehr_bundle: bundle)
       expect(result.result).to eq('wait')
       get patient_endpoint

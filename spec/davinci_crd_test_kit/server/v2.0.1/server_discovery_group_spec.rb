@@ -22,21 +22,22 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
 
   describe 'discovery endpoint test' do
     let(:runnable) { group.tests[1] }
-    let(:authentication_required) { 'no' }
-    let(:encryption_method) { 'ES384' }
+    let(:workspace_bearer) { 'workspace-token' }
 
     it 'passes when a 200 response is received' do
       stub_request(:get, discovery_url)
+        .with(headers: { 'Authorization' => "Bearer #{workspace_bearer}" })
         .to_return(status: 200, body: cds_services.to_json)
-      result = run(runnable, base_url:, authentication_required:, encryption_method:)
+      result = run(runnable, base_url:, workspace_bearer:)
 
       expect(result.result).to eq('pass')
     end
 
     it 'persists cds_services output' do
       stub_request(:get, discovery_url)
+        .with(headers: { 'Authorization' => "Bearer #{workspace_bearer}" })
         .to_return(status: 200, body: cds_services.to_json)
-      run(runnable, base_url:, authentication_required:, encryption_method:)
+      run(runnable, base_url:, workspace_bearer:)
 
       expect(session_data_repo.load(test_session_id: test_session.id, name: 'cds_services'))
         .to eq(cds_services.to_json)
@@ -44,16 +45,29 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
 
     it 'fails when a non-200 response is received' do
       stub_request(:get, discovery_url)
+        .with(headers: { 'Authorization' => "Bearer #{workspace_bearer}" })
         .to_return(status: 201, body: cds_services.to_json)
-      result = run(runnable, base_url:, authentication_required:, encryption_method:)
+      result = run(runnable, base_url:, workspace_bearer:)
       expect(result.result).to eq('fail')
       expect(result.result_message).to include('Unexpected response status:')
     end
 
+    it 'sends the workspace bearer' do
+      discovery_request = stub_request(:get, discovery_url)
+        .with(headers: { 'Authorization' => "Bearer #{workspace_bearer}" })
+        .to_return(status: 200, body: cds_services.to_json)
+
+      result = run(runnable, base_url:, workspace_bearer:)
+
+      expect(result.result).to eq('pass')
+      expect(discovery_request).to have_been_made.once
+    end
+
     it 'fails when the response body is an invalid json' do
       stub_request(:get, discovery_url)
+        .with(headers: { 'Authorization' => "Bearer #{workspace_bearer}" })
         .to_return(status: 200, body: 'wd')
-      result = run(runnable, base_url:, authentication_required:, encryption_method:)
+      result = run(runnable, base_url:, workspace_bearer:)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to include('Invalid JSON')
