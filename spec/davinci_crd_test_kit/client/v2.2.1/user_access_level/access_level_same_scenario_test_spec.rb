@@ -29,11 +29,12 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     end
   end
 
-  def create_hook_request(tag, body)
+  def create_hook_request(tag, body, subset: false)
+    prefix = subset ? DaVinciCRDTestKit::PREFETCH_SUBSET_PREFIX : ''
     repo_create(
       :request,
       direction: 'incoming',
-      url: "https://example.com/cds-services/#{body['hook']}-service",
+      url: "https://example.com#{prefix}/cds-services/#{body.is_a?(Hash) ? body['hook'] : 'order-sign'}-service",
       result:,
       test_session_id: test_session.id,
       request_body: body.is_a?(Hash) ? body.to_json : body,
@@ -43,9 +44,9 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     )
   end
 
-  def run_both(full, limited)
-    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full)
-    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited)
+  def run_both(full, limited, full_subset: false, limited_subset: false)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full, subset: full_subset)
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited, subset: limited_subset)
     run(test)
   end
 
@@ -182,6 +183,20 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(error_messages(result)).to include('different patients')
     expect(error_messages(result)).to include('"pat-1"')
     expect(error_messages(result)).to include('"pat-2"')
+  end
+
+  it 'passes when both requests are made to the subset prefetch service' do
+    result = run_both(full_body, limited_body, full_subset: true, limited_subset: true)
+
+    expect(result.result).to eq('pass')
+  end
+
+  it 'fails when the two requests are made to different Inferno services' do
+    result = run_both(full_body, limited_body, limited_subset: true)
+
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('different Inferno')
+    expect(error_messages(result)).to include('Both runs must invoke the same service')
   end
 
   it 'fails when the hook does not identify any order, appointment, or encounter' do

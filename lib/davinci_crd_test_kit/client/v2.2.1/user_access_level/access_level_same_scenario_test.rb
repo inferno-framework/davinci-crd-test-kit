@@ -1,3 +1,4 @@
+require_relative '../../client_base_urls'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../../cross_suite/tags'
 require_relative '../../../cross_suite/prefetch_completeness_checker'
@@ -15,7 +16,9 @@ module DaVinciCRDTestKit
         This test compares the full-access and limited-access hook requests made earlier in this
         scenario and confirms that they invoke the same hook for the same patient, with the same
         content, meaning that the codes of the order(s), the primary performer of the
-        appointment, or the class and type of the encounter match.
+        appointment, or the class and type of the encounter match. Both requests must also be made
+        to the same Inferno simulated CRD server, so that any difference in the prefetch data
+        reflects the user's access level rather than the data set that server requests.
 
         Where a hook provides only a reference to those resources, Inferno takes their details from
         the prefetch data, which its services always request. If a request does not contain enough
@@ -256,6 +259,21 @@ module DaVinciCRDTestKit
         false
       end
 
+      # the two services request different prefetch data sets, so invoking one of each would
+      # produce prefetch differences that have nothing to do with the user's access level
+      def check_same_service(full_request, limited_request)
+        return if subset_prefetch_service?(full_request) == subset_prefetch_service?(limited_request)
+
+        add_message('error',
+                    'The full-access and limited-access requests were made to different Inferno ' \
+                    'simulated CRD servers, one requesting the complete prefetch data set and the ' \
+                    'other a subset. Both runs must invoke the same service.')
+      end
+
+      def subset_prefetch_service?(request)
+        request.url.to_s.include?(PREFETCH_SUBSET_PREFIX)
+      end
+
       def check_same_patient(full_body, limited_body)
         full_patient_id = full_body.dig('context', 'patientId')
         limited_patient_id = limited_body.dig('context', 'patientId')
@@ -295,6 +313,7 @@ module DaVinciCRDTestKit
                'A hook request did not provide an object in `context`, so Inferno could not confirm ' \
                'that both runs represent the same scenario.'
 
+        check_same_service(full_requests.first, limited_requests.first)
         check_same_patient(full_body, limited_body)
         # comparing content across two different hooks is not meaningful
         check_same_content(full_body, limited_body) if same_hook?(full_body, limited_body)
