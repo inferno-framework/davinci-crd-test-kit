@@ -27,13 +27,15 @@ module DaVinciCRDTestKit
       )
       simulation_verification
 
-      ORDER_CODE_FIELDS = ['code', 'medicationCodeableConcept', 'codeCodeableConcept'].freeze
-      ORDER_REFERENCE_FIELDS = ['medicationReference', 'codeReference'].freeze
+      ORDER_CONTENT_FIELDS = ['code', 'medicationCodeableConcept', 'medicationReference',
+                              'codeCodeableConcept', 'codeReference'].freeze
+      COMMUNICATION_REQUEST_CONTENT_FIELDS = ['payload'].freeze
+      NUTRITION_ORDER_CONTENT_FIELDS = ['foodPreferenceModifier', 'excludeFoodModifier', 'oralDiet',
+                                        'supplement', 'enteralFormula'].freeze
+      VISION_PRESCRIPTION_CONTENT_FIELDS = ['lensSpecification'].freeze
       FHIR_ID_PATTERN = /\A[A-Za-z0-9\-.]{1,64}\z/
       PARTICIPATION_TYPE_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'.freeze
       PRIMARY_PERFORMER_CODE = 'PPRF'.freeze
-      COMMUNICATION_PAYLOAD_CONTENT_EXTENSION =
-        'http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content'.freeze
 
       def malformed_request(role, detail)
         add_message('error',
@@ -152,30 +154,40 @@ module DaVinciCRDTestKit
           return
         end
 
-        contents.sort
+        contents.sort_by { |content| canonical(content).to_s }
+      end
+
+      # a request may list the resources it was invoked for in either order, so sort the content
+      # before comparing. Hashes are not comparable, and their keys may be in any order, so sort
+      # on a rendering that does not depend on either.
+      def canonical(content)
+        case content
+        when Hash then content.sort.map { |key, value| [key, canonical(value)] }
+        when Array then content.map { |element| canonical(element) }
+        else content
+        end
       end
 
       def resource_content(resource)
         case resource['resourceType']
         when 'Appointment' then appointment_content(resource)
         when 'Encounter' then encounter_content(resource)
-        when 'CommunicationRequest' then communication_request_content(resource)
-        when 'NutritionOrder' then nutrition_order_content(resource)
-        when 'VisionPrescription' then vision_prescription_content(resource)
-        else order_content(resource)
+        when 'CommunicationRequest' then order_elements(resource, COMMUNICATION_REQUEST_CONTENT_FIELDS)
+        when 'NutritionOrder' then order_elements(resource, NUTRITION_ORDER_CONTENT_FIELDS)
+        when 'VisionPrescription' then order_elements(resource, VISION_PRESCRIPTION_CONTENT_FIELDS)
+        else order_elements(resource, ORDER_CONTENT_FIELDS)
         end
+      end
+
+      # what was ordered is not always captured by a code, so compare the whole structure under the
+      # elements that describe it rather than pulling particular codings out of them
+      def order_elements(resource, fields)
+        fields.index_with { |field| resource[field] }.compact_blank.presence
       end
 
       # request content comes from the tester, so walk it without assuming any element's type
       def nested(value, *keys)
         keys.reduce(value) { |element, key| element.is_a?(Hash) ? element[key] : nil }
-      end
-
-      def order_content(resource)
-        codes = ORDER_CODE_FIELDS.flat_map { |field| codeable_concept_codes(resource[field]) }
-        references = ORDER_REFERENCE_FIELDS.filter_map { |field| nested(resource, field, 'reference') }
-
-        (codes + references).sort.presence
       end
 
       # at least one primary performer is required, while the appointment's type and date are not
@@ -192,42 +204,6 @@ module DaVinciCRDTestKit
         Array.wrap(participant['type']).any? do |type|
           codeable_concept_codes(type).include?("#{PARTICIPATION_TYPE_SYSTEM}|#{PRIMARY_PERFORMER_CODE}")
         end
-      end
-
-      # the code is carried by an R5 extension on the payload rather than by an element
-      def communication_request_content(resource)
-        Array.wrap(resource['payload']).flat_map do |payload|
-          Array.wrap(nested(payload, 'extension'))
-            .select { |extension| nested(extension, 'url') == COMMUNICATION_PAYLOAD_CONTENT_EXTENSION }
-            .flat_map { |extension| codeable_concept_codes(extension['valueCodeableConcept']) }
-        end.sort.presence
-      end
-
-      # no single element defines the order, so combine the optional ones that describe the diet
-      def nutrition_order_content(resource)
-        codes =
-          Array.wrap(resource['foodPreferenceModifier']).flat_map { |item| codeable_concept_codes(item) } +
-          Array.wrap(resource['excludeFoodModifier']).flat_map { |item| codeable_concept_codes(item) } +
-          Array.wrap(nested(resource, 'oralDiet', 'type')).flat_map { |item| codeable_concept_codes(item) } +
-          Array.wrap(resource['supplement']).flat_map { |item| codeable_concept_codes(nested(item, 'type')) } +
-          codeable_concept_codes(nested(resource, 'enteralFormula', 'baseFormulaType'))
-
-        codes.sort.presence
-      end
-
-      def vision_prescription_content(resource)
-        specifications = Array.wrap(resource['lensSpecification'])
-        return if specifications.blank?
-
-        contents = specifications.map do |specification|
-          product = codeable_concept_codes(nested(specification, 'product'))
-          eye = nested(specification, 'eye')
-          next if product.blank? || eye.blank?
-
-          "#{eye}|#{product.sort.join(',')}"
-        end
-
-        contents.any?(&:blank?) ? nil : contents.sort
       end
 
       def encounter_content(resource)
@@ -292,8 +268,8 @@ module DaVinciCRDTestKit
 
         add_message('error',
                     'The full-access and limited-access requests do not describe the same order, ' \
-                    "appointment, or encounter (#{full_content.join(', ')} vs " \
-                    "#{limited_content.join(', ')}). Both runs must be performed for content that " \
+                    "appointment, or encounter (#{full_content.to_json} vs " \
+                    "#{limited_content.to_json}). Both runs must be performed for content that " \
                     'matches, such as an order for the same service.')
       end
 

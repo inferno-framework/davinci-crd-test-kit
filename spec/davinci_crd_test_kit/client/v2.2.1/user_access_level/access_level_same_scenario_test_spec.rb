@@ -403,6 +403,39 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
   end
 
+  it 'fails when diet orders share a code but describe a different diet' do
+    smooth = nutrition_order('nut-1', '435801000124108')
+    smooth['oralDiet']['texture'] = [{ 'modifier' => { 'coding' => [{ 'system' => 'http://snomed.info/sct',
+                                                                      'code' => '228053002' }] } }]
+    full = order_sign_body('full-instance', [smooth])
+    limited = order_sign_body('limited-instance', [nutrition_order('nut-2', '435801000124108')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+  end
+
+  it 'ignores elements that do not describe what was ordered' do
+    full_order = med_order('med-1', '1049502').merge('status' => 'draft', 'authoredOn' => '2026-09-01')
+    limited_order = med_order('med-2', '1049502').merge('status' => 'active', 'authoredOn' => '2026-09-29')
+    full = order_sign_body('full-instance', [full_order])
+    limited = order_sign_body('limited-instance', [limited_order])
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
+  it 'matches orders whose codings are listed with their keys in a different order' do
+    reordered = { 'resourceType' => 'MedicationRequest', 'id' => 'med-2',
+                  'medicationCodeableConcept' => {
+                    'coding' => [{ 'code' => '1049502',
+                                   'system' => 'http://www.nlm.nih.gov/research/umls/rxnorm' }]
+                  } }
+    full = order_sign_body('full-instance', [med_order('med-1', '1049502')])
+    limited = order_sign_body('limited-instance', [reordered])
+
+    expect(run_both(full, limited).result).to eq('pass')
+  end
+
   it 'matches VisionPrescriptions on the lens product and eye' do
     full = order_sign_body('full-instance', [vision_prescription('vis-1', 'lens', 'right')])
     limited = order_sign_body('limited-instance', [vision_prescription('vis-2', 'lens', 'right')])
