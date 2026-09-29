@@ -570,4 +570,52 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(cov_request).to_not have_been_made
     end
   end
+
+  describe 'scenario group handling' do
+    def endpoint_for(interaction_group)
+      endpoint = described_class.new
+      allow(endpoint).to receive(:test)
+        .and_return(double(config: double(options: { crd_interaction_group: interaction_group })))
+      endpoint
+    end
+
+    it 'recognizes both user access level groups' do
+      [DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:user_access_level_group?)).to be(true)
+      end
+    end
+
+    it 'does not treat another scenario group as a user access level group' do
+      expect(endpoint_for(DaVinciCRDTestKit::SELF_PAY_GROUP_TAG).send(:user_access_level_group?)).to be(false)
+      expect(endpoint_for(nil).send(:user_access_level_group?)).to be(false)
+    end
+
+    # these scenarios each expect exactly one request, so the wait ends as soon as it arrives
+    it 'continues after one request for the scenarios that expect only one' do
+      [DaVinciCRDTestKit::LONG_RUNNING_GROUP_TAG,
+       DaVinciCRDTestKit::UNKNOWN_CONTENT_GROUP_TAG,
+       DaVinciCRDTestKit::SELF_PAY_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:continue_after_one_hook_request?)).to be(true)
+      end
+    end
+
+    # the tester says when they are done, since more than one request may be made
+    it 'does not continue after one request for the multiple payers scenario' do
+      endpoint = endpoint_for(DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG)
+
+      expect(endpoint.send(:continue_after_one_hook_request?)).to be(false)
+    end
+
+    it 'returns a fixed coverage information response for the scenarios that do not let the tester choose' do
+      [DaVinciCRDTestKit::SELF_PAY_GROUP_TAG,
+       DaVinciCRDTestKit::LONG_RUNNING_GROUP_TAG,
+       DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:fixed_coverage_information_group?)).to be(true)
+      end
+    end
+  end
 end

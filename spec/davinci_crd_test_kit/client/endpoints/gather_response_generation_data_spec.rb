@@ -689,4 +689,51 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(sr_request).to have_been_made.once
     end
   end
+
+  describe '#request_access_level_target' do
+    let(:target_reference) { 'Observation/123' }
+    let(:access_level_instance) do
+      Class.new do
+        include DaVinciCRDTestKit::GatherResponseGenerationData
+
+        attr_accessor :result, :request_body
+      end.new
+    end
+
+    def stub_target_input(value)
+      inputs = value.nil? ? [] : [{ 'name' => 'access_level_target_reference', 'value' => value }]
+      access_level_instance.result = double(input_json: inputs.to_json)
+      access_level_instance.request_body = { 'fhirServer' => fhir_server }
+    end
+
+    it 'does not attempt a read when no target reference was provided' do
+      stub_target_input(nil)
+      allow(access_level_instance).to receive(:fetch_reference)
+
+      access_level_instance.request_access_level_target
+
+      expect(access_level_instance).to_not have_received(:fetch_reference)
+    end
+
+    # the test finds this read by its tag, so that it is not confused with the other data gathered
+    it 'reads the target reference and tags the request' do
+      stub_target_input(target_reference)
+      allow(access_level_instance).to receive(:fetch_reference)
+
+      access_level_instance.request_access_level_target
+
+      expect(access_level_instance).to have_received(:fetch_reference)
+        .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
+    end
+
+    it 'reads a reference given as an absolute url on the request fhirServer' do
+      stub_target_input("#{fhir_server}/#{target_reference}")
+      allow(access_level_instance).to receive(:fetch_reference)
+
+      access_level_instance.request_access_level_target
+
+      expect(access_level_instance).to have_received(:fetch_reference)
+        .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
+    end
+  end
 end
