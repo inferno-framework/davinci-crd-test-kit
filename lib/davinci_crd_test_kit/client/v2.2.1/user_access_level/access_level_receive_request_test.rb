@@ -14,18 +14,6 @@ module DaVinciCRDTestKit
 
       id :crd_v221_access_level_receive_request
       title 'Client invokes a hook as an EHR user'
-      description %(
-        During this test, Inferno will wait while the client makes a single hook request of any type,
-        made while the tester is signed in as the EHR user role configured for this test instance
-        (full-access or limited-access). Both instances of this test should reference the same order,
-        appointment, or encounter and the same patient.
-
-        Inferno will use the access token in the request to attempt to read the **Target Resource
-        Reference** and will return a [mocked](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-        coverage-information response. The details of the request and its response are not evaluated
-        or checked for conformance in this test. The test will automatically continue once Inferno
-        has received a single valid hook request.
-      )
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
@@ -34,8 +22,9 @@ module DaVinciCRDTestKit
             title: 'Target Resource Reference',
             description: %(
               Relative reference (e.g. `Observation/123`) that Inferno will read using the access
-              token supplied in the hook request. This resource is expected to be readable by the
-              full-access user and denied to the limited-access user.
+              token supplied in the hook request. This resource is expected to be accessible by the
+              full-access user and denied to the limited-access user. If possible, it should be
+              within the set of prefetched data requested by Inferno.
             )
 
       def limited_access_run?
@@ -44,6 +33,16 @@ module DaVinciCRDTestKit
 
       def access_level_role
         crd_interaction_group == ACCESS_LEVEL_FULL_GROUP_TAG ? 'full-access' : 'limited-access'
+      end
+
+      # only the second run has an earlier one whose content it has to match
+      def same_scenario_instruction
+        return '' unless limited_access_run?
+
+        %(
+            Invoke the hook for the same order, appointment, or encounter used for the full-access
+            user in this scenario.
+        )
       end
 
       run do
@@ -73,10 +72,9 @@ module DaVinciCRDTestKit
             must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
             will automatically continue once Inferno has received a request and returned
             a response.
-
-            Invoke the hook for the same order, appointment, or encounter used for the other user
-            role in this scenario. Inferno will use the access token in the request to attempt to
-            read `#{access_level_target_reference}` and will return a mocked coverage-information
+            #{same_scenario_instruction}
+            Inferno will use the access token in the request to attempt to read
+            `#{access_level_target_reference}` and will return a mocked coverage-information
             response.
           )
         )

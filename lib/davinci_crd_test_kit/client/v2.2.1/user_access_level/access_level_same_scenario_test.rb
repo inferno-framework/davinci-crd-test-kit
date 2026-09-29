@@ -14,10 +14,8 @@ module DaVinciCRDTestKit
       description %(
         This test compares the full-access and limited-access hook requests made earlier in this
         scenario and confirms that they invoke the same hook for the same patient, with the same
-        content. Systems do not always allow the same workflow action to be repeated, so rather
-        than requiring that both runs reference the same resources, Inferno compares the details of
-        the resources they do reference: the codes of the order(s), the primary performer of the
-        appointment, or the class and type of the encounter.
+        content, meaning that the codes of the order(s), the primary performer of the
+        appointment, or the class and type of the encounter match.
 
         Where a hook provides only a reference to those resources, Inferno takes their details from
         the prefetch data, which its services always request. If a request does not contain enough

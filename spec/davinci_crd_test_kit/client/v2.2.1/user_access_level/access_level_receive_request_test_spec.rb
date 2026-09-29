@@ -67,6 +67,24 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelReceiveRequestTest, :request 
     expect(result.result_message).to include(example_client_url)
   end
 
+  describe 'the full-access run' do
+    let(:test) do
+      Class.new(described_class) do
+        config(options: { crd_interaction_group: DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG })
+      end
+    end
+
+    before { allow(test).to receive(:suite).and_return(suite) }
+
+    it 'does not ask the tester to match another run' do
+      result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+      expect(result.result).to eq('wait')
+      expect(result.result_message).to include('full-access')
+      expect(result.result_message).to_not include('used for the full-access')
+    end
+  end
+
   describe 'the limited-access run' do
     let(:test) do
       Class.new(described_class) do
@@ -104,6 +122,14 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelReceiveRequestTest, :request 
       result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
 
       expect(result.result).to eq('wait')
+    end
+
+    it 'asks the tester to match the full-access run' do
+      full_access_request
+      result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+      expect(result.result_message).to include('limited-access')
+      expect(result.result_message).to include('used for the full-access')
     end
   end
 

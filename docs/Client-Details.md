@@ -213,6 +213,3 @@ Specific general limitations across all versions include:
   and workarounds have been added to the test kit. If you identify an error
   reported by Inferno that you believe is inaccurate, please report it
   using [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
-- Inferno does not simulate access levels during the "User Access Level Scoping" scenario. It
-  reads the target resource during each hook request and compares the results, so the difference
-  in access must be enforced by the system under test.

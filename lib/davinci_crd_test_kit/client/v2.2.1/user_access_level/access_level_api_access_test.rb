@@ -11,8 +11,9 @@ module DaVinciCRDTestKit
       id :crd_v221_access_level_api_access
       title 'FHIR API access to the target resource is scoped to the EHR user'
       description %(
-        This test compares the FHIR reads that Inferno made, during hook processing, of the
-        **Target Resource Reference** using the access token supplied in each of the full-access and
+        This test compares the FHIR reads that Inferno made during hook processing of the
+        resource referenced in the **Target Resource Reference** input using the access
+        token supplied in each of the full-access and
         limited-access hook requests. For this test to pass, the full-access read must return the
         target resource and the limited-access read must not. The manner in which the limited-access
         read is denied is not checked, as the specification does not require a particular approach.
@@ -35,7 +36,9 @@ module DaVinciCRDTestKit
         body = JSON.parse(hook_request.request_body)
         missing = []
         missing << '`fhirServer`' if body['fhirServer'].blank?
-        missing << '`fhirAuthorization.access_token`' if body.dig('fhirAuthorization', 'access_token').blank?
+        unless body['fhirAuthorization'].is_a?(Hash) && body.dig('fhirAuthorization', 'access_token').present?
+          missing << '`fhirAuthorization.access_token`'
+        end
         return if missing.blank?
 
         add_message('error',

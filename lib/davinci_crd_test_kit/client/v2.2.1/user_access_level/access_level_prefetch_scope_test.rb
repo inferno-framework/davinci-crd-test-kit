@@ -15,10 +15,11 @@ module DaVinciCRDTestKit
       title 'Prefetched data access is scoped to the EHR user'
       description %(
         This test compares the prefetch data included with the full-access and limited-access hook
-        requests. If the **Target Resource Reference** is present in the full-access request's
-        prefetch, it must be absent from the limited-access request's prefetch. If it is not present
-        in the full-access request's prefetch, the tester attests whether prefetch data can be
-        limited by the user's access level for resources of that kind.
+        requests. If the resource referenced in the **Target Resource Reference** input is present in
+        the full-access request's prefetch, it must be absent from the limited-access request's
+        prefetch. If it is not present in the full-access request's prefetch, the tester attests
+        whether prefetch data can be limited by the user's access level for resources of that
+        kind.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@42'
