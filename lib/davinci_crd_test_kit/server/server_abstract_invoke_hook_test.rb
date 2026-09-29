@@ -27,8 +27,9 @@ module DaVinciCRDTestKit
 
         The test is deemed successful if the CRD server returns a 200 HTTP response for all requests.
       )
-    input_order :base_url
+    input_order :base_url, :workspace_bearer
     input :base_url
+    input :workspace_bearer
     input :service_ids,
           description: %(
               If blank, Inferno will attempt to infer the service id to use by finding a service entry in the
@@ -108,8 +109,7 @@ module DaVinciCRDTestKit
         payloads,
         service_endpoint,
         inferno_base_url,
-        nil,
-        nil,
+        workspace_bearer,
         tested_hook_name,
         continuation_url,
         failure_url,

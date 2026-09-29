@@ -62,7 +62,14 @@ module DaVinciCRDTestKit
       )
 
       input :base_url,
-            title: 'CRD server base URL'
+            title: 'CRD server base URL',
+            description: 'Origin plus /auth/fhir. The suite appends /cds-services.'
+      input :workspace_bearer,
+            title: 'Workspace bearer',
+            description: <<~DESCRIPTION
+              The access_token returned by POST /auth/token. Inferno sends it as
+              Authorization on /auth/fhir and does not call /auth/token.
+            DESCRIPTION
 
       fhir_resource_validator do
         igs(

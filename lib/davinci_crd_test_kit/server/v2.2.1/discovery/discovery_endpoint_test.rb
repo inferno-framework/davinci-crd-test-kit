@@ -1,8 +1,9 @@
-require_relative '../../anterior_workspace_token'
+require_relative '../../docker_host_origin'
 
 module DaVinciCRDTestKit
   module V221
     class DiscoveryEndpointTest < Inferno::Test
+      include DaVinciCRDTestKit::DockerHostOrigin
       title 'Server returns a discovery response'
       id :crd_v221_discovery_endpoint_test
       description %(
@@ -19,33 +20,17 @@ module DaVinciCRDTestKit
         It only checks to see if the RESTful interaction is supported and returns a valid JSON object.
       )
 
-      input_order :base_url, :authentication_required
+      input_order :base_url, :workspace_bearer
       input :base_url
-      input :authentication_required,
-            title: 'Discovery endpoint requires authentication?',
-            type: 'radio',
-            default: 'no',
-            options: {
-              list_options: [
-                {
-                  label: 'No',
-                  value: 'no'
-                },
-                {
-                  label: 'Yes',
-                  value: 'yes'
-                }
-              ]
-            }
+      input :workspace_bearer
       output :cds_services
 
       run do
         discovery_url = "#{base_url.chomp('/')}/cds-services"
-        headers = { 'Accept' => 'application/json' }
-
-        if authentication_required == 'yes'
-          headers['Authorization'] = AnteriorWorkspaceToken.authorization_header(discovery_url)
-        end
+        headers = {
+          'Accept' => 'application/json',
+          'Authorization' => "Bearer #{workspace_bearer}"
+        }.merge(docker_host_origin_headers(discovery_url))
         get(discovery_url, headers:, tags: [DISCOVERY_TAG])
         assert_response_status(200)
         assert_valid_json(request.response_body)

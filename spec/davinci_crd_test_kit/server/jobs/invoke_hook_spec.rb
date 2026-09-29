@@ -14,6 +14,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
   end
   let(:service_request_bodies) { [service_request_body] }
   let(:service_endpoint) { "#{discovery_url}/#{service_ids}" }
+  let(:workspace_bearer) { 'workspace-token' }
   let(:invoked_hook) { 'appointment-book' }
   let(:coverage_info_response) do
     {
@@ -65,9 +66,6 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
     allow_any_instance_of(Inferno::Repositories::Requests)
       .to receive(:create)
       .and_return(nil)
-    allow(DaVinciCRDTestKit::AnteriorWorkspaceToken)
-      .to receive(:authorization_header)
-      .and_return('Bearer workspace-token')
   end
 
   describe 'when continuing after the invoke hooks job' do
@@ -82,11 +80,51 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to have_been_made.once
       expect(continuation_request).to have_been_made.once
+    end
+
+    it 'resumes through the nginx service when the continuation URL is localhost' do
+      hook_request = stub_request(:post, service_endpoint).to_return(status: 200)
+      continuation_request = stub_request(
+        :get,
+        'http://nginx/custom/crd_server/resume_pass?token=12345'
+      ).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, service_request_bodies, service_endpoint,
+        'http://localhost/custom/crd_server',
+        workspace_bearer, invoked_hook,
+        'http://localhost/custom/crd_server/resume_pass?token=12345',
+        'http://localhost/custom/crd_server/resume_fail?token=12345',
+        false, false
+      )
+
+      expect(hook_request).to have_been_made.once
+      expect(continuation_request).to have_been_made.once
+    end
+
+    it 'sends the localhost origin when the service is host.docker.internal' do
+      endpoint = 'http://host.docker.internal:22041/auth/fhir/cds-services/order-sign-crd'
+      hook_request = stub_request(:post, endpoint)
+        .with(headers: {
+                'Authorization' => 'Bearer workspace-token',
+                'X-Forwarded-Host' => 'localhost',
+                'X-Forwarded-Proto' => 'http',
+                'X-Forwarded-Port' => '22041'
+              })
+        .to_return(status: 200)
+      stub_request(:get, continuation_url).to_return(status: 200)
+
+      described_class.new.perform(
+        test_session_id, service_request_bodies, endpoint, inferno_base_url,
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
+      )
+
+      expect(hook_request).to have_been_made.once
     end
 
     it 'updates hook request details before invoking the service' do
@@ -106,7 +144,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to have_been_made.once
@@ -160,7 +198,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       job.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, true
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, true
       )
 
       expect(original_request).to have_been_made.once
@@ -191,7 +229,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       job.perform(
         test_session_id, request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, true
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, true
       )
 
       expect(original_request).to have_been_made.twice
@@ -207,7 +245,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, true, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, true, false
       )
 
       expect(hook_request).to have_been_made.once
@@ -223,7 +261,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
       )
       expect(failure_request).to have_been_made.once
     end
@@ -248,7 +286,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to have_been_made.once
@@ -268,7 +306,7 @@ RSpec.describe DaVinciCRDTestKit::Jobs::InvokeHook do
 
       described_class.new.perform(
         test_session_id, service_request_bodies, service_endpoint, inferno_base_url,
-        nil, nil, invoked_hook, continuation_url, failure_url, false, false
+        workspace_bearer, invoked_hook, continuation_url, failure_url, false, false
       )
 
       expect(hook_request).to_not have_been_made

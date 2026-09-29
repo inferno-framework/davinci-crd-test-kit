@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative '../anterior_workspace_token'
 require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/base_urls'
 require_relative '../../cross_suite/cards_identification'
 require_relative '../endpoints/mock_ehr/fhir_request_handler'
 require_relative '../server_base_urls'
+require_relative '../docker_host_origin'
 
 module DaVinciCRDTestKit
   module Jobs
@@ -13,15 +13,17 @@ module DaVinciCRDTestKit
       include Sidekiq::Job
       include DaVinciCRDTestKit::CardsIdentification
       include DaVinciCRDTestKit::ServerBaseURLs
+      include DaVinciCRDTestKit::DockerHostOrigin
 
       sidekiq_options retry: false
 
-      def perform(test_session_id, request_bodies, service_endpoint, inferno_base_url, _jwks_kid,
-                  _encryption_method, request_tag, continuation_url, failure_url, acknowledge_before_continuing,
+      def perform(test_session_id, request_bodies, service_endpoint, inferno_base_url, workspace_bearer,
+                  request_tag, continuation_url, failure_url, acknowledge_before_continuing,
                   coverage_info_configuration_supported)
         @test_session_id = test_session_id
         @service_endpoint = service_endpoint
         @inferno_base_url = inferno_base_url
+        @workspace_bearer = workspace_bearer
         @request_tag = request_tag
         @continuation_url = continuation_url
         @failure_url = failure_url
@@ -48,9 +50,20 @@ module DaVinciCRDTestKit
         return unless test_waiting?
 
         # end the wait to continue the tests
-        Faraday.get(@continuation_url) unless @acknowledge_before_continuing
+        Faraday.get(worker_reachable_url(@continuation_url)) unless @acknowledge_before_continuing
       rescue StandardError => e
-        Faraday.get(@failure_url, { message: "Hook invocation failed: #{e.message}" })
+        Faraday.get(worker_reachable_url(@failure_url), { message: "Hook invocation failed: #{e.message}" })
+      end
+
+      # localhost is the published nginx port: the browser and capbluecross use it.
+      # This process is in Docker, where that port is closed, so resume calls use
+      # the nginx service on the compose network.
+      def worker_reachable_url(url)
+        uri = URI.parse(url)
+        return url unless uri.host == 'localhost'
+
+        uri.host = 'nginx'
+        uri.to_s
       end
 
       def test_run_id
@@ -106,8 +119,8 @@ module DaVinciCRDTestKit
       def send_hook_invocation(request_body, extra_tags = [])
         headers = {
           'Content-type' => 'application/json',
-          'Authorization' => AnteriorWorkspaceToken.authorization_header(@service_endpoint)
-        }
+          'Authorization' => "Bearer #{@workspace_bearer}"
+        }.merge(docker_host_origin_headers(@service_endpoint))
         response = invoke_hook(request_body, headers)
         persist_hook_request(response, [@request_tag] + extra_tags, headers)
         response
