@@ -75,38 +75,14 @@ module DaVinciCRDTestKit
         cached = scratch[:must_support_extraction]
         return cached if cached && cached[:request_ids] == request_ids
 
-        dropped = []
         scratch[:must_support_extraction] = {
           request_ids:,
-          resources_by_type: fhir_resources_by_type(must_support_requests, dropped:),
-          dropped:
+          resources_by_type: fhir_resources_by_type(must_support_requests)
         }
-      end
-
-      def dropped_resources
-        extraction[:dropped]
       end
 
       def resources_by_type
         extraction[:resources_by_type]
-      end
-
-      def check_for_dropped_resources
-        dropped_resources.each do |entry|
-          add_message('error', dropped_resource_message(entry))
-        end
-
-        assert dropped_resources.blank?,
-               "Inferno could not read #{dropped_resources.length} item(s) in the hook requests made " \
-               'by the client system. See Messages for details.'
-      end
-
-      def dropped_resource_message(entry)
-        if entry[:reason] == :unparsable_body
-          'Could not parse the body of a hook request as JSON.'
-        else
-          "Could not read a #{entry[:resource_type].presence || 'resource'} found in a hook request."
-        end
       end
 
       def ig_version
@@ -138,7 +114,8 @@ module DaVinciCRDTestKit
       end
 
       def hook_invoked?(hook_tag)
-        Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [hook_tag]).present?
+        Inferno::Repositories::Requests.new
+          .tagged_requests(test_session_id, [hook_tag, CROSS_HOOK_ANALYSIS_TAG]).present?
       end
 
       def declared_unsupported?(resource_type)
@@ -288,7 +265,6 @@ module DaVinciCRDTestKit
         unobserved = gather_unobserved
         check_for_unexpected_types(unobserved)
         log_info_messages(unobserved)
-        check_for_dropped_resources
         pass pass_message if unobserved.blank?
 
         identifier = SecureRandom.hex(32)

@@ -76,10 +76,10 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookInteractionGroup, :reques
   # their mind must not still be short circuited.
   it 'clears the flag when the waiting test runs again' do
     run(wait_test, wait_test_inputs('false'), scratch)
-    expect(scratch[:short_circuit]).to eq(:pass)
+    expect(scratch[:cross_hook_short_circuit]).to eq(:pass)
 
     run(wait_test, wait_test_inputs('true'), scratch)
 
-    expect(scratch[:short_circuit]).to be_nil
+    expect(scratch[:cross_hook_short_circuit]).to be_nil
   end
 end

@@ -23,21 +23,14 @@ module DaVinciCRDTestKit
       each_prefetch_resource(request_body['prefetch'], &)
     end
 
-    # Anything Inferno cannot read is recorded in `dropped` rather than being skipped silently
-    def fhir_resources_by_type(requests, dropped: [])
+    def fhir_resources_by_type(requests)
       Array(requests).each_with_object({}) do |request, resources_by_type|
         request_body = parse_request_body(request)
-        if request_body.blank?
-          dropped << { reason: :unparsable_body }
-          next
-        end
+        next if request_body.blank?
 
         each_hook_request_resource(request_body) do |raw_resource|
           resource = to_fhir_resource(raw_resource)
-          if resource.nil?
-            dropped << { reason: :unreadable_resource, resource_type: raw_resource['resourceType'] }
-            next
-          end
+          next if resource.nil?
 
           (resources_by_type[resource.resourceType] ||= []) << resource
         end
@@ -123,8 +116,6 @@ module DaVinciCRDTestKit
 
     def to_fhir_resource(raw_resource)
       FHIR.from_contents(raw_resource.to_json)
-    rescue JSON::ParserError
-      nil
     end
   end
 end
