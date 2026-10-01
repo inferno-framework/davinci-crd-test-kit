@@ -146,15 +146,19 @@ module DaVinciCRDTestKit
         resources = scenario_resources(body, references, role)
         return if resources.blank?
 
-        contents = resources.map { |resource| resource_content(resource) }
-        if contents.any?(&:blank?)
+        summaries = resources.map { |resource| resource_summary(resource) }
+        if summaries.any? { |summary| summary[:elements].blank? }
           add_message('error',
                       "The #{role} hook request does not describe #{references.join(', ')} in enough " \
                       'detail for Inferno to compare it against the other request.')
           return
         end
 
-        contents.sort_by { |content| canonical(content).to_s }
+        summaries.sort_by { |summary| canonical(summary[:elements]).to_s }
+      end
+
+      def resource_summary(resource)
+        { resource_type: resource['resourceType'], elements: resource_content(resource) }
       end
 
       # a request may list the resources it was invoked for in either order, so sort the content
@@ -192,10 +196,11 @@ module DaVinciCRDTestKit
 
       # at least one primary performer is required, while the appointment's type and date are not
       def appointment_content(resource)
-        Array.wrap(resource['participant'])
+        performers = Array.wrap(resource['participant'])
           .select { |participant| primary_performer?(participant) }
           .filter_map { |participant| nested(participant, 'actor', 'reference') }
-          .sort.presence
+
+        { 'participant:PrimaryPerformer' => performers.sort }.compact_blank
       end
 
       def primary_performer?(participant)
@@ -207,10 +212,9 @@ module DaVinciCRDTestKit
       end
 
       def encounter_content(resource)
-        types = Array.wrap(resource['type']).flat_map { |type| codeable_concept_codes(type) } +
-                [coding_code(resource['class'])].compact
-
-        types.sort.presence
+        { 'class' => coding_code(resource['class']),
+          'type' => Array.wrap(resource['type']).flat_map { |type| codeable_concept_codes(type) }.sort }
+          .compact_blank
       end
 
       def codeable_concept_codes(codeable_concept)
@@ -261,16 +265,43 @@ module DaVinciCRDTestKit
       end
 
       def check_same_content(full_body, limited_body)
-        full_content = scenario_content(full_body, 'full-access')
-        limited_content = scenario_content(limited_body, 'limited-access')
-        return if full_content.blank? || limited_content.blank?
-        return if full_content == limited_content
+        full_summaries = scenario_content(full_body, 'full-access')
+        limited_summaries = scenario_content(limited_body, 'limited-access')
+        return if full_summaries.blank? || limited_summaries.blank?
+        return unless same_resource_types?(full_summaries, limited_summaries)
+
+        full_summaries.zip(limited_summaries).each do |full_summary, limited_summary|
+          check_same_elements(full_summary, limited_summary)
+        end
+      end
+
+      def same_resource_types?(full_summaries, limited_summaries)
+        full_types = full_summaries.map { |summary| summary[:resource_type] }.sort
+        limited_types = limited_summaries.map { |summary| summary[:resource_type] }.sort
+        return true if full_types == limited_types
 
         add_message('error',
-                    'The full-access and limited-access requests do not describe the same order, ' \
-                    "appointment, or encounter (#{full_content.to_json} vs " \
-                    "#{limited_content.to_json}). Both runs must be performed for content that " \
-                    'matches, such as an order for the same service.')
+                    'The full-access and limited-access requests were made for different kinds of ' \
+                    "resource (#{full_types.to_sentence} vs #{limited_types.to_sentence}). Both runs " \
+                    'must be performed for the same order, appointment, or encounter.')
+        false
+      end
+
+      def check_same_elements(full_summary, limited_summary)
+        full_elements = full_summary[:elements]
+        limited_elements = limited_summary[:elements]
+        differing = (full_elements.keys | limited_elements.keys)
+          .reject { |element| full_elements[element] == limited_elements[element] }
+        return if differing.blank?
+
+        add_message('error',
+                    "The #{full_summary[:resource_type]} in the full-access request differs from the " \
+                    "one in the limited-access request in #{quoted_list(differing)}. Both runs must " \
+                    'be performed for content that matches, such as an order for the same service.')
+      end
+
+      def quoted_list(elements)
+        elements.map { |element| "`#{element}`" }.to_sentence
       end
 
       run do

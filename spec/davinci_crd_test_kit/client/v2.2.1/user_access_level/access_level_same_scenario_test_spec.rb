@@ -306,9 +306,34 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
-    expect(error_messages(result)).to include('1049502')
-    expect(error_messages(result)).to include('9999999')
+    expect(error_messages(result)).to include('The MedicationRequest in the full-access request')
+    expect(error_messages(result)).to include('`medicationCodeableConcept`')
+  end
+
+  it 'fails when the two runs were made for different kinds of resource' do
+    full = order_sign_body('full-instance', [med_order('med-1', '1049502')])
+    limited = order_sign_body('limited-instance', [service_order('sr-1', '24623002')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('different kinds of resource')
+    expect(error_messages(result)).to include('MedicationRequest')
+    expect(error_messages(result)).to include('ServiceRequest')
+  end
+
+  it 'names every element that differs, not just the first' do
+    full_order = med_order('med-1', '1049502').merge(
+      'medicationReference' => { 'reference' => 'Medication/a' }
+    )
+    limited_order = med_order('med-2', '9999999').merge(
+      'medicationReference' => { 'reference' => 'Medication/b' }
+    )
+    result = run_both(order_sign_body('full-instance', [full_order]),
+                      order_sign_body('limited-instance', [limited_order]))
+
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('`medicationCodeableConcept`')
+    expect(error_messages(result)).to include('`medicationReference`')
   end
 
   it 'matches orders that point to a medication instance rather than carrying a code' do
@@ -354,8 +379,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
-    expect(error_messages(result)).to include('Practitioner/prac-1')
+    expect(error_messages(result)).to include('The Appointment in the full-access request')
+    expect(error_messages(result)).to include('`participant:PrimaryPerformer`')
   end
 
   it 'ignores appointment participants that are not the primary performer' do
@@ -384,7 +409,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('The CommunicationRequest in the full-access request')
+    expect(error_messages(result)).to include('`payload`')
   end
 
   it 'matches NutritionOrders on the codes that describe the diet' do
@@ -400,7 +426,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('The NutritionOrder in the full-access request')
+    expect(error_messages(result)).to include('`oralDiet`')
   end
 
   it 'fails when diet orders share a code but describe a different diet' do
@@ -412,7 +439,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('The NutritionOrder in the full-access request')
+    expect(error_messages(result)).to include('`oralDiet`')
   end
 
   it 'ignores elements that do not describe what was ordered' do
@@ -449,7 +477,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('The VisionPrescription in the full-access request')
+    expect(error_messages(result)).to include('`lensSpecification`')
   end
 
   # -- encounter hooks ---------------------------------------------------------------------------
@@ -479,9 +508,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
-    expect(error_messages(result)).to include('AMB')
-    expect(error_messages(result)).to include('IMP')
+    expect(error_messages(result)).to include('The Encounter in the full-access request')
+    expect(error_messages(result)).to include('`class`')
   end
 
   it 'fails when the encounters were not provided in the prefetch data' do
@@ -530,7 +558,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('do not describe the same order, appointment, or encounter')
+    expect(error_messages(result)).to include('The ServiceRequest in the full-access request')
+    expect(error_messages(result)).to include('`code`')
   end
 
   it 'does not read order-dispatch context from the v2.0.1 `order` field' do
