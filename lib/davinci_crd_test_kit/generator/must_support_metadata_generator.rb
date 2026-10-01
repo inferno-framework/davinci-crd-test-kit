@@ -45,14 +45,9 @@ module DaVinciCRDTestKit
           puts "CRD v#{ig_version}"
           PROFILES.fetch(ig_version).each do |config|
             @dropped_slices = []
-            @filtered_slices = []
-            @reference_target_slices = []
             metadata = extract(ig_version, config)
             write(ig_version, config[:key], metadata)
             puts "  #{config[:key].ljust(26)} #{metadata.must_support_strings.length} must support element(s)"
-            @dropped_slices.each { |slice_id| puts "    dropped unmatchable required binding slice: #{slice_id}" }
-            @filtered_slices.each { |slice_id| puts "    matching on system alone: #{slice_id}" }
-            @reference_target_slices.each { |entry| puts "    matching on reference target: #{entry}" }
           end
         end
       end
@@ -103,7 +98,7 @@ module DaVinciCRDTestKit
         }
       end
 
-      def add_binding_systems(slice, profile, implementation_guide) # rubocop:disable Metrics/CyclomaticComplexity
+      def add_binding_systems(slice, profile, implementation_guide)
         discriminator = slice[:discriminator]
 
         return slice if discriminator&.dig(:type) != 'requiredBinding' || discriminator[:values].present?
@@ -115,8 +110,6 @@ module DaVinciCRDTestKit
           return nil
         end
 
-        @filtered_slices << slice[:slice_id] if includes.any? { |include| include.filter.present? }
-
         systems = includes.map { |include| { system: include.system } }.uniq
         slice.merge(discriminator: discriminator.merge(values: systems))
       end
@@ -127,7 +120,6 @@ module DaVinciCRDTestKit
         resource_type = actor_resource_type(slice[:slice_id], profile, ig_version)
         return slice if resource_type.blank?
 
-        @reference_target_slices << "#{slice[:slice_id]} -> #{resource_type}"
         slice.merge(discriminator: slice[:discriminator].merge(type: 'referenceTarget', resource_type:))
       end
 

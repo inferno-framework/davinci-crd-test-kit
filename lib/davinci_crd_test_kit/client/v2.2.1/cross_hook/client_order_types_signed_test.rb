@@ -11,17 +11,8 @@ module DaVinciCRDTestKit
       id :crd_v221_client_order_types_signed
       description <<~DESCRIPTION
         CRD clients are required to support the `order-sign` hook for the order types they handle.
-        The Must Support tests above check that each order type appeared somewhere across the hook
-        requests received, which a client could satisfy through `order-select` or `order-dispatch`
-        alone.
-
-        During this test, Inferno checks that every order type it observed also appeared as a
-        `draftOrder` on an `order-sign` invocation. Order types that were never observed at all are
-        not considered here, since the Must Support tests already ask the tester to attest to those.
-
-        To demonstrate an order type that earlier requests did not sign, use the "Additional Hook
-        Invocations for Cross Hook Support Demonstration" group to send an `order-sign` request
-        carrying it, then re-run this test.
+        During this test, Inferno checks that every order type it observed appeared as a
+        `draftOrder` on an `order-sign` invocation.
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'

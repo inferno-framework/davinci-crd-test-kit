@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
 
       # Optional so that a group whose requests were declined can pass rather than skip on an input
       # the short circuited test before it never produced. The run block still skips when empty.
-      input :auth_token_headers_json, optional: true
+      input :auth_token_headers_json, optional: true, default: '[]'
       input :cds_jwk_set,
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
       run do
         check_for_short_circuit
 
-        auth_token_headers = JSON.parse(auth_token_headers_json.presence || '[]') # NOTE: pre-verified json
+        auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
         skip_if cds_jwk_set.blank? && cds_jwk_set_input_needed?(auth_token_headers),
                 "JWK Set must be inputted if the client's JWK Set is not available"
