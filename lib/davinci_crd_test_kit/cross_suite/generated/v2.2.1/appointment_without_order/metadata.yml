@@ -20,8 +20,9 @@
     :slice_name: Patient
     :path: participant
     :discriminator:
-      :type: unsupported
+      :type: referenceTarget
       :path: type
+      :resource_type: Patient
   - :slice_id: Appointment.participant:PrimaryPerformer
     :slice_name: PrimaryPerformer
     :path: participant

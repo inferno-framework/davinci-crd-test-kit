@@ -1,5 +1,19 @@
 require_relative 'cross_hook/client_card_must_support_coverage_information_test'
-require_relative 'must_support/request_must_support_with_attestation_option'
+require_relative 'cross_hook/client_order_types_signed_test'
+require_relative 'must_support/generated/vision_prescription_must_support_test'
+require_relative 'must_support/generated/service_request_must_support_test'
+require_relative 'must_support/generated/nutrition_order_must_support_test'
+require_relative 'must_support/generated/medication_request_must_support_test'
+require_relative 'must_support/generated/device_request_must_support_test'
+require_relative 'must_support/generated/communication_request_must_support_test'
+require_relative 'must_support/generated/appointment_must_support_test'
+require_relative 'must_support/generated/encounter_must_support_test'
+require_relative 'must_support/generated/coverage_must_support_test'
+require_relative 'must_support/generated/location_must_support_test'
+require_relative 'must_support/generated/organization_must_support_test'
+require_relative 'must_support/generated/patient_must_support_test'
+require_relative 'must_support/generated/practitioner_must_support_test'
+require_relative 'must_support/generated/practitioner_role_must_support_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -20,68 +34,69 @@ module DaVinciCRDTestKit
         Hooks tests can be demonstrated there and this group re-run.
       DESCRIPTION
 
-      IG_VERSION = 'v2.2.1'.freeze
-      CONF_3 = 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'.freeze
-      HOOK_3 = 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'.freeze
-
-      # One test per request type, plus a single test covering the profiles that are referenced
-      # from within a request rather than being requests themselves.
-      TEST_DEFINITIONS = [
-        { id: :crd_v221_vision_prescription_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'VisionPrescription', profile_keys: ['vision_prescription'] }] },
-        { id: :crd_v221_service_request_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'ServiceRequest', profile_keys: ['service_request'] }] },
-        { id: :crd_v221_nutrition_order_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'NutritionOrder', profile_keys: ['nutrition_order'] }] },
-        { id: :crd_v221_medication_request_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'MedicationRequest', profile_keys: ['medication_request'] }] },
-        { id: :crd_v221_device_request_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'DeviceRequest', profile_keys: ['device_request'] }] },
-        { id: :crd_v221_communication_request_must_support, requirements: [CONF_3, HOOK_3],
-          profiles: [{ resource_type: 'CommunicationRequest', profile_keys: ['communication_request'] }] },
-        { id: :crd_v221_appointment_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Appointment', title: 'CRD Appointment', supporting_profile: true,
-                       profile_keys: %w[appointment_with_order appointment_without_order] }] },
-        { id: :crd_v221_encounter_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Encounter', supporting_profile: true, profile_keys: ['encounter'] }] },
-        { id: :crd_v221_coverage_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Coverage', supporting_profile: true, profile_keys: ['coverage'] }] },
-        { id: :crd_v221_location_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Location', supporting_profile: true, profile_keys: ['location'] }] },
-        { id: :crd_v221_organization_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Organization', supporting_profile: true, profile_keys: ['organization'] }] },
-        { id: :crd_v221_patient_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Patient', supporting_profile: true, profile_keys: ['patient'] }] },
-        { id: :crd_v221_practitioner_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'Practitioner', supporting_profile: true, profile_keys: ['practitioner'] }] },
-        { id: :crd_v221_practitioner_role_must_support, requirements: [CONF_3],
-          profiles: [{ resource_type: 'PractitionerRole', supporting_profile: true,
-                       profile_keys: ['practitioner_role'] }] }
+      ORDER_TYPE_OPTIONS = [
+        { label: 'VisionPrescription', value: 'VisionPrescription' },
+        { label: 'ServiceRequest', value: 'ServiceRequest' },
+        { label: 'NutritionOrder', value: 'NutritionOrder' },
+        { label: 'MedicationRequest', value: 'MedicationRequest' },
+        { label: 'DeviceRequest', value: 'DeviceRequest' },
+        { label: 'CommunicationRequest', value: 'CommunicationRequest' }
       ].freeze
 
-      TEST_DEFINITIONS.each do |definition|
-        options = { ig_version: IG_VERSION, profiles: definition[:profiles] }
-        test_id = definition[:id]
-        test_requirements = definition[:requirements]
-        test_description = RequestMustSupportWithAttestationOption.build_description(options)
-        test_title =
-          definition[:title] ||
-          begin
-            profile = definition[:profiles].first
-            metadata = RequestMustSupportWithAttestationOption.metadata_for(IG_VERSION, profile)
-            name = RequestMustSupportWithAttestationOption.title_for(metadata, profile)
-            "#{name} must support elements are observed"
-          end
+      # Patient and Coverage are required of every CRD client, so they are not listed here.
+      SUPPORTING_TYPE_OPTIONS = [
+        { label: 'Location', value: 'Location' },
+        { label: 'Organization', value: 'Organization' },
+        { label: 'Practitioner', value: 'Practitioner' },
+        { label: 'PractitionerRole', value: 'PractitionerRole' }
+      ].freeze
 
-        test from: :crd_v221_request_must_support_with_attestation_option do
-          id test_id
-          title test_title
-          description test_description
-          verifies_requirements(*test_requirements)
-          config(options:)
-        end
-      end
+      # A resource type only a non-required hook would carry is not expected when that hook was
+      # never invoked, so its test passes rather than asking the tester to attest.
+      REQUIRING_HOOKS = {
+        'Appointment' => [APPOINTMENT_BOOK_TAG],
+        'Encounter' => [ENCOUNTER_START_TAG, ENCOUNTER_DISCHARGE_TAG]
+      }.freeze
 
+      input :order_types_supported,
+            title: 'Order types supported by the client system',
+            description: %(
+              Select each order type the client system can send in a CRD hook request. Inferno will
+              expect to observe the types selected here, and will fail if it observes one that is
+              not selected.
+            ),
+            type: 'checkbox',
+            default: ORDER_TYPE_OPTIONS.map { |option| option[:value] },
+            optional: true,
+            options: { list_options: ORDER_TYPE_OPTIONS }
+      input :supporting_types_supported,
+            title: 'Supporting resource types populated by the client system',
+            description: %(
+              Select each supporting resource type the client system populates within its CRD hook
+              requests. `Patient` and `Coverage` are required of every client, so they are not
+              listed. Inferno will expect to observe the types selected here, and will fail if it
+              observes one that is not selected.
+            ),
+            type: 'checkbox',
+            default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
+            optional: true,
+            options: { list_options: SUPPORTING_TYPE_OPTIONS }
+
+      test from: :crd_v221_vision_prescription_must_support
+      test from: :crd_v221_service_request_must_support
+      test from: :crd_v221_nutrition_order_must_support
+      test from: :crd_v221_medication_request_must_support
+      test from: :crd_v221_device_request_must_support
+      test from: :crd_v221_communication_request_must_support
+      test from: :crd_v221_appointment_must_support
+      test from: :crd_v221_encounter_must_support
+      test from: :crd_v221_coverage_must_support
+      test from: :crd_v221_location_must_support
+      test from: :crd_v221_organization_must_support
+      test from: :crd_v221_patient_must_support
+      test from: :crd_v221_practitioner_must_support
+      test from: :crd_v221_practitioner_role_must_support
+      test from: :crd_v221_client_order_types_signed
       test from: :crd_v221_client_card_must_support_coverage_information
     end
   end

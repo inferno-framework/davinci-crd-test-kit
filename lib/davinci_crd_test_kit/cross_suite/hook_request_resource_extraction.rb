@@ -44,6 +44,61 @@ module DaVinciCRDTestKit
       end
     end
 
+    def resources_from_request(request)
+      request_body = parse_request_body(request)
+      return [] unless request_body.is_a?(Hash)
+
+      context_resources(request_body) + prefetch_resources(request_body)
+    end
+
+    def context_resources(request_body)
+      context = request_body['context']
+      return [] unless context.is_a?(Hash)
+
+      bundle_entry_resources(context_bundle(context['appointments'])) +
+        bundle_entry_resources(context_bundle(context['draftOrders'])) +
+        resources_from_value(context['fulfillmentTasks'])
+    end
+
+    def prefetch_resources(request_body)
+      prefetch = request_body['prefetch']
+      return [] unless prefetch.is_a?(Hash)
+
+      prefetch.values.flat_map { |value| resources_from_value(value) }
+    end
+
+    def resources_from_value(value)
+      case value
+      when Array then value.flat_map { |entry| resources_from_value(entry) }
+      when Hash then resources_from_hash(value)
+      else []
+      end
+    end
+
+    def resources_from_hash(contents)
+      return [] if contents['resourceType'].blank?
+
+      resource = to_fhir_resource(contents)
+      return [] if resource.blank?
+      return bundle_entry_resources(resource) if resource.is_a?(FHIR::Bundle)
+
+      [resource]
+    end
+
+    def bundle_entry_resources(bundle)
+      return [] unless bundle.is_a?(FHIR::Bundle)
+
+      bundle.entry.filter_map { |entry| entry&.resource.presence }
+    end
+
+    # An absent context field is ordinary, so it is skipped before parsing rather than being handed
+    # to fhir_models, which logs a deserialization error for it.
+    def context_bundle(contents)
+      return unless contents.present?
+
+      to_fhir_resource(contents)
+    end
+
     def each_resource_within(value, &block)
       case value
       when Array then value.each { |element| each_resource_within(element, &block) }

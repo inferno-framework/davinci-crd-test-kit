@@ -1,9 +1,11 @@
 require_relative '../../multi_request_message_helper'
+require_relative '../../../cross_suite/short_circuit_interaction'
 
 module DaVinciCRDTestKit
   module V221
     class RetrieveJWKSTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::ShortCircuitInteraction
 
       id :crd_v221_retrieve_jwks
       title 'JWKSs can be retrieved'
@@ -18,7 +20,9 @@ module DaVinciCRDTestKit
       verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
                             'cds-hooks_3.0.0-ballot@199'
 
-      input :auth_token_headers_json
+      # Optional so that a group whose requests were declined can pass rather than skip on an input
+      # the short circuited test before it never produced. The run block still skips when empty.
+      input :auth_token_headers_json, optional: true
       input :cds_jwk_set,
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
@@ -33,7 +37,9 @@ module DaVinciCRDTestKit
       output :crd_jwks_keys_json
 
       run do
-        auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
+        check_for_short_circuit
+
+        auth_token_headers = JSON.parse(auth_token_headers_json.presence || '[]') # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
         skip_if cds_jwk_set.blank? && cds_jwk_set_input_needed?(auth_token_headers),
                 "JWK Set must be inputted if the client's JWK Set is not available"

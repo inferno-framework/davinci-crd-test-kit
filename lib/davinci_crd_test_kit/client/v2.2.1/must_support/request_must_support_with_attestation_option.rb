@@ -1,5 +1,6 @@
 require_relative '../../../cross_suite/hook_request_resource_extraction'
 require_relative '../../../cross_suite/profile_metadata'
+require_relative '../../../cross_suite/must_support_slice_matching'
 require_relative '../../../cross_suite/tags'
 require_relative '../client_urls'
 
@@ -13,6 +14,9 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_request_must_support_with_attestation_option
+
+      input :order_types_supported, optional: true
+      input :supporting_types_supported, optional: true
 
       output :attest_true_url
       output :attest_false_url
@@ -63,12 +67,28 @@ module DaVinciCRDTestKit
           Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [CROSS_HOOK_ANALYSIS_TAG])
       end
 
+      # Every must support test in this group reads the same pooled requests, so the extraction is
+      # kept in scratch, which persists across test instances. The request ids it was built from are
+      # stored alongside it, since a tester can send more hook requests and re-run the group.
+      def extraction
+        request_ids = must_support_requests.map(&:id)
+        cached = scratch[:must_support_extraction]
+        return cached if cached && cached[:request_ids] == request_ids
+
+        dropped = []
+        scratch[:must_support_extraction] = {
+          request_ids:,
+          resources_by_type: fhir_resources_by_type(must_support_requests, dropped:),
+          dropped:
+        }
+      end
+
       def dropped_resources
-        @dropped_resources ||= []
+        extraction[:dropped]
       end
 
       def resources_by_type
-        @resources_by_type ||= fhir_resources_by_type(must_support_requests, dropped: dropped_resources)
+        extraction[:resources_by_type]
       end
 
       def check_for_dropped_resources
@@ -93,25 +113,102 @@ module DaVinciCRDTestKit
         config.options[:ig_version]
       end
 
+      # A resource type the tester did not select, or that only a hook they never invoked would
+      # carry, is not expected. Observing one anyway contradicts what the tester declared.
+      def expected?(resource_type)
+        return false if declared_unsupported?(resource_type)
+
+        hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
+        hooks.nil? || hooks.any? { |hook_tag| hook_invoked?(hook_tag) }
+      end
+
+      # nil when the type is required of every client, so no input governs it. Inferno hands a
+      # checkbox input over as an array, empty when the tester cleared it or never reached it, so
+      # an empty selection leaves every type expected rather than none.
+      def selected_types(resource_type)
+        if ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
+          selected_or_all(order_types_supported, ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS)
+        elsif ClientCrossHookMustSupportGroup::SUPPORTING_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
+          selected_or_all(supporting_types_supported, ClientCrossHookMustSupportGroup::SUPPORTING_TYPE_OPTIONS)
+        end
+      end
+
+      def selected_or_all(selected, options)
+        selected.presence || options.map { |option| option[:value] }
+      end
+
+      def hook_invoked?(hook_tag)
+        Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [hook_tag]).present?
+      end
+
+      def declared_unsupported?(resource_type)
+        selected = selected_types(resource_type)
+
+        selected.present? && selected.exclude?(resource_type)
+      end
+
+      def unexpected_reason(resource_type)
+        return 'the tester did not select it as supported' if declared_unsupported?(resource_type)
+
+        hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
+        "no #{hooks.join(' or ')} hook was invoked"
+      end
+
       def gather_unobserved
         config.options[:profiles].filter_map do |profile|
           metadata = self.class.metadata_for(ig_version, profile)
           title = self.class.title_for(metadata, profile)
-          resources = resources_by_type[profile[:resource_type]] || []
+          resource_type = profile[:resource_type]
+          resources = resources_by_type[resource_type] || []
 
           # `missing_must_support_elements` returns nil rather than the full list when handed no
           # resources, so an absent resource type has to be caught before calling it.
           if resources.blank?
-            next { kind: :unsupported_type, title:, resource_type: profile[:resource_type],
+            next unless expected?(resource_type)
+
+            next { kind: :unsupported_type, title:, resource_type:,
                    supporting_profile: profile[:supporting_profile] }
           end
+
+          # Only a type the tester declared unsupported contradicts what they said. A hook gated
+          # type can  turn up in another hook's request, so it is checked as normal.
+          next { kind: :unexpected_type, title:, resource_type:, count: resources.length } if
+            declared_unsupported?(resource_type)
 
           missing = missing_must_support_elements(resources, nil, metadata:)
           next if missing.blank?
 
-          { kind: :unobserved_elements, title:, resource_type: profile[:resource_type],
-            count: resources.length, missing: }
+          { kind: :unobserved_elements, title:, resource_type:, count: resources.length, missing: }
         end
+      end
+
+      def unexpected(unobserved)
+        unobserved.select { |entry| entry[:kind] == :unexpected_type }
+      end
+
+      # The tester said the system does not send this type, but it did, so neither passing nor
+      # asking them to attest to its absence would be right.
+      def check_for_unexpected_types(unobserved)
+        unexpected(unobserved).each do |entry|
+          add_message('error',
+                      "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests " \
+                      "made by the client system, but #{unexpected_reason(entry[:resource_type])}.")
+        end
+
+        assert unexpected(unobserved).blank?,
+               'Inferno observed resource type(s) it was not expecting: ' \
+               "#{unexpected(unobserved).map { |entry| entry[:resource_type] }.join(', ')}. See Messages."
+      end
+
+      # A type that was neither observed nor expected passes without the tester having to say
+      # anything, so the message says why rather than claiming its elements were seen.
+      def pass_message
+        vacuous = config.options[:profiles].map { |profile| profile[:resource_type] }
+          .reject { |resource_type| resources_by_type[resource_type].present? }
+        return 'All must support elements were observed.' if vacuous.blank?
+
+        "No instances of #{vacuous.join(', ')} observed, and none required: " \
+          "#{vacuous.map { |resource_type| unexpected_reason(resource_type) }.uniq.join('; ')}."
       end
 
       def log_info_messages(unobserved)
@@ -189,9 +286,10 @@ module DaVinciCRDTestKit
         skip_if must_support_requests.blank?, 'No hook requests received.'
 
         unobserved = gather_unobserved
+        check_for_unexpected_types(unobserved)
         log_info_messages(unobserved)
         check_for_dropped_resources
-        pass 'All must support elements were observed.' if unobserved.blank?
+        pass pass_message if unobserved.blank?
 
         identifier = SecureRandom.hex(32)
         attest_true_url = "#{resume_pass_url}?token=#{identifier}"

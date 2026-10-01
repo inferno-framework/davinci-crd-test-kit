@@ -1,4 +1,6 @@
 require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../../lib/davinci_crd_test_kit/generator/must_support_test_generator'
+require_relative 'complete_resources'
 
 RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption, :request do
   let(:suite_id) { 'crd_client_v221' }
@@ -11,51 +13,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   let(:attest_true_url) { "#{base_url}/resume_pass?token=#{known_token}" }
   let(:attest_false_url) { "#{base_url}/resume_fail?token=#{known_token}" }
   let(:receiving_result) { repo_create(:result, test_session_id: test_session.id) }
-  let(:complete_service_request) do
-    {
-      resourceType: 'ServiceRequest',
-      id: 'sr1',
-      status: 'draft',
-      intent: 'order',
-      subject: { reference: 'Patient/p1' },
-      identifier: [{ system: 'http://example.org', value: 'sr-1' }],
-      doNotPerform: false,
-      # Inherited from US Core, which the snapshot scope brings into the must support set.
-      authoredOn: '2026-01-01T00:00:00Z',
-      encounter: { reference: 'Encounter/e1' },
-      requester: { reference: 'Practitioner/pr1' },
-      occurrencePeriod: { start: '2026-01-01T00:00:00Z' },
-      occurrenceTiming: { event: ['2026-01-01T00:00:00Z'] },
-      category: [{ coding: [{ system: 'http://snomed.info/sct', code: '108252007' }] }],
-      basedOn: [{ reference: 'ServiceRequest/sr0' }],
-      contained: [{ resourceType: 'Practitioner', id: 'pr1' }],
-      quantityQuantity: { value: 1 },
-      reasonReference: [{ reference: 'Condition/c1' }],
-      locationReference: [{ reference: 'Location/l1' }],
-      performer: [{ reference: 'Practitioner/pr1' }],
-      extension: [
-        { url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information',
-          extension: [{ url: 'coverage', valueReference: { reference: 'Coverage/c1' } }] }
-      ],
-      code: {
-        coding: [{ system: 'http://snomed.info/sct', code: '1234' }],
-        extension: [
-          { url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options',
-            valueCodeableConcept: { coding: [{ code: 'x' }] } }
-        ]
-      },
-      performerType: {
-        coding: [{ system: 'http://nucc.org/provider-taxonomy', code: '207Q00000X' }],
-        extension: [
-          { url: 'http://hl7.org/fhir/StructureDefinition/codeOptions',
-            valueCodeableConcept: { coding: [{ code: 'y' }] } }
-        ]
-      },
-      locationCode: [{ coding: [{ system: 'https://www.cms.gov/Medicare/Coding/place-of-service-codes',
-                                  code: '11' }] }],
-      reasonCode: [{ coding: [{ system: 'http://hl7.org/fhir/sid/icd-10-cm', code: 'A00' }] }]
-    }
-  end
+  let(:complete_service_request) { DaVinciCRDTestKit::CompleteResources::SERVICE_REQUEST }
   let(:service_request_test) { test_for([{ resource_type: 'ServiceRequest', profile_keys: ['service_request'] }]) }
 
   before { allow(SecureRandom).to receive(:hex).and_return(known_token) }
@@ -255,6 +213,141 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
         test_session.id, [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG]
       ).length).to eq(1)
       expect(result.requests).to be_empty
+    end
+  end
+
+  describe 'every resource type the group checks' do
+    let(:complete_resources) do
+      resources = DaVinciCRDTestKit::CompleteResources
+      {
+        'ServiceRequest' => [resources::SERVICE_REQUEST],
+        'VisionPrescription' => [resources::VISION_PRESCRIPTION],
+        'NutritionOrder' => [resources::NUTRITION_ORDER],
+        'MedicationRequest' => resources::MEDICATION_REQUESTS,
+        'DeviceRequest' => resources::DEVICE_REQUESTS,
+        'CommunicationRequest' => [resources::COMMUNICATION_REQUEST],
+        'Encounter' => [resources::ENCOUNTER],
+        'Coverage' => [resources::COVERAGE],
+        'Location' => [resources::LOCATION],
+        'Organization' => [resources::ORGANIZATION],
+        'Patient' => [resources::PATIENT],
+        'Practitioner' => [resources::PRACTITIONER],
+        'PractitionerRole' => [resources::PRACTITIONER_ROLE],
+        'Appointment' => [resources::APPOINTMENT]
+      }
+    end
+
+    DaVinciCRDTestKit::Generator::MustSupportTestGenerator::TEST_DEFINITIONS.each do |definition|
+      it "passes when every #{definition[:profiles].first[:resource_type]} must support element is observed" do
+        resource_type = definition[:profiles].first[:resource_type]
+        complete_resources.fetch(resource_type).each do |resource|
+          create_request(hook_request_body(prefetch: { resource: }))
+        end
+
+        result = run(test_for(definition[:profiles]))
+
+        expect(result.result).to eq('pass'), "#{resource_type}: #{result.result_message}"
+      end
+    end
+  end
+
+  # Attestations are only worth a tester's time where the resource type was actually expected.
+  describe 'resource types that were not expected' do
+    let(:appointment_test) do
+      test_for([{ resource_type: 'Appointment', title: 'CRD Appointment', supporting_profile: true,
+                  profile_keys: %w[appointment_with_order appointment_without_order] }])
+    end
+    let(:location_test) { test_for([{ resource_type: 'Location', profile_keys: ['location'] }]) }
+
+    def hook_request(hook_tag)
+      repo_create(:request, test_session_id: test_session.id, result: receiving_result,
+                            request_body: hook_request_body(prefetch: { patient: { resourceType: 'Patient' } }),
+                            tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag])
+    end
+
+    it 'passes without an attestation when no hook requiring the type was invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(appointment_test)
+
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('No instances of Appointment observed')
+      expect(result.result_message).to include('appointment-book')
+    end
+
+    it 'asks for an attestation when the hook requiring the type was invoked' do
+      hook_request(DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG)
+
+      result = run(appointment_test)
+
+      expect(result.result).to eq('wait')
+      expect(result.result_message).to include('did not observe any `Appointment` resources')
+    end
+
+    it 'still checks a hook gated type that turned up in another hook request' do
+      create_request(hook_request_body(prefetch: { appointment: { resourceType: 'Appointment', id: 'a1',
+                                                                  status: 'booked' } }))
+
+      expect(run(appointment_test).result).to eq('wait')
+    end
+
+    it 'passes without an attestation when the tester did not select the type' do
+      create_request(hook_request_body(context: draft_orders(complete_service_request)))
+
+      result = run(location_test, { supporting_types_supported: %w[Organization Practitioner] })
+
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('No instances of Location observed')
+      expect(result.result_message).to include('did not select it as supported')
+    end
+
+    it 'fails when a type the tester did not select was observed anyway' do
+      create_request(hook_request_body(prefetch: { resource: DaVinciCRDTestKit::CompleteResources::LOCATION }))
+
+      result = run(location_test, { supporting_types_supported: %w[Organization Practitioner] })
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('Location')
+    end
+
+    it 'expects every type when the tester left the input untouched' do
+      create_request(hook_request_body(context: draft_orders(complete_service_request)))
+
+      result = run(location_test, { supporting_types_supported: [] })
+
+      expect(result.result).to eq('wait')
+      expect(result.result_message).to include('did not observe any `Location` resources')
+    end
+  end
+
+  # Every test in the group analyzes the same pooled requests, so the extraction is done once and
+  # shared through scratch rather than repeated by each test instance.
+  describe 'extraction reuse across tests' do
+    let(:scratch) { {} }
+    let(:location_test) { test_for([{ resource_type: 'Location', profile_keys: ['location'] }]) }
+
+    before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
+
+    it 'parses the requests once for several tests' do
+      run(service_request_test, {}, scratch)
+      extraction = scratch[:must_support_extraction]
+
+      run(location_test, {}, scratch)
+
+      expect(scratch[:must_support_extraction]).to be(extraction)
+    end
+
+    it 'reaches the same verdicts whether or not the extraction is shared' do
+      expect(run(service_request_test, {}, scratch).result).to eq('pass')
+      expect(run(service_request_test, {}, {}).result).to eq('pass')
+    end
+
+    it 're-extracts once further hook requests arrive' do
+      expect(run(service_request_test, {}, scratch).result).to eq('pass')
+
+      create_request(hook_request_body(prefetch: { location: { resourceType: 'Location', id: 'l1' } }))
+
+      expect(run(location_test, {}, scratch).result).to eq('wait')
     end
   end
 end

@@ -1,27 +1,30 @@
 require_relative '../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../lib/davinci_crd_test_kit/generator/must_support_test_generator'
 
 RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
   let(:suite_id) { 'crd_client_v221' }
   let(:group) { described_class }
-  let(:ig_version) { described_class::IG_VERSION }
-  let(:conf3) { described_class::CONF_3 }
-  let(:hook3) { described_class::HOOK_3 }
+  let(:generator) { DaVinciCRDTestKit::Generator::MustSupportTestGenerator }
+  let(:definitions) { generator::TEST_DEFINITIONS }
+  let(:ig_version) { generator::IG_VERSION }
+  let(:conf3) { generator::CONF_3 }
+  let(:hook3) { generator::HOOK_3 }
 
   # The must support tests, excluding the pre-existing coverage information card test.
   let(:must_support_tests) do
     group.tests.select { |test| test.id.to_s.end_with?(*definition_ids) }
   end
 
-  let(:definition_ids) { described_class::TEST_DEFINITIONS.map { |definition| definition[:id].to_s } }
+  let(:definition_ids) { definitions.map { |definition| definition[:id].to_s } }
 
-  it 'holds one test per resource type plus the coverage information test' do
-    expect(described_class::TEST_DEFINITIONS.length).to eq(14)
-    expect(group.tests.length).to eq(15)
+  it 'holds one test per resource type plus the order signing and coverage information tests' do
+    expect(definitions.length).to eq(14)
+    expect(group.tests.length).to eq(16)
   end
 
   # Each test issues its own attestation, so a tester answers for one resource type at a time
   it 'checks exactly one resource type per test' do
-    described_class::TEST_DEFINITIONS.each do |definition|
+    definitions.each do |definition|
       expect(definition[:profiles].length).to eq(1), "#{definition[:id]} batches multiple resource types"
     end
   end
@@ -54,7 +57,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
 
   describe 'test configuration' do
     it 'points every profile key at generated metadata whose resource type matches' do
-      described_class::TEST_DEFINITIONS.each do |definition|
+      definitions.each do |definition|
         definition[:profiles].each do |profile|
           profile[:profile_keys].each do |profile_key|
             metadata = DaVinciCRDTestKit::ProfileMetadata.for(ig_version, profile_key)
@@ -68,7 +71,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     end
 
     it 'covers each request resource type exactly once across all tests' do
-      resource_types = described_class::TEST_DEFINITIONS.flat_map do |definition|
+      resource_types = definitions.flat_map do |definition|
         definition[:profiles].map { |profile| profile[:resource_type] }
       end
 
@@ -80,7 +83,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     end
 
     it 'checks Appointment against both Appointment profiles' do
-      appointment = described_class::TEST_DEFINITIONS
+      appointment = definitions
         .find { |definition| definition[:id] == :crd_v221_appointment_must_support }
 
       expect(appointment[:profiles].first[:profile_keys])
@@ -100,7 +103,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
                           'crd_v221_nutrition_order_must_support', 'crd_v221_medication_request_must_support',
                           'crd_v221_device_request_must_support', 'crd_v221_communication_request_must_support']
 
-      described_class::TEST_DEFINITIONS.each do |definition|
+      definitions.each do |definition|
         expected = !request_type_ids.include?(definition[:id].to_s)
         flagged = definition[:profiles].all? { |profile| profile[:supporting_profile] == true }
 

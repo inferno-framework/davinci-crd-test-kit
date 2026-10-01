@@ -65,12 +65,18 @@ RSpec.describe DaVinciCRDTestKit::ProfileMetadata do
       end
     end
 
-    it 'keeps the element a dropped slice constrains' do
+    it 'records the system for a binding that enumerates no codes' do
       metadata = described_class.for(ig_version, 'service_request')
+      slice = metadata.must_supports[:slices].find { |one| one[:slice_id] == 'ServiceRequest.reasonCode.coding:ICD10' }
 
-      expect(metadata.must_supports[:slices].map { |slice| slice[:slice_id] })
-        .to_not include('ServiceRequest.locationCode.coding:nubc')
-      expect(metadata.must_support_strings).to include('locationCode')
+      expect(slice.dig(:discriminator, :values)).to eq([{ system: 'http://hl7.org/fhir/sid/icd-10-cm' }])
+    end
+
+    it 'records the system for a binding whose value set filters that system' do
+      metadata = described_class.for(ig_version, 'service_request')
+      slice = metadata.must_supports[:slices].find { |one| one[:slice_id] == 'ServiceRequest.locationCode.coding:nucc' }
+
+      expect(slice.dig(:discriminator, :values)).to eq([{ system: 'http://nucc.org/provider-taxonomy' }])
     end
 
     it 'strips stray whitespace from profile titles' do

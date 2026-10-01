@@ -72,6 +72,38 @@
         :code: '409073007'
       - :system: http://snomed.info/sct
         :code: '387713003'
+  - :slice_id: ServiceRequest.locationCode.coding:cms
+    :slice_name: cms
+    :path: locationCode.coding
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set
+  - :slice_id: ServiceRequest.locationCode.coding:nubc
+    :slice_name: nubc
+    :path: locationCode.coding
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: https://www.nubc.org/CodeSystem/TypeOfBill
+  - :slice_id: ServiceRequest.locationCode.coding:nucc
+    :slice_name: nucc
+    :path: locationCode.coding
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://nucc.org/provider-taxonomy
+  - :slice_id: ServiceRequest.reasonCode.coding:ICD10
+    :slice_name: ICD10
+    :path: reasonCode.coding
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://hl7.org/fhir/sid/icd-10-cm
   :elements:
   - :path: authoredOn
   - :path: basedOn

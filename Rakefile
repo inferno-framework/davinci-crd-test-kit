@@ -6,10 +6,15 @@ rescue LoadError # rubocop:disable Lint/SuppressedException
 end
 
 namespace :crd do
-  desc 'Regenerate must support metadata for the CRD profiles sent within CRD hook requests'
+  desc 'Regenerate must support metadata and the must support tests that read it'
   task :generate_must_support_metadata do
     require_relative 'lib/davinci_crd_test_kit/generator/must_support_metadata_generator'
     DaVinciCRDTestKit::Generator::MustSupportMetadataGenerator.new.run
+
+    # Loaded after the metadata is written
+    require_relative 'lib/davinci_crd_test_kit/generator/must_support_test_generator'
+    puts 'Must support tests'
+    DaVinciCRDTestKit::Generator::MustSupportTestGenerator.new.run
   end
 end
 
