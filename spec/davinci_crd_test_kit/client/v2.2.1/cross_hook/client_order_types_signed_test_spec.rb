@@ -102,7 +102,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     run(test)
 
     expect(messages_from(test))
-      .to include(a_string_matching(/`DeviceRequest` was observed on the `order-select` hook, but never as a/))
+      .to include(a_string_matching(/`DeviceRequest` that was observed on the `order-select` hook, but not on an/))
   end
 
   it 'names every hook an unsigned order type was observed on' do
@@ -115,7 +115,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     run(test)
 
     expect(messages_from(test))
-      .to include(a_string_matching(/`DeviceRequest` was observed on the `order-dispatch` and `order-select` hooks/))
+      .to include(a_string_matching(/`DeviceRequest`.*`order-dispatch` and `order-select` hooks/))
   end
 
   it 'does not name order-sign when the type was only there outside draftOrders' do
@@ -127,6 +127,6 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     run(test)
 
     expect(messages_from(test))
-      .to include(a_string_matching(/`DeviceRequest` was observed, but never as a `draftOrder`/))
+      .to include(a_string_matching(/instance of `DeviceRequest` that was observed, but not as a draft order/))
   end
 end

@@ -60,11 +60,16 @@ module DaVinciCRDTestKit
       # hook is named only where it does not contradict the finding.
       def unsigned_message(resource_type, hooks)
         elsewhere = Array(hooks&.to_a) - ['order-sign']
-        return "`#{resource_type}` was observed, but never as a `draftOrder` on an `order-sign` invocation." if
-          elsewhere.blank?
+        if elsewhere.blank?
+          return "There was an instance of `#{resource_type}` that was observed, but not as a draft order on " \
+                 'an `order-sign` invocation. All order types must be signed as a draft order on an ' \
+                 'order-sign hook invocation.'
+        end
 
-        "`#{resource_type}` was observed on the #{elsewhere.sort.map { |hook| "`#{hook}`" }.to_sentence} " \
-          "#{'hook'.pluralize(elsewhere.length)}, but never as a `draftOrder` on an `order-sign` invocation."
+        "There was an instance of `#{resource_type}` that was observed on the " \
+          "#{elsewhere.sort.map { |hook| "`#{hook}`" }.to_sentence} " \
+          "#{'hook'.pluralize(elsewhere.length)}, but not on an `order-sign` invocation. All order " \
+          'types must be signed as a draft order on an order-sign hook invocation.'
       end
 
       run do
