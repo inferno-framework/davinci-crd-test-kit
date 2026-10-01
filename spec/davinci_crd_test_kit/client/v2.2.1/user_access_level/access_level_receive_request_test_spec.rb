@@ -59,6 +59,15 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelReceiveRequestTest, :request 
     expect(result.result).to eq('wait')
   end
 
+  # wait messages are not run through markdown formatting, so an indented line would render as a
+  # code block rather than as prose
+  it 'does not indent any line of the wait dialog' do
+    result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
+
+    indented = result.result_message.lines.select { |line| line.match?(/\A\s+\S/) }
+    expect(indented).to be_empty
+  end
+
   it 'describes the service endpoints and the required iss claim in the wait dialog' do
     result = run(test, cds_jwt_iss: example_client_url, access_level_target_reference: target_reference)
 

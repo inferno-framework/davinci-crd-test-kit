@@ -39,10 +39,32 @@ module DaVinciCRDTestKit
       def same_scenario_instruction
         return '' unless limited_access_run?
 
-        %(
-            Invoke the hook for the same order, appointment, or encounter used for the full-access
-            user in this scenario.
-        )
+        'Invoke the hook for the same order, appointment, or encounter used for the full-access ' \
+          'user in this scenario. '
+      end
+
+      # wait messages are rendered as given, so keep every line flush to avoid markdown reading
+      # the indentation as a code block
+      def wait_message
+        <<~MESSAGE
+          **Invoke a hook as a #{access_level_role} user**:
+
+          Invoke any supported hook, while signed in as a **#{access_level_role}** user, on one of
+          the two Inferno simulated CRD servers discoverable at the following endpoints:
+
+          - Complete Prefetch: `#{discovery_url}`
+          - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+
+          For Inferno to recognize these requests and associate them with this session,
+          the authentication JWT sent as a Bearer token in the Authorization header
+          must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
+          will automatically continue once Inferno has received a request and returned
+          a response.
+
+          #{same_scenario_instruction}Inferno will use the access token in the request to attempt
+          to read `#{access_level_target_reference}` and will return a mocked coverage-information
+          response.
+        MESSAGE
       end
 
       run do
@@ -56,28 +78,7 @@ module DaVinciCRDTestKit
         end
 
         identifier = cds_jwt_iss
-        wait(
-          identifier:,
-          message: %(
-            **Invoke a hook as a #{access_level_role} user**:
-
-            Invoke any supported hook, while signed in as a **#{access_level_role}** user, on one of
-            the two Inferno simulated CRD servers discoverable at the following endpoints:
-
-            - Complete Prefetch: `#{discovery_url}`
-            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
-
-            For Inferno to recognize these requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
-            will automatically continue once Inferno has received a request and returned
-            a response.
-            #{same_scenario_instruction}
-            Inferno will use the access token in the request to attempt to read
-            `#{access_level_target_reference}` and will return a mocked coverage-information
-            response.
-          )
-        )
+        wait(identifier:, message: wait_message)
       end
     end
   end
