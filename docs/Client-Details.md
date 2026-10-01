@@ -184,6 +184,24 @@ hook configuration options specified in hook requests, including:
   including cards with a `coverage-info` source type or topic, and coverage information and
   form completion responses in the `systemActions` list.
 
+#### Matching Requests in the User Access Level Scoping Scenario
+
+The "User Access Level Scoping" scenario compares the two hook requests it receives to confirm that
+they represent the same workflow action. Both must invoke the same hook for the same patient on the
+same service endpoint, and must describe matching content:
+- order hooks: the elements of each order that describe what was ordered - `code`,
+  `medicationCodeableConcept`, `medicationReference`, `codeCodeableConcept` and `codeReference`. For
+  the order types that carry no such element, `payload` is used for CommunicationRequest,
+  `lensSpecification` for VisionPrescription, and `foodPreferenceModifier`, `excludeFoodModifier`,
+  `oralDiet`, `supplement` and `enteralFormula` for NutritionOrder.
+- `appointment-book`: the `actor` references of the appointment's [PrimaryPerformer participants](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-base-definitions.html#Appointment.participant:PrimaryPerformer).
+- encounter hooks: the encounter's `class` and `type`.
+
+Each of these elements is compared in full, so two resources differ if any detail within one of them
+differs. Order and appointment hooks provide the resources in the request context, while encounter
+and `order-dispatch` hooks provide only a reference and the resources are taken from the prefetch
+data. A request that provides neither the resources nor any of the elements above fails the test.
+
 ## Testing Limitations
 
 Much of what the CRD IG specifies is optional, such as which hooks and resource
