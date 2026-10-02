@@ -316,9 +316,8 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
 
     result = run_both(full, limited)
     expect(result.result).to eq('fail')
-    expect(error_messages(result)).to include('different kinds of resource')
-    expect(error_messages(result)).to include('MedicationRequest')
-    expect(error_messages(result)).to include('ServiceRequest')
+    expect(error_messages(result)).to include('is a MedicationRequest')
+    expect(error_messages(result)).to include('is a ServiceRequest')
   end
 
   it 'names every element that differs, not just the first' do
@@ -334,6 +333,77 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelSameScenarioTest do
     expect(result.result).to eq('fail')
     expect(error_messages(result)).to include('`medicationCodeableConcept`')
     expect(error_messages(result)).to include('`medicationReference`')
+  end
+
+  describe 'when a hook carries more than one resource' do
+    # the case reported in review: two draft orders, the first matching and the second not
+    it 'reports the second order once, naming its position' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502'), med_order('med-2', '9999999')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', '1049502'), med_order('med-4', '1111111')])
+
+      result = run_both(full, limited)
+      expect(result.result).to eq('fail')
+      expect(error_messages(result).lines.grep(/differs from the one/).length).to eq(1)
+      expect(error_messages(result)).to include('The MedicationRequest #2 in the full-access request')
+    end
+
+    # the ordering that previously knocked every pair out of step and reported one difference twice
+    it 'reports one difference once even when the differing order sorts before the matching one' do
+      full = order_sign_body('full-instance', [med_order('med-1', 'aaa'), med_order('med-2', 'bbb')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', 'aaa'), med_order('med-4', '000')])
+
+      result = run_both(full, limited)
+      expect(result.result).to eq('fail')
+      expect(error_messages(result).lines.grep(/differs from the one/).length).to eq(1)
+      expect(error_messages(result)).to include('#2')
+    end
+
+    it 'passes when every order matches its counterpart' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502'), med_order('med-2', '9999999')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', '1049502'), med_order('med-4', '9999999')])
+
+      expect(run_both(full, limited).result).to eq('pass')
+    end
+
+    # index to index, so the same orders listed in a different sequence are not treated as equivalent
+    it 'fails when the same orders are listed in a different sequence' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502'), med_order('med-2', '9999999')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', '9999999'), med_order('med-4', '1049502')])
+
+      result = run_both(full, limited)
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('#1')
+      expect(error_messages(result)).to include('#2')
+    end
+
+    it 'fails when the two runs carry different numbers of resources' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502'), med_order('med-2', '9999999')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', '1049502')])
+
+      result = run_both(full, limited)
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('made for 2 resources')
+      expect(error_messages(result)).to include('limited-access request for 1')
+    end
+
+    it 'names the position when the resources at an index are different kinds' do
+      full = order_sign_body('full-instance', [med_order('med-1', '1049502'), med_order('med-2', '9999999')])
+      limited = order_sign_body('limited-instance', [med_order('med-3', '1049502'), service_order('sr-1', '24623002')])
+
+      result = run_both(full, limited)
+      expect(result.result).to eq('fail')
+      expect(error_messages(result)).to include('Resource #2 in the full-access request')
+    end
+  end
+
+  it 'does not number the resource when each request carries only one' do
+    full = order_sign_body('full-instance', [med_order('med-1', '1049502')])
+    limited = order_sign_body('limited-instance', [med_order('med-2', '9999999')])
+
+    result = run_both(full, limited)
+    expect(result.result).to eq('fail')
+    expect(error_messages(result)).to include('The MedicationRequest in the full-access request')
+    expect(error_messages(result)).to_not include('#1')
   end
 
   it 'matches orders that point to a medication instance rather than carrying a code' do

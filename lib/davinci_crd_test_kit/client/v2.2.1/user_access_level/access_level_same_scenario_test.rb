@@ -149,22 +149,11 @@ module DaVinciCRDTestKit
           return
         end
 
-        summaries.sort_by { |summary| canonical(summary[:elements]).to_s }
+        summaries
       end
 
       def resource_summary(resource)
         { resource_type: resource['resourceType'], elements: resource_content(resource) }
-      end
-
-      # a request may list the resources it was invoked for in either order, so sort the content
-      # before comparing. Hashes are not comparable, and their keys may be in any order, so sort
-      # on a rendering that does not depend on either.
-      def canonical(content)
-        case content
-        when Hash then content.sort.map { |key, value| [key, canonical(value)] }
-        when Array then content.map { |element| canonical(element) }
-        else content
-        end
       end
 
       def resource_content(resource)
@@ -259,30 +248,49 @@ module DaVinciCRDTestKit
                     "(#{full_patient_id.inspect} vs #{limited_patient_id.inspect}).")
       end
 
+      # each request is compared to the other in the order it listed its resources, so that a
+      # single difference is reported once rather than knocking every later pair out of step
       def check_same_content(full_body, limited_body)
         full_summaries = scenario_content(full_body, 'full-access')
         limited_summaries = scenario_content(limited_body, 'limited-access')
         return if full_summaries.blank? || limited_summaries.blank?
-        return unless same_resource_types?(full_summaries, limited_summaries)
+        return unless same_resource_count?(full_summaries, limited_summaries)
 
-        full_summaries.zip(limited_summaries).each do |full_summary, limited_summary|
-          check_same_elements(full_summary, limited_summary)
+        full_summaries.each_with_index do |full_summary, index|
+          position = position_description(index, full_summaries.length)
+          limited_summary = limited_summaries[index]
+          next unless same_resource_type?(full_summary, limited_summary, position)
+
+          check_same_elements(full_summary, limited_summary, position)
         end
       end
 
-      def same_resource_types?(full_summaries, limited_summaries)
-        full_types = full_summaries.map { |summary| summary[:resource_type] }.sort
-        limited_types = limited_summaries.map { |summary| summary[:resource_type] }.sort
-        return true if full_types == limited_types
+      # only worth identifying which resource when the requests carry more than one
+      def position_description(index, count)
+        count > 1 ? " ##{index + 1}" : ''
+      end
+
+      def same_resource_count?(full_summaries, limited_summaries)
+        return true if full_summaries.length == limited_summaries.length
 
         add_message('error',
-                    'The full-access and limited-access requests were made for different kinds of ' \
-                    "resource (#{full_types.to_sentence} vs #{limited_types.to_sentence}). Both runs " \
-                    'must be performed for the same order(s), appointment(s), or encounter.')
+                    "The full-access request was made for #{full_summaries.length} resources and the " \
+                    "limited-access request for #{limited_summaries.length}. Both runs must be " \
+                    'performed for the same order(s), appointment(s), or encounter.')
         false
       end
 
-      def check_same_elements(full_summary, limited_summary)
+      def same_resource_type?(full_summary, limited_summary, position)
+        return true if full_summary[:resource_type] == limited_summary[:resource_type]
+
+        add_message('error',
+                    "Resource#{position} in the full-access request is a #{full_summary[:resource_type]} " \
+                    "while the one in the limited-access request is a #{limited_summary[:resource_type]}. " \
+                    'Both runs must be performed for the same order(s), appointment(s), or encounter.')
+        false
+      end
+
+      def check_same_elements(full_summary, limited_summary, position)
         full_elements = full_summary[:elements]
         limited_elements = limited_summary[:elements]
         differing = (full_elements.keys | limited_elements.keys)
@@ -290,9 +298,9 @@ module DaVinciCRDTestKit
         return if differing.blank?
 
         add_message('error',
-                    "The #{full_summary[:resource_type]} in the full-access request differs from the " \
-                    "one in the limited-access request in #{quoted_list(differing)}. Both runs must " \
-                    'be performed for content that matches, such as an order for the same service.')
+                    "The #{full_summary[:resource_type]}#{position} in the full-access request differs " \
+                    "from the one in the limited-access request in #{quoted_list(differing)}. Both runs " \
+                    'must be performed for content that matches, such as an order for the same service.')
       end
 
       def quoted_list(elements)
