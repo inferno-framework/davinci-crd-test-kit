@@ -41,6 +41,32 @@ module DaVinciCRDTestKit
     end
 
     # -----------------------------------------------------------------------
+    # Prefetched Resource Presence Checking
+    # -----------------------------------------------------------------------
+
+    def prefetched_resource_present?(relative_reference)
+      prefetched_resource(relative_reference).present?
+    end
+
+    def prefetched_resource(relative_reference)
+      return if relative_reference.blank?
+
+      resource = prefetched_resources["#{base_fhir_server}#{relative_reference}"] if base_fhir_server.present?
+      resource || prefetched_resource_by_reference(relative_reference)
+    end
+
+    # prefetched Bundle entries are indexed by their fullUrl, which may be rooted somewhere other
+    # than the fhirServer given in the request, so fall back to the resource's own type and id
+    def prefetched_resource_by_reference(relative_reference)
+      resource_type, id = relative_reference.split('/')
+      return if resource_type.blank? || id.blank?
+
+      prefetched_resources.values.find do |resource|
+        resource.is_a?(Hash) && resource['resourceType'] == resource_type && resource['id'] == id
+      end
+    end
+
+    # -----------------------------------------------------------------------
     # Complete vs Subset Prefetch Difference Checking
     # -----------------------------------------------------------------------
 
@@ -353,8 +379,10 @@ module DaVinciCRDTestKit
     end
 
     def extract_prefetched_resources
-      hook_request['prefetch']&.each_value do |prefetch_resource|
-        next unless prefetch_resource&.dig('resourceType').present?
+      return unless hook_request['prefetch'].is_a?(Hash)
+
+      hook_request['prefetch'].each_value do |prefetch_resource|
+        next unless prefetch_resource.is_a?(Hash) && prefetch_resource['resourceType'].present?
 
         if prefetch_resource['resourceType'] == 'Bundle'
           extract_resources_from_prefetched_bundle(prefetch_resource)
@@ -366,7 +394,7 @@ module DaVinciCRDTestKit
 
     def extract_resources_from_prefetched_bundle(bundle)
       bundle['entry']&.each do |entry|
-        next unless entry['resource'].present?
+        next unless entry.is_a?(Hash) && entry['resource'].present?
 
         if entry['fullUrl'].present?
           prefetched_resources[entry['fullUrl']] = entry['resource'] unless prefetched_resources.key?(entry['fullUrl'])
@@ -381,18 +409,20 @@ module DaVinciCRDTestKit
     def extract_prefetched_resource_instance(resource_instance)
       return unless resource_instance['id'].present? &&
                     resource_instance['resourceType'].present? &&
-                    hook_request['fhirServer'].present?
+                    base_fhir_server.present?
 
-      fhir_server =
-        if hook_request['fhirServer'].ends_with?('/')
-          hook_request['fhirServer']
-        else
-          "#{hook_request['fhirServer']}/"
-        end
-      key = "#{fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
+      key = "#{base_fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
       return if prefetched_resources.key?(key)
 
       prefetched_resources[key] = resource_instance
+    end
+
+    # ends with a slash so that relative references can be appended to form the
+    # absolute urls that prefetched resources are indexed by
+    def base_fhir_server
+      return if hook_request['fhirServer'].blank?
+
+      @base_fhir_server ||= "#{hook_request['fhirServer'].to_s.chomp('/')}/"
     end
 
     # -------------------------------------------------------------------------

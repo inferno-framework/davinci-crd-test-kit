@@ -154,10 +154,15 @@ In the 2.2.1 version of the CRD IG, clients are [required to support prefetch](h
 and to be able to provide the complete minimal data set via this mechanism. Inferno therefore assumes
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
 during a hook invocation. However, clients are still required to allow servers to access data via FHIR
-APIs. Inferno will request during a hook invocation FHIR resources outside the standard prefetch data
+APIs. During a hook invocation, Inferno will use the provided `fhirServer` and
+`fhirAuthorization.access_token` to request resources outside the standard prefetch data
 set that it needs to validate other requirements, including
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.
 - Parent Location resources of those provided via prefetch via the `partOf` element.
+
+During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
+tester-specified resource. Whereas the other resources listed above must be accessible, Inferno
+will expect this resource to be available only during the hook request made by the full-access user.
 
 #### Multiple Service Endpoints
 
@@ -178,6 +183,24 @@ hook configuration options specified in hook requests, including:
   extension: if set to `false` Inferno's simulation will not return any cards related to coverages,
   including cards with a `coverage-info` source type or topic, and coverage information and
   form completion responses in the `systemActions` list.
+
+#### Matching Requests in the User Access Level Scoping Scenario
+
+The "User Access Level Scoping" scenario compares the two hook requests it receives to confirm that
+they represent the same workflow action. Both must invoke the same hook for the same patient on the
+same service endpoint, and must describe matching content:
+- order hooks: the elements of each order that describe what was ordered - `code`,
+  `medicationCodeableConcept`, `medicationReference`, `codeCodeableConcept` and `codeReference`. For
+  the order types that carry no such element, `payload` is used for CommunicationRequest,
+  `lensSpecification` for VisionPrescription, and `foodPreferenceModifier`, `excludeFoodModifier`,
+  `oralDiet`, `supplement` and `enteralFormula` for NutritionOrder.
+- `appointment-book`: the `actor` references of the appointment's [PrimaryPerformer participants](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-base-definitions.html#Appointment.participant:PrimaryPerformer).
+- encounter hooks: the encounter's `class` and `type`.
+
+Each of these elements is compared in full, so two resources differ if any detail within one of them
+differs. Order and appointment hooks provide the resources in the request context, while encounter
+and `order-dispatch` hooks provide only a reference and the resources are taken from the prefetch
+data. A request that provides neither the resources nor any of the elements above fails the test.
 
 ## Testing Limitations
 

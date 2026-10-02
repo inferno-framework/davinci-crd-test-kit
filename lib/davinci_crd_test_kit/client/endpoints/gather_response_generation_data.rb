@@ -359,6 +359,19 @@ module DaVinciCRDTestKit
       request_parent_locations
     end
 
+    def request_access_level_target
+      return if access_level_target_reference.blank?
+
+      fetch_reference(normalize_reference(access_level_target_reference),
+                      additional_tag: ACCESS_LEVEL_TARGET_FETCH_TAG)
+    end
+
+    def access_level_target_reference
+      JSON.parse(result.input_json)
+        .find { |input| input['name'].include?('access_level_target_reference') }
+        &.dig('value')
+    end
+
     def prefetched_coverage_resource
       if prefetched_coverage.is_a?(FHIR::Bundle)
         prefetched_coverage.entry.first&.resource

@@ -843,4 +843,73 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(errors).to be_empty
     end
   end
+
+  describe '#prefetched_resource' do
+    let(:observation) { { 'resourceType' => 'Observation', 'id' => '123' } }
+    let(:bundle_with_foreign_full_url) do
+      { 'resourceType' => 'Bundle',
+        'entry' => [{ 'fullUrl' => 'https://elsewhere.example.org/fhir/Observation/123',
+                      'resource' => observation }] }
+    end
+
+    def checker_for(prefetch, fhir_server: base_fhir_url)
+      request = { 'prefetch' => prefetch }
+      request['fhirServer'] = fhir_server if fhir_server
+      described_class.new(request, nil, nil)
+    end
+
+    it 'finds a resource prefetched on its own' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'finds a resource in a Bundle entry with no fullUrl' do
+      bundle = { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => observation }] }
+
+      expect(checker_for({ 'obs' => bundle }).prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    # prefetch templates that are searches return Bundles whose fullUrls the server chooses
+    it 'finds a Bundle entry whose fullUrl is rooted elsewhere than the fhirServer' do
+      checker = checker_for({ 'obs' => bundle_with_foreign_full_url })
+
+      expect(checker.prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'finds a resource when the request provides no fhirServer' do
+      checker = checker_for({ 'obs' => bundle_with_foreign_full_url }, fhir_server: nil)
+
+      expect(checker.prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'returns nil for a resource that was not prefetched' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation/456')).to be_nil
+    end
+
+    it 'returns nil for a reference that is not a relative reference' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation')).to be_nil
+    end
+
+    it 'returns nil rather than raising when prefetch is not an object' do
+      expect(checker_for('none').prefetched_resource('Observation/123')).to be_nil
+    end
+
+    it 'does not raise when fhirServer is not a string' do
+      checker = checker_for({ 'obs' => observation }, fhir_server: 42)
+
+      expect { checker.prefetched_resource('Observation/123') }.to_not raise_error
+    end
+  end
+
+  describe '#prefetched_resource_present?' do
+    let(:observation) { { 'resourceType' => 'Observation', 'id' => '123' } }
+
+    it 'is true when the resource was prefetched and false when it was not' do
+      checker = described_class.new(
+        { 'fhirServer' => base_fhir_url, 'prefetch' => { 'obs' => observation } }, nil, nil
+      )
+
+      expect(checker.prefetched_resource_present?('Observation/123')).to be(true)
+      expect(checker.prefetched_resource_present?('Observation/456')).to be(false)
+    end
+  end
 end
