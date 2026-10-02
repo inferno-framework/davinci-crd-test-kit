@@ -1,5 +1,6 @@
 require 'inferno'
 require 'yaml'
+require_relative 'crd_must_support_metadata_extractor'
 require_relative '../cross_suite/profile_metadata'
 
 module DaVinciCRDTestKit
@@ -70,7 +71,7 @@ module DaVinciCRDTestKit
         raise "Profile #{config[:id]} has no elements" if elements.blank?
 
         extractor =
-          Inferno::DSL::MustSupportMetadataExtractor.new(elements, profile, profile.type, implementation_guide)
+          CRDMustSupportMetadataExtractor.new(elements, profile, profile.type, implementation_guide)
 
         ProfileMetadata.new(
           resource: extractor.resource,

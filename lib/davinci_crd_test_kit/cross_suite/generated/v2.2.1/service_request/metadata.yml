@@ -21,23 +21,6 @@
     :url: http://hl7.org/fhir/StructureDefinition/codeOptions
     :modifier_extension: false
   :slices:
-  - :slice_id: ServiceRequest.category:encounterType
-    :slice_name: encounterType
-    :path: category
-    :discriminator:
-      :type: requiredBinding
-      :path: ''
-      :values:
-      - :system: http://snomed.info/sct
-        :code: '108252007'
-      - :system: http://snomed.info/sct
-        :code: '363679005'
-      - :system: http://snomed.info/sct
-        :code: '409063005'
-      - :system: http://snomed.info/sct
-        :code: '409073007'
-      - :system: http://snomed.info/sct
-        :code: '387713003'
   - :slice_id: ServiceRequest.category:serviceType
     :slice_name: serviceType
     :path: category
@@ -45,33 +28,7 @@
       :type: requiredBinding
       :path: ''
       :values:
-      - :system: http://snomed.info/sct
-        :code: '108252007'
-      - :system: http://snomed.info/sct
-        :code: '363679005'
-      - :system: http://snomed.info/sct
-        :code: '409063005'
-      - :system: http://snomed.info/sct
-        :code: '409073007'
-      - :system: http://snomed.info/sct
-        :code: '387713003'
-  - :slice_id: ServiceRequest.category:us-core
-    :slice_name: us-core
-    :path: category
-    :discriminator:
-      :type: requiredBinding
-      :path: ''
-      :values:
-      - :system: http://snomed.info/sct
-        :code: '108252007'
-      - :system: http://snomed.info/sct
-        :code: '363679005'
-      - :system: http://snomed.info/sct
-        :code: '409063005'
-      - :system: http://snomed.info/sct
-        :code: '409073007'
-      - :system: http://snomed.info/sct
-        :code: '387713003'
+      - :system: https://codesystem.x12.org/005010/1365
   - :slice_id: ServiceRequest.locationCode.coding:cms
     :slice_name: cms
     :path: locationCode.coding

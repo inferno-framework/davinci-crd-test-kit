@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
     class ClientOrderTypesSignedTest < Inferno::Test
       include HookRequestResourceExtraction
 
-      title 'Order types observed were signed through the order-sign hook'
+      title 'Observed order types were submitted as draftOrders on the order-sign hook'
       id :crd_v221_client_order_types_signed
       description <<~DESCRIPTION
         CRD clients are required to support the `order-sign` hook for the order types they handle.
@@ -61,15 +61,16 @@ module DaVinciCRDTestKit
       def unsigned_message(resource_type, hooks)
         elsewhere = Array(hooks&.to_a) - ['order-sign']
         if elsewhere.blank?
-          return "There was an instance of `#{resource_type}` that was observed, but not as a draft order on " \
-                 'an `order-sign` invocation. All order types must be signed as a draft order on an ' \
-                 'order-sign hook invocation.'
+          return "There was an instance of `#{resource_type}` that was observed, but never seen as a " \
+                 'draft order on an `order-sign` invocation. All supported order types must be able ' \
+                 'to be sent as a draft order on an order-sign hook invocation.'
         end
 
         "There was an instance of `#{resource_type}` that was observed on the " \
           "#{elsewhere.sort.map { |hook| "`#{hook}`" }.to_sentence} " \
-          "#{'hook'.pluralize(elsewhere.length)}, but not on an `order-sign` invocation. All order " \
-          'types must be signed as a draft order on an order-sign hook invocation.'
+          "#{'hook'.pluralize(elsewhere.length)}, but never seen as a draft order on an " \
+          '`order-sign` invocation. All supported order types must be able to be sent as a draft ' \
+          'order on an order-sign hook invocation.'
       end
 
       run do

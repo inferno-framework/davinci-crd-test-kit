@@ -37,9 +37,17 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
   end
 
+  def all_types_selected(inputs = {})
+    generator = DaVinciCRDTestKit::Generator::MustSupportTestGenerator
+    {
+      order_types_supported: generator::ORDER_TYPE_OPTIONS.to_json,
+      supporting_types_supported: generator::SUPPORTING_TYPE_OPTIONS.to_json
+    }.merge(inputs)
+  end
+
   describe 'when no requests have been received' do
     it 'skips' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to include('No hook requests received')
@@ -50,14 +58,14 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
 
     it 'passes without waiting for an attestation' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
 
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('All must support elements were observed')
     end
 
     it 'records no unobserved element messages' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
       messages = results_repo.current_results_for_test_session_and_runnables(
         test_session.id, [service_request_test]
       ).first.messages
@@ -73,7 +81,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     before { create_request(hook_request_body(context: draft_orders(partial_service_request))) }
 
     it 'waits for an attestation naming the missing elements' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
 
       expect(result.result).to eq('wait')
       expect(result.result_message).to include('reasonReference')
@@ -82,13 +90,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
 
     it 'reports the number of instances it looked at' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
 
       expect(result.result_message).to include('observed 1 `ServiceRequest` instance')
     end
 
     it 'logs each unobserved element as an info message' do
-      run(service_request_test)
+      run(service_request_test, all_types_selected)
       messages = results_repo.current_results_for_test_session_and_runnables(
         test_session.id, [service_request_test]
       ).first.messages
@@ -99,7 +107,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
 
     it 'offers both attestation links as outputs' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
       outputs = result.outputs.to_h { |output| [output['name'], output['value']] }
 
       expect(outputs['attest_true_url']).to eq(attest_true_url)
@@ -107,7 +115,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
 
     it 'passes when the tester follows the attestation link' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
       expect(result.result).to eq('wait')
 
       get(attest_true_url)
@@ -116,7 +124,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
 
     it 'fails when the tester declines the attestation' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
       expect(result.result).to eq('wait')
 
       get(attest_false_url)
@@ -128,12 +136,22 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   describe 'when the resource type is not present at all' do
     before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
 
-    it 'asks the tester to attest that the request type is unsupported' do
-      result = run(test_for([{ resource_type: 'VisionPrescription', profile_keys: ['vision_prescription'] }]))
+    it 'fails when the tester selected the type as supported' do
+      profiles = [{ resource_type: 'VisionPrescription', profile_keys: ['vision_prescription'] }]
 
-      expect(result.result).to eq('wait')
-      expect(result.result_message).to include('did not observe any `VisionPrescription` resources')
-      expect(result.result_message).to include('does **not** support')
+      result = run(test_for(profiles), all_types_selected)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('do not match those the client system is expected to support')
+    end
+
+    it 'passes when the tester did not select the type as supported' do
+      profiles = [{ resource_type: 'VisionPrescription', profile_keys: ['vision_prescription'] }]
+
+      result = run(test_for(profiles), all_types_selected(order_types_supported: ['ServiceRequest'].to_json))
+
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('No instances of VisionPrescription observed')
     end
   end
 
@@ -141,34 +159,34 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     it 'finds resources carried only in prefetch' do
       create_request(hook_request_body(prefetch: { orders: complete_service_request }))
 
-      expect(run(service_request_test).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected).result).to eq('pass')
     end
 
     it 'finds resources carried only in context' do
       create_request(hook_request_body(context: draft_orders(complete_service_request)))
 
-      expect(run(service_request_test).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected).result).to eq('pass')
     end
 
     it 'pools instances across several requests so coverage can accumulate' do
       create_request(hook_request_body(context: draft_orders(complete_service_request.except(:reasonReference))))
       create_request(hook_request_body(context: draft_orders(complete_service_request.except(:performer))))
 
-      expect(run(service_request_test).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected).result).to eq('pass')
     end
   end
 
   describe 'a test covering several profiles at once' do
     before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
 
-    it 'reports an absent type and an incomplete type in the same message' do
+    it 'fails on the absent type rather than attesting for it' do
       result = run(test_for([
                               { resource_type: 'ServiceRequest', profile_keys: ['service_request'] },
                               { resource_type: 'Location', profile_keys: ['location'] }
-                            ]))
+                            ]), all_types_selected)
 
-      expect(result.result).to eq('wait')
-      expect(result.result_message).to include('did not observe any `Location` resources')
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('do not match those the client system is expected to support')
     end
   end
 
@@ -184,7 +202,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       create_request(hook_request_body(context: { appointments: { resourceType: 'Bundle',
                                                                   entry: [{ resource: appointment }] } }))
 
-      result = run(appointment_test)
+      result = run(appointment_test, all_types_selected)
 
       expect(result.result).to eq('wait')
       expect(result.result_message).to include('basedOn')
@@ -195,7 +213,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
 
     it 'does not attach the cross hook requests to its own result' do
-      result = run(service_request_test)
+      result = run(service_request_test, all_types_selected)
 
       expect(Inferno::Repositories::Requests.new.tagged_requests(
         test_session.id, [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG]
@@ -232,7 +250,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
           create_request(hook_request_body(prefetch: { resource: }))
         end
 
-        result = run(test_for(definition[:profiles]))
+        result = run(test_for(definition[:profiles]), all_types_selected)
 
         expect(result.result).to eq('pass'), "#{resource_type}: #{result.result_message}"
       end
@@ -256,33 +274,34 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     it 'passes without an attestation when no hook requiring the type was invoked' do
       hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
 
-      result = run(appointment_test)
+      result = run(appointment_test, all_types_selected)
 
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Appointment observed')
       expect(result.result_message).to include('appointment-book')
     end
 
-    it 'asks for an attestation when the hook requiring the type was invoked' do
+    it 'fails when the hook requiring the type was invoked but the type never appeared' do
       hook_request(DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG)
 
-      result = run(appointment_test)
+      result = run(appointment_test, all_types_selected)
 
-      expect(result.result).to eq('wait')
-      expect(result.result_message).to include('did not observe any `Appointment` resources')
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('do not match those the client system is expected to support')
     end
 
     it 'still checks a hook gated type that turned up in another hook request' do
       create_request(hook_request_body(prefetch: { appointment: { resourceType: 'Appointment', id: 'a1',
                                                                   status: 'booked' } }))
 
-      expect(run(appointment_test).result).to eq('wait')
+      expect(run(appointment_test, all_types_selected).result).to eq('wait')
     end
 
     it 'passes without an attestation when the tester did not select the type' do
       create_request(hook_request_body(context: draft_orders(complete_service_request)))
 
-      result = run(location_test, { supporting_types_supported: %w[Organization Practitioner] })
+      result = run(location_test,
+                   all_types_selected(supporting_types_supported: %w[Organization Practitioner].to_json))
 
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Location observed')
@@ -292,19 +311,24 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     it 'fails when a type the tester did not select was observed anyway' do
       create_request(hook_request_body(prefetch: { resource: DaVinciCRDTestKit::CompleteResources::LOCATION }))
 
-      result = run(location_test, { supporting_types_supported: %w[Organization Practitioner] })
+      result = run(location_test,
+                   all_types_selected(supporting_types_supported: %w[Organization Practitioner].to_json))
+      messages = results_repo.current_results_for_test_session_and_runnables(
+        test_session.id, [location_test]
+      ).first.messages
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('Location')
+      expect(messages.map(&:message)).to include(a_string_matching(/Observed 1 `Location` instance/))
     end
 
-    it 'expects every type when the tester left the input untouched' do
+    # A client need not support any of these types, so clearing the input expects none of them.
+    it 'expects no types when the tester cleared the input' do
       create_request(hook_request_body(context: draft_orders(complete_service_request)))
 
-      result = run(location_test, { supporting_types_supported: [] })
+      result = run(location_test, all_types_selected(supporting_types_supported: [].to_json))
 
-      expect(result.result).to eq('wait')
-      expect(result.result_message).to include('did not observe any `Location` resources')
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('No instances of Location observed')
     end
   end
 
@@ -326,16 +350,16 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
 
     it 'reaches the same verdicts whether or not the extraction is shared' do
-      expect(run(service_request_test, {}, scratch).result).to eq('pass')
-      expect(run(service_request_test, {}, {}).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected, scratch).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected, {}).result).to eq('pass')
     end
 
     it 're-extracts once further hook requests arrive' do
-      expect(run(service_request_test, {}, scratch).result).to eq('pass')
+      expect(run(service_request_test, all_types_selected, scratch).result).to eq('pass')
 
-      create_request(hook_request_body(prefetch: { location: { resourceType: 'Location', id: 'l1' } }))
+      create_request(hook_request_body(prefetch: { resource: DaVinciCRDTestKit::CompleteResources::LOCATION }))
 
-      expect(run(location_test, {}, scratch).result).to eq('wait')
+      expect(run(location_test, all_types_selected, scratch).result).to eq('pass')
     end
   end
 end

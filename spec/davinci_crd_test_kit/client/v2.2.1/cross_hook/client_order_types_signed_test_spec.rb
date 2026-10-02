@@ -102,7 +102,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     run(test)
 
     expect(messages_from(test))
-      .to include(a_string_matching(/`DeviceRequest` that was observed on the `order-select` hook, but not on an/))
+      .to include(a_string_matching(/`DeviceRequest`.*`order-select` hook, but never seen as a draft order/))
   end
 
   it 'names every hook an unsigned order type was observed on' do
@@ -127,6 +127,6 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     run(test)
 
     expect(messages_from(test))
-      .to include(a_string_matching(/instance of `DeviceRequest` that was observed, but not as a draft order/))
+      .to include(a_string_matching(/instance of `DeviceRequest` that was observed, but never seen as a draft order/))
   end
 end

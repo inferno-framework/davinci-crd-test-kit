@@ -26,9 +26,7 @@ module DaVinciCRDTestKit
         - `authoredOn`
         - `basedOn`
         - `category`
-        - `category:encounterType`
         - `category:serviceType`
-        - `category:us-core`
         - `code`
         - `code.extension:BillingOptions`
         - `contained`

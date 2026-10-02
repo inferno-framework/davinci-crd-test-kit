@@ -23,6 +23,13 @@ module DaVinciCRDTestKit
 
       run_as_group
 
+      input_order :make_additional_hook_requests,
+                  :order_types_supported,
+                  :supporting_types_supported,
+                  :cross_hooks_response_approach,
+                  :cross_hooks_selected_response_types,
+                  :cross_hooks_custom_response_template
+
       group from: :crd_v221_client_cross_hook_interaction
       group from: :crd_v221_client_cross_hook_must_support
       group do

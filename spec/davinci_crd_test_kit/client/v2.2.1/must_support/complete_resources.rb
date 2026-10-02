@@ -11,6 +11,7 @@ module DaVinciCRDTestKit
             system: 'urn:oid:2.16.840.1.113883.4.4', value: '12-3456789' }.freeze
     CONTAINED_CONDITION = { resourceType: 'Condition', id: 'cond1',
                             subject: { reference: 'Patient/p1' } }.freeze
+    X12_SERVICE_TYPE_SYSTEM = 'https://codesystem.x12.org/005010/1365'.freeze
 
     COVERAGE_INFORMATION =
       { url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information',
@@ -34,7 +35,7 @@ module DaVinciCRDTestKit
       requester: { reference: 'Practitioner/pr1' },
       occurrencePeriod: { start: '2026-01-01T00:00:00Z' },
       occurrenceTiming: { event: ['2026-01-01T00:00:00Z'] },
-      category: [{ coding: [{ system: 'http://snomed.info/sct', code: '108252007' }] }],
+      category: [{ coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }],
       basedOn: [{ reference: 'ServiceRequest/sr0' }],
       contained: [{ resourceType: 'Practitioner', id: 'pr1' }],
       quantityQuantity: { value: 1 },
@@ -63,11 +64,7 @@ module DaVinciCRDTestKit
     APPOINTMENT = {
       resourceType: 'Appointment', id: 'a1', status: 'booked',
       identifier: [{ system: 'http://example.org/appt', value: 'a-1' }],
-      serviceCategory: [
-        { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/service-category', code: '1' }] },
-        { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/service-category', code: '2' }] },
-        { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/service-category', code: '3' }] }
-      ],
+      serviceCategory: [{ coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }],
       serviceType: [{ coding: [{ code: 'st' }], extension: [BILLING_OPTIONS] }],
       specialty: [{ coding: [{ system: 'http://nucc.org/provider-taxonomy', code: '207Q00000X' }] }],
       appointmentType: { coding: [{ code: 'ROUTINE' }] },
@@ -277,8 +274,7 @@ module DaVinciCRDTestKit
       category: [
         { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
                      code: 'community' }] },
-        { coding: [{ system: 'http://snomed.info/sct', code: '162673000' }] },
-        { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/service-type', code: '57' }] }
+        { coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }
       ],
       reasonCode: [{ coding: [{ code: 'rc' }] }],
       reasonReference: [{ reference: 'Condition/cond1' }],

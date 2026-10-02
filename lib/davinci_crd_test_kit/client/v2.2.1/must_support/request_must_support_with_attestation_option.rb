@@ -15,8 +15,10 @@ module DaVinciCRDTestKit
 
       id :crd_v221_request_must_support_with_attestation_option
 
-      input :order_types_supported, optional: true
-      input :supporting_types_supported, optional: true
+      # The type matters: Inferno parses a checkbox input's stored JSON into an array, and without
+      # it the raw string arrives instead.
+      input :order_types_supported, optional: true, type: 'checkbox'
+      input :supporting_types_supported, optional: true, type: 'checkbox'
 
       output :attest_true_url
       output :attest_false_url
@@ -98,19 +100,14 @@ module DaVinciCRDTestKit
         hooks.nil? || hooks.any? { |hook_tag| hook_invoked?(hook_tag) }
       end
 
-      # nil when the type is required of every client, so no input governs it. Inferno hands a
-      # checkbox input over as an array, empty when the tester cleared it or never reached it, so
-      # an empty selection leaves every type expected rather than none.
+      # nil when the type is required of every client, so no input governs it. A client need not
+      # support any order type, so clearing every box means none are expected rather than all.
       def selected_types(resource_type)
         if ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
-          selected_or_all(order_types_supported, ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS)
+          Array(order_types_supported)
         elsif ClientCrossHookMustSupportGroup::SUPPORTING_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
-          selected_or_all(supporting_types_supported, ClientCrossHookMustSupportGroup::SUPPORTING_TYPE_OPTIONS)
+          Array(supporting_types_supported)
         end
-      end
-
-      def selected_or_all(selected, options)
-        selected.presence || options.map { |option| option[:value] }
       end
 
       def hook_invoked?(hook_tag)
@@ -119,9 +116,7 @@ module DaVinciCRDTestKit
       end
 
       def declared_unsupported?(resource_type)
-        selected = selected_types(resource_type)
-
-        selected.present? && selected.exclude?(resource_type)
+        selected_types(resource_type)&.exclude?(resource_type) || false
       end
 
       def unexpected_reason(resource_type)
@@ -143,8 +138,7 @@ module DaVinciCRDTestKit
           if resources.blank?
             next unless expected?(resource_type)
 
-            next { kind: :unsupported_type, title:, resource_type:,
-                   supporting_profile: profile[:supporting_profile] }
+            next { kind: :missing_type, title:, resource_type: }
           end
 
           # Only a type the tester declared unsupported contradicts what they said. A hook gated
@@ -163,18 +157,29 @@ module DaVinciCRDTestKit
         unobserved.select { |entry| entry[:kind] == :unexpected_type }
       end
 
-      # The tester said the system does not send this type, but it did, so neither passing nor
-      # asking them to attest to its absence would be right.
-      def check_for_unexpected_types(unobserved)
+      def missing(unobserved)
+        unobserved.select { |entry| entry[:kind] == :missing_type }
+      end
+
+      # What the tester declared and what the client sent have to agree: a type they said is
+      # supported must turn up, and one they said is not must not.
+      def check_declared_types(unobserved)
         unexpected(unobserved).each do |entry|
           add_message('error',
                       "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests " \
                       "made by the client system, but #{unexpected_reason(entry[:resource_type])}.")
         end
 
-        assert unexpected(unobserved).blank?,
-               'Inferno observed resource type(s) it was not expecting: ' \
-               "#{unexpected(unobserved).map { |entry| entry[:resource_type] }.join(', ')}. See Messages."
+        missing(unobserved).each do |entry|
+          add_message('error',
+                      "No `#{entry[:resource_type]}` instances were observed in the hook requests made by the " \
+                      'client system. The tester checked off that the client system supports ' \
+                      "`#{entry[:resource_type]}`, so this was expected to be observed.")
+        end
+
+        assert (unexpected(unobserved) + missing(unobserved)).blank?,
+               'The resource types observed do not match those the client system is expected to support. ' \
+               'See Messages.'
       end
 
       # A type that was neither observed nor expected passes without the tester having to say
@@ -184,16 +189,13 @@ module DaVinciCRDTestKit
           .reject { |resource_type| resources_by_type[resource_type].present? }
         return 'All must support elements were observed.' if vacuous.blank?
 
-        "No instances of #{vacuous.join(', ')} observed, and none required: " \
+        "No instances of #{vacuous.to_sentence} observed, and none expected: " \
           "#{vacuous.map { |resource_type| unexpected_reason(resource_type) }.uniq.join('; ')}."
       end
 
       def log_info_messages(unobserved)
         unobserved.each do |entry|
-          if entry[:kind] == :unsupported_type
-            add_message('info', "No #{entry[:resource_type]} instances observed for #{entry[:title]}.")
-            next
-          end
+          next unless entry[:kind] == :unobserved_elements
 
           add_message('info',
                       "Observed #{entry[:count]} #{entry[:resource_type]} instance(s) across " \
@@ -210,15 +212,13 @@ module DaVinciCRDTestKit
 
           #{unobserved.map { |entry| attestation_section(entry) }.join("\n\n")}
 
-          [Click here](#{attest_true_url}) if the above statement is **true**. The test will **pass**.
+          [Click here](#{attest_true_url}) if the above statement is **true**.
 
-          [Click here](#{attest_false_url}) if the above statement is **false**. The test will **fail**.
+          [Click here](#{attest_false_url}) if the above statement is **false**.
         MESSAGE
       end
 
       def attestation_section(entry)
-        return unsupported_type_section(entry) if entry[:kind] == :unsupported_type
-
         <<~SECTION.chomp
           Inferno observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests
           made by the client system, but the following #{entry[:title]} must support elements were not
@@ -226,36 +226,7 @@ module DaVinciCRDTestKit
 
           #{entry[:missing].map { |element| "- `#{element}`" }.join("\n")}
 
-          Attest that, for each element listed above, the client system either does not capture the
-          data or does not surface it to its users, and therefore cannot populate it in CRD requests.
-        SECTION
-      end
-
-      def unsupported_type_section(entry)
-        return supporting_profile_section(entry) if entry[:supporting_profile]
-
-        <<~SECTION.chomp
-          Inferno did not observe any `#{entry[:resource_type]}` resources in the hook requests made by
-          the client system, in either the hook `context` or the `prefetch`.
-
-          Attest that the client system does **not** support the #{entry[:title]} request type -- it
-          does not allow users to create or act on requests of this type, and therefore never includes
-          them in CRD hook requests.
-        SECTION
-      end
-
-      def supporting_profile_section(entry)
-        <<~SECTION.chomp
-          Inferno did not observe any `#{entry[:resource_type]}` resources in the hook requests made by
-          the client system, in either the hook `context` or the `prefetch`.
-
-          `#{entry[:resource_type]}` is referenced from within CRD requests rather than being a request
-          type itself, so this is unexpected. Confirm that the hook requests sent so far were expected
-          to include #{entry[:title]} data.
-
-          Attest that the client system does not populate `#{entry[:resource_type]}` data in its CRD
-          hook requests. If it should have, cancel this attestation, send further requests that include
-          it, and re-run this group.
+           I attest that the client system either does not capture or does not surface it to its users the data represented by the elements in the list above.
         SECTION
       end
 
@@ -263,7 +234,7 @@ module DaVinciCRDTestKit
         skip_if must_support_requests.blank?, 'No hook requests received.'
 
         unobserved = gather_unobserved
-        check_for_unexpected_types(unobserved)
+        check_declared_types(unobserved)
         log_info_messages(unobserved)
         pass pass_message if unobserved.blank?
 

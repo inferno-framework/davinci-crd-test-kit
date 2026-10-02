@@ -41,9 +41,7 @@ module DaVinciCRDTestKit
         - `reasonReference`
         - `requestedPeriod`
         - `serviceCategory`
-        - `serviceCategory:encounterType`
         - `serviceCategory:serviceType`
-        - `serviceCategory:us-core`
         - `serviceType`
         - `serviceType.extension:BillingOptions`
         - `specialty`
