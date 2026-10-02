@@ -21,7 +21,6 @@ module DaVinciCRDTestKit
 
         This test does not check any other aspect of the requests for conformance.
       )
-      simulation_verification
 
       ORDER_CONTENT_FIELDS = ['code', 'medicationCodeableConcept', 'medicationReference',
                               'codeCodeableConcept', 'codeReference'].freeze
