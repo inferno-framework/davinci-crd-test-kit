@@ -1,0 +1,74 @@
+---
+:resource: Encounter
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-encounter
+:profile_name: CRD Encounter
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Encounter.extension:Coverage-Information
+    :slice_name: Coverage-Information
+    :path: extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+    :modifier_extension: false
+  - :id: Encounter.serviceType.extension:BillingOptions
+    :slice_name: BillingOptions
+    :path: serviceType.extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
+    :modifier_extension: false
+  :slices: []
+  :elements:
+  - :path: appointment
+    :types:
+    - Reference
+  - :path: class
+  - :path: contained
+  - :path: diagnosis
+  - :path: diagnosis.condition
+    :types:
+    - Reference
+  - :path: hospitalization
+  - :path: hospitalization.dischargeDisposition
+  - :path: identifier
+  - :path: identifier.system
+  - :path: identifier.value
+  - :path: length
+  - :path: location
+  - :path: location.location
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location
+  - :path: location.period
+  - :path: location.status
+  - :path: meta
+  - :path: meta.lastUpdated
+  - :path: participant
+  - :path: participant.individual
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner|7.0.0
+  - :path: participant.period
+  - :path: participant.type
+  - :path: period
+  - :path: reasonCode
+  - :path: reasonReference
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis|7.0.0
+  - :path: serviceProvider
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-organization|7.0.0
+  - :path: serviceType
+  - :path: status
+  - :path: subject
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+  - :path: type
+  :recursive_elements: []

@@ -1,12 +1,12 @@
 require 'yaml'
-require_relative '../../resource_extractor'
 require_relative '../../server_test_helper'
+require_relative '../../../cross_suite/hook_request_resource_extraction'
 require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
     class SupportedUSCoreVersionsTest < Inferno::Test
-      include DaVinciCRDTestKit::ResourceExtractor
+      include DaVinciCRDTestKit::HookRequestResourceExtraction
       include DaVinciCRDTestKit::ServerTestHelper
 
       title 'Provided resources demonstrate support for all required US Core versions'

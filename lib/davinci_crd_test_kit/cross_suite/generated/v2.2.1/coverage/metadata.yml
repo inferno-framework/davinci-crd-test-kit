@@ -1,0 +1,67 @@
+---
+:resource: Coverage
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-coverage
+:profile_name: CRD Coverage
+:profile_version: 2.2.1
+:must_supports:
+  :extensions: []
+  :slices:
+  - :slice_id: Coverage.class:group
+    :slice_name: group
+    :path: class
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: group
+      :system: http://terminology.hl7.org/CodeSystem/coverage-class
+  - :slice_id: Coverage.class:plan
+    :slice_name: plan
+    :path: class
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: plan
+      :system: http://terminology.hl7.org/CodeSystem/coverage-class
+  - :slice_id: Coverage.identifier:memberid
+    :slice_name: memberid
+    :path: identifier
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: MB
+      :system: http://terminology.hl7.org/CodeSystem/v2-0203
+  :elements:
+  - :path: beneficiary
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+  - :path: class
+  - :path: class:group.name
+  - :path: class:group.value
+  - :path: class:plan.name
+  - :path: class:plan.value
+  - :path: dependent
+  - :path: identifier
+  - :path: identifier:memberid.type
+  - :path: network
+  - :path: order
+  - :path: payor
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization
+  - :path: period
+  - :path: policyHolder
+    :types:
+    - Reference
+  - :path: relationship
+  - :path: status
+  - :path: subscriber
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+  - :path: subscriberId
+  - :path: type
+  :recursive_elements: []

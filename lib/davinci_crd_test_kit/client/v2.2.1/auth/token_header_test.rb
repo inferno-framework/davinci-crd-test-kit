@@ -1,9 +1,11 @@
 require_relative '../../multi_request_message_helper'
+require_relative '../../../cross_suite/short_circuit_interaction'
 
 module DaVinciCRDTestKit
   module V221
     class TokenHeaderTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::ShortCircuitInteraction
 
       id :crd_v221_token_header
       title 'Authorization token headers contain required information'
@@ -18,10 +20,15 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184', 'cds-hooks_3.0.0-ballot@202'
 
-      input :auth_token_headers_json, :crd_jwks_keys_json
+      # Optional so that a group whose requests were declined can pass rather than skip on inputs
+      # the short circuited tests before it never produced. The run block still skips when empty.
+      input :auth_token_headers_json, optional: true, default: '[]'
+      input :crd_jwks_keys_json, optional: true, default: '[]'
       output :auth_tokens_jwk_json
 
       run do
+        check_for_short_circuit
+
         auth_token_headers = JSON.parse(auth_token_headers_json)
         crd_jwks_keys = JSON.parse(crd_jwks_keys_json)
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous tests.'

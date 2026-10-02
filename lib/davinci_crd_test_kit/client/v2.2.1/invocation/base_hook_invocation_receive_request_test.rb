@@ -133,7 +133,14 @@ module DaVinciCRDTestKit
         send(:"#{hook_key}_prefetch_subset_url")
       end
 
+      # Overridden by a group whose additional requests are optional, so it can pass without waiting.
+      def skip_waiting_for_requests?
+        false
+      end
+
       run do
+        next if skip_waiting_for_requests?
+
         identifier = cds_jwt_iss
         continuation_url = "#{resume_pass_url}?token=#{identifier}"
         output(continuation_url:)
