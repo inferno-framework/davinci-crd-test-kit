@@ -279,7 +279,7 @@ module DaVinciCRDTestKit
         add_message('error',
                     'The full-access and limited-access requests were made for different kinds of ' \
                     "resource (#{full_types.to_sentence} vs #{limited_types.to_sentence}). Both runs " \
-                    'must be performed for the same order, appointment, or encounter.')
+                    'must be performed for the same order(s), appointment(s), or encounter.')
         false
       end
 

@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
       def same_scenario_instruction
         return '' unless limited_access_run?
 
-        'Invoke the hook for the same order, appointment, or encounter used for the full-access ' \
+        'Invoke the hook for the same order(s), appointment(s), or encounter used for the full-access ' \
           'user in this scenario. '
       end
 

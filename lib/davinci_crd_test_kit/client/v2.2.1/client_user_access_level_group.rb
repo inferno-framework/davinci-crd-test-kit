@@ -61,7 +61,7 @@ module DaVinciCRDTestKit
         description %(
           During this test, Inferno will wait while the client makes a single hook request, made
           while the tester is signed in as a user with limited access. It must invoke the same hook
-          for the same patient and the same order, appointment, or encounter as the full-access
+          for the same patient and the same order(s), appointment(s), or encounter as the full-access
           request made during the previous test.
 
           Inferno will use the access token in the request to attempt to read the resource
