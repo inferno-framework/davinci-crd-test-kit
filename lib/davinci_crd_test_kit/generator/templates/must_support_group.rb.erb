@@ -14,14 +14,19 @@ module DaVinciCRDTestKit
         observed across the hook requests the client made, and that the must support elements on
         them were populated.
 
-        Each resource type is checked separately, so a client that supports only some of them will
-        be asked to attest to the ones it does not support. Expect one attestation prompt per
-        resource type that was not fully demonstrated.
+        Each resource type is checked separately. Use the inputs below to say which types the
+        client system supports; a type left unchecked is not expected to appear. Where a type was
+        observed but some of its must support elements were not, the tester is asked to attest that
+        the client system cannot populate them.
 
         Requests made during the "Additional Hook Invocations for Cross Hook Support
         Demonstration" group above are included in this analysis, so anything not covered by the
-        Hooks tests can be demonstrated there and this group re-run.
+        Hooks tests can be demonstrated there and this group re-run on its own.
       DESCRIPTION
+
+      run_as_group
+
+      input_order :order_types_supported, :supporting_types_supported
 
       ORDER_TYPE_OPTIONS = [
 <%= order_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
@@ -41,9 +46,10 @@ module DaVinciCRDTestKit
       input :order_types_supported,
             title: 'Order types supported by the client system',
             description: %(
-              Select each order type the client system can send in a CRD hook request. Inferno will
-              expect to observe the types selected here, and will fail if it observes one that is
-              not selected.
+              Select the resource types that the client system supports placing orders for.
+              Inferno will expect those order types to be demonstrated within hook requests.
+              By unchecking a resource type, the tester attests that the client system does
+              not support placing orders for the kind of request represented by that FHIR resource type.
             ),
             type: 'checkbox',
             default: ORDER_TYPE_OPTIONS.map { |option| option[:value] },
@@ -52,10 +58,12 @@ module DaVinciCRDTestKit
       input :supporting_types_supported,
             title: 'Supporting resource types populated by the client system',
             description: %(
-              Select each supporting resource type the client system populates within its CRD hook
-              requests. `Patient` and `Coverage` are required of every client, so they are not
-              listed. Inferno will expect to observe the types selected here, and will fail if it
-              observes one that is not selected.
+              Select the resource types that the client system supports when representing information
+              related to requests sent as a part of CRD. Inferno will expect those order types to be
+              demonstrated within hook requests. By unchecking a resource type, the tester attests
+              that the client system does not support the information represented by the resource type
+              or does not surface it to users. `Patient` and `Coverage` resource types are required of
+              every client and are always checked.
             ),
             type: 'checkbox',
             default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },

@@ -21,20 +21,19 @@ module DaVinciCRDTestKit
         most recent execution of a given group will be included in the analysis.
       DESCRIPTION
 
-      run_as_group
-
       input_order :make_additional_hook_requests,
-                  :order_types_supported,
-                  :supporting_types_supported,
                   :cross_hooks_response_approach,
                   :cross_hooks_selected_response_types,
-                  :cross_hooks_custom_response_template
+                  :cross_hooks_custom_response_template,
+                  :order_types_supported,
+                  :supporting_types_supported
 
       group from: :crd_v221_client_cross_hook_interaction
       group from: :crd_v221_client_cross_hook_must_support
       group do
         id :crd_v221_client_cross_hook_additional_capabilities
         title 'Additional Capabilities'
+        run_as_group
 
         test from: :crd_v221_client_location_address_propagation
         test from: :crd_v221_client_fhir_path_collection_as_comma_delimited_string

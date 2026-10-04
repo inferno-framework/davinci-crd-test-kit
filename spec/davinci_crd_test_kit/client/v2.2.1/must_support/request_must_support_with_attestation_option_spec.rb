@@ -11,7 +11,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
   let(:known_token) { 'abc123' }
   let(:attest_true_url) { "#{base_url}/resume_pass?token=#{known_token}" }
-  let(:attest_false_url) { "#{base_url}/resume_fail?token=#{known_token}" }
+  let(:decline_message) { CGI.escape('Not all must support elements demonstrated. See messages for details.') }
+  let(:attest_false_url) { "#{base_url}/resume_fail?token=#{known_token}&message=#{decline_message}" }
   let(:receiving_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:complete_service_request) { DaVinciCRDTestKit::CompleteResources::SERVICE_REQUEST }
   let(:service_request_test) { test_for([{ resource_type: 'ServiceRequest', profile_keys: ['service_request'] }]) }
@@ -123,13 +124,15 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(results_repo.find(result.id).result).to eq('pass')
     end
 
-    it 'fails when the tester declines the attestation' do
+    it 'fails with a result message when the tester declines the attestation' do
       result = run(service_request_test, all_types_selected)
       expect(result.result).to eq('wait')
 
       get(attest_false_url)
 
-      expect(results_repo.find(result.id).result).to eq('fail')
+      declined = results_repo.find(result.id)
+      expect(declined.result).to eq('fail')
+      expect(declined.result_message).to eq('Not all must support elements demonstrated. See messages for details.')
     end
   end
 
@@ -142,7 +145,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       result = run(test_for(profiles), all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('do not match those the client system is expected to support')
+      expect(result.result_message).to include('No `VisionPrescription` instances were observed')
     end
 
     it 'passes when the tester did not select the type as supported' do
@@ -186,7 +189,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
                             ]), all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('do not match those the client system is expected to support')
+      expect(result.result_message).to include('No `Location` instances were observed')
     end
   end
 
@@ -287,7 +290,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       result = run(appointment_test, all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('do not match those the client system is expected to support')
+      expect(result.result_message).to include('No `Appointment` instances were observed')
     end
 
     it 'still checks a hook gated type that turned up in another hook request' do
@@ -313,12 +316,10 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
 
       result = run(location_test,
                    all_types_selected(supporting_types_supported: %w[Organization Practitioner].to_json))
-      messages = results_repo.current_results_for_test_session_and_runnables(
-        test_session.id, [location_test]
-      ).first.messages
 
       expect(result.result).to eq('fail')
-      expect(messages.map(&:message)).to include(a_string_matching(/Observed 1 `Location` instance/))
+      expect(result.result_message).to include('Observed 1 `Location` instance')
+      expect(result.result_message).to include('did not select it as supported')
     end
 
     # A client need not support any of these types, so clearing the input expects none of them.

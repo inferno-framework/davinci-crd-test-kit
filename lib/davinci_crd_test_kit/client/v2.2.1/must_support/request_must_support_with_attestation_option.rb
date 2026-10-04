@@ -164,22 +164,20 @@ module DaVinciCRDTestKit
       # What the tester declared and what the client sent have to agree: a type they said is
       # supported must turn up, and one they said is not must not.
       def check_declared_types(unobserved)
-        unexpected(unobserved).each do |entry|
-          add_message('error',
-                      "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests " \
-                      "made by the client system, but #{unexpected_reason(entry[:resource_type])}.")
-        end
+        mismatched = unexpected(unobserved) + missing(unobserved)
 
-        missing(unobserved).each do |entry|
-          add_message('error',
-                      "No `#{entry[:resource_type]}` instances were observed in the hook requests made by the " \
-                      'client system. The tester checked off that the client system supports ' \
-                      "`#{entry[:resource_type]}`, so this was expected to be observed.")
-        end
+        assert mismatched.blank?, mismatched.map { |entry| declared_type_message(entry) }.join(' ')
+      end
 
-        assert (unexpected(unobserved) + missing(unobserved)).blank?,
-               'The resource types observed do not match those the client system is expected to support. ' \
-               'See Messages.'
+      def declared_type_message(entry)
+        if entry[:kind] == :unexpected_type
+          "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
+            "client system, but #{unexpected_reason(entry[:resource_type])}."
+        else
+          "No `#{entry[:resource_type]}` instances were observed in the hook requests made by the client " \
+            "system. The tester checked off that the client system supports `#{entry[:resource_type]}`, " \
+            'so this was expected to be observed.'
+        end
       end
 
       # A type that was neither observed nor expected passes without the tester having to say
@@ -240,7 +238,8 @@ module DaVinciCRDTestKit
 
         identifier = SecureRandom.hex(32)
         attest_true_url = "#{resume_pass_url}?token=#{identifier}"
-        attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+        decline_message = CGI.escape('Not all must support elements demonstrated. See messages for details.')
+        attest_false_url = "#{resume_fail_url}?token=#{identifier}&message=#{decline_message}"
         output(attest_true_url:)
         output(attest_false_url:)
 
