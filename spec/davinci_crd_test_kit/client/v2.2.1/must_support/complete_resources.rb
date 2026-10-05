@@ -277,8 +277,10 @@ module DaVinciCRDTestKit
       requester: { reference: 'Practitioner/pr1' }, performer: { reference: 'Practitioner/pr1' },
       authoredOn: '2026-01-01T00:00:00Z', reportedBoolean: false,
       category: [
+        # One coding per category slice: us-core, encounterType, and serviceType.
         { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/medicationrequest-category',
                      code: 'community' }] },
+        { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' }] },
         { coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }
       ],
       reasonCode: [{ coding: [{ code: 'rc' }] }],
