@@ -47,15 +47,6 @@ RSpec.describe DaVinciCRDTestKit::ProfileMetadata do
       expect(metadata.must_support_strings).to include('locationCode', 'reasonCode')
     end
 
-    # The value sets behind the us-core and encounterType slices are not in the packages, so those
-    # slices are dropped rather than taking on whatever is bound to the element they slice.
-    it 'keeps only the category slice whose required binding resolves' do
-      slices = described_class.for(ig_version, 'appointment_without_order').must_supports[:slices]
-      category_slices = slices.map { |slice| slice[:slice_id] }.grep(/serviceCategory/)
-
-      expect(category_slices).to eq(['Appointment.serviceCategory:serviceType'])
-    end
-
     it 'records the system a category slice binding admits rather than the element default' do
       slices = described_class.for(ig_version, 'appointment_without_order').must_supports[:slices]
       slice = slices.find { |one| one[:slice_id] == 'Appointment.serviceCategory:serviceType' }

@@ -16,6 +16,35 @@
     :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
     :modifier_extension: false
   :slices:
+  - :slice_id: MedicationRequest.category:encounterType
+    :slice_name: encounterType
+    :path: category
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: AMB
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: EMER
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: FLD
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: HH
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: IMP
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: ACUTE
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: NONAC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: OBSENC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: PRENC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: SS
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: VR
   - :slice_id: MedicationRequest.category:serviceType
     :slice_name: serviceType
     :path: category
@@ -24,6 +53,21 @@
       :path: ''
       :values:
       - :system: https://codesystem.x12.org/005010/1365
+  - :slice_id: MedicationRequest.category:us-core
+    :slice_name: us-core
+    :path: category
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://terminology.hl7.org/CodeSystem/medicationrequest-category
+        :code: inpatient
+      - :system: http://terminology.hl7.org/CodeSystem/medicationrequest-category
+        :code: outpatient
+      - :system: http://terminology.hl7.org/CodeSystem/medicationrequest-category
+        :code: community
+      - :system: http://terminology.hl7.org/CodeSystem/medicationrequest-category
+        :code: discharge
   - :slice_id: MedicationRequest.medication[x]:medicationCodeableConcept
     :slice_name: medicationCodeableConcept
     :path: medication[x]

@@ -12,6 +12,11 @@ module DaVinciCRDTestKit
     CONTAINED_CONDITION = { resourceType: 'Condition', id: 'cond1',
                             subject: { reference: 'Patient/p1' } }.freeze
     X12_SERVICE_TYPE_SYSTEM = 'https://codesystem.x12.org/005010/1365'.freeze
+    CATEGORY_CODINGS = [
+      { coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] },
+      { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' }] },
+      { coding: [{ system: 'http://snomed.info/sct', code: '108252007' }] }
+    ].freeze
 
     COVERAGE_INFORMATION =
       { url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information',
@@ -35,7 +40,7 @@ module DaVinciCRDTestKit
       requester: { reference: 'Practitioner/pr1' },
       occurrencePeriod: { start: '2026-01-01T00:00:00Z' },
       occurrenceTiming: { event: ['2026-01-01T00:00:00Z'] },
-      category: [{ coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }],
+      category: CATEGORY_CODINGS,
       basedOn: [{ reference: 'ServiceRequest/sr0' }],
       contained: [{ resourceType: 'Practitioner', id: 'pr1' }],
       quantityQuantity: { value: 1 },
@@ -64,7 +69,7 @@ module DaVinciCRDTestKit
     APPOINTMENT = {
       resourceType: 'Appointment', id: 'a1', status: 'booked',
       identifier: [{ system: 'http://example.org/appt', value: 'a-1' }],
-      serviceCategory: [{ coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] }],
+      serviceCategory: CATEGORY_CODINGS,
       serviceType: [{ coding: [{ code: 'st' }], extension: [BILLING_OPTIONS] }],
       specialty: [{ coding: [{ system: 'http://nucc.org/provider-taxonomy', code: '207Q00000X' }] }],
       appointmentType: { coding: [{ code: 'ROUTINE' }] },

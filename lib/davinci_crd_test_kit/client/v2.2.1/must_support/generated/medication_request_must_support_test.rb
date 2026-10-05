@@ -25,7 +25,9 @@ module DaVinciCRDTestKit
 
         - `authoredOn`
         - `category`
+        - `category:encounterType`
         - `category:serviceType`
+        - `category:us-core`
         - `contained`
         - `dispenseRequest`
         - `dispenseRequest.numberOfRepeatsAllowed`

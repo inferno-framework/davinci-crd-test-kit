@@ -120,7 +120,9 @@ module DaVinciCRDTestKit
       end
 
       def unexpected_reason(resource_type)
-        return 'the tester did not select it as supported' if declared_unsupported?(resource_type)
+        if declared_unsupported?(resource_type)
+          return 'the tester indicated that the client system does not support this resource type'
+        end
 
         hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
         "no #{hooks.join(' or ')} hook was invoked"
@@ -174,9 +176,8 @@ module DaVinciCRDTestKit
           "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
             "client system, but #{unexpected_reason(entry[:resource_type])}."
         else
-          "No `#{entry[:resource_type]}` instances were observed in the hook requests made by the client " \
-            "system. The tester checked off that the client system supports `#{entry[:resource_type]}`, " \
-            'so this was expected to be observed.'
+          "The tester indicated the client system supports the `#{entry[:resource_type]}` " \
+            'resource type, but no instances were observed in the hook requests made.'
         end
       end
 

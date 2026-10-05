@@ -145,7 +145,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       result = run(test_for(profiles), all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('No `VisionPrescription` instances were observed')
+      expect(result.result_message).to include('`VisionPrescription` resource type, but no instances')
     end
 
     it 'passes when the tester did not select the type as supported' do
@@ -189,7 +189,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
                             ]), all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('No `Location` instances were observed')
+      expect(result.result_message).to include('supports the `Location` resource type, but no instances were observed')
     end
   end
 
@@ -290,7 +290,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       result = run(appointment_test, all_types_selected)
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('No `Appointment` instances were observed')
+      expect(result.result_message).to include('`Appointment` resource type, but no instances')
     end
 
     it 'still checks a hook gated type that turned up in another hook request' do
@@ -308,7 +308,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
 
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Location observed')
-      expect(result.result_message).to include('did not select it as supported')
+      expect(result.result_message).to include('does not support this resource type')
     end
 
     it 'fails when a type the tester did not select was observed anyway' do
@@ -319,7 +319,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to include('Observed 1 `Location` instance')
-      expect(result.result_message).to include('did not select it as supported')
+      expect(result.result_message).to include('does not support this resource type')
     end
 
     # A client need not support any of these types, so clearing the input expects none of them.
