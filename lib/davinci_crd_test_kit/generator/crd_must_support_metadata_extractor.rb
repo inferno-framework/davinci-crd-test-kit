@@ -68,6 +68,9 @@ module DaVinciCRDTestKit
         'enteralFormula.administration.schedule'
       ].freeze
 
+      INTERCHANGEABLE_TIMING_PATHS = ['oralDiet.schedule', 'supplement.schedule',
+                                      'enteralFormula.administration.schedule'].freeze
+
       def extract_required_binding_values(pattern_element, _metadata)
         hand_coded_values(pattern_element).presence ||
           Inferno::DSL::ValueExtractor.new(ig_resources, resource, profile_elements)
@@ -81,13 +84,23 @@ module DaVinciCRDTestKit
 
       def must_supports
         @expanded_must_supports ||= # rubocop:disable Naming/MemoizedInstanceVariableName
-          super.merge(elements: super[:elements].flat_map { |element| with_timing(element) })
+          super.merge(elements: super[:elements].flat_map { |element| with_timing(element) },
+                      choices: super[:choices].to_a + timing_choices(super[:elements]))
       end
 
       def with_timing(element)
         return [element] unless TIMING_ELEMENT_PATHS.include?(element[:path])
 
         [element] + TIMING_MUST_SUPPORTS.map { |sub_path| { path: "#{element[:path]}.#{sub_path}" } }
+      end
+
+      def timing_choices(elements)
+        locations = INTERCHANGEABLE_TIMING_PATHS & elements.map { |element| element[:path] }
+        return [] if locations.length < 2
+
+        TIMING_MUST_SUPPORTS.map do |sub_path|
+          { element: sub_path, paths: locations.map { |location| "#{location}.#{sub_path}" } }
+        end
       end
     end
   end

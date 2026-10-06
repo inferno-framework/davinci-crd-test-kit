@@ -25,4 +25,5 @@
   - :path: telecom.system
   - :path: telecom.use
   - :path: telecom.value
+  :choices: []
   :recursive_elements: []

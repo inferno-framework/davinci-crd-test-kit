@@ -62,4 +62,5 @@
     - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner
     - http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/hrex-practitionerrole
   - :path: status
+  :choices: []
   :recursive_elements: []

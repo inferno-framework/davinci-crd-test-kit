@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
 
         Inferno will consider resources present within the `context` and `prefetch` elements of all hook
         requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
-        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Secnearios`
+        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Scenarios`
         subgroups. If any of the considered groups are re-run, then requests made during prior runs will
         no longer be considered and must support elements demonstrated only during that prior run must
         be re-demonstrated on the new run or a subsequent one.
@@ -40,15 +40,6 @@ module DaVinciCRDTestKit
         - `enteralFormula.administration.quantity`
         - `enteralFormula.administration.rate[x]:rateRatio`
         - `enteralFormula.administration.schedule`
-        - `enteralFormula.administration.schedule.event`
-        - `enteralFormula.administration.schedule.repeat`
-        - `enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod`
-        - `enteralFormula.administration.schedule.repeat.count`
-        - `enteralFormula.administration.schedule.repeat.duration`
-        - `enteralFormula.administration.schedule.repeat.durationUnit`
-        - `enteralFormula.administration.schedule.repeat.frequency`
-        - `enteralFormula.administration.schedule.repeat.period`
-        - `enteralFormula.administration.schedule.repeat.periodUnit`
         - `enteralFormula.baseFormulaType`
         - `enteralFormula.caloricDensity`
         - `enteralFormula.routeofAdministration`
@@ -62,15 +53,6 @@ module DaVinciCRDTestKit
         - `oralDiet.nutrient`
         - `oralDiet.nutrient.modifier`
         - `oralDiet.schedule`
-        - `oralDiet.schedule.event`
-        - `oralDiet.schedule.repeat`
-        - `oralDiet.schedule.repeat.bounds[x]:boundsPeriod`
-        - `oralDiet.schedule.repeat.count`
-        - `oralDiet.schedule.repeat.duration`
-        - `oralDiet.schedule.repeat.durationUnit`
-        - `oralDiet.schedule.repeat.frequency`
-        - `oralDiet.schedule.repeat.period`
-        - `oralDiet.schedule.repeat.periodUnit`
         - `oralDiet.texture`
         - `oralDiet.texture.foodType`
         - `oralDiet.texture.modifier`
@@ -81,16 +63,57 @@ module DaVinciCRDTestKit
         - `supplement`
         - `supplement.quantity`
         - `supplement.schedule`
-        - `supplement.schedule.event`
-        - `supplement.schedule.repeat`
-        - `supplement.schedule.repeat.bounds[x]:boundsPeriod`
-        - `supplement.schedule.repeat.count`
-        - `supplement.schedule.repeat.duration`
-        - `supplement.schedule.repeat.durationUnit`
-        - `supplement.schedule.repeat.frequency`
-        - `supplement.schedule.repeat.period`
-        - `supplement.schedule.repeat.periodUnit`
         - `supplement.type`
+
+        #### Timing
+
+        The CRD Timing elements below appear in more than one place on this profile. Each only
+        needs to be demonstrated in one of the locations listed under it.
+
+        - `event`, on any one of:
+          - `oralDiet.schedule.event`
+          - `supplement.schedule.event`
+          - `enteralFormula.administration.schedule.event`
+
+        - `repeat`, on any one of:
+          - `oralDiet.schedule.repeat`
+          - `supplement.schedule.repeat`
+          - `enteralFormula.administration.schedule.repeat`
+
+        - `repeat.bounds[x]:boundsPeriod`, on any one of:
+          - `oralDiet.schedule.repeat.bounds[x]:boundsPeriod`
+          - `supplement.schedule.repeat.bounds[x]:boundsPeriod`
+          - `enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod`
+
+        - `repeat.count`, on any one of:
+          - `oralDiet.schedule.repeat.count`
+          - `supplement.schedule.repeat.count`
+          - `enteralFormula.administration.schedule.repeat.count`
+
+        - `repeat.duration`, on any one of:
+          - `oralDiet.schedule.repeat.duration`
+          - `supplement.schedule.repeat.duration`
+          - `enteralFormula.administration.schedule.repeat.duration`
+
+        - `repeat.durationUnit`, on any one of:
+          - `oralDiet.schedule.repeat.durationUnit`
+          - `supplement.schedule.repeat.durationUnit`
+          - `enteralFormula.administration.schedule.repeat.durationUnit`
+
+        - `repeat.frequency`, on any one of:
+          - `oralDiet.schedule.repeat.frequency`
+          - `supplement.schedule.repeat.frequency`
+          - `enteralFormula.administration.schedule.repeat.frequency`
+
+        - `repeat.period`, on any one of:
+          - `oralDiet.schedule.repeat.period`
+          - `supplement.schedule.repeat.period`
+          - `enteralFormula.administration.schedule.repeat.period`
+
+        - `repeat.periodUnit`, on any one of:
+          - `oralDiet.schedule.repeat.periodUnit`
+          - `supplement.schedule.repeat.periodUnit`
+          - `enteralFormula.administration.schedule.repeat.periodUnit`
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3',

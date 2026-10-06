@@ -25,16 +25,59 @@ module DaVinciCRDTestKit
 
       class << self
         def build_description(options)
-          sections = options[:profiles].flat_map do |profile|
-            profile[:profile_keys].map do |profile_key|
-              metadata = ProfileMetadata.for(options[:ig_version], profile_key)
-              elements = metadata.must_support_strings.map { |element| "- `#{element}`" }.join("\n")
+          sections = options[:profiles].map do |profile|
+            parts = profile[:profile_keys].map { |key| ProfileMetadata.for(options[:ig_version], key) }
+            heading = parts.map { |one| "[#{one.profile_name}](#{profile_page_url(one)})" }.to_sentence(
+              two_words_connector: ' or ', last_word_connector: ', or '
+            )
+            metadata = metadata_for(options[:ig_version], profile)
 
-              "### [#{metadata.profile_name}](#{profile_page_url(metadata)})\n\n#{elements}"
-            end
+            "### #{heading}\n\n#{multiple_profiles_note if parts.length > 1}" \
+              "#{element_list(metadata)}#{choice_section(metadata)}"
           end
 
           "#{description_intro}\n\n#{sections.join("\n\n")}"
+        end
+
+        def element_list(metadata)
+          (metadata.must_support_strings - choice_paths(metadata))
+            .map { |element| "- `#{element}`" }.join("\n")
+        end
+
+        def choice_paths(metadata)
+          Array(metadata.must_supports[:choices]).flat_map { |choice| Array(choice[:paths]) }
+        end
+
+        def choice_section(metadata)
+          choices = Array(metadata.must_supports[:choices])
+          return '' if choices.blank?
+
+          "\n\n#{choice_note}#{choices.map { |choice| choice_entry(choice) }.join("\n\n")}"
+        end
+
+        def choice_entry(choice)
+          locations = Array(choice[:paths]).map { |path| "  - `#{path}`" }.join("\n")
+
+          "- `#{choice[:element]}`, on any one of:\n#{locations}"
+        end
+
+        def choice_note
+          <<~NOTE
+            #### Timing
+
+            The CRD Timing elements below appear in more than one place on this profile. Each only
+            needs to be demonstrated in one of the locations listed under it.
+
+          NOTE
+        end
+
+        def multiple_profiles_note
+          <<~NOTE
+            The elements below are drawn from both appointment profiles, and each may be demonstrated on
+            an instance of either of them. A client that supports only one of these profiles can still
+            demonstrate every element.
+
+          NOTE
         end
 
         def profile_page_url(metadata)
@@ -61,7 +104,7 @@ module DaVinciCRDTestKit
 
             Inferno will consider resources present within the `context` and `prefetch` elements of all hook
             requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
-            Invocations for Cross Hook Support Demonstration` group, but not any made within the `Secnearios`
+            Invocations for Cross Hook Support Demonstration` group, but not any made within the `Scenarios`
             subgroups. If any of the considered groups are re-run, then requests made during prior runs will
             no longer be considered and must support elements demonstrated only during that prior run must
             be re-demonstrated on the new run or a subsequent one.

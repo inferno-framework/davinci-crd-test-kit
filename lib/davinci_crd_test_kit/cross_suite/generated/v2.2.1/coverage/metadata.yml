@@ -64,4 +64,5 @@
     - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
   - :path: subscriberId
   - :path: type
+  :choices: []
   :recursive_elements: []

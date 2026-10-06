@@ -102,4 +102,50 @@
   - :path: supplement.schedule.repeat.period
   - :path: supplement.schedule.repeat.periodUnit
   - :path: supplement.type
+  :choices:
+  - :element: event
+    :paths:
+    - oralDiet.schedule.event
+    - supplement.schedule.event
+    - enteralFormula.administration.schedule.event
+  - :element: repeat
+    :paths:
+    - oralDiet.schedule.repeat
+    - supplement.schedule.repeat
+    - enteralFormula.administration.schedule.repeat
+  - :element: repeat.bounds[x]:boundsPeriod
+    :paths:
+    - oralDiet.schedule.repeat.bounds[x]:boundsPeriod
+    - supplement.schedule.repeat.bounds[x]:boundsPeriod
+    - enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
+  - :element: repeat.count
+    :paths:
+    - oralDiet.schedule.repeat.count
+    - supplement.schedule.repeat.count
+    - enteralFormula.administration.schedule.repeat.count
+  - :element: repeat.duration
+    :paths:
+    - oralDiet.schedule.repeat.duration
+    - supplement.schedule.repeat.duration
+    - enteralFormula.administration.schedule.repeat.duration
+  - :element: repeat.durationUnit
+    :paths:
+    - oralDiet.schedule.repeat.durationUnit
+    - supplement.schedule.repeat.durationUnit
+    - enteralFormula.administration.schedule.repeat.durationUnit
+  - :element: repeat.frequency
+    :paths:
+    - oralDiet.schedule.repeat.frequency
+    - supplement.schedule.repeat.frequency
+    - enteralFormula.administration.schedule.repeat.frequency
+  - :element: repeat.period
+    :paths:
+    - oralDiet.schedule.repeat.period
+    - supplement.schedule.repeat.period
+    - enteralFormula.administration.schedule.repeat.period
+  - :element: repeat.periodUnit
+    :paths:
+    - oralDiet.schedule.repeat.periodUnit
+    - supplement.schedule.repeat.periodUnit
+    - enteralFormula.administration.schedule.repeat.periodUnit
   :recursive_elements: []

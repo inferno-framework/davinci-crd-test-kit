@@ -33,4 +33,5 @@
   - :path: telecom
   - :path: telecom.system
   - :path: telecom.value
+  :choices: []
   :recursive_elements: []

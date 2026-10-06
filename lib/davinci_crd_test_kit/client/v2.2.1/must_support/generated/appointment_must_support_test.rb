@@ -22,33 +22,21 @@ module DaVinciCRDTestKit
 
         Inferno will consider resources present within the `context` and `prefetch` elements of all hook
         requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
-        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Secnearios`
+        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Scenarios`
         subgroups. If any of the considered groups are re-run, then requests made during prior runs will
         no longer be considered and must support elements demonstrated only during that prior run must
         be re-demonstrated on the new run or a subsequent one.
 
 
-        ### [CRD Appointment with Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)
+        ### [CRD Appointment with Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html) or [CRD Appointment without Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
 
-        - `basedOn`
-        - `basedOn.extension:AlternateReference`
-        - `contained`
-        - `end`
-        - `participant.actor`
-        - `participant.status`
-        - `participant:Patient`
-        - `participant:Patient.actor`
-        - `participant:Patient.status`
-        - `participant:PrimaryPerformer`
-        - `participant:PrimaryPerformer.actor`
-        - `participant:PrimaryPerformer.status`
-        - `requestedPeriod`
-        - `start`
-        - `status`
-
-        ### [CRD Appointment without Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
+        The elements below are drawn from both appointment profiles, and each may be demonstrated on
+        an instance of either of them. A client that supports only one of these profiles can still
+        demonstrate every element.
 
         - `appointmentType`
+        - `basedOn`
+        - `basedOn.extension:AlternateReference`
         - `contained`
         - `end`
         - `extension:Coverage-Information`

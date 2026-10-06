@@ -39,6 +39,7 @@ module DaVinciCRDTestKit
           extensions: union_by(parts, :extensions) { |extension| extension[:id] },
           slices: union_by(parts, :slices) { |slice| slice[:slice_id] },
           elements: union_by(parts, :elements) { |element| [element[:path], element[:fixed_value]] },
+          choices: union_by(parts, :choices) { |choice| choice[:paths] },
           recursive_elements: parts.flat_map { |part| Array(part.must_supports[:recursive_elements]) }.uniq
         }
       end

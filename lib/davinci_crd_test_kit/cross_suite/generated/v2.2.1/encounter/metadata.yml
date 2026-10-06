@@ -71,4 +71,5 @@
     :target_profiles:
     - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
   - :path: type
+  :choices: []
   :recursive_elements: []

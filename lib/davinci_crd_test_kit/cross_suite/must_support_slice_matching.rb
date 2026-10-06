@@ -40,23 +40,6 @@ module DaVinciCRDTestKit
       codings = Array.wrap(slice.send(discriminator[:path])).flat_map { |value| Array.wrap(value.coding) }
       codings.any? { |coding| coding.code == discriminator[:code] && coding.system == discriminator[:system] }
     end
-
-    INTERCHANGEABLE_TIMING_PATHS = ['oralDiet.schedule', 'supplement.schedule',
-                                    'enteralFormula.administration.schedule'].freeze
-
-    def missing_elements(resources = [])
-      missing = super
-
-      missing.reject do |element_definition|
-        schedule = INTERCHANGEABLE_TIMING_PATHS.find { |path| element_definition[:path].start_with?("#{path}.") }
-        next false if schedule.blank?
-
-        timing_field = element_definition[:path].delete_prefix("#{schedule}.")
-        (INTERCHANGEABLE_TIMING_PATHS - [schedule]).any? do |other|
-          missing.none? { |one| one[:path] == "#{other}.#{timing_field}" }
-        end
-      end
-    end
   end
 end
 

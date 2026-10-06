@@ -23,4 +23,5 @@
   - :path: status
   - :path: telecom
   - :path: type
+  :choices: []
   :recursive_elements: []

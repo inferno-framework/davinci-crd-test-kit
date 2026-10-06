@@ -51,4 +51,5 @@
   - :path: requestedPeriod
   - :path: start
   - :path: status
+  :choices: []
   :recursive_elements: []

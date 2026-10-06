@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
 
         Inferno will consider resources present within the `context` and `prefetch` elements of all hook
         requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
-        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Secnearios`
+        Invocations for Cross Hook Support Demonstration` group, but not any made within the `Scenarios`
         subgroups. If any of the considered groups are re-run, then requests made during prior runs will
         no longer be considered and must support elements demonstrated only during that prior run must
         be re-demonstrated on the new run or a subsequent one.
