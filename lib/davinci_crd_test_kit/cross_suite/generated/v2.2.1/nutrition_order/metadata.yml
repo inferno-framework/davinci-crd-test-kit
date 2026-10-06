@@ -45,6 +45,15 @@
   - :path: enteralFormula.administration
   - :path: enteralFormula.administration.quantity
   - :path: enteralFormula.administration.schedule
+  - :path: enteralFormula.administration.schedule.event
+  - :path: enteralFormula.administration.schedule.repeat
+  - :path: enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
+  - :path: enteralFormula.administration.schedule.repeat.count
+  - :path: enteralFormula.administration.schedule.repeat.duration
+  - :path: enteralFormula.administration.schedule.repeat.durationUnit
+  - :path: enteralFormula.administration.schedule.repeat.frequency
+  - :path: enteralFormula.administration.schedule.repeat.period
+  - :path: enteralFormula.administration.schedule.repeat.periodUnit
   - :path: enteralFormula.baseFormulaType
   - :path: enteralFormula.caloricDensity
   - :path: enteralFormula.routeofAdministration
@@ -55,6 +64,15 @@
   - :path: oralDiet.nutrient
   - :path: oralDiet.nutrient.modifier
   - :path: oralDiet.schedule
+  - :path: oralDiet.schedule.event
+  - :path: oralDiet.schedule.repeat
+  - :path: oralDiet.schedule.repeat.bounds[x]:boundsPeriod
+  - :path: oralDiet.schedule.repeat.count
+  - :path: oralDiet.schedule.repeat.duration
+  - :path: oralDiet.schedule.repeat.durationUnit
+  - :path: oralDiet.schedule.repeat.frequency
+  - :path: oralDiet.schedule.repeat.period
+  - :path: oralDiet.schedule.repeat.periodUnit
   - :path: oralDiet.texture
   - :path: oralDiet.texture.foodType
   - :path: oralDiet.texture.modifier
@@ -74,5 +92,14 @@
   - :path: supplement
   - :path: supplement.quantity
   - :path: supplement.schedule
+  - :path: supplement.schedule.event
+  - :path: supplement.schedule.repeat
+  - :path: supplement.schedule.repeat.bounds[x]:boundsPeriod
+  - :path: supplement.schedule.repeat.count
+  - :path: supplement.schedule.repeat.duration
+  - :path: supplement.schedule.repeat.durationUnit
+  - :path: supplement.schedule.repeat.frequency
+  - :path: supplement.schedule.repeat.period
+  - :path: supplement.schedule.repeat.periodUnit
   - :path: supplement.type
   :recursive_elements: []

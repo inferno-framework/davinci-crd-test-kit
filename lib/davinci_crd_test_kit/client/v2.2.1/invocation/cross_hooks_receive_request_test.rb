@@ -46,9 +46,6 @@ module DaVinciCRDTestKit
             ),
             type: 'radio',
             default: 'mocked',
-            # Optional so that a tester who is not sending more requests is not asked to configure
-            # responses to them.
-            optional: true,
             options: {
               list_options: [
                 {

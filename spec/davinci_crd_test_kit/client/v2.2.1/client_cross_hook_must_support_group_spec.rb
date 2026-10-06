@@ -131,13 +131,13 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
         test = group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
 
         expect(test).to_not be_nil, "#{test_id} not found"
-        expect(test.description).to include("### #{profile_name}")
+        expect(test.description).to include("### [#{profile_name}](")
       end
     end
 
     it 'points testers at the group where more requests can be demonstrated' do
       must_support_tests.each do |test|
-        expect(test.description).to include('Additional Hook Invocations')
+        expect(test.description).to match(/Additional Hook\s+Invocations/)
       end
     end
   end

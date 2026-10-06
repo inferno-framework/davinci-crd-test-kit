@@ -11,7 +11,10 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookInteractionGroup, :reques
   let(:conformance_test) { find_test(described_class, 'crd_v221_hook_request_conformance') }
 
   def wait_test_inputs(make_additional_hook_requests)
-    { make_additional_hook_requests:, cds_jwt_iss: 'https://example.org/client' }
+    inputs = { make_additional_hook_requests:, cds_jwt_iss: 'https://example.org/client' }
+    return inputs unless make_additional_hook_requests == 'true'
+
+    inputs.merge(cross_hooks_response_approach: 'mocked')
   end
 
   # Every test in the group other than the one that does the waiting.

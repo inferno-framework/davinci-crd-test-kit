@@ -54,6 +54,20 @@ module DaVinciCRDTestKit
         ].freeze
       }.freeze
 
+      # Must support elements of the CRD Timing profile, which the extractor does not follow into
+      # because it stops at the type boundary.
+      # - https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-timing.html
+      TIMING_MUST_SUPPORTS = [
+        'event', 'repeat', 'repeat.bounds[x]:boundsPeriod', 'repeat.count', 'repeat.duration',
+        'repeat.durationUnit', 'repeat.frequency', 'repeat.period', 'repeat.periodUnit'
+      ].freeze
+
+      # Elements across the CRD profiles whose type is the CRD Timing profile.
+      TIMING_ELEMENT_PATHS = [
+        'dosageInstruction.timing', 'occurrenceTiming', 'oralDiet.schedule', 'supplement.schedule',
+        'enteralFormula.administration.schedule'
+      ].freeze
+
       def extract_required_binding_values(pattern_element, _metadata)
         hand_coded_values(pattern_element).presence ||
           Inferno::DSL::ValueExtractor.new(ig_resources, resource, profile_elements)
@@ -63,6 +77,17 @@ module DaVinciCRDTestKit
 
       def hand_coded_values(pattern_element)
         UNRESOLVABLE_VALUE_SETS[pattern_element.binding&.valueSet&.split('|')&.first]
+      end
+
+      def must_supports
+        @expanded_must_supports ||= # rubocop:disable Naming/MemoizedInstanceVariableName
+          super.merge(elements: super[:elements].flat_map { |element| with_timing(element) })
+      end
+
+      def with_timing(element)
+        return [element] unless TIMING_ELEMENT_PATHS.include?(element[:path])
+
+        [element] + TIMING_MUST_SUPPORTS.map { |sub_path| { path: "#{element[:path]}.#{sub_path}" } }
       end
     end
   end

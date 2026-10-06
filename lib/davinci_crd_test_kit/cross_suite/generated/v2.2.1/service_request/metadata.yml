@@ -149,6 +149,15 @@
     :original_path: occurrence[x]
   - :path: occurrenceTiming
     :original_path: occurrence[x]
+  - :path: occurrenceTiming.event
+  - :path: occurrenceTiming.repeat
+  - :path: occurrenceTiming.repeat.bounds[x]:boundsPeriod
+  - :path: occurrenceTiming.repeat.count
+  - :path: occurrenceTiming.repeat.duration
+  - :path: occurrenceTiming.repeat.durationUnit
+  - :path: occurrenceTiming.repeat.frequency
+  - :path: occurrenceTiming.repeat.period
+  - :path: occurrenceTiming.repeat.periodUnit
   - :path: performer
     :types:
     - Reference

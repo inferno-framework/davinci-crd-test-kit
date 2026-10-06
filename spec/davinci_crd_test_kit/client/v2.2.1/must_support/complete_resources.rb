@@ -12,6 +12,12 @@ module DaVinciCRDTestKit
     CONTAINED_CONDITION = { resourceType: 'Condition', id: 'cond1',
                             subject: { reference: 'Patient/p1' } }.freeze
     X12_SERVICE_TYPE_SYSTEM = 'https://codesystem.x12.org/005010/1365'.freeze
+    # Every must support element of the CRD Timing profile.
+    FULL_TIMING = {
+      event: ['2026-01-01T00:00:00Z'],
+      repeat: { boundsPeriod: { start: '2026-01-01', end: '2026-02-01' }, count: 3, duration: 30,
+                durationUnit: 'min', frequency: 2, period: 1, periodUnit: 'd' }
+    }.freeze
     CATEGORY_CODINGS = [
       { coding: [{ system: X12_SERVICE_TYPE_SYSTEM, code: '1' }] },
       { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' }] },
@@ -39,7 +45,7 @@ module DaVinciCRDTestKit
       encounter: { reference: 'Encounter/e1' },
       requester: { reference: 'Practitioner/pr1' },
       occurrencePeriod: { start: '2026-01-01T00:00:00Z' },
-      occurrenceTiming: { event: ['2026-01-01T00:00:00Z'] },
+      occurrenceTiming: FULL_TIMING,
       category: CATEGORY_CODINGS,
       basedOn: [{ reference: 'ServiceRequest/sr0' }],
       contained: [{ resourceType: 'Practitioner', id: 'pr1' }],
@@ -206,7 +212,7 @@ module DaVinciCRDTestKit
       excludeFoodModifier: [{ coding: [{ code: 'nuts' }] }],
       oralDiet: {
         type: [{ coding: [{ code: 'diabetic' }] }],
-        schedule: [{ repeat: { frequency: 3, period: 1, periodUnit: 'd' } }],
+        schedule: [FULL_TIMING],
         nutrient: [{ modifier: { coding: [{ code: 'carb' }] }, amount: { value: 50, unit: 'g' } }],
         texture: [{ modifier: { coding: [{ code: 'pureed' }] }, foodType: { coding: [{ code: 'meat' }] } }]
       },
@@ -287,7 +293,7 @@ module DaVinciCRDTestKit
       priorPrescription: { reference: 'MedicationRequest/mr0' },
       substitution: { allowedBoolean: true },
       dosageInstruction: [{ text: 'take one',
-                            timing: { repeat: { frequency: 1, period: 1, periodUnit: 'd' } },
+                            timing: FULL_TIMING,
                             doseAndRate: [{ doseQuantity: { value: 1, unit: 'tab' } }] }],
       dispenseRequest: { numberOfRepeatsAllowed: 2, quantity: { value: 30, unit: 'tab' },
                          performer: { reference: 'Organization/o1' } },

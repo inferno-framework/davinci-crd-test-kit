@@ -45,7 +45,6 @@ module DaVinciCRDTestKit
         IG_VERSIONS.each do |ig_version|
           puts "CRD v#{ig_version}"
           PROFILES.fetch(ig_version).each do |config|
-            @dropped_slices = []
             metadata = extract(ig_version, config)
             write(ig_version, config[:key], metadata)
             puts "  #{config[:key].ljust(26)} #{metadata.must_support_strings.length} must support element(s)"
@@ -105,11 +104,7 @@ module DaVinciCRDTestKit
         return slice if discriminator&.dig(:type) != 'requiredBinding' || discriminator[:values].present?
 
         includes = binding_includes(slice[:slice_id], profile, implementation_guide)
-
-        if includes.empty?
-          @dropped_slices << slice[:slice_id]
-          return nil
-        end
+        return nil if includes.empty?
 
         systems = includes.map { |include| { system: include.system } }.uniq
         slice.merge(discriminator: discriminator.merge(values: systems))

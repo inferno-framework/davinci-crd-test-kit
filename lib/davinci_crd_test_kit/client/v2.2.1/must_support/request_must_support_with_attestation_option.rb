@@ -25,31 +25,46 @@ module DaVinciCRDTestKit
 
       class << self
         def build_description(options)
-          sections = options[:profiles].map do |profile|
-            metadata = metadata_for(options[:ig_version], profile)
-            elements = metadata.must_support_strings.map { |element| "- `#{element}`" }.join("\n")
+          sections = options[:profiles].flat_map do |profile|
+            profile[:profile_keys].map do |profile_key|
+              metadata = ProfileMetadata.for(options[:ig_version], profile_key)
+              elements = metadata.must_support_strings.map { |element| "- `#{element}`" }.join("\n")
 
-            "### #{title_for(metadata, profile)}\n\n#{elements}"
+              "### [#{metadata.profile_name}](#{profile_page_url(metadata)})\n\n#{elements}"
+            end
           end
 
           "#{description_intro}\n\n#{sections.join("\n\n")}"
         end
 
+        def profile_page_url(metadata)
+          ig_base, structure_definition = metadata.profile_url.split('/StructureDefinition/')
+
+          "#{ig_base}/#{metadata.profile_version}/en/StructureDefinition-#{structure_definition}.html"
+        end
+
         def description_intro
           <<~INTRO
-            CRD clients populate the FHIR resources they send within a hook request from the data
-            they maintain. During this test, Inferno checks the resources found in the `context` and
-            `prefetch` of every hook request received so far, and verifies that each must support
-            element below was populated on at least one instance.
+            The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3)
+            that when a client "maintains a mustSupport data element and surfaces it to users, then it
+            SHALL be exposed in their FHIR interface when the data exists and privacy constraints permit."
 
-            Elements that were not observed do not fail this test on their own. Inferno will instead
-            ask the tester to attest that the client system does not capture that data or does not
-            surface it to its users. The same applies to a resource type that was not seen at all,
-            which the tester may attest the system does not support.
+            During this test, Inferno will check whether all must support elements defined in the
+            profile(s) listed below are demonstrated within hook requests made during this session.
+            This check may vacuously pass if the tester has attested that this resource type is not
+            supported by the client system or if the relevant hooks are not invoked.
 
-            To demonstrate elements that earlier hook requests did not cover, use the
-            "Additional Hook Invocations for Cross Hook Support Demonstration" group to send more
-            requests, then re-run this group.
+            If any must support elements are not demonstrated, the tester will have the option to attest
+            that these elements are not supported by the client system or surfaced to its users. Testers
+            must setup scenarios in which the "data exists and privacy constraints permit" Inferno to view
+            the must support information.
+
+            Inferno will consider resources present within the `context` and `prefetch` elements of all hook
+            requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
+            Invocations for Cross Hook Support Demonstration` group, but not any made within the `Secnearios`
+            subgroups. If any of the considered groups are re-run, then requests made during prior runs will
+            no longer be considered and must support elements demonstrated only during that prior run must
+            be re-demonstrated on the new run or a subsequent one.
           INTRO
         end
 
@@ -225,7 +240,7 @@ module DaVinciCRDTestKit
 
           #{entry[:missing].map { |element| "- `#{element}`" }.join("\n")}
 
-           I attest that the client system either does not capture or does not surface it to its users the data represented by the elements in the list above.
+          I attest that the client system either does not capture or does not surface it to its users the data represented by the elements in the list above.
         SECTION
       end
 

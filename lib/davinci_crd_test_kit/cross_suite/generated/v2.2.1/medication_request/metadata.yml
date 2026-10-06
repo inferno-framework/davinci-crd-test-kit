@@ -98,6 +98,15 @@
     :original_path: dosageInstruction.doseAndRate.dose[x]
   - :path: dosageInstruction.text
   - :path: dosageInstruction.timing
+  - :path: dosageInstruction.timing.event
+  - :path: dosageInstruction.timing.repeat
+  - :path: dosageInstruction.timing.repeat.bounds[x]:boundsPeriod
+  - :path: dosageInstruction.timing.repeat.count
+  - :path: dosageInstruction.timing.repeat.duration
+  - :path: dosageInstruction.timing.repeat.durationUnit
+  - :path: dosageInstruction.timing.repeat.frequency
+  - :path: dosageInstruction.timing.repeat.period
+  - :path: dosageInstruction.timing.repeat.periodUnit
   - :path: encounter
     :types:
     - Reference
