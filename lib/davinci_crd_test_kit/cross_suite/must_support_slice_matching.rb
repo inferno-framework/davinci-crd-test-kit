@@ -41,9 +41,10 @@ module DaVinciCRDTestKit
       codings.any? { |coding| coding.code == discriminator[:code] && coding.system == discriminator[:system] }
     end
   end
-end
 
-# The must support assessment runs inside this class rather than in the test
-Inferno::DSL::MustSupportAssessment::InternalMustSupportLogic.prepend(
-  DaVinciCRDTestKit::MustSupportSliceMatching
-)
+  # The must support assessment runs inside this class rather than in the test, so the overrides
+  # go on a CRD-only subclass instead of the inferno_core class, which other test kits share.
+  class MustSupportLogic < Inferno::DSL::MustSupportAssessment::InternalMustSupportLogic
+    include MustSupportSliceMatching
+  end
+end

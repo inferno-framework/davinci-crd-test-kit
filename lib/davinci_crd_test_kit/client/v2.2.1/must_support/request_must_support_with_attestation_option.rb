@@ -192,7 +192,7 @@ module DaVinciCRDTestKit
           resource_type = profile[:resource_type]
           resources = resources_by_type[resource_type] || []
 
-          # `missing_must_support_elements` returns nil rather than the full list when handed no
+          # The must support assessment returns nil rather than the full list when handed no
           # resources, so an absent resource type has to be caught before calling it.
           if resources.blank?
             next unless expected?(resource_type)
@@ -205,7 +205,9 @@ module DaVinciCRDTestKit
           next { kind: :unexpected_type, title:, resource_type:, count: resources.length } if
             declared_unsupported?(resource_type)
 
-          missing = missing_must_support_elements(resources, nil, metadata:)
+          missing = MustSupportLogic.new.perform_must_support_test_with_metadata(
+            resources, metadata, debug_metadata: config.options[:debug_must_support_metadata]
+          )
           next if missing.blank?
 
           { kind: :unobserved_elements, title:, resource_type:, count: resources.length, missing: }
