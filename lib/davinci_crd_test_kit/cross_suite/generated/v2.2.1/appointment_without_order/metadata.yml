@@ -1,0 +1,133 @@
+---
+:resource: Appointment
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order
+:profile_name: CRD Appointment without Order
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Appointment.extension:Coverage-Information
+    :slice_name: Coverage-Information
+    :path: extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information
+    :modifier_extension: false
+  - :id: Appointment.serviceType.extension:BillingOptions
+    :slice_name: BillingOptions
+    :path: serviceType.extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
+    :modifier_extension: false
+  :slices:
+  - :slice_id: Appointment.participant:Patient
+    :slice_name: Patient
+    :path: participant
+    :discriminator:
+      :type: referenceTarget
+      :path: type
+      :resource_type: Patient
+  - :slice_id: Appointment.participant:PrimaryPerformer
+    :slice_name: PrimaryPerformer
+    :path: participant
+    :discriminator:
+      :type: patternCodeableConcept
+      :path: type
+      :code: PPRF
+      :system: http://terminology.hl7.org/CodeSystem/v3-ParticipationType
+  - :slice_id: Appointment.serviceCategory:encounterType
+    :slice_name: encounterType
+    :path: serviceCategory
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: AMB
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: EMER
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: FLD
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: HH
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: IMP
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: ACUTE
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: NONAC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: OBSENC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: PRENC
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: SS
+      - :system: http://terminology.hl7.org/CodeSystem/v3-ActCode
+        :code: VR
+  - :slice_id: Appointment.serviceCategory:serviceType
+    :slice_name: serviceType
+    :path: serviceCategory
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: https://codesystem.x12.org/005010/1365
+  - :slice_id: Appointment.serviceCategory:us-core
+    :slice_name: us-core
+    :path: serviceCategory
+    :discriminator:
+      :type: requiredBinding
+      :path: ''
+      :values:
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: sdoh
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: functional-status
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: disability-status
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: cognitive-status
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: treatment-intervention-preference
+      - :system: http://hl7.org/fhir/us/core/CodeSystem/us-core-category
+        :code: care-experience-preference
+      - :system: http://snomed.info/sct
+        :code: '386053000'
+      - :system: http://snomed.info/sct
+        :code: '410606002'
+      - :system: http://snomed.info/sct
+        :code: '108252007'
+      - :system: http://snomed.info/sct
+        :code: '363679005'
+      - :system: http://snomed.info/sct
+        :code: '409063005'
+      - :system: http://snomed.info/sct
+        :code: '409073007'
+      - :system: http://snomed.info/sct
+        :code: '387713003'
+  :elements:
+  - :path: appointmentType
+  - :path: contained
+  - :path: end
+  - :path: identifier
+  - :path: participant.actor
+    :types:
+    - Reference
+  - :path: participant.status
+  - :path: participant:Patient.actor
+    :types:
+    - Reference
+    :target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-patient
+  - :path: participant:Patient.status
+  - :path: participant:PrimaryPerformer.actor
+    :types:
+    - Reference
+  - :path: participant:PrimaryPerformer.status
+  - :path: reasonReference
+    :types:
+    - Reference
+  - :path: requestedPeriod
+  - :path: serviceCategory
+  - :path: serviceType
+  - :path: specialty
+  - :path: start
+  - :path: status
+  :choices: []
+  :recursive_elements: []

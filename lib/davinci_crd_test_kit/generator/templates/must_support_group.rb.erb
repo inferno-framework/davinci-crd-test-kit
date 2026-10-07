@@ -1,0 +1,80 @@
+require_relative 'cross_hook/client_card_must_support_coverage_information_test'
+require_relative 'cross_hook/client_order_types_signed_test'
+<%- test_file_names.each do |file_name| -%>
+require_relative 'must_support/generated/<%= file_name %>'
+<%- end -%>
+
+module DaVinciCRDTestKit
+  module <%= module_name %>
+    class ClientCrossHookMustSupportGroup < Inferno::TestGroup
+      title 'Must Support'
+      id :<%= group_id %>
+      description <<~DESCRIPTION
+        These tests check that the CRD profiles which can be sent within a hook request were
+        observed across the hook requests the client made, and that the must support elements on
+        them were populated.
+
+        Each resource type is checked separately. Use the inputs below to say which types the
+        client system supports; a type left unchecked is not expected to appear. Where a type was
+        observed but some of its must support elements were not, the tester is asked to attest that
+        the client system cannot populate them.
+
+        Requests made during the "Additional Hook Invocations for Cross Hook Support
+        Demonstration" group above are included in this analysis, so anything not covered by the
+        Hooks tests can be demonstrated there and this group re-run on its own.
+      DESCRIPTION
+
+      run_as_group
+
+      input_order :order_types_supported, :supporting_types_supported
+
+      ORDER_TYPE_OPTIONS = [
+<%= order_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
+      ].freeze
+
+      # Patient and Coverage are required of every CRD client, so they are not listed here.
+      SUPPORTING_TYPE_OPTIONS = [
+<%= supporting_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
+      ].freeze
+
+      # A resource type only a non-required hook would carry is not expected when that hook was
+      # never invoked, so its test passes rather than asking the tester to attest.
+      REQUIRING_HOOKS = {
+<%= requiring_hooks.map { |type, tags| "        '#{type}' => [#{tags.join(', ')}]" }.join(",\n") %>
+      }.freeze
+
+      input :order_types_supported,
+            title: 'Order types supported by the client system',
+            description: %(
+              Select the resource types that the client system supports placing orders for.
+              Inferno will expect those order types to be demonstrated within hook requests.
+              By unchecking a resource type, the tester attests that the client system does
+              not support placing orders for the kind of request represented by that FHIR resource type.
+            ),
+            type: 'checkbox',
+            default: ORDER_TYPE_OPTIONS.map { |option| option[:value] },
+            optional: true,
+            options: { list_options: ORDER_TYPE_OPTIONS }
+      input :supporting_types_supported,
+            title: 'Supporting resource types populated by the client system',
+            description: %(
+              Select the resource types that the client system supports when representing information
+              related to requests sent as a part of CRD. Inferno will expect those order types to be
+              demonstrated within hook requests. By unchecking a resource type, the tester attests
+              that the client system does not support the information represented by the resource type
+              or does not surface it to users. `Patient` and `Coverage` resource types are required of
+              every client and are always checked.
+            ),
+            type: 'checkbox',
+            default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
+            optional: true,
+            options: { list_options: SUPPORTING_TYPE_OPTIONS }
+
+<%- test_ids.each do |test_id| -%>
+      test from: :<%= test_id %>
+<%- end -%>
+      test from: :<%= order_types_signed_test_id %>
+      test from: :<%= coverage_information_test_id %>
+    end
+  end
+end

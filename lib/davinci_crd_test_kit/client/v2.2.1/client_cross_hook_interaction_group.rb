@@ -31,7 +31,8 @@ module DaVinciCRDTestKit
       DESCRIPTION
       run_as_group
 
-      input_order :cross_hooks_response_approach,
+      input_order :make_additional_hook_requests,
+                  :cross_hooks_response_approach,
                   :cross_hooks_selected_response_types,
                   :cross_hooks_custom_response_template
 

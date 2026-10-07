@@ -38,11 +38,15 @@ module DaVinciCRDTestKit
         inferno_base_url + hook_suffix
       end
 
-      input :auth_tokens,
-            :auth_tokens_jwk_json,
-            :cds_jwt_iss
+      # Optional so that a group whose requests were declined can pass rather than skip on inputs
+      # the short circuited tests before it never produced. The run block still skips when empty.
+      input :auth_tokens, optional: true, default: '[]'
+      input :auth_tokens_jwk_json, optional: true, default: '[]'
+      input :cds_jwt_iss
 
       run do
+        check_for_short_circuit
+
         auth_tokens_list = JSON.parse(auth_tokens)
         auth_tokens_jwk = JSON.parse(auth_tokens_jwk_json)
         requests = load_interaction_group_requests
