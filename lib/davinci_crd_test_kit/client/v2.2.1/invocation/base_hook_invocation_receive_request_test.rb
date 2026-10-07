@@ -49,7 +49,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),

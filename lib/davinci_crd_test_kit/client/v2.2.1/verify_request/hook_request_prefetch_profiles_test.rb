@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         See the [Prefetch Template](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-template)
         section for more information about the format of `prefetch` templates.
 
-        [The CRD IG requires client support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
+        [The CRD IG requires that CRD clients support prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
         including that the provided resources, which are part of the data included in the hook invocation,
         [conform to the appropriate CRD profile](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-21).
 

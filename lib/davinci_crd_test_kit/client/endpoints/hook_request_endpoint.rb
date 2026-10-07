@@ -83,7 +83,7 @@ module DaVinciCRDTestKit
                             code: 400,
                             outcome_code: 'value')
       elsif invoked_hook != requested_hook
-        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
+        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the CRD client " \
                             "requested the #{requested_hook} hook.",
                             code: 400,
                             outcome_code: 'value')

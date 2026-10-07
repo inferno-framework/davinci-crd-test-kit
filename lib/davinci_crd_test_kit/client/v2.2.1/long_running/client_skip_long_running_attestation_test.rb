@@ -8,11 +8,11 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_client_skip_long_running_attestation_test
-      title 'Client allows the user to continue their workflow during long-running requests'
+      title 'CRD client allows the user to continue their workflow during long-running requests'
       description %(
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-6)
-        that client systems not block their users while waiting for long-running CRD Hook calls.
-        During this test, the tester will confirm that the client system allows users to continue
+        that CRD clients not block their users while waiting for long-running CRD Hook calls.
+        During this test, the tester will confirm that the CRD client allows users to continue
         with their workflow when a hook request is long-running. This could be accomplished,
         for example, by providing a bypass/continue mechanism when a CRD server is taking too long
         to respond, or by always running hooks requests in the background and notifying users when they

@@ -12,12 +12,12 @@ module DaVinciCRDTestKit
       KNOWN_ACTION_ELEMENTS = ['type', 'description', 'resource', 'resourceId', 'extension'].freeze
 
       id :crd_v221_client_unknown_content_attestation_test
-      title 'Client processes coverage information returned with unknown content'
+      title 'CRD client processes coverage information returned with unknown content'
       description %(
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-33)
-        that client systems ignore unexpected elements within CDS Hooks structures when processing
+        that CRD clients ignore unexpected elements within CDS Hooks structures when processing
         instances. During this test, the tester will confirm that the unknown element and custom extension
-        included in the CDS section of the previous response did not prevent the client system from
+        included in the CDS section of the previous response did not prevent the CRD client from
         processing the returned coverage information and making it available to the user.
       )
       attestation
@@ -84,7 +84,7 @@ module DaVinciCRDTestKit
 
             #{format_unknown_content(bodies)}
 
-            I attest that this unexpected content did not prevent the client system from
+            I attest that this unexpected content did not prevent the CRD client from
             processing the coverage information returned in the same response and that the
             coverage information was displayed or otherwise made available to the user:
 

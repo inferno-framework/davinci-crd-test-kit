@@ -80,7 +80,7 @@ module DaVinciCRDTestKit
         test from: :crd_v221_card_display_attest_test
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_client_hook_response_support_coverage_information do
-          title 'Client supports the Coverage Information response type on the appointment-book hook'
+          title 'CRD client supports the Coverage Information response type on the appointment-book hook'
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-26'
         end
       end

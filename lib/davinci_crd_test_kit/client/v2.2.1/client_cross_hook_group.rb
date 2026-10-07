@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         and hook requests rather than specific ones.
 
         These tests must be run after the tests in the "Hooks" group are run.
-        Clients may, but are not required to, make additional hook requests
+        The CRD client may, but is not required to, make additional hook requests
         during these tests to show additional features not demonstrated during
         previous hook requests. Note that only the requests made during the
         most recent execution of a given group will be included in the analysis.

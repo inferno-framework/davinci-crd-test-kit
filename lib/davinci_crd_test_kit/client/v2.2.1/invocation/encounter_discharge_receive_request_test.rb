@@ -4,9 +4,9 @@ module DaVinciCRDTestKit
   module V221
     class EncounterDischargeReceiveRequestTest < BaseHookInvocationReceiveRequestTest
       id :crd_v221_encounter_discharge_request
-      title 'Client invokes the encounter-discharge hook'
+      title 'CRD client invokes the encounter-discharge hook'
       description %(
-        During this test, Inferno will wait while the client makes one or more [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
+        During this test, Inferno will wait while the CRD client makes one or more [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
         hook requests against Inferno's simulated CRD servers. Inferno will respond
         based on the response configuration provided when running the test.
         For more details on how Inferno's simulated CRD servers behave during

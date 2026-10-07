@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
     class ClientLocationAddressPropagationTest < Inferno::Test
       include TaggedRequestLoadHelper
 
-      title 'Client propagates addresses to child Location resources'
+      title 'CRD client propagates addresses to child Location resources'
       id :crd_v221_client_location_address_propagation
       description <<~DESCRIPTION
         The CRD IG requires that ([prof-13](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-location.html#ci-c-prof-13))

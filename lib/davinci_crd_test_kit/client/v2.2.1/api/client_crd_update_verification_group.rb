@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
       id :crd_v221_client_update_verification
       title 'CRD Update Tests'
       description %(
-        This CRD-specific group verifies that the client was able to
+        This CRD-specific group verifies that the CRD client was able to
         persist updates provided by the payer server as a part of
         decision support responses.
       )

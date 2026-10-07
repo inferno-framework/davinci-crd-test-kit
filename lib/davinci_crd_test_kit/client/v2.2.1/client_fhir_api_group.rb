@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
     class ClientFHIRAPIGroup < Inferno::TestGroup
       title 'FHIR API'
       description <<~DESCRIPTION
-        CRD client systems are responsible for returning data requested by the CRD server needed to provide decision support.
+        CRD clients are responsible for returning data requested by the CRD server needed to provide decision support.
         This group contains tests that verify the required 'server' FHIR API capabilities.
         These 'server' capabilities are based on the US Core Server Capability Statement for the US Core version chosen
         when the test session was initiated.
@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-1'
 
       INPUT_INSTRUCTIONS = %(
-        The location of and an access token for the client's FHIR server are expected to come in
+        The location of and an access token for the CRD client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
         the body of the latest hook invocation made during this session:
         - The URL of the CRD client FHIR server from the `fhirServer` field.

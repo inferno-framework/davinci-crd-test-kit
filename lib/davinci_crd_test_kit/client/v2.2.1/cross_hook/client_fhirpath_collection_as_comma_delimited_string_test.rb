@@ -5,7 +5,7 @@ module DaVinciCRDTestKit
     class ClientFHIRPathCollectionAsCommaDelimitedStringTest < Inferno::Test
       include CrossHookHelper
 
-      title 'Client correctly interprets collections when substituting FHIRPath results in prefetch templates'
+      title 'CRD client correctly interprets collections when substituting FHIRPath results in prefetch templates'
       id :crd_v221_client_fhir_path_collection_as_comma_delimited_string
       description <<~DESCRIPTION
         The CDS Hooks specification requires that when a FHIRPath token in A
@@ -16,7 +16,7 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that during a previously-run hook test,
         there was at least one instance of a prefetch template that has a
         token which Inferno expects to result in a collection with multiple unique members.
-        Note that this does not test whether the client correctly
+        Note that this does not test whether the CRD client correctly
         handles the collection, which is checked by the
         "Hook requests include the requested prefetch data" test.
 

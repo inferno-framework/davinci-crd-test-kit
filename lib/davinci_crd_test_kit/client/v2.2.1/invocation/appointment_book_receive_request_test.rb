@@ -4,9 +4,9 @@ module DaVinciCRDTestKit
   module V221
     class AppointmentBookReceiveRequestTest < BaseHookInvocationReceiveRequestTest
       id :crd_v221_appointment_book_request
-      title 'Client invokes the appointment-book hook'
+      title 'CRD client invokes the appointment-book hook'
       description %(
-        During this test, Inferno will wait while the client makes one or more [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
+        During this test, Inferno will wait while the CRD client makes one or more [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
         hook requests against Inferno's simulated CRD servers. Inferno will respond
         based on the response configuration provided when running the test.
         For more details on how Inferno's simulated CRD servers behave during

@@ -9,7 +9,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
         {
           'hook' => 'appointment-book',
           'title' => 'Appointment Booking CDS Service',
-          'description' => 'An example of a CDS Service that is invoked when user of a CRD Client books an appointment',
+          'description' => 'An example of a CDS Service that is invoked when user books an appointment',
           'id' => 'appointment-book-service',
           'prefetch' => {
             'user' => '{{context.userId}}',
@@ -108,7 +108,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerDiscoveryGroup do
           {
             'hook' => ['appointment-book'],
             'title' => 'Appointment Booking CDS Service',
-            'description' => 'An example of a CDS Service that is invoked when user of a CRD Client books an appt.',
+            'description' => 'An example of a CDS Service that is invoked when user books an appt.',
             'id' => 'appointment-book-service',
             'prefetch' => {
               'user' => '{{context.userId}}',

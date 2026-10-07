@@ -6,8 +6,8 @@ require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
-    # Checks that the CRD profiles within a given scope were observed in the hook requests the
-    # client made, and that every must support element on them was populated on at least one
+    # Checks that the CRD profiles within a given scope were observed in the hook requests made
+    # by the CRD client, and that every must support element on them was populated on at least one
     # instance. Anything not observed falls back to a tester attestation.
     class RequestMustSupportWithAttestationOption < Inferno::Test
       include HookRequestResourceExtraction
@@ -74,7 +74,7 @@ module DaVinciCRDTestKit
         def multiple_profiles_note
           <<~NOTE
             The elements below are drawn from both appointment profiles, and each may be demonstrated on
-            an instance of either of them. A client that supports only one of these profiles can
+            an instance of either of them. A CRD client that supports only one of these profiles can
             attest to non-support of the related elements.
           NOTE
         end
@@ -94,10 +94,10 @@ module DaVinciCRDTestKit
             During this test, Inferno will check whether all must support elements defined in the
             profile(s) listed below are demonstrated within hook requests made during this session.
             This check may vacuously pass if the tester has attested that this resource type is not
-            supported by the client system or if the relevant hooks are not invoked.
+            supported by the CRD client or if the relevant hooks are not invoked.
 
             If any must support elements are not demonstrated, the tester will have the option to attest
-            that these elements are not supported by the client system or surfaced to its users. Testers
+            that these elements are not supported by the CRD client or surfaced to its users. Testers
             must setup scenarios in which the "data exists and privacy constraints permit" Inferno to view
             the must support information.
 
@@ -157,7 +157,7 @@ module DaVinciCRDTestKit
         hooks.nil? || hooks.any? { |hook_tag| hook_invoked?(hook_tag) }
       end
 
-      # nil when the type is required of every client, so no input governs it. A client need not
+      # nil when the type is required of every CRD client, so no input governs it. A CRD client need not
       # support any order type, so clearing every box means none are expected rather than all.
       def selected_types(resource_type)
         if ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
@@ -178,7 +178,7 @@ module DaVinciCRDTestKit
 
       def unexpected_reason(resource_type)
         if declared_unsupported?(resource_type)
-          return 'the tester indicated that the client system does not support this resource type'
+          return 'the tester indicated that the CRD client does not support this resource type'
         end
 
         hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
@@ -222,7 +222,7 @@ module DaVinciCRDTestKit
         unobserved.select { |entry| entry[:kind] == :missing_type }
       end
 
-      # What the tester declared and what the client sent have to agree: a type they said is
+      # What the tester declared and what the CRD client sent have to agree: a type they said is
       # supported must turn up, and one they said is not must not.
       def check_declared_types(unobserved)
         mismatched = unexpected(unobserved) + missing(unobserved)
@@ -233,12 +233,12 @@ module DaVinciCRDTestKit
       def declared_type_message(entry)
         if entry[:kind] == :unexpected_type
           "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
-            "client system, but #{unexpected_reason(entry[:resource_type])}."
+            "CRD client, but #{unexpected_reason(entry[:resource_type])}."
         elsif ['Patient', 'Coverage'].include?(entry[:resource_type])
-          "Client systems are required to support the `#{entry[:resource_type]}` " \
+          "CRD clients are required to support the `#{entry[:resource_type]}` " \
             'resource type, but no instances were observed in the hook requests made.'
         else
-          "The tester indicated the client system supports the `#{entry[:resource_type]}` " \
+          "The tester indicated the CRD client supports the `#{entry[:resource_type]}` " \
             'resource type, but no instances were observed in the hook requests made.'
         end
       end
@@ -282,12 +282,12 @@ module DaVinciCRDTestKit
       def attestation_section(entry)
         <<~SECTION.chomp
           Inferno observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests
-          made by the client system, but the following #{entry[:title]} must support elements were not
+          made by the CRD client, but the following #{entry[:title]} must support elements were not
           observed on any of them#{nutrition_order_schedule_note if entry[:resource_type] == 'NutritionOrder'}:
 
           #{entry[:missing].map { |element| "- `#{element}`" }.join("\n")}
 
-          I attest that the client system either does not capture or does not surface to its users the data represented by the elements in the list above.
+          I attest that the CRD client either does not capture or does not surface to its users the data represented by the elements in the list above.
         SECTION
       end
 

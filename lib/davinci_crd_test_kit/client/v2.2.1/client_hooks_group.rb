@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
     class ClientHooksGroup < Inferno::TestGroup
       title 'Hooks'
       description <<~DESCRIPTION
-        This group contains sub-groups which each verify the ability of the client to make and react to responses from
+        This group contains sub-groups which each verify the ability of the CRD client to make and react to responses from
         one of the [six hooks described in the CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html):
         * [appointment-book](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#appointment-book)
         * [encounter-start](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-start)
@@ -21,13 +21,13 @@ module DaVinciCRDTestKit
         * [encounter-discharge](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#encounter-discharge)
 
         Each hook-specific group follows the same pattern:
-        1. Allow the client to make hook invocations for the tested hook, waiting until the tester indicates
+        1. Allow the CRD client to make hook invocations for the tested hook, waiting until the tester indicates
            that all desired requests have been made, then
         2. Check the requests and their associated responses for conformance to CRD and CDS Hooks requirements.
-           Additionally, ask the tester to confirm that the responses were displayed appropriately by the client.
+           Additionally, ask the tester to confirm that the responses were displayed appropriately by the CRD client.
 
         The CRD IG does not require support for any specific hook, so all the hook-specific sub-groups are
-        optional. A conformant CRD client will have implemented at least one hook and will run and pass
+        optional. Conformant CRD clients will have implemented at least one hook and will run and pass
         the hook-specific groups corresponding to each hook that it implements.
 
         Inferno simulates two CRD discovery endpoints, each with service endpoints for all six CRD hooks
@@ -54,7 +54,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),
