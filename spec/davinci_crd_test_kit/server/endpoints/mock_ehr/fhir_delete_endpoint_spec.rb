@@ -14,13 +14,13 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   let(:base_url) { 'http://example.com' }
   let(:discovery_url) { 'http://example.com/cds-services' }
   let(:inferno_base_url) { 'http://inferno.com' }
+  let(:workspace_bearer) { 'workspace-token' }
   let(:service_ids) { 'appointment-book-service' }
   let(:service_request_body) do
     json = File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'appointment_book_hook_request.json'))
     JSON.parse(json)
   end
   let(:service_request_bodies) { [service_request_body].to_json }
-  let(:encryption_method) { 'ES384' }
   let(:patient) do
     FHIR.from_contents(File.read(File.join(__dir__, '..', '..', '..', '..', 'fixtures', 'crd_patient_example.json')))
   end
@@ -32,7 +32,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   let(:not_a_bundle) { FHIR::Patient.new.to_json }
 
   def wait_and_auth(bundle_input = mock_ehr_bundle)
-    result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:, service_request_bodies:,
+    result = run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:, service_request_bodies:,
                            mock_ehr_bundle: bundle_input)
     expect(result.result).to eq('wait')
     header 'Authorization', "Bearer #{token}"
@@ -80,7 +80,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
     end
 
     it 'returns an error when the Authorization header is missing' do
-      run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+      run(runnable, base_url:, workspace_bearer:, inferno_base_url:, service_ids:,
                     service_request_bodies:, mock_ehr_bundle:)
       delete "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
       expect(last_response.status).to be >= 400
