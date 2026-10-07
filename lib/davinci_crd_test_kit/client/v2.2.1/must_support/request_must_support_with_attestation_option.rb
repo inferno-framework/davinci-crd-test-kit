@@ -74,9 +74,8 @@ module DaVinciCRDTestKit
         def multiple_profiles_note
           <<~NOTE
             The elements below are drawn from both appointment profiles, and each may be demonstrated on
-            an instance of either of them. A client that supports only one of these profiles can still
-            demonstrate every element.
-
+            an instance of either of them. A client that supports only one of these profiles can
+            attest to non-support of the related elements.
           NOTE
         end
 
@@ -233,6 +232,9 @@ module DaVinciCRDTestKit
         if entry[:kind] == :unexpected_type
           "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
             "client system, but #{unexpected_reason(entry[:resource_type])}."
+        elsif ['Patient', 'Coverage'].include?(entry[:resource_type])
+          "Client systems are required to support the `#{entry[:resource_type]}` " \
+            'resource type, but no instances were observed in the hook requests made.'
         else
           "The tester indicated the client system supports the `#{entry[:resource_type]}` " \
             'resource type, but no instances were observed in the hook requests made.'
@@ -279,12 +281,19 @@ module DaVinciCRDTestKit
         <<~SECTION.chomp
           Inferno observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests
           made by the client system, but the following #{entry[:title]} must support elements were not
-          observed on any of them:
+          observed on any of them#{nutrition_order_schedule_note if entry[:resource_type] == 'NutritionOrder'}:
 
           #{entry[:missing].map { |element| "- `#{element}`" }.join("\n")}
 
-          I attest that the client system either does not capture or does not surface it to its users the data represented by the elements in the list above.
+          I attest that the client system either does not capture or does not surface to its users the data represented by the elements in the list above.
         SECTION
+      end
+
+      def nutrition_order_schedule_note
+        ' (NOTE - `schedule` subelements from the [CRD Timing data type profile]' \
+          '(https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-timing.html) ' \
+          'appear under elements `enteralFormula.administration`, `oralDiet`, and `supplement` ' \
+          'but only have to be demonstrated under one of them)'
       end
 
       run do

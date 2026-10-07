@@ -31,9 +31,8 @@ module DaVinciCRDTestKit
         ### [CRD Appointment with Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html) or [CRD Appointment without Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
 
         The elements below are drawn from both appointment profiles, and each may be demonstrated on
-        an instance of either of them. A client that supports only one of these profiles can still
-        demonstrate every element.
-
+        an instance of either of them. A client that supports only one of these profiles can
+        attest to non-support of the related elements.
         - `appointmentType`
         - `basedOn`
         - `basedOn.extension:AlternateReference`

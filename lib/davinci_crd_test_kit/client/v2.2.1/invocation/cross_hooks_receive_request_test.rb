@@ -28,7 +28,8 @@ module DaVinciCRDTestKit
               of each group in this session. Select `Yes` to send more requests now so that features
               the earlier requests did not cover can be demonstrated. Otherwise select `No` to
               evaluate the requests already received, and every test in this group will pass without
-              further requests.
+              further requests. NOTE: if re-running this test, requests made during its previous
+              execution run will no longer be considered, even if `No` is selected.
             ),
             type: 'radio',
             default: 'false',
