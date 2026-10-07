@@ -34,7 +34,8 @@ module DaVinciCRDTestKit
 
       def parse_request_bodies(hook_requests)
         hook_requests.map do |request|
-          body = JSON.parse(request.request_body)
+          # request_body is nil when the request had no body
+          body = JSON.parse(request.request_body.to_s)
           body if body.is_a?(Hash)
         rescue JSON::ParserError
           nil

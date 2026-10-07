@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
     include ProfilesAndResourceTypes
 
     def json_parse(json)
-      JSON.parse(json)
+      JSON.parse(json.to_s)
     rescue JSON::ParserError
       add_message('error', "#{request_number}Invalid JSON.")
       false
