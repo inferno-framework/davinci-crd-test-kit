@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
       def hooks_by_order_type
         tagged_requests(CROSS_HOOK_ANALYSIS_TAG).each_with_object({}) do |request, hooks|
           request_body = parse_request_body(request)
-          hook = request_body&.dig('hook')
+          hook = request_body['hook'] if request_body.is_a?(Hash)
 
           each_hook_request_resource(request_body) do |raw_resource|
             resource_type = raw_resource['resourceType']
@@ -47,13 +47,19 @@ module DaVinciCRDTestKit
       # orders being signed. The same resource elsewhere in the request does not demonstrate signing.
       def signed_order_types
         tagged_requests(ORDER_SIGN_TAG, CROSS_HOOK_ANALYSIS_TAG).each_with_object(Set.new) do |request, types|
-          draft_orders = parse_request_body(request)&.dig('context', 'draftOrders')
-
-          each_resource_within(draft_orders) do |raw_resource|
+          each_resource_within(draft_orders(request)) do |raw_resource|
             resource_type = raw_resource['resourceType']
             types << resource_type if ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES.include?(resource_type)
           end
         end
+      end
+
+      # A malformed request may carry a body or `context` that is not a JSON object, which `dig` would
+      # raise on, so each level is checked before reading from it.
+      def draft_orders(request)
+        body = parse_request_body(request)
+        context = body['context'] if body.is_a?(Hash)
+        context['draftOrders'] if context.is_a?(Hash)
       end
 
       # An order type can turn up on an order-sign request without being in its `draftOrders`, so the

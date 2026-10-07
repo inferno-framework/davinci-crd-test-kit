@@ -90,6 +90,19 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     expect(result.result_message).to include('DeviceRequest')
   end
 
+  it 'skips over order-sign requests whose body or context is not a JSON object' do
+    order_sign(service_request)
+    create_request({ hook: 'order-sign', hookInstance: SecureRandom.uuid, context: 'not an object' },
+                   hook_tag: DaVinciCRDTestKit::ORDER_SIGN_TAG)
+    create_request([{ context: { draftOrders: bundle(device_request) } }],
+                   hook_tag: DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+    result = run(test)
+
+    expect(result.result).to eq('pass')
+    expect(result.result_message).to include('ServiceRequest')
+  end
+
   def messages_from(result_test)
     Inferno::Repositories::Results.new
       .current_results_for_test_session_and_runnables(test_session.id, [result_test]).first.messages.map(&:message)
