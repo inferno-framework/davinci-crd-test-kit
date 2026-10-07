@@ -30,6 +30,21 @@ module DaVinciCRDTestKit
 
       input_instructions INPUT_INSTRUCTIONS
 
+      # The imported US Core tests refer to the tested system as "the server" or "the system under
+      # test"; within this suite it is the CRD client. General US Core requirement statements
+      # (e.g., "A server SHALL support...") are left as-is.
+      def self.rename_tested_system(runnable)
+        runnable.all_children.each do |child|
+          child.title(child.title.sub(/\AServer /, 'CRD client '))
+          description = child.description.to_s
+            .gsub(/\b([Tt])he(\s+)system\s+under\s+test\b/, '\\1he\\2CRD client')
+            .gsub(/\b([Tt])he(\s+)server(\s+)endpoint\b/, "\\1he\\2CRD client's\\3FHIR endpoint")
+            .gsub(/\b([Tt])he(\s+)server\b/, '\\1he\\2CRD client')
+          child.description(description) unless description == child.description.to_s
+          rename_tested_system(child)
+        end
+      end
+
       input :url,
             title: 'FHIR Endpoint',
             description: %(
@@ -54,6 +69,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_311_client_update_verification
         reorder :crd_v221_us_core_311_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
       group from: :'us_core_v610-us_core_v610_fhir_api' do
         description %(
@@ -69,6 +86,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_610_client_update_verification
         reorder :crd_v221_us_core_610_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
       group from: :'us_core_v700-us_core_v700_fhir_api' do
         description %(
@@ -84,6 +103,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_700_client_update_verification
         reorder :crd_v221_us_core_700_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
     end
   end
