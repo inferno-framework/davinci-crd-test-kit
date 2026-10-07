@@ -6,7 +6,7 @@ require_relative '../client/v2.2.1/must_support/request_must_support_with_attest
 module DaVinciCRDTestKit
   module Generator
     # Generates the must support group and the one test per resource type it holds. Run as part of
-    # `bundle exec rake crd:generate_must_support_metadata`.
+    # `bundle exec rake crd:generate`.
     class MustSupportTestGenerator
       CONF_3 = 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'.freeze
       HOOK_3 = 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'.freeze
