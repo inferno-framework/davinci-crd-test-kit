@@ -12,7 +12,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientFHIRPathCollectionAsCommaDelimited
   let(:prefetch_complete_test) do
     Inferno::Repositories::Tests.new.find(
       'crd_client_v221-crd_v221_client_hook_invocation-crd_v221_client_hooks' \
-      '-crd_v221_client_order_sign-Group03-crd_v221_hook_request_prefetch_complete'
+      '-crd_v221_client_order_sign-crd_v221_order_sign_requests-crd_v221_hook_request_prefetch_complete'
     )
   end
 
