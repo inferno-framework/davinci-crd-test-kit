@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
       # (e.g., "A server SHALL support...") are left as-is.
       def self.rename_tested_system(runnable)
         runnable.all_children.each do |child|
-          child.title(child.title.sub(/\AServer /, 'CRD client '))
+          child.title(child.title.sub(/\A(?:FHIR )?Server /i, 'CRD client '))
           description = child.description.to_s
             .gsub(/\b([Tt])he(\s+)system\s+under\s+test\b/, '\\1he\\2CRD client')
             .gsub(/\b([Tt])he(\s+)server(\s+)endpoint\b/, "\\1he\\2CRD client's\\3FHIR endpoint")
