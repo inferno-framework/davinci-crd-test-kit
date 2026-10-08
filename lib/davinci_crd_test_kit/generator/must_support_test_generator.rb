@@ -65,21 +65,21 @@ module DaVinciCRDTestKit
       ORDER_TYPES_SIGNED_TEST_ID = 'crd_v221_client_order_types_signed'.freeze
       COVERAGE_INFORMATION_TEST_ID = 'crd_v221_client_card_must_support_coverage_information'.freeze
 
-      GROUP_DIRECTORY = File.join(__dir__, '..', 'client', 'v2.2.1').freeze
-      TEST_DIRECTORY = File.join(GROUP_DIRECTORY, 'must_support', 'generated').freeze
+      # The group is written alongside its tests so that every generated file sits in one folder.
+      OUTPUT_DIRECTORY = File.join(__dir__, '..', 'client', 'v2.2.1', 'must_support', 'generated').freeze
 
       # Generated files are linted along with the rest of the project.
       MAX_LINE_LENGTH = 120
 
       def run
-        FileUtils.mkdir_p(TEST_DIRECTORY)
+        FileUtils.mkdir_p(OUTPUT_DIRECTORY)
 
         TEST_DEFINITIONS.each do |definition|
-          File.write(File.join(TEST_DIRECTORY, file_name_for(definition)), render_test(definition))
+          File.write(File.join(OUTPUT_DIRECTORY, file_name_for(definition)), render_test(definition))
           puts "  #{file_name_for(definition)}"
         end
 
-        File.write(File.join(GROUP_DIRECTORY, 'client_cross_hook_must_support_group.rb'), render_group)
+        File.write(File.join(OUTPUT_DIRECTORY, 'client_cross_hook_must_support_group.rb'), render_group)
         puts '  client_cross_hook_must_support_group.rb'
       end
 

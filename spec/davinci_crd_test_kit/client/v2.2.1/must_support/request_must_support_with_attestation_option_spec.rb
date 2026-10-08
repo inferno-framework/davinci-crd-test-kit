@@ -1,4 +1,4 @@
-require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_group'
 require_relative '../../../../../lib/davinci_crd_test_kit/generator/must_support_test_generator'
 require_relative 'complete_resources'
 
@@ -333,8 +333,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
   end
 
-  # When a type is both selectable and gated on hooks, either selecting it or invoking one of its
-  # hooks makes it expected.
+  # When a type is both selectable and gated on hooks, selecting it makes it expected, and invoking
+  # one of its hooks while it is deselected contradicts the tester's declaration.
   describe 'a type governed by both an input and requiring hooks' do
     let(:encounter_test) { test_for([{ resource_type: 'Encounter', profile_keys: ['encounter'] }]) }
     let(:encounter) { { resourceType: 'Encounter', id: 'e1', status: 'in-progress' } }
@@ -354,14 +354,23 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(result.result_message).to include('The tester indicated the CRD client supports the `Encounter`')
     end
 
-    it 'expects the type when a requiring hook was invoked even though it was not selected' do
+    it 'fails when a requiring hook was invoked but the type was not selected' do
       hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG)
 
       result = run(encounter_test, supporting_types_supported: [].to_json)
 
       expect(result.result).to eq('fail')
       expect(result.result_message).to include('invoked the `encounter-start` hook(s)')
-      expect(result.result_message).to include('`Encounter` resource type, but no instances')
+      expect(result.result_message).to include('does not support this resource type')
+    end
+
+    it 'expects the type when selected and a requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG)
+
+      result = run(encounter_test, supporting_types_supported: ['Encounter'].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Encounter`')
     end
 
     it 'passes vacuously when neither selected nor required by an invoked hook' do
@@ -374,10 +383,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
         .to include('does not support this resource type and no encounter-start or encounter-discharge hook')
     end
 
-    it 'checks an unselected type observed alongside an invoked requiring hook' do
+    it 'fails when an unselected type is observed alongside an invoked requiring hook' do
       hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG, prefetch: { encounter: })
 
-      expect(run(encounter_test, supporting_types_supported: [].to_json).result).to eq('wait')
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('invoked the `encounter-start` hook(s)')
     end
 
     it 'fails when an unselected type is observed and no requiring hook was invoked' do

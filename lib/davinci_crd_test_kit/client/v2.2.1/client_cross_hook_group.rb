@@ -1,4 +1,4 @@
-require_relative 'client_cross_hook_must_support_group'
+require_relative 'must_support/generated/client_cross_hook_must_support_group'
 require_relative 'cross_hook/client_location_address_propagation_test'
 require_relative 'cross_hook/client_fhirpath_collection_as_comma_delimited_string_test'
 require_relative 'cross_hook/client_hook_instances_unique_test'

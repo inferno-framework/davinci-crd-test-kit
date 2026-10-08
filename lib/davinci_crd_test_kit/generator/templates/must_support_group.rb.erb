@@ -1,7 +1,7 @@
-require_relative 'cross_hook/client_card_must_support_coverage_information_test'
-require_relative 'cross_hook/client_order_types_signed_test'
+require_relative '../../cross_hook/client_card_must_support_coverage_information_test'
+require_relative '../../cross_hook/client_order_types_signed_test'
 <%- test_file_names.each do |file_name| -%>
-require_relative 'must_support/generated/<%= file_name %>'
+require_relative '<%= file_name %>'
 <%- end -%>
 
 module DaVinciCRDTestKit
@@ -14,14 +14,18 @@ module DaVinciCRDTestKit
         observed across the hook requests the CRD client made, and that the must support elements on
         them were populated.
 
-        Each resource type is checked separately. Use the inputs below to say which types the
-        CRD client supports; a type left unchecked is not expected to appear. Where a type was
-        observed but some of its must support elements were not, the tester is asked to attest that
-        the CRD client does not capture the represented data or does not surface it to users.
+        Inferno expects to see a resource type when a hook is invoked where the resource type must appear
+        in the context or the type is selected in the **Order types supported by the CRD Client** or
+        **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
+        further analysis if an expected resource type is not observed or vice-versa. When a resource type
+        was observed but some of its must support elements were not, the tester is asked to attest
+        that the CRD client does not capture the represented data or does not surface it to users.
 
-        Requests made during the "Additional Hook Invocations for Cross Hook Support
-        Demonstration" group above are included in this analysis, so anything not covered by the
-        Hooks tests can be demonstrated there and this group re-run on its own.
+        All requests made during the latest runs of each "Hooks" sub-groups and the "Additional Hook
+        Invocations for Cross Hook Support Demonstration" group above are included in this analysis.
+        When re-running these groups, remember that requests made during the prior execution will fall
+        out of scope of this analysis, so elements only demonstrated during that execution will need to
+        be demonstrated again during the new test run.
       DESCRIPTION
 
       run_as_group
@@ -39,7 +43,8 @@ module DaVinciCRDTestKit
 
       # A resource type only a non-required hook would carry is not expected when that hook was
       # never invoked, so its test passes rather than asking the tester to attest. A type that is also
-      # in one of the lists above is expected when it is selected or one of its hooks was invoked.
+      # in one of the lists above is expected when selected, and invoking one of its hooks while it is
+      # deselected fails as a contradiction.
       REQUIRING_HOOKS = {
 <%= requiring_hooks.map { |type, tags| "        '#{type}' => [#{tags.join(', ')}]" }.join(",\n") %>
       }.freeze
@@ -64,8 +69,7 @@ module DaVinciCRDTestKit
               demonstrated within hook requests. By unchecking a resource type, the tester attests
               that the CRD client does not support the information represented by the resource type
               or does not surface it to users. `Patient` and `Coverage` resource types are always
-              checked because CRD clients are required to support them. `Encounter` is also expected
-              whenever an `encounter-start` or `encounter-discharge` hook is invoked, even if unchecked.
+              checked because CRD clients are required to support them.
             ),
             type: 'checkbox',
             default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
