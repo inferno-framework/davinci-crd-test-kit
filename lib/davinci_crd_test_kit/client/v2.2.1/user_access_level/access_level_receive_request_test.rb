@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_receive_request
-      title 'Client invokes a hook as an EHR user'
+      title 'CRD client invokes a hook as an EHR user'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',

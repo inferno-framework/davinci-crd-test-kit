@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         See the [Prefetch Template](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-template)
         section for more information about the format of `prefetch` templates.
 
-        [The CRD IG requires client support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
+        [The CRD IG requires that CRD clients support prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
         including the ability to provide all data in and subsets of the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
         when they are requested by the invoked CRD server. Inferno simulates two CRD servers,
         one at `#{ClientURLs.discovery_url}` requiring the [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)

@@ -13,15 +13,15 @@ module DaVinciCRDTestKit
       IGNORED_COMPARISON_ELEMENTS = ['hookInstance', 'fhirAuthorization', 'prefetch', 'extension'].freeze
 
       id :crd_v221_client_multiple_payers_request_verification
-      title 'Client solicits coverage information from only one payer'
+      title 'CRD client solicits coverage information from only one payer'
       description %(
         When a patient has multiple active coverages that could be relevant to the current action,
         the CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-28)
-        that client systems select from those coverages which is most likely to be primary and only
-        solicit coverage information for that one payer. If clients invoke CRD on other payers, the
+        that CRD clients select from those coverages which is most likely to be primary and only
+        solicit coverage information for that one payer. If CRD clients invoke CRD on other payers, the
         CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-30)
         that response types that return coverage information are disabled for those 'likely
-        secondary' payers. During this test, Inferno verifies that the client made one or two hook
+        secondary' payers. During this test, Inferno verifies that the CRD client made one or two hook
         requests when the tester performed a workflow for a patient with two payer coverages during
         the previous test. If a single request was received, it must not disable coverage
         information responses. If two requests were received, each must have been made to a service
@@ -34,7 +34,8 @@ module DaVinciCRDTestKit
 
       def parse_request_bodies(hook_requests)
         hook_requests.map do |request|
-          body = JSON.parse(request.request_body)
+          # request_body is nil when the request had no body
+          body = JSON.parse(request.request_body.to_s)
           body if body.is_a?(Hash)
         rescue JSON::ParserError
           nil
@@ -46,7 +47,7 @@ module DaVinciCRDTestKit
 
         add_message('error',
                     'The hook request disables coverage information in its `davinci-crd.configuration` ' \
-                    'extension. The client must solicit coverage information from the payer associated ' \
+                    'extension. The CRD client must solicit coverage information from the payer associated ' \
                     'with the coverage most likely to be primary.')
       end
 
@@ -86,7 +87,7 @@ module DaVinciCRDTestKit
         elsif disabled_count == 2
           add_message('error',
                       'Both hook requests disable coverage information in their `davinci-crd.configuration` ' \
-                      'extensions. The client must solicit coverage information from the payer associated ' \
+                      'extensions. The CRD client must solicit coverage information from the payer associated ' \
                       'with the coverage most likely to be primary.')
         end
       end
@@ -116,7 +117,7 @@ module DaVinciCRDTestKit
         hook_requests = load_interaction_group_requests
 
         assert hook_requests.present?,
-               'Inferno did not receive any hook requests during the previous test. The client must ' \
+               'Inferno did not receive any hook requests during the previous test. The CRD client must ' \
                'solicit coverage information from the payer associated with the coverage most likely ' \
                'to be primary.'
         assert hook_requests.length <= 2,

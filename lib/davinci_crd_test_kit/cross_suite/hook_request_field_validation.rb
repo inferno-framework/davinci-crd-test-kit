@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
     include ProfilesAndResourceTypes
 
     def json_parse(json)
-      JSON.parse(json)
+      JSON.parse(json.to_s)
     rescue JSON::ParserError
       add_message('error', "#{request_number}Invalid JSON.")
       false
@@ -65,7 +65,8 @@ module DaVinciCRDTestKit
     def hook_request_prefetch_check(advertised_prefetch_fields, received_prefetch, received_context, ig_version: 'v201')
       received_prefetch.each do |received_prefetch_key, received_prefetch_hash|
         unless advertised_prefetch_fields.key?(received_prefetch_key)
-          add_message('error', "#{request_number}Client sent non-requested Prefetch field `#{received_prefetch_key}`.")
+          add_message('error', "#{request_number}CRD client sent non-requested Prefetch field " \
+                               "`#{received_prefetch_key}`.")
           next
         end
 

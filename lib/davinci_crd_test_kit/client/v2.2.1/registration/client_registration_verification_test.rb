@@ -12,14 +12,14 @@ module DaVinciCRDTestKit
         In order to register with and be able to make hook requests against Inferno's
         simulated CRD servers, the tester must provide the `iss` (issuer) claim in
         the payload of the JWT sent in the Authorization header of hook requests
-        made by the client against Inferno. This information is used to
+        made by the CRD client against Inferno. This information is used to
         associate inbound requests to Inferno's simulated CRD servers with this session.
         Requests made without a JWT or with a different `iss` value will not appear in this
         session or be analyzed.
 
-        Inferno also requires some additional information to verify conformant client behavior.
-        This information is not needed to execute the tests, but the tests will not completely
-        pass without it:
+        Inferno also requires some additional information to verify that the CRD client behaves
+        in a conformant manner. This information is not needed to execute the tests, but the
+        tests will not completely pass without it:
         - A JSON Web Key Set (JWKS) containing the key used to sign the JWT sent in the Authorization
           header for use in signature validation. It can be provided either as a URL where it is
           publicly hosted (preferred) or the raw JWKS as JSON.
@@ -38,7 +38,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that will be sent in the JWT used to authorize the client's hook
+              Value of the `iss` claim that will be sent in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               This value will be used to associate incoming requests with this test
               session and any requests that use a different `iss` value will not be recognized.

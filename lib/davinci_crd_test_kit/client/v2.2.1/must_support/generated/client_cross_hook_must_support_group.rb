@@ -1,14 +1,25 @@
 require_relative '../../cross_hook/client_card_must_support_coverage_information_test'
 require_relative '../../cross_hook/client_order_types_signed_test'
-<%- test_file_names.each do |file_name| -%>
-require_relative '<%= file_name %>'
-<%- end -%>
+require_relative 'vision_prescription_must_support_test'
+require_relative 'service_request_must_support_test'
+require_relative 'nutrition_order_must_support_test'
+require_relative 'medication_request_must_support_test'
+require_relative 'device_request_must_support_test'
+require_relative 'communication_request_must_support_test'
+require_relative 'appointment_must_support_test'
+require_relative 'encounter_must_support_test'
+require_relative 'coverage_must_support_test'
+require_relative 'location_must_support_test'
+require_relative 'organization_must_support_test'
+require_relative 'patient_must_support_test'
+require_relative 'practitioner_must_support_test'
+require_relative 'practitioner_role_must_support_test'
 
 module DaVinciCRDTestKit
-  module <%= module_name %>
+  module V221
     class ClientCrossHookMustSupportGroup < Inferno::TestGroup
       title 'Must Support'
-      id :<%= group_id %>
+      id :crd_v221_client_cross_hook_must_support
       description <<~DESCRIPTION
         These tests check that the CRD client supports the must support elements of the CRD profiles
         that it sends within hook requests and that it receives within hook responses.
@@ -25,12 +36,21 @@ module DaVinciCRDTestKit
       input_order :order_types_supported, :supporting_types_supported
 
       ORDER_TYPE_OPTIONS = [
-<%= order_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
+        { label: 'VisionPrescription', value: 'VisionPrescription' },
+        { label: 'ServiceRequest', value: 'ServiceRequest' },
+        { label: 'NutritionOrder', value: 'NutritionOrder' },
+        { label: 'MedicationRequest', value: 'MedicationRequest' },
+        { label: 'DeviceRequest', value: 'DeviceRequest' },
+        { label: 'CommunicationRequest', value: 'CommunicationRequest' }
       ].freeze
 
       # Patient and Coverage are required of every CRD client, so they are not listed here.
       SUPPORTING_TYPE_OPTIONS = [
-<%= supporting_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
+        { label: 'Encounter', value: 'Encounter' },
+        { label: 'Location', value: 'Location' },
+        { label: 'Organization', value: 'Organization' },
+        { label: 'Practitioner', value: 'Practitioner' },
+        { label: 'PractitionerRole', value: 'PractitionerRole' }
       ].freeze
 
       # A resource type only a non-required hook would carry is not expected when that hook was
@@ -38,7 +58,8 @@ module DaVinciCRDTestKit
       # in one of the lists above is expected when selected, and invoking one of its hooks while it is
       # deselected fails as a contradiction.
       REQUIRING_HOOKS = {
-<%= requiring_hooks.map { |type, tags| "        '#{type}' => [#{tags.join(', ')}]" }.join(",\n") %>
+        'Appointment' => [APPOINTMENT_BOOK_TAG],
+        'Encounter' => [ENCOUNTER_START_TAG, ENCOUNTER_DISCHARGE_TAG]
       }.freeze
 
       input :order_types_supported,
@@ -70,7 +91,7 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
-        id :<%= requests_group_id %>
+        id :crd_v221_client_cross_hook_must_support_requests
         description <<~DESCRIPTION
           These tests check that the CRD profiles which can be sent within a hook request were
           observed across the hook requests the CRD client made, and that the must support elements on
@@ -84,21 +105,32 @@ module DaVinciCRDTestKit
           that the CRD client does not capture the represented data or does not surface it to users.
         DESCRIPTION
 
-<%- test_ids.each do |test_id| -%>
-        test from: :<%= test_id %>
-<%- end -%>
-        test from: :<%= order_types_signed_test_id %>
+        test from: :crd_v221_vision_prescription_must_support
+        test from: :crd_v221_service_request_must_support
+        test from: :crd_v221_nutrition_order_must_support
+        test from: :crd_v221_medication_request_must_support
+        test from: :crd_v221_device_request_must_support
+        test from: :crd_v221_communication_request_must_support
+        test from: :crd_v221_appointment_must_support
+        test from: :crd_v221_encounter_must_support
+        test from: :crd_v221_coverage_must_support
+        test from: :crd_v221_location_must_support
+        test from: :crd_v221_organization_must_support
+        test from: :crd_v221_patient_must_support
+        test from: :crd_v221_practitioner_must_support
+        test from: :crd_v221_practitioner_role_must_support
+        test from: :crd_v221_client_order_types_signed
       end
 
       group do
         title 'Responses'
-        id :<%= responses_group_id %>
+        id :crd_v221_client_cross_hook_must_support_responses
         description <<~DESCRIPTION
           These tests check that the CRD client supports the response types and the must support
           elements within them that CRD clients are required to support when returned by a CRD server.
         DESCRIPTION
 
-        test from: :<%= coverage_information_test_id %>
+        test from: :crd_v221_client_card_must_support_coverage_information
       end
     end
   end

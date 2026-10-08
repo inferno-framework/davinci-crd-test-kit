@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
     end
 
     def parse_json_request_entity(body, entity, request_index)
-      JSON.parse(body)
+      JSON.parse(body.to_s)
     rescue JSON::ParserError
       add_request_message('error', "#{entity} contains invalid JSON.", request_index)
       nil

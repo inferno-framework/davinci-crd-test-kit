@@ -1,4 +1,4 @@
-require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_group'
 
 RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
   let(:suite_id) { 'crd_client_v221' }

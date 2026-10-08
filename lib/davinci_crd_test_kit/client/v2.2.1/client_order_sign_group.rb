@@ -68,22 +68,27 @@ module DaVinciCRDTestKit
 
       group do
         title 'Interaction'
+        id :crd_v221_order_sign_interaction
+
         test from: :crd_v221_order_sign_request
       end
 
       group do
         title 'Response Handling'
+        id :crd_v221_order_sign_responses
 
         test from: :crd_v221_card_display_attest_test
         test from: :crd_v221_inferno_response_validation
         test from: :crd_v221_client_hook_response_support_coverage_information do
-          title 'Client supports the Coverage Information response type on the order-sign hook'
+          title 'CRD client supports the Coverage Information response type on the order-sign hook'
           verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@hook-39'
         end
       end
 
       group do
         title 'Requests'
+        id :crd_v221_order_sign_requests
+
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-37',
@@ -105,6 +110,8 @@ module DaVinciCRDTestKit
 
       group do
         title 'Authorization'
+        id :crd_v221_order_sign_auth
+
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header

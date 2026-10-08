@@ -6,11 +6,11 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_multiple_payers_workflow
-      title 'Client performs a workflow for a patient with multiple payer coverages'
+      title 'CRD client performs a workflow for a patient with multiple payer coverages'
       description %(
         During this test, the tester will perform a workflow that triggers hook invocations for a
         request on a patient that has two active coverages associated with two different payers,
-        each associated with one of Inferno's simulated CRD servers. The client is expected to solicit
+        each associated with one of Inferno's simulated CRD servers. The CRD client is expected to solicit
         coverage information from only the payer associated with the coverage most likely to be primary
         and may also invoke the hook on the other payer with coverage information disabled using
         the `coverage-info` key within the `davinci-crd.configuration` extension. Inferno will return
@@ -23,7 +23,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),
@@ -90,7 +90,7 @@ module DaVinciCRDTestKit
             must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
             By [clicking here](#{continuation_url}) I attest that a user completed a workflow
-            in the client system that triggered hook invocation for a patient with active
+            in the CRD client that triggered hook invocation for a patient with active
             coverages from two different payers and that all resulting hook requests have
             been sent.
           )

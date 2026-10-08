@@ -6,7 +6,7 @@ require_relative '../client/v2.2.1/must_support/request_must_support_with_attest
 module DaVinciCRDTestKit
   module Generator
     # Generates the must support group and the one test per resource type it holds. Run as part of
-    # `bundle exec rake crd:generate_must_support_metadata`.
+    # `bundle exec rake crd:generate`.
     class MustSupportTestGenerator
       CONF_3 = 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'.freeze
       HOOK_3 = 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'.freeze
@@ -52,7 +52,7 @@ module DaVinciCRDTestKit
         VisionPrescription ServiceRequest NutritionOrder MedicationRequest DeviceRequest
         CommunicationRequest
       ].freeze
-      SUPPORTING_TYPE_OPTIONS = %w[Location Organization Practitioner PractitionerRole].freeze
+      SUPPORTING_TYPE_OPTIONS = %w[Encounter Location Organization Practitioner PractitionerRole].freeze
 
       REQUIRING_HOOKS = {
         'Appointment' => ['APPOINTMENT_BOOK_TAG'],
@@ -62,24 +62,26 @@ module DaVinciCRDTestKit
       IG_VERSION = 'v2.2.1'.freeze
       MODULE_NAME = 'V221'.freeze
       GROUP_ID = 'crd_v221_client_cross_hook_must_support'.freeze
+      REQUESTS_GROUP_ID = "#{GROUP_ID}_requests".freeze
+      RESPONSES_GROUP_ID = "#{GROUP_ID}_responses".freeze
       ORDER_TYPES_SIGNED_TEST_ID = 'crd_v221_client_order_types_signed'.freeze
       COVERAGE_INFORMATION_TEST_ID = 'crd_v221_client_card_must_support_coverage_information'.freeze
 
-      GROUP_DIRECTORY = File.join(__dir__, '..', 'client', 'v2.2.1').freeze
-      TEST_DIRECTORY = File.join(GROUP_DIRECTORY, 'must_support', 'generated').freeze
+      # The group is written alongside its tests so that every generated file sits in one folder.
+      OUTPUT_DIRECTORY = File.join(__dir__, '..', 'client', 'v2.2.1', 'must_support', 'generated').freeze
 
       # Generated files are linted along with the rest of the project.
       MAX_LINE_LENGTH = 120
 
       def run
-        FileUtils.mkdir_p(TEST_DIRECTORY)
+        FileUtils.mkdir_p(OUTPUT_DIRECTORY)
 
         TEST_DEFINITIONS.each do |definition|
-          File.write(File.join(TEST_DIRECTORY, file_name_for(definition)), render_test(definition))
+          File.write(File.join(OUTPUT_DIRECTORY, file_name_for(definition)), render_test(definition))
           puts "  #{file_name_for(definition)}"
         end
 
-        File.write(File.join(GROUP_DIRECTORY, 'client_cross_hook_must_support_group.rb'), render_group)
+        File.write(File.join(OUTPUT_DIRECTORY, 'client_cross_hook_must_support_group.rb'), render_group)
         puts '  client_cross_hook_must_support_group.rb'
       end
 
@@ -109,6 +111,8 @@ module DaVinciCRDTestKit
         render('must_support_group.rb.erb',
                module_name: MODULE_NAME,
                group_id: GROUP_ID,
+               requests_group_id: REQUESTS_GROUP_ID,
+               responses_group_id: RESPONSES_GROUP_ID,
                test_file_names: TEST_DEFINITIONS.map { |definition| file_name_for(definition).delete_suffix('.rb') },
                test_ids: TEST_DEFINITIONS.map { |definition| definition[:id] },
                order_type_options: ORDER_TYPE_OPTIONS,

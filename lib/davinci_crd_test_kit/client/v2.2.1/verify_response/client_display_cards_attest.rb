@@ -10,10 +10,10 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_card_display_attest_test
-      title 'Client displays returned decision support details to the user'
+      title 'CRD client displays returned decision support details to the user'
       description %(
         During this test, the tester will confirm that the received cards and actions in the
-        hook responses have been displayed or otherwise made available to users of the client system
+        hook responses have been displayed or otherwise made available to users of the CRD client
         in an appopriate way that allows for consideration and action if warranted.
       )
       attestation
@@ -77,7 +77,7 @@ module DaVinciCRDTestKit
 
       run do
         load_interaction_group_requests
-        skip_if responded_card_types.blank?, 'No responses sent to the client.'
+        skip_if responded_card_types.blank?, 'No responses sent to the CRD client.'
 
         identifier = SecureRandom.hex(32)
         attest_true_url = "#{resume_pass_url}?token=#{identifier}"
@@ -90,7 +90,7 @@ module DaVinciCRDTestKit
             **Card Display Attestation**:
 
             I attest that the simulated CRD responses returned by Inferno during this
-            group were successfully processed by the client system and that they were
+            group were successfully processed by the CRD client and that they were
             made available to users of the system in an appropriate way that allowed for
             user review and action if warranted.
 

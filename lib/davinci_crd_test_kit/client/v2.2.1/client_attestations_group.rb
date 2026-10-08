@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         Each test in this group asks the tester to confirm system conformance to one or more
         **SHALL** requirements from the [CRD v2.2.1 Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1)
         or the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/).
-        The tester attests that the client system under test meets the statement by selecting "Yes",
+        The tester attests that the CRD client meets the statement by selecting "Yes",
         and may record supporting details in the accompanying notes field. Selecting "No" fails the
         test. Notes provided are recorded in the test result.
 

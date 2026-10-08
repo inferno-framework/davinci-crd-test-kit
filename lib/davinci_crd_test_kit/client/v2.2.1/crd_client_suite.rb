@@ -35,12 +35,12 @@ module DaVinciCRDTestKit
         - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
         - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
           and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)
-          instructions for executing against a client system, and
+          instructions for executing this suite against a CRD client, and
         - How to [interpret test results](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#interpreting-results).
       DESCRIPTION
 
       suite_summary <<~SUMMARY
-        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of client systems
+        The Da Vinci CRD Client v2.2.1 Test Suite tests the conformance of CRD clients
         to [version 2.2.1 of the Da Vinci Coverage Requirements Discovery (CRD)
         Implementation Guide](https://hl7.org/fhir/us/davinci-crd/2.2.1).
       SUMMARY

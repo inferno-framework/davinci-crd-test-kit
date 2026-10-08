@@ -6,7 +6,7 @@ module DaVinciCRDTestKit
     class ClientHookInstancesUniqueTest < Inferno::Test
       include MultiRequestMessageHelper
 
-      title 'Client does not reuse hookInstance values'
+      title 'CRD client does not reuse hookInstance values'
       id :crd_v221_client_hook_instances_unique
       description <<~DESCRIPTION
         The CDS Hooks specification requires that the `hookInstance` field of each hook

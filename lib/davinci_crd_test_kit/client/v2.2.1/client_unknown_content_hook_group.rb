@@ -7,8 +7,8 @@ module DaVinciCRDTestKit
       title 'Unknown Response Content'
       id :crd_v221_client_unknown_content_hook
       description <<~DESCRIPTION
-        CRD servers may return content that clients do not recognize, and the CRD IG requires
-        clients to ignore it rather than fail. During this scenario Inferno returns coverage
+        CRD servers may return content that CRD clients do not recognize, and the CRD IG requires
+        CRD clients to ignore it rather than fail. During this scenario Inferno returns coverage
         information accompanied by an element within the system action and a custom extension
         on the response, both with randomly generated names. This content is added at the CRD
         response level rather than within the FHIR resources carried in the response.

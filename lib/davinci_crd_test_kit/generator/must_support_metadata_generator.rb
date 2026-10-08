@@ -5,7 +5,7 @@ require_relative '../cross_suite/profile_metadata'
 
 module DaVinciCRDTestKit
   module Generator
-    # Run with `bundle exec rake crd:generate_must_support_metadata`.
+    # Run with `bundle exec rake crd:generate`.
     class MustSupportMetadataGenerator
       IG_VERSIONS = ['2.2.1'].freeze
 

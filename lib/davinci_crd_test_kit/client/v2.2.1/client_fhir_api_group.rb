@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
     class ClientFHIRAPIGroup < Inferno::TestGroup
       title 'FHIR API'
       description <<~DESCRIPTION
-        CRD client systems are responsible for returning data requested by the CRD server needed to provide decision support.
+        CRD clients are responsible for returning data requested by the CRD server needed to provide decision support.
         This group contains tests that verify the required 'server' FHIR API capabilities.
         These 'server' capabilities are based on the US Core Server Capability Statement for the US Core version chosen
         when the test session was initiated.
@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-1'
 
       INPUT_INSTRUCTIONS = %(
-        The location of and an access token for the client's FHIR server are expected to come in
+        The location of and an access token for the CRD client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
         the body of the latest hook invocation made during this session:
         - The URL of the CRD client FHIR server from the `fhirServer` field.
@@ -29,6 +29,21 @@ module DaVinciCRDTestKit
       ).freeze
 
       input_instructions INPUT_INSTRUCTIONS
+
+      # The imported US Core tests refer to the tested system as "the server" or "the system under
+      # test"; within this suite it is the CRD client. General US Core requirement statements
+      # (e.g., "A server SHALL support...") are left as-is.
+      def self.rename_tested_system(runnable)
+        runnable.all_children.each do |child|
+          child.title(child.title.sub(/\A(?:FHIR )?Server /i, 'CRD client '))
+          description = child.description.to_s
+            .gsub(/\b([Tt])he(\s+)system\s+under\s+test\b/, '\\1he\\2CRD client')
+            .gsub(/\b([Tt])he(\s+)server(\s+)endpoint\b/, "\\1he\\2CRD client's\\3FHIR endpoint")
+            .gsub(/\b([Tt])he(\s+)server\b/, '\\1he\\2CRD client')
+          child.description(description) unless description == child.description.to_s
+          rename_tested_system(child)
+        end
+      end
 
       input :url,
             title: 'FHIR Endpoint',
@@ -54,6 +69,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_311_client_update_verification
         reorder :crd_v221_us_core_311_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
       group from: :'us_core_v610-us_core_v610_fhir_api' do
         description %(
@@ -69,6 +86,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_610_client_update_verification
         reorder :crd_v221_us_core_610_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
       group from: :'us_core_v700-us_core_v700_fhir_api' do
         description %(
@@ -84,6 +103,8 @@ module DaVinciCRDTestKit
         group from: :crd_v221_client_update_verification,
               id: :crd_v221_us_core_700_client_update_verification
         reorder :crd_v221_us_core_700_client_update_verification, 1
+
+        ClientFHIRAPIGroup.rename_tested_system(self)
       end
     end
   end

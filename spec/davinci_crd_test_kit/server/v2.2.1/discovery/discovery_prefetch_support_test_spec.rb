@@ -6,7 +6,7 @@ RSpec.describe DaVinciCRDTestKit::V221::DiscoveryPrefetchSupportTest do
     {
       'hook' => 'appointment-book',
       'title' => 'Appointment Booking CDS Service',
-      'description' => 'An example of a CDS Service that is invoked when user of a CRD Client books an appointment',
+      'description' => 'An example of a CDS Service that is invoked when user books an appointment',
       'id' => 'appointment-book-service',
       'prefetch' => {
         'user' => '{{context.userId}}',
