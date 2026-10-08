@@ -62,6 +62,8 @@ module DaVinciCRDTestKit
       IG_VERSION = 'v2.2.1'.freeze
       MODULE_NAME = 'V221'.freeze
       GROUP_ID = 'crd_v221_client_cross_hook_must_support'.freeze
+      REQUESTS_GROUP_ID = "#{GROUP_ID}_requests".freeze
+      RESPONSES_GROUP_ID = "#{GROUP_ID}_responses".freeze
       ORDER_TYPES_SIGNED_TEST_ID = 'crd_v221_client_order_types_signed'.freeze
       COVERAGE_INFORMATION_TEST_ID = 'crd_v221_client_card_must_support_coverage_information'.freeze
 
@@ -109,6 +111,8 @@ module DaVinciCRDTestKit
         render('must_support_group.rb.erb',
                module_name: MODULE_NAME,
                group_id: GROUP_ID,
+               requests_group_id: REQUESTS_GROUP_ID,
+               responses_group_id: RESPONSES_GROUP_ID,
                test_file_names: TEST_DEFINITIONS.map { |definition| file_name_for(definition).delete_suffix('.rb') },
                test_ids: TEST_DEFINITIONS.map { |definition| definition[:id] },
                order_type_options: ORDER_TYPE_OPTIONS,

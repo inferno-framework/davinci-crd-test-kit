@@ -21,16 +21,8 @@ module DaVinciCRDTestKit
       title 'Must Support'
       id :crd_v221_client_cross_hook_must_support
       description <<~DESCRIPTION
-        These tests check that the CRD profiles which can be sent within a hook request were
-        observed across the hook requests the CRD client made, and that the must support elements on
-        them were populated.
-
-        Inferno expects to see a resource type when a hook is invoked where the resource type must appear
-        in the context or the type is selected in the **Order types supported by the CRD Client** or
-        **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
-        further analysis if an expected resource type is not observed or vice-versa. When a resource type
-        was observed but some of its must support elements were not, the tester is asked to attest
-        that the CRD client does not capture the represented data or does not surface it to users.
+        These tests check that the CRD client supports the must support elements of the CRD profiles
+        that it sends within hook requests and that it receives within hook responses.
 
         All requests made during the latest runs of each "Hooks" sub-groups and the "Additional Hook
         Invocations for Cross Hook Support Demonstration" group above are included in this analysis.
@@ -97,22 +89,49 @@ module DaVinciCRDTestKit
             optional: true,
             options: { list_options: SUPPORTING_TYPE_OPTIONS }
 
-      test from: :crd_v221_vision_prescription_must_support
-      test from: :crd_v221_service_request_must_support
-      test from: :crd_v221_nutrition_order_must_support
-      test from: :crd_v221_medication_request_must_support
-      test from: :crd_v221_device_request_must_support
-      test from: :crd_v221_communication_request_must_support
-      test from: :crd_v221_appointment_must_support
-      test from: :crd_v221_encounter_must_support
-      test from: :crd_v221_coverage_must_support
-      test from: :crd_v221_location_must_support
-      test from: :crd_v221_organization_must_support
-      test from: :crd_v221_patient_must_support
-      test from: :crd_v221_practitioner_must_support
-      test from: :crd_v221_practitioner_role_must_support
-      test from: :crd_v221_client_order_types_signed
-      test from: :crd_v221_client_card_must_support_coverage_information
+      group do
+        title 'Requests'
+        id :crd_v221_client_cross_hook_must_support_requests
+        description <<~DESCRIPTION
+          These tests check that the CRD profiles which can be sent within a hook request were
+          observed across the hook requests the CRD client made, and that the must support elements on
+          them were populated.
+
+          Inferno expects to see a resource type when a hook is invoked where the resource type must appear
+          in the context or the type is selected in the **Order types supported by the CRD Client** or
+          **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
+          further analysis if an expected resource type is not observed or vice-versa. When a resource type
+          was observed but some of its must support elements were not, the tester is asked to attest
+          that the CRD client does not capture the represented data or does not surface it to users.
+        DESCRIPTION
+
+        test from: :crd_v221_vision_prescription_must_support
+        test from: :crd_v221_service_request_must_support
+        test from: :crd_v221_nutrition_order_must_support
+        test from: :crd_v221_medication_request_must_support
+        test from: :crd_v221_device_request_must_support
+        test from: :crd_v221_communication_request_must_support
+        test from: :crd_v221_appointment_must_support
+        test from: :crd_v221_encounter_must_support
+        test from: :crd_v221_coverage_must_support
+        test from: :crd_v221_location_must_support
+        test from: :crd_v221_organization_must_support
+        test from: :crd_v221_patient_must_support
+        test from: :crd_v221_practitioner_must_support
+        test from: :crd_v221_practitioner_role_must_support
+        test from: :crd_v221_client_order_types_signed
+      end
+
+      group do
+        title 'Responses'
+        id :crd_v221_client_cross_hook_must_support_responses
+        description <<~DESCRIPTION
+          These tests check that the CRD client supports the response types and the must support
+          elements within them that CRD clients are required to support when returned by a CRD server.
+        DESCRIPTION
+
+        test from: :crd_v221_client_card_must_support_coverage_information
+      end
     end
   end
 end

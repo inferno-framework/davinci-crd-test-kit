@@ -10,16 +10,31 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
   let(:conf3) { generator::CONF_3 }
   let(:hook3) { generator::HOOK_3 }
 
-  # The must support tests, excluding the pre-existing coverage information card test.
+  let(:requests_group) { group.groups.find { |child| child.id.to_s.end_with?(generator::REQUESTS_GROUP_ID) } }
+  let(:responses_group) { group.groups.find { |child| child.id.to_s.end_with?(generator::RESPONSES_GROUP_ID) } }
+  let(:all_tests) { group.groups.flat_map(&:tests) }
+
+  # The generated must support tests, excluding the order signing test.
   let(:must_support_tests) do
-    group.tests.select { |test| test.id.to_s.end_with?(*definition_ids) }
+    requests_group.tests.select { |test| test.id.to_s.end_with?(*definition_ids) }
   end
 
   let(:definition_ids) { definitions.map { |definition| definition[:id].to_s } }
 
-  it 'holds one test per resource type plus the order signing and coverage information tests' do
+  it 'splits its tests into a Requests and a Responses group' do
+    expect(group.tests).to be_empty
+    expect(group.groups.map(&:title)).to eq(%w[Requests Responses])
+  end
+
+  it 'holds one test per resource type plus the order signing test in the Requests group' do
     expect(definitions.length).to eq(14)
-    expect(group.tests.length).to eq(16)
+    expect(requests_group.tests.length).to eq(15)
+    expect(requests_group.tests.last.id.to_s).to end_with(generator::ORDER_TYPES_SIGNED_TEST_ID)
+  end
+
+  it 'holds the coverage information test in the Responses group' do
+    expect(responses_group.tests.map { |test| test.id.to_s.split('-').last })
+      .to eq([generator::COVERAGE_INFORMATION_TEST_ID])
   end
 
   # Each test issues its own attestation, so a tester answers for one resource type at a time
@@ -30,8 +45,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
   end
 
   it 'gives every test a unique id and title' do
-    expect(group.tests.map(&:id).uniq.length).to eq(group.tests.length)
-    expect(group.tests.map(&:title).uniq.length).to eq(group.tests.length)
+    expect(all_tests.map(&:id).uniq.length).to eq(all_tests.length)
+    expect(all_tests.map(&:title).uniq.length).to eq(all_tests.length)
   end
 
   describe 'requirement coverage' do
@@ -128,7 +143,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
         crd_v221_practitioner_must_support: 'CRD Practitioner',
         crd_v221_practitioner_role_must_support: 'HRex PractitionerRole Profile'
       }.each do |test_id, profile_name|
-        test = group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
+        test = requests_group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
 
         expect(test).to_not be_nil, "#{test_id} not found"
         expect(test.description).to include("### [#{profile_name}](")

@@ -10,16 +10,8 @@ module DaVinciCRDTestKit
       title 'Must Support'
       id :<%= group_id %>
       description <<~DESCRIPTION
-        These tests check that the CRD profiles which can be sent within a hook request were
-        observed across the hook requests the CRD client made, and that the must support elements on
-        them were populated.
-
-        Inferno expects to see a resource type when a hook is invoked where the resource type must appear
-        in the context or the type is selected in the **Order types supported by the CRD Client** or
-        **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
-        further analysis if an expected resource type is not observed or vice-versa. When a resource type
-        was observed but some of its must support elements were not, the tester is asked to attest
-        that the CRD client does not capture the represented data or does not surface it to users.
+        These tests check that the CRD client supports the must support elements of the CRD profiles
+        that it sends within hook requests and that it receives within hook responses.
 
         All requests made during the latest runs of each "Hooks" sub-groups and the "Additional Hook
         Invocations for Cross Hook Support Demonstration" group above are included in this analysis.
@@ -76,11 +68,38 @@ module DaVinciCRDTestKit
             optional: true,
             options: { list_options: SUPPORTING_TYPE_OPTIONS }
 
+      group do
+        title 'Requests'
+        id :<%= requests_group_id %>
+        description <<~DESCRIPTION
+          These tests check that the CRD profiles which can be sent within a hook request were
+          observed across the hook requests the CRD client made, and that the must support elements on
+          them were populated.
+
+          Inferno expects to see a resource type when a hook is invoked where the resource type must appear
+          in the context or the type is selected in the **Order types supported by the CRD Client** or
+          **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
+          further analysis if an expected resource type is not observed or vice-versa. When a resource type
+          was observed but some of its must support elements were not, the tester is asked to attest
+          that the CRD client does not capture the represented data or does not surface it to users.
+        DESCRIPTION
+
 <%- test_ids.each do |test_id| -%>
-      test from: :<%= test_id %>
+        test from: :<%= test_id %>
 <%- end -%>
-      test from: :<%= order_types_signed_test_id %>
-      test from: :<%= coverage_information_test_id %>
+        test from: :<%= order_types_signed_test_id %>
+      end
+
+      group do
+        title 'Responses'
+        id :<%= responses_group_id %>
+        description <<~DESCRIPTION
+          These tests check that the CRD client supports the response types and the must support
+          elements within them that CRD clients are required to support when returned by a CRD server.
+        DESCRIPTION
+
+        test from: :<%= coverage_information_test_id %>
+      end
     end
   end
 end
