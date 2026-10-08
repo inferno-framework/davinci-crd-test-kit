@@ -15,6 +15,9 @@ module DaVinciCRDTestKit
 
       id :crd_v221_request_must_support_with_attestation_option
 
+      DECLARED_UNSUPPORTED_REASON =
+        'the tester indicated that the CRD client does not support this resource type'.freeze
+
       # The type matters: Inferno parses a checkbox input's stored JSON into an array, and without
       # it the raw string arrives instead.
       input :order_types_supported, optional: true, type: 'checkbox'
@@ -148,13 +151,25 @@ module DaVinciCRDTestKit
         config.options[:ig_version]
       end
 
-      # A resource type the tester did not select, or that only a hook they never invoked would
-      # carry, is not expected. Observing one anyway contradicts what the tester declared.
+      # A type governed by an input, by requiring hooks, or by both is expected when the tester
+      # selected it or one of its hooks was invoked. A type governed by neither is required of every
+      # CRD client.
       def expected?(resource_type)
-        return false if declared_unsupported?(resource_type)
+        return true if required_of_every_client?(resource_type)
 
-        hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
-        hooks.nil? || hooks.any? { |hook_tag| hook_invoked?(hook_tag) }
+        selected_types(resource_type)&.include?(resource_type) || required_by_invoked_hook?(resource_type)
+      end
+
+      def required_of_every_client?(resource_type)
+        selected_types(resource_type).nil? && requiring_hooks(resource_type).nil?
+      end
+
+      def invoked_requiring_hooks(resource_type)
+        Array(requiring_hooks(resource_type)).select { |hook_tag| hook_invoked?(hook_tag) }
+      end
+
+      def required_by_invoked_hook?(resource_type)
+        invoked_requiring_hooks(resource_type).present?
       end
 
       # nil when the type is required of every CRD client, so no input governs it. A CRD client need not
@@ -167,22 +182,33 @@ module DaVinciCRDTestKit
         end
       end
 
+      def requiring_hooks(resource_type)
+        ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
+      end
+
+      # The pooled requests carry their tags, so a hook's invocation is read from them rather than
+      # with another query.
       def hook_invoked?(hook_tag)
-        Inferno::Repositories::Requests.new
-          .tagged_requests(test_session_id, [hook_tag, CROSS_HOOK_ANALYSIS_TAG]).present?
+        must_support_requests.any? { |request| request.tags.include?(hook_tag) }
       end
 
       def declared_unsupported?(resource_type)
         selected_types(resource_type)&.exclude?(resource_type) || false
       end
 
-      def unexpected_reason(resource_type)
-        if declared_unsupported?(resource_type)
-          return 'the tester indicated that the CRD client does not support this resource type'
-        end
+      # Observing a type contradicts the tester only when they declared it unsupported and no hook
+      # that requires it was invoked. A hook gated type can turn up in another hook's request, so
+      # absent a declaration it is checked as normal.
+      def contradicts_declaration?(resource_type)
+        declared_unsupported?(resource_type) && !required_by_invoked_hook?(resource_type)
+      end
 
-        hooks = ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
-        "no #{hooks.join(' or ')} hook was invoked"
+      def not_expected_reason(resource_type)
+        reasons = []
+        reasons << DECLARED_UNSUPPORTED_REASON if declared_unsupported?(resource_type)
+        hooks = requiring_hooks(resource_type)
+        reasons << "no #{hooks.join(' or ')} hook was invoked" if hooks.present?
+        reasons.join(' and ')
       end
 
       def gather_unobserved
@@ -200,10 +226,8 @@ module DaVinciCRDTestKit
             next { kind: :missing_type, title:, resource_type: }
           end
 
-          # Only a type the tester declared unsupported contradicts what they said. A hook gated
-          # type can  turn up in another hook's request, so it is checked as normal.
           next { kind: :unexpected_type, title:, resource_type:, count: resources.length } if
-            declared_unsupported?(resource_type)
+            contradicts_declaration?(resource_type)
 
           missing = MustSupportLogic.new.perform_must_support_test_with_metadata(
             resources, metadata, debug_metadata: config.options[:debug_must_support_metadata]
@@ -233,13 +257,21 @@ module DaVinciCRDTestKit
       def declared_type_message(entry)
         if entry[:kind] == :unexpected_type
           "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
-            "CRD client, but #{unexpected_reason(entry[:resource_type])}."
-        elsif ['Patient', 'Coverage'].include?(entry[:resource_type])
-          "CRD clients are required to support the `#{entry[:resource_type]}` " \
-            'resource type, but no instances were observed in the hook requests made.'
+            "CRD client, but #{DECLARED_UNSUPPORTED_REASON}."
         else
-          "The tester indicated the CRD client supports the `#{entry[:resource_type]}` " \
+          "#{missing_type_reason(entry[:resource_type])} the `#{entry[:resource_type]}` " \
             'resource type, but no instances were observed in the hook requests made.'
+        end
+      end
+
+      def missing_type_reason(resource_type)
+        if required_of_every_client?(resource_type)
+          'CRD clients are required to support'
+        elsif selected_types(resource_type)&.include?(resource_type)
+          'The tester indicated the CRD client supports'
+        else
+          hooks = invoked_requiring_hooks(resource_type).map { |hook_tag| "`#{hook_tag}`" }
+          "The CRD client invoked the #{hooks.to_sentence} hook(s), which are expected to include"
         end
       end
 
@@ -251,7 +283,7 @@ module DaVinciCRDTestKit
         return 'All must support elements were observed.' if vacuous.blank?
 
         "No instances of #{vacuous.to_sentence} observed, and none expected: " \
-          "#{vacuous.map { |resource_type| unexpected_reason(resource_type) }.uniq.join('; ')}."
+          "#{vacuous.map { |resource_type| not_expected_reason(resource_type) }.uniq.join('; ')}."
       end
 
       def log_info_messages(unobserved)

@@ -333,6 +333,63 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
   end
 
+  # When a type is both selectable and gated on hooks, either selecting it or invoking one of its
+  # hooks makes it expected.
+  describe 'a type governed by both an input and requiring hooks' do
+    let(:encounter_test) { test_for([{ resource_type: 'Encounter', profile_keys: ['encounter'] }]) }
+    let(:encounter) { { resourceType: 'Encounter', id: 'e1', status: 'in-progress' } }
+
+    def hook_request(hook_tag, prefetch: { patient: { resourceType: 'Patient' } })
+      repo_create(:request, test_session_id: test_session.id, result: receiving_result,
+                            request_body: hook_request_body(prefetch:),
+                            tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag])
+    end
+
+    it 'expects the type when selected even though no requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(encounter_test, supporting_types_supported: ['Encounter'].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Encounter`')
+    end
+
+    it 'expects the type when a requiring hook was invoked even though it was not selected' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG)
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('invoked the `encounter-start` hook(s)')
+      expect(result.result_message).to include('`Encounter` resource type, but no instances')
+    end
+
+    it 'passes vacuously when neither selected nor required by an invoked hook' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('pass')
+      expect(result.result_message)
+        .to include('does not support this resource type and no encounter-start or encounter-discharge hook')
+    end
+
+    it 'checks an unselected type observed alongside an invoked requiring hook' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG, prefetch: { encounter: })
+
+      expect(run(encounter_test, supporting_types_supported: [].to_json).result).to eq('wait')
+    end
+
+    it 'fails when an unselected type is observed and no requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG, prefetch: { encounter: })
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('Observed 1 `Encounter` instance')
+    end
+  end
+
   # Every test in the group analyzes the same pooled requests, so the extraction is done once and
   # shared through scratch rather than repeated by each test instance.
   describe 'extraction reuse across tests' do

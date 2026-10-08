@@ -52,7 +52,7 @@ module DaVinciCRDTestKit
         VisionPrescription ServiceRequest NutritionOrder MedicationRequest DeviceRequest
         CommunicationRequest
       ].freeze
-      SUPPORTING_TYPE_OPTIONS = %w[Location Organization Practitioner PractitionerRole].freeze
+      SUPPORTING_TYPE_OPTIONS = %w[Encounter Location Organization Practitioner PractitionerRole].freeze
 
       REQUIRING_HOOKS = {
         'Appointment' => ['APPOINTMENT_BOOK_TAG'],

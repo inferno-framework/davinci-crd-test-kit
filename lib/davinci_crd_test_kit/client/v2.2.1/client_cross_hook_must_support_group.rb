@@ -50,6 +50,7 @@ module DaVinciCRDTestKit
 
       # Patient and Coverage are required of every CRD client, so they are not listed here.
       SUPPORTING_TYPE_OPTIONS = [
+        { label: 'Encounter', value: 'Encounter' },
         { label: 'Location', value: 'Location' },
         { label: 'Organization', value: 'Organization' },
         { label: 'Practitioner', value: 'Practitioner' },
@@ -57,7 +58,8 @@ module DaVinciCRDTestKit
       ].freeze
 
       # A resource type only a non-required hook would carry is not expected when that hook was
-      # never invoked, so its test passes rather than asking the tester to attest.
+      # never invoked, so its test passes rather than asking the tester to attest. A type that is also
+      # in one of the lists above is expected when it is selected or one of its hooks was invoked.
       REQUIRING_HOOKS = {
         'Appointment' => [APPOINTMENT_BOOK_TAG],
         'Encounter' => [ENCOUNTER_START_TAG, ENCOUNTER_DISCHARGE_TAG]
@@ -83,7 +85,8 @@ module DaVinciCRDTestKit
               demonstrated within hook requests. By unchecking a resource type, the tester attests
               that the CRD client does not support the information represented by the resource type
               or does not surface it to users. `Patient` and `Coverage` resource types are always
-              checked because CRD clients are required to support them.
+              checked because CRD clients are required to support them. `Encounter` is also expected
+              whenever an `encounter-start` or `encounter-discharge` hook is invoked, even if unchecked.
             ),
             type: 'checkbox',
             default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
