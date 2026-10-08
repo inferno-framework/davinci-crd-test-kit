@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         requests against Inferno's simulated CRD servers. Inferno will respond
         based on the response configuration provided when running the test.
         For more details on how Inferno's simulated CRD servers behave during
-        hook invocation see the [simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#crd-server-simulation)
+        hook invocation see the [simulated CRD server](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#simulated-crd-server-in-the-crd-client-v221-suite)
         documentation.
 
         Inferno will pause and wait for inbound requests until told explicitly to continue

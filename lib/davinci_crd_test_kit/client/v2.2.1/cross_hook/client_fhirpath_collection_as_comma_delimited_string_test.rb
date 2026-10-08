@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       title 'CRD client correctly interprets collections when substituting FHIRPath results in prefetch templates'
       id :crd_v221_client_fhir_path_collection_as_comma_delimited_string
       description <<~DESCRIPTION
-        The CDS Hooks specification requires that when a FHIRPath token in A
+        The CDS Hooks specification requires that when a FHIRPath token in a
         prefetch template resolves to a collection of datatypes (e.g., resource ids),
         then the collection gets turned into a comma-delimited string when instantiating
         the prefetch template.
