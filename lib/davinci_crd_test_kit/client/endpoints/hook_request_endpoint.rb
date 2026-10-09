@@ -1,4 +1,5 @@
-require_relative 'gather_response_generation_data'
+require_relative 'v201_hook_request_data_gathering'
+require_relative 'v221_hook_request_data_gathering'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
 require_relative 'scenario_service_response'
@@ -8,7 +9,8 @@ require_relative '../../cross_suite/tags'
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint
     include DaVinciCRDTestKit::MockServiceResponse
-    include DaVinciCRDTestKit::GatherResponseGenerationData
+    include DaVinciCRDTestKit::V201HookRequestDataGathering
+    include DaVinciCRDTestKit::V221HookRequestDataGathering
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
     include DaVinciCRDTestKit::ScenarioServiceResponse
