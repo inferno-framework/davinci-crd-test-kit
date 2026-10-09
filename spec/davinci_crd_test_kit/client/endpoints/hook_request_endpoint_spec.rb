@@ -538,12 +538,14 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       end
     end
 
-    it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do
+    it 'does not make the v2.0.1 response generation data fetches when requestedVersion extension specifies 2.2' do
       allow(test).to receive(:suite).and_return(suite)
+      # v2.2.1 reads must support references instead, such as the draft order's orderer, which this
+      # example does not look at. Stubs declared later take precedence, so the ones below still record
+      # their own requests.
+      stub_request(:get, %r{\A#{fhir_server}/}).to_return(status: 404)
       pat_request = stub_request(:get, patient_example_reference_absolute)
         .to_return(status: 200, body: patient_example.to_json)
-      p_request = stub_request(:get, practitioner_example_reference_absolute)
-        .to_return(status: 200, body: practitioner_example.to_json)
       cov_request = stub_request(:get, coverage_search_url)
         .to_return(status: 200, body: crd_coverage_bundle.to_json)
 
@@ -566,7 +568,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
       expect(last_response).to be_ok
       expect(pat_request).to_not have_been_made
-      expect(p_request).to_not have_been_made
       expect(cov_request).to_not have_been_made
     end
   end

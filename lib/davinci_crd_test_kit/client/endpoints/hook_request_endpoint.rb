@@ -203,7 +203,11 @@ module DaVinciCRDTestKit
     end
 
     def cross_hook_tag
-      CROSS_HOOK_ANALYSIS_TAG if test.config.options[:include_in_cross_hook_analysis]
+      CROSS_HOOK_ANALYSIS_TAG if include_in_cross_hook_analysis?
+    end
+
+    def include_in_cross_hook_analysis?
+      test.config.options[:include_in_cross_hook_analysis].present?
     end
 
     def hook_error_response(error_message, code: 400, outcome_code: 'invalid')

@@ -9,6 +9,10 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       def request_body
         nil
       end
+
+      def include_in_cross_hook_analysis?
+        false
+      end
     end.new
   end
 
@@ -176,16 +180,30 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(local_request).to have_been_made.once
     end
 
-    it 'requests references (external absolute refrence)' do
+    it 'requests references without the access token (external absolute refrence)' do
       external_reference = "https://another.server/r4/#{patient_example_reference_relative}"
       allow(module_instance).to receive(:request_body).and_return(order_sign_request)
 
       external_request = stub_request(:get, external_reference)
+        .with { |request| request.headers.keys.none? { |name| name.casecmp?('Authorization') } }
         .to_return(status: 200, body: patient_example.to_json)
 
       module_instance.gather_data_for_request([external_reference], [])
       expect(module_instance.analyzed_resources[external_reference]).to eq(patient_example)
       expect(external_request).to have_been_made.once
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, anything, request_headers: {})
+    end
+
+    it 'requests references with the access token (local absolute reference)' do
+      allow(module_instance).to receive_messages(request_body: order_sign_request)
+
+      local_request = stub_request(:get, patient_example_reference_absolute)
+        .with(headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' })
+        .to_return(status: 200, body: patient_example.to_json)
+
+      module_instance.gather_data_for_request([patient_example_reference_absolute], [])
+      expect(local_request).to have_been_made.once
     end
 
     it 'follows a redirect when fetching a reference' do
@@ -726,14 +744,240 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
         .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
     end
 
-    it 'reads a reference given as an absolute url on the request fhirServer' do
+    it 'reads a reference given as an absolute url on the request fhirServer with the access token' do
       stub_target_input("#{fhir_server}/#{target_reference}")
-      allow(access_level_instance).to receive(:fetch_reference)
+      access_level_instance.request_body['fhirAuthorization'] = { 'access_token' => 'SAMPLE_TOKEN' }
+      allow(access_level_instance).to receive(:persist_query_request)
+      target_request = stub_request(:get, "#{fhir_server}/#{target_reference}")
+        .with(headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' })
+        .to_return(status: 200, body: { resourceType: 'Observation', id: '123' }.to_json)
 
       access_level_instance.request_access_level_target
 
-      expect(access_level_instance).to have_received(:fetch_reference)
-        .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
+      expect(target_request).to have_been_made.once
+    end
+  end
+
+  describe 'when reading references to other servers outside must support analysis' do
+    def stub_tokenless_get(url, body)
+      stub_request(:get, url)
+        .with { |request| request.headers.keys.none? { |name| name.casecmp?('Authorization') } }
+        .to_return(status: 200, body: body.to_json)
+    end
+
+    # The coverage fixture's payor is an absolute reference to http://example.org/fhir.
+    it 'reads the coverage payer from its server without the access token' do
+      order_sign_request['prefetch'] = { 'coverage' => crd_coverage }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      payer_request = stub_tokenless_get(crd_coverage['payor'].first['reference'], organization_example)
+
+      module_instance.request_coverage_payer
+
+      expect(payer_request).to have_been_made.once
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, include(DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG), request_headers: {})
+    end
+
+    it 'reads a parent location from its server without the access token' do
+      external_parent = 'https://elsewhere.example/r4/Location/parent'
+      location = location_example.merge('partOf' => { 'reference' => external_parent })
+      order_sign_request['prefetch'] = { 'locations' => location }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      parent_request = stub_tokenless_get(external_parent, location2_example)
+
+      module_instance.request_parent_locations
+
+      expect(parent_request).to have_been_made.once
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, include(DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG), request_headers: {})
+    end
+  end
+
+  describe 'when reading must support references' do
+    let(:performer) { [] }
+    let(:external_practitioner_url) { 'https://elsewhere.example/r4/Practitioner/other' }
+    let(:service_request) do
+      {
+        resourceType: 'ServiceRequest',
+        id: 'sr1',
+        subject: { reference: patient_example_reference_relative },
+        requester: { reference: practitioner_role_example_reference_absolute },
+        performer:,
+        locationReference: [{ reference: '#contained-location' }]
+      }
+    end
+    let(:hook_request) do
+      {
+        'hook' => 'order-sign',
+        'hookInstance' => 'instance-1',
+        'fhirServer' => fhir_server,
+        'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+        'context' => {
+          'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => service_request }] }
+        },
+        'prefetch' => { 'patient' => patient_example }
+      }.as_json
+    end
+    let(:must_support_fetch_tags) do
+      [DaVinciCRDTestKit::DATA_FETCH_TAG, DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag('instance-1'),
+       DaVinciCRDTestKit::MUST_SUPPORT_REFERENCE_FETCH_TAG]
+    end
+
+    let!(:practitioner_role_request) do
+      stub_request(:get, practitioner_role_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_role_example.to_json)
+    end
+    let!(:practitioner_request) do
+      stub_request(:get, practitioner_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_example.to_json)
+    end
+
+    before do
+      allow(module_instance).to receive_messages(request_body: hook_request, include_in_cross_hook_analysis?: true)
+    end
+
+    it 'reads references within must support elements and follows those within what it reads' do
+      module_instance.request_additional_fhir_data
+
+      expect(practitioner_role_request).to have_been_made.once
+      expect(practitioner_request).to have_been_made.once
+    end
+
+    it 'tags each read as a must support reference fetch for the hook instance' do
+      module_instance.request_additional_fhir_data
+
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, must_support_fetch_tags, request_headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' }).twice
+    end
+
+    it 'does not read resources carried in the request or contained' do
+      patient_request = stub_request(:get, patient_example_reference_absolute)
+
+      module_instance.request_additional_fhir_data
+
+      expect(patient_request).to_not have_been_made
+      expect(a_request(:get, /contained-location/)).to_not have_been_made
+    end
+
+    context 'when two elements hold the same reference' do
+      let(:performer) { [{ reference: practitioner_role_example_reference_relative }] }
+
+      it 'reads it only once' do
+        module_instance.request_additional_fhir_data
+
+        expect(practitioner_role_request).to have_been_made.once
+      end
+    end
+
+    it 'makes no reads for requests outside the cross hook analysis' do
+      allow(module_instance).to receive(:include_in_cross_hook_analysis?).and_return(false)
+
+      module_instance.request_additional_fhir_data
+
+      expect(practitioner_role_request).to_not have_been_made
+    end
+
+    context 'when a reference points to another server' do
+      let(:performer) { [{ reference: external_practitioner_url }] }
+
+      it 'reads it from that server without the access token' do
+        external_request = stub_request(:get, external_practitioner_url)
+          .with { |request| request.headers.keys.none? { |name| name.casecmp?('Authorization') } }
+          .to_return(status: 200, body: practitioner_example.to_json)
+
+        module_instance.request_additional_fhir_data
+
+        expect(external_request).to have_been_made.once
+      end
+
+      it 'records that no access token was sent' do
+        stub_request(:get, external_practitioner_url).to_return(status: 200, body: practitioner_example.to_json)
+
+        module_instance.request_additional_fhir_data
+
+        expect(module_instance).to have_received(:persist_query_request)
+          .with(anything, must_support_fetch_tags, request_headers: {}).once
+      end
+
+      it 'keeps reading from the FHIR server after the other server times out' do
+        stub_request(:get, external_practitioner_url).to_timeout
+
+        module_instance.request_additional_fhir_data
+
+        expect(practitioner_role_request).to have_been_made.once
+      end
+    end
+
+    context 'when an external reference names a resource carried in the request under that fullUrl' do
+      let(:performer) { [{ reference: external_practitioner_url }] }
+
+      it 'does not read it' do
+        hook_request['prefetch']['others'] = {
+          'resourceType' => 'Bundle',
+          'entry' => [{ 'fullUrl' => external_practitioner_url, 'resource' => practitioner_example }]
+        }
+        external_request = stub_request(:get, external_practitioner_url)
+
+        module_instance.request_additional_fhir_data
+
+        expect(external_request).to_not have_been_made
+      end
+    end
+
+    context 'when a resource is identified by a fullUrl on another server' do
+      let(:elsewhere) { 'https://elsewhere.example/r4' }
+
+      def stub_tokenless_get(url, body)
+        stub_request(:get, url)
+          .with { |request| request.headers.keys.none? { |name| name.casecmp?('Authorization') } }
+          .to_return(status: 200, body: body.to_json)
+      end
+
+      # The PractitionerRole read from the other server in turn references its Practitioner
+      # relatively, so that is read from the other server too.
+      it 'reads its relative references from that server without the access token' do
+        entry = hook_request['context']['draftOrders']['entry'].first
+        entry['fullUrl'] = "#{elsewhere}/ServiceRequest/sr1"
+        entry['resource']['requester'] = { 'reference' => practitioner_role_example_reference_relative }
+        role_request = stub_tokenless_get("#{elsewhere}/#{practitioner_role_example_reference_relative}",
+                                          practitioner_role_example)
+        practitioner_elsewhere = stub_tokenless_get("#{elsewhere}/#{practitioner_example_reference_relative}",
+                                                    practitioner_example)
+        stub_request(:get, "#{elsewhere}/#{patient_example_reference_relative}").to_return(status: 404)
+
+        module_instance.request_additional_fhir_data
+
+        expect(role_request).to have_been_made.once
+        expect(practitioner_elsewhere).to have_been_made.once
+        expect(practitioner_role_request).to_not have_been_made
+      end
+    end
+
+    # performer is read before requester, as the elements are visited in path order.
+    context 'when a read from the FHIR server times out' do
+      let(:performer) { [{ reference: 'Practitioner/slow' }] }
+
+      it 'attempts no further reads from that server for the request' do
+        stub_request(:get, "#{fhir_server}/Practitioner/slow").to_timeout
+
+        module_instance.request_additional_fhir_data
+
+        expect(module_instance.server_timed_out?(practitioner_role_example_reference_relative)).to be(true)
+        expect(practitioner_role_request).to_not have_been_made
+      end
+    end
+
+    context 'when a read fails without timing out' do
+      let(:performer) { [{ reference: 'Practitioner/missing' }] }
+
+      it 'continues with the remaining reads' do
+        stub_request(:get, "#{fhir_server}/Practitioner/missing").to_return(status: 404)
+
+        module_instance.request_additional_fhir_data
+
+        expect(module_instance.timed_out_servers).to be_empty
+        expect(practitioner_role_request).to have_been_made.once
+      end
     end
   end
 end

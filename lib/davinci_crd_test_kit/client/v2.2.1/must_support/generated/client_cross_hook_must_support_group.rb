@@ -1,19 +1,31 @@
 require_relative '../../cross_hook/client_card_must_support_coverage_information_test'
 require_relative '../../cross_hook/client_order_types_signed_test'
 require_relative 'vision_prescription_must_support_test'
+require_relative 'vision_prescription_reference_resolution_test'
 require_relative 'service_request_must_support_test'
+require_relative 'service_request_reference_resolution_test'
 require_relative 'nutrition_order_must_support_test'
+require_relative 'nutrition_order_reference_resolution_test'
 require_relative 'medication_request_must_support_test'
+require_relative 'medication_request_reference_resolution_test'
 require_relative 'device_request_must_support_test'
+require_relative 'device_request_reference_resolution_test'
 require_relative 'communication_request_must_support_test'
+require_relative 'communication_request_reference_resolution_test'
 require_relative 'appointment_must_support_test'
+require_relative 'appointment_reference_resolution_test'
 require_relative 'encounter_must_support_test'
+require_relative 'encounter_reference_resolution_test'
 require_relative 'coverage_must_support_test'
+require_relative 'coverage_reference_resolution_test'
 require_relative 'location_must_support_test'
+require_relative 'location_reference_resolution_test'
 require_relative 'organization_must_support_test'
+require_relative 'organization_reference_resolution_test'
 require_relative 'patient_must_support_test'
 require_relative 'practitioner_must_support_test'
 require_relative 'practitioner_role_must_support_test'
+require_relative 'practitioner_role_reference_resolution_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -106,19 +118,31 @@ module DaVinciCRDTestKit
         DESCRIPTION
 
         test from: :crd_v221_vision_prescription_must_support
+        test from: :crd_v221_vision_prescription_must_support_reference_resolution
         test from: :crd_v221_service_request_must_support
+        test from: :crd_v221_service_request_must_support_reference_resolution
         test from: :crd_v221_nutrition_order_must_support
+        test from: :crd_v221_nutrition_order_must_support_reference_resolution
         test from: :crd_v221_medication_request_must_support
+        test from: :crd_v221_medication_request_must_support_reference_resolution
         test from: :crd_v221_device_request_must_support
+        test from: :crd_v221_device_request_must_support_reference_resolution
         test from: :crd_v221_communication_request_must_support
+        test from: :crd_v221_communication_request_must_support_reference_resolution
         test from: :crd_v221_appointment_must_support
+        test from: :crd_v221_appointment_must_support_reference_resolution
         test from: :crd_v221_encounter_must_support
+        test from: :crd_v221_encounter_must_support_reference_resolution
         test from: :crd_v221_coverage_must_support
+        test from: :crd_v221_coverage_must_support_reference_resolution
         test from: :crd_v221_location_must_support
+        test from: :crd_v221_location_must_support_reference_resolution
         test from: :crd_v221_organization_must_support
+        test from: :crd_v221_organization_must_support_reference_resolution
         test from: :crd_v221_patient_must_support
         test from: :crd_v221_practitioner_must_support
         test from: :crd_v221_practitioner_role_must_support
+        test from: :crd_v221_practitioner_role_must_support_reference_resolution
         test from: :crd_v221_client_order_types_signed
       end
 

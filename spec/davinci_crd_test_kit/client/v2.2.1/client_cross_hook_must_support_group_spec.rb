@@ -21,14 +21,29 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
 
   let(:definition_ids) { definitions.map { |definition| definition[:id].to_s } }
 
+  let(:reference_tests) do
+    requests_group.tests.select { |test| test.id.to_s.end_with?('_reference_resolution') }
+  end
+
+  it 'places each reference test directly after the element test for the same resource type' do
+    ids = requests_group.tests.map { |test| test.id.to_s.split('-').last }
+
+    reference_tests.each do |test|
+      id = test.id.to_s.split('-').last
+      expect(ids[ids.index(id) - 1]).to eq(id.delete_suffix('_reference_resolution'))
+    end
+  end
+
   it 'splits its tests into a Requests and a Responses group' do
     expect(group.tests).to be_empty
     expect(group.groups.map(&:title)).to eq(%w[Requests Responses])
   end
 
-  it 'holds one test per resource type plus the order signing test in the Requests group' do
+  it 'holds one test per resource type, a reference test per type with must support references, ' \
+     'and the order signing test in the Requests group' do
     expect(definitions.length).to eq(14)
-    expect(requests_group.tests.length).to eq(15)
+    expect(reference_tests.length).to eq(12)
+    expect(requests_group.tests.length).to eq(27)
     expect(requests_group.tests.last.id.to_s).to end_with(generator::ORDER_TYPES_SIGNED_TEST_ID)
   end
 
@@ -95,6 +110,18 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
                                         'MedicationRequest', 'DeviceRequest', 'CommunicationRequest',
                                         'Appointment', 'Encounter', 'Coverage', 'Location',
                                         'Organization', 'Patient', 'Practitioner', 'PractitionerRole')
+    end
+
+    it 'can find the resource type of every must support reference target profile' do
+      definitions.flat_map { |definition| definition[:profiles] }.each do |profile|
+        metadata = DaVinciCRDTestKit::ProfileMetadata.merged(ig_version, profile[:profile_keys])
+        DaVinciCRDTestKit::MustSupportReferences.reference_elements(metadata).each do |element|
+          Array(element[:target_profiles]).each do |target_profile|
+            expect(DaVinciCRDTestKit::ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource)
+              .to be_present, "no metadata for #{target_profile}, targeted by #{element[:path]}"
+          end
+        end
+      end
     end
 
     it 'checks Appointment against both Appointment profiles' do

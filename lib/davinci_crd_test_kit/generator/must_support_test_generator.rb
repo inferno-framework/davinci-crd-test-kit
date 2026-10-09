@@ -2,11 +2,13 @@ require 'erb'
 require 'fileutils'
 require_relative '../cross_suite/profile_metadata'
 require_relative '../client/v2.2.1/must_support/request_must_support_with_attestation_option'
+require_relative '../client/v2.2.1/must_support/request_must_support_reference_resolution'
 
 module DaVinciCRDTestKit
   module Generator
-    # Generates the must support group and the one test per resource type it holds. Run as part of
-    # `bundle exec rake crd:generate`.
+    # Generates the must support group, the must support element test for each resource type it
+    # holds, and a reference resolution test for each of those types with must support Reference
+    # elements. Run as part of `bundle exec rake crd:generate`.
     class MustSupportTestGenerator
       CONF_3 = 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'.freeze
       HOOK_3 = 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'.freeze
@@ -79,6 +81,11 @@ module DaVinciCRDTestKit
         TEST_DEFINITIONS.each do |definition|
           File.write(File.join(OUTPUT_DIRECTORY, file_name_for(definition)), render_test(definition))
           puts "  #{file_name_for(definition)}"
+          next unless references?(definition)
+
+          File.write(File.join(OUTPUT_DIRECTORY, reference_file_name_for(definition)),
+                     render_reference_test(definition))
+          puts "  #{reference_file_name_for(definition)}"
         end
 
         File.write(File.join(OUTPUT_DIRECTORY, 'client_cross_hook_must_support_group.rb'), render_group)
@@ -107,14 +114,32 @@ module DaVinciCRDTestKit
                profiles_literal: profiles_literal(definition[:profiles]))
       end
 
+      # Each reference resolution test follows the element test for the same resource type.
+      def render_reference_test(definition)
+        profile = definition[:profiles].first
+        options = { ig_version: IG_VERSION, profiles: definition[:profiles] }
+        metadata = test_class.metadata_for(IG_VERSION, profile)
+
+        render('reference_resolution_test.rb.erb',
+               module_name: MODULE_NAME,
+               class_name: reference_class_name_for(definition),
+               test_id: reference_test_id_for(definition),
+               title: "#{definition[:title] || test_class.title_for(metadata, profile)} must support references " \
+                      'resolve',
+               indented_description: indent(reference_test_class.build_description(options), 8),
+               requirements: [CONF_3],
+               ig_version: IG_VERSION,
+               profiles_literal: profiles_literal(definition[:profiles]))
+      end
+
       def render_group
         render('must_support_group.rb.erb',
                module_name: MODULE_NAME,
                group_id: GROUP_ID,
                requests_group_id: REQUESTS_GROUP_ID,
                responses_group_id: RESPONSES_GROUP_ID,
-               test_file_names: TEST_DEFINITIONS.map { |definition| file_name_for(definition).delete_suffix('.rb') },
-               test_ids: TEST_DEFINITIONS.map { |definition| definition[:id] },
+               test_file_names: group_file_names,
+               test_ids: group_test_ids,
                order_type_options: ORDER_TYPE_OPTIONS,
                supporting_type_options: SUPPORTING_TYPE_OPTIONS,
                requiring_hooks: REQUIRING_HOOKS,
@@ -122,8 +147,43 @@ module DaVinciCRDTestKit
                coverage_information_test_id: COVERAGE_INFORMATION_TEST_ID)
       end
 
+      def group_test_ids
+        TEST_DEFINITIONS.flat_map do |definition|
+          [definition[:id], (reference_test_id_for(definition) if references?(definition))].compact
+        end
+      end
+
+      def group_file_names
+        file_names = TEST_DEFINITIONS.flat_map do |definition|
+          [file_name_for(definition), (reference_file_name_for(definition) if references?(definition))].compact
+        end
+        file_names.map { |file_name| file_name.delete_suffix('.rb') }
+      end
+
+      def references?(definition)
+        definition[:profiles].any? do |profile|
+          MustSupportReferences.reference_elements(test_class.metadata_for(IG_VERSION, profile)).present?
+        end
+      end
+
       def test_class
         V221::RequestMustSupportWithAttestationOption
+      end
+
+      def reference_test_class
+        V221::RequestMustSupportReferenceResolution
+      end
+
+      def reference_test_id_for(definition)
+        :"#{definition[:id]}_reference_resolution"
+      end
+
+      def reference_class_name_for(definition)
+        "#{definition[:profiles].first[:resource_type]}ReferenceResolutionTest"
+      end
+
+      def reference_file_name_for(definition)
+        "#{reference_class_name_for(definition).underscore}.rb"
       end
 
       def description_for(options)

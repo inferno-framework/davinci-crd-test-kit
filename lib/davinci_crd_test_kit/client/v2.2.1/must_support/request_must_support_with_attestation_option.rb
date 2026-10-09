@@ -3,6 +3,7 @@ require_relative '../../../cross_suite/profile_metadata'
 require_relative '../../../cross_suite/must_support_slice_matching'
 require_relative '../../../cross_suite/tags'
 require_relative '../client_urls'
+require_relative 'request_must_support_scope'
 
 module DaVinciCRDTestKit
   module V221
@@ -12,6 +13,7 @@ module DaVinciCRDTestKit
     class RequestMustSupportWithAttestationOption < Inferno::Test
       include HookRequestResourceExtraction
       include ClientURLs
+      include RequestMustSupportScope
 
       id :crd_v221_request_must_support_with_attestation_option
 
@@ -123,13 +125,6 @@ module DaVinciCRDTestKit
         end
       end
 
-      # Reads the requests directly rather than going through `load_tagged_requests`, which would
-      # also associate every cross hook request with this test's own result.
-      def must_support_requests
-        @must_support_requests ||=
-          Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [CROSS_HOOK_ANALYSIS_TAG])
-      end
-
       # Every must support test in this group reads the same pooled requests, so the extraction is
       # kept in scratch, which persists across test instances. The request ids it was built from are
       # stored alongside it, since a tester can send more hook requests and re-run the group.
@@ -174,16 +169,6 @@ module DaVinciCRDTestKit
         invoked_requiring_hooks(resource_type).present?
       end
 
-      # nil when the type is required of every CRD client, so no input governs it. A CRD client need not
-      # support any order type, so clearing every box means none are expected rather than all.
-      def selected_types(resource_type)
-        if ClientCrossHookMustSupportGroup::ORDER_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
-          Array(order_types_supported)
-        elsif ClientCrossHookMustSupportGroup::SUPPORTING_TYPE_OPTIONS.any? { |one| one[:value] == resource_type }
-          Array(supporting_types_supported)
-        end
-      end
-
       def requiring_hooks(resource_type)
         ClientCrossHookMustSupportGroup::REQUIRING_HOOKS[resource_type]
       end
@@ -192,10 +177,6 @@ module DaVinciCRDTestKit
       # with another query.
       def hook_invoked?(hook_tag)
         must_support_requests.any? { |request| request.tags.include?(hook_tag) }
-      end
-
-      def declared_unsupported?(resource_type)
-        selected_types(resource_type)&.exclude?(resource_type) || false
       end
 
       def not_expected_reason(resource_type)

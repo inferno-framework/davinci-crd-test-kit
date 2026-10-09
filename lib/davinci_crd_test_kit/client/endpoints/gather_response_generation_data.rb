@@ -1,5 +1,7 @@
 require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/hook_request_resource_extraction'
+require_relative '../../cross_suite/must_support_references'
+require_relative '../../cross_suite/resource_identity'
 
 module DaVinciCRDTestKit
   # Make requests to client's FHIR server to use in building responses
@@ -47,9 +49,18 @@ module DaVinciCRDTestKit
       ]
     }.freeze
 
+    MUST_SUPPORT_IG_VERSION = 'v2.2.1'.freeze
+    # Reads happen before the hook response is sent, so a server that stops responding must not
+    # hold the response indefinitely.
+    FHIR_SERVER_TIMEOUT_SECONDS = 10
+
     def hook_instance_data_fetch_tag
       @hook_instance_data_fetch_tag ||= TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
     end
+
+    ###########################################################################
+    # v2.0.1 hook-specific data gather methods
+    ###########################################################################
 
     def gather_appointment_book_data
       appointment_book_to_read = []
@@ -168,6 +179,16 @@ module DaVinciCRDTestKit
       find_references_to_read(resource, to_read_list)
     end
 
+    ###########################################################################
+    # v2.2.1 data gather methods
+    ###########################################################################
+
+    # A normalized reference that is still absolute points to a server other than the FHIR server
+    # named in the request.
+    def absolute_url?(reference)
+      reference.match?(%r{\Ahttps?://})
+    end
+
     # turn absolute references into relative if
     # for the fhir server indicated in the request
     def normalize_reference(reference)
@@ -180,13 +201,16 @@ module DaVinciCRDTestKit
       end
     end
 
+    # A reference to a server other than the FHIR server named in the request is read without the
+    # access token, which is only for that FHIR server.
     def fetch_reference(reference, additional_tag: nil, parse_as_fhir: false)
-      response = execute_request(reference)
+      reference = normalize_reference(reference)
+      fetched_references << reference
+      external = absolute_url?(reference)
+      response = execute_request(reference, connection: external ? external_connection : fhir_server_connection)
       return nil unless response.present?
 
-      tags = [DATA_FETCH_TAG, hook_instance_data_fetch_tag]
-      tags << additional_tag if additional_tag.present?
-      persist_query_request(response, tags)
+      persist_query_request(response, fetch_tags(additional_tag), request_headers: external ? {} : data_request_headers)
       return nil unless response.status.to_s.starts_with?('2')
 
       begin
@@ -194,6 +218,14 @@ module DaVinciCRDTestKit
       rescue JSON::ParserError
         nil
       end
+    end
+
+    def fetch_tags(additional_tag)
+      [DATA_FETCH_TAG, hook_instance_data_fetch_tag, additional_tag].compact_blank
+    end
+
+    def fetched_references
+      @fetched_references ||= Set.new
     end
 
     def find_references_to_read(resource, to_read_list)
@@ -258,11 +290,20 @@ module DaVinciCRDTestKit
         if request_body['fhirServer'].present? &&
            request_body['fhirAuthorization'].present? &&
            request_body['fhirAuthorization']['access_token'].present?
-          Faraday.new(url: request_body['fhirServer'], request: { open_timeout: 10 },
+          Faraday.new(url: request_body['fhirServer'],
+                      request: { open_timeout: FHIR_SERVER_TIMEOUT_SECONDS, timeout: FHIR_SERVER_TIMEOUT_SECONDS },
                       headers: data_request_headers) do |f|
             f.request :url_encoded
             f.use FaradayMiddleware::FollowRedirects
           end
+        end
+    end
+
+    def external_connection
+      @external_connection ||=
+        Faraday.new(request: { open_timeout: FHIR_SERVER_TIMEOUT_SECONDS, timeout: FHIR_SERVER_TIMEOUT_SECONDS }) do |f|
+          f.request :url_encoded
+          f.use FaradayMiddleware::FollowRedirects
         end
     end
 
@@ -271,17 +312,42 @@ module DaVinciCRDTestKit
         { 'Authorization' => "Bearer #{request_body['fhirAuthorization']['access_token']}" }
     end
 
-    def execute_request(query)
-      fhir_server_connection&.get(query)
+    def execute_request(query, connection: fhir_server_connection)
+      connection&.get(query)
     rescue Faraday::Error => e
+      timed_out_servers << server_for(query, connection) if timeout?(e)
       # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
       #          no clean way to persist that information for the Inferno test to check later. The solution here
       #          is to persist the request anyway with a status of nil, using the error message as response body
-      Faraday::Response.new(response_body: e.message, url: fhir_server_connection.url_prefix.to_s)
+      url = query.to_s.match?(%r{\Ahttps?://}) ? query : connection.url_prefix.to_s
+      Faraday::Response.new(response_body: e.message, url:)
     end
 
-    def persist_query_request(response, tags)
-      inferno_request_headers = data_request_headers.map { |name, value| { name:, value: } }
+    # The servers that have timed out while processing this request, each identified by scheme,
+    # host, and port.
+    def timed_out_servers
+      @timed_out_servers ||= Set.new
+    end
+
+    def server_for(query, connection = fhir_server_connection)
+      uri = query.to_s.match?(%r{\Ahttps?://}) ? URI(query.to_s) : connection&.url_prefix
+      "#{uri.scheme}://#{uri.host}:#{uri.port}" if uri.present?
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def server_timed_out?(query)
+      timed_out_servers.include?(server_for(query))
+    end
+
+    # Faraday reports a read timeout as a TimeoutError, but a connection timeout as a
+    # ConnectionFailed wrapping Net::OpenTimeout.
+    def timeout?(error)
+      error.is_a?(Faraday::TimeoutError) || error.wrapped_exception.is_a?(Net::OpenTimeout)
+    end
+
+    def persist_query_request(response, tags, request_headers: data_request_headers)
+      inferno_request_headers = request_headers.map { |name, value| { name:, value: } }
       inferno_response_headers = response.headers&.map { |name, value| { name:, value: } }
       requests_repo.create(
         verb: 'GET',
@@ -332,13 +398,57 @@ module DaVinciCRDTestKit
     def request_additional_fhir_data
       request_coverage_payer
       request_parent_locations
+      request_must_support_references if include_in_cross_hook_analysis?
+    end
+
+    # Reads the resources referenced from the must support Reference elements of the resources in
+    # the request, and from those of each resource read in turn, so that the must support reference
+    # tests can later check that they resolved. Inferno cannot reach the CRD client's FHIR server
+    # once the hook request is over, so they have to be read now.
+    #
+    # Resources and references are compared by absolute URL (see ResourceIdentity), so a resource
+    # the request already carries, or that was already read for it, is not read again. A reference
+    # to a server other than the `fhirServer` is read from that server without the access token.
+    # Once a server has timed out, further reads from it would likely time out too, so no more are
+    # attempted from that server.
+    def request_must_support_references
+      carried = Set.new
+      to_read = []
+      ResourceIdentity.each_identified_resource(request_body) do |identity, raw_resource|
+        carried << identity
+        to_read.concat(must_support_references_to_read(HookRequestResourceExtraction.to_fhir_resource(raw_resource),
+                                                       identity))
+      end
+
+      while (url = to_read.shift)
+        next if carried.include?(url) || fetched_references.include?(normalize_reference(url))
+        next if server_timed_out?(url)
+
+        resource = fetch_reference(url, additional_tag: MUST_SUPPORT_REFERENCE_FETCH_TAG, parse_as_fhir: true)
+        to_read.concat(must_support_references_to_read(resource, url))
+      end
+    end
+
+    # The absolute URLs of the readable references in the must support Reference elements of a
+    # resource identified by the given URL.
+    def must_support_references_to_read(resource, identity)
+      return [] unless resource.respond_to?(:resourceType)
+
+      base = ResourceIdentity.base_for(identity) || ResourceIdentity.fhir_server_base(request_body)
+      metadata = ProfileMetadata.for_resource_type(MUST_SUPPORT_IG_VERSION, resource.resourceType)
+      navigator = MustSupportReferences::Navigator.new(metadata)
+      MustSupportReferences.reference_elements(metadata).flat_map do |element|
+        navigator.literal_references(resource, element[:path]).filter_map do |reference|
+          url = ResourceIdentity.absolute_reference(reference.reference, base)
+          url if ResourceIdentity.readable?(url)
+        end
+      end.uniq
     end
 
     def request_access_level_target
       return if access_level_target_reference.blank?
 
-      fetch_reference(normalize_reference(access_level_target_reference),
-                      additional_tag: ACCESS_LEVEL_TARGET_FETCH_TAG)
+      fetch_reference(access_level_target_reference, additional_tag: ACCESS_LEVEL_TARGET_FETCH_TAG)
     end
 
     def access_level_target_reference
