@@ -132,7 +132,7 @@ module DaVinciCRDTestKit
           resources = request_fhir_resources(request_body)
           reads = reads_by_tag[TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])]
           available = available_from_reads(reads, fhir_server)
-          resources.each { |entry| available[entry[:identity]] = entry.merge(source: 'the hook request') }
+          resources.each { |entry| available[entry[:identity]] = entry }
           { request:, fhir_server:, resources:, available:, reads: }
         end
       end
@@ -159,13 +159,8 @@ module DaVinciCRDTestKit
 
       def available_from_reads(reads, fhir_server)
         reads.each_with_object({}) do |read, available|
-          source = if ResourceIdentity.on_server?(read.url, fhir_server)
-                     'a read made while processing the hook request'
-                   else
-                     'a read made from its server without the access token'
-                   end
           identified_read_resources(read, fhir_server).each do |identity, resource|
-            available[identity] ||= { identity:, resource:, source:, read: }
+            available[identity] ||= { identity:, resource:, read: }
           end
         end
       end
@@ -191,48 +186,24 @@ module DaVinciCRDTestKit
         identified
       end
 
-      # The resource a reference resolved to and where it came from, or why it did not resolve.
+      # The resource a reference resolved to, if any, along with the read made for it, which is
+      # attached as evidence for the result. Logical references cannot be resolved.
       def resolve(reference, entry, request_data)
-        if reference.reference.blank?
-          return { failure: 'it has no literal `reference`, only an identifier or display, so Inferno could not ' \
-                            'resolve it' }
-        end
+        return {} if reference.reference.blank?
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
         base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]
         url = ResourceIdentity.absolute_reference(reference.reference, base)
-        if url.blank?
-          return { failure: 'it is neither a `Type/id` reference nor an absolute URL, so Inferno could not ' \
-                            'resolve it' }
-        end
+        return {} if url.blank?
 
-        request_data[:available][url]&.merge(url:) ||
-          { url:, failure: unresolved_reason(url, request_data), read: read_of(url, request_data) }
-      end
-
-      # The read made for a reference that did not resolve, if one was attempted, which shows why.
-      def read_of(url, request_data)
-        request_data[:reads].find { |read| read.url == url }
-      end
-
-      def unresolved_reason(url, request_data)
-        if ResourceIdentity.on_server?(url, request_data[:fhir_server])
-          'it was neither carried in the hook request nor successfully read while processing it'
-        else
-          "it points to a server other than the hook request's `fhirServer` " \
-            "(#{request_data[:fhir_server].presence || 'not provided'}), and was neither carried in the hook " \
-            'request nor read from there without the access token while processing it'
-        end
+        request_data[:available][url] || { read: request_data[:reads].find { |read| read.url == url } }
       end
 
       def resolve_contained(reference, resource)
         contained_id = reference.reference.delete_prefix('#')
-        return { resource:, source: 'the referencing resource itself' } if contained_id.blank?
+        return { resource: } if contained_id.blank?
 
-        contained = Array(resource.contained).find { |one| one.id == contained_id }
-        return { resource: contained, source: 'a contained resource' } if contained.present?
-
-        { failure: "no contained resource has the id `#{contained_id}`" }
+        { resource: Array(resource.contained).find { |one| one.id == contained_id } }.compact
       end
 
       # Each reference found at the path across every hook request, with what it resolved to.
@@ -241,7 +212,7 @@ module DaVinciCRDTestKit
           request_data[:resources].select { |entry| entry[:resource].resourceType == resource_type }
             .flat_map do |entry|
               navigator.references(entry[:resource], path).map do |reference|
-                resolve(reference, entry, request_data).merge(reference: reference.reference)
+                resolve(reference, entry, request_data)
               end
             end
         end
@@ -264,7 +235,6 @@ module DaVinciCRDTestKit
       def unresolved_targets(profile)
         metadata = self.class.metadata_for(ig_version, profile)
         navigator = MustSupportReferences::Navigator.new(metadata)
-        title = self.class.title_for(metadata, profile)
 
         reference_targets(metadata).filter_map do |target|
           next if target[:target_type].present? && declared_unsupported?(target[:target_type])
@@ -273,7 +243,7 @@ module DaVinciCRDTestKit
           consulted_reads.concat(attempts.filter_map { |attempt| attempt[:read] })
           next if attempts.blank? || target_resolved?(attempts, target)
 
-          target.merge(title:, attempts:)
+          target
         end
       end
 
@@ -308,40 +278,6 @@ module DaVinciCRDTestKit
         self.class.target_profile_link(ig_version, target_profile)
       end
 
-      def log_unresolved(unresolved)
-        unresolved.each do |target|
-          outcomes = target[:attempts].map { |attempt| attempt_outcome(attempt, target) }.uniq
-          add_message('info',
-                      "No reference within #{target[:title]} element #{target_description(target)} resolved " \
-                      "to a conforming resource:\n\n#{outcomes.map { |outcome| "- #{outcome}" }.join("\n")}")
-        end
-      end
-
-      # Only called for a target none of whose resolved resources conformed, so a resolved resource
-      # either has the wrong type or failed validation against the target profile.
-      def attempt_outcome(attempt, target)
-        reason =
-          if attempt[:failure].present?
-            "not resolved: #{attempt[:failure]}"
-          elsif target[:target_type].present? && attempt[:resource].resourceType != target[:target_type]
-            "resolved from #{attempt[:source]}, but is a #{attempt[:resource].resourceType} rather than a " \
-              "#{target[:target_type]}"
-          else
-            "resolved from #{attempt[:source]}, but does not conform to #{target_profile_link(target[:target_profile])}"
-          end
-
-        "#{attempt_reference(attempt)} #{reason}"
-      end
-
-      # A relative reference is shown with the absolute URL it was resolved as, so that it is clear
-      # which server it was looked up on.
-      def attempt_reference(attempt)
-        return 'A logical reference' if attempt[:reference].blank?
-        return "`#{attempt[:reference]}`" if attempt[:url].blank? || attempt[:url] == attempt[:reference]
-
-        "`#{attempt[:reference]}` (as `#{attempt[:url]}`)"
-      end
-
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
         associate_requests(relevant_requests)
@@ -354,11 +290,10 @@ module DaVinciCRDTestKit
 
         unresolved = config.options[:profiles].flat_map { |profile| unresolved_targets(profile) }
         requests.concat(consulted_reads.uniq(&:id))
-        log_unresolved(unresolved)
 
         skip_if unresolved.present?,
                 'Could not resolve and validate any must support references for ' \
-                "#{unresolved.map { |target| target_description(target) }.to_sentence}. See messages for details."
+                "#{unresolved.map { |target| target_description(target) }.to_sentence}."
 
         pass 'At least one reference within each populated must support Reference element resolved to a ' \
              'conforming resource.'

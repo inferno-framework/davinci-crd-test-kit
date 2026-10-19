@@ -4,7 +4,6 @@ require_relative '../../../../../lib/davinci_crd_test_kit/generator/must_support
 RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :request do
   let(:suite_id) { 'crd_client_v221' }
   let(:test_session) { repo_create(:test_session, test_suite_id: suite_id) }
-  let(:results_repo) { Inferno::Repositories::Results.new }
   let(:receiving_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:fhir_server) { 'https://example/r4' }
   let(:vision_prescription_test) do
@@ -79,10 +78,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     all_types_selected(supporting_types_supported: (generator::SUPPORTING_TYPE_OPTIONS - ['PractitionerRole']).to_json)
   end
 
-  def messages_for(test)
-    results_repo.current_results_for_test_session_and_runnables(test_session.id, [test]).first.messages
-  end
-
   before do
     allow_any_instance_of(vision_prescription_test).to receive(:resource_is_valid?).and_return(true)
   end
@@ -122,17 +117,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to_not include('[CRD Practitioner](')
   end
 
-  it 'explains a reference that resolved to a resource of a different type than the target' do
-    create_hook_request([vision_prescription], read: [encounter, practitioner])
-
-    run(vision_prescription_test, all_types_selected)
-
-    expect(messages_for(vision_prescription_test).map(&:message)).to include(
-      a_string_including("`Practitioner/pr1` (as `#{fhir_server}/Practitioner/pr1`) resolved from a read made " \
-                         'while processing the hook request, but is a Practitioner rather than a PractitionerRole')
-    )
-  end
-
   it 'does not require target profiles for resource types the tester declared unsupported' do
     create_hook_request([vision_prescription], read: [encounter, practitioner])
 
@@ -141,16 +125,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result).to eq('pass')
   end
 
-  it 'skips and logs the references observed when a populated element never resolves' do
+  it 'skips when a populated element never resolves' do
     create_hook_request([vision_prescription], read: [practitioner], failed_reads: [encounter])
 
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to include('`encounter`')
-    expect(messages_for(vision_prescription_test).map(&:message)).to include(
-      a_string_matching(%r{element `encounter`.*`#{fhir_server}/Encounter/e1` not resolved: it was neither carried}m)
-    )
   end
 
   it 'does not resolve a reference using a read made for a different hook request' do
@@ -182,8 +163,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
-    nonconforming = %r{`Practitioner/pr1` \(as `\S+`\) resolved .*, but does not conform to \[CRD Practitioner\]\(}
-    expect(messages_for(vision_prescription_test).map(&:message)).to include(a_string_matching(nonconforming))
   end
 
   describe 'when resources are identified by fullUrl' do
@@ -217,9 +196,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
       result = run(vision_prescription_test, without_practitioner_role)
 
       expect(result.result).to eq('skip')
-      expect(messages_for(vision_prescription_test).map(&:message)).to include(
-        a_string_including("`Encounter/e1` (as `#{elsewhere}/Encounter/e1`) not resolved: it points to a server")
-      )
+      expect(result.result_message).to include('`encounter`')
     end
   end
 
@@ -235,14 +212,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
       expect(result.result).to eq('pass')
     end
 
-    it 'explains why it did not resolve when the read did not succeed' do
+    it 'does not resolve it when the read from that server did not succeed' do
       create_hook_request([order], read: [encounter])
 
-      run(vision_prescription_test, without_practitioner_role)
+      result = run(vision_prescription_test, without_practitioner_role)
 
-      expect(messages_for(vision_prescription_test).map(&:message)).to include(
-        a_string_matching(/elsewhere\.example.*not resolved: it points to a server other than .*without the access/)
-      )
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('`prescriber`')
     end
 
     it 'does not resolve it to a resource with the same type and id from the FHIR server' do
@@ -279,7 +255,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
-    expect(messages_for(vision_prescription_test).map(&:message).join).to include('A logical reference not resolved')
   end
 
   it 'passes when a logical reference sits alongside a literal one that resolves' do
