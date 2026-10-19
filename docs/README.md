@@ -23,6 +23,7 @@ to this test kit.
     the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
     and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
 *   **[Controlling Simulated CRD server Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
+*   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what CRD clients must demonstrate to pass.
 
 ### Using the Da Vinci CRD Server Test Suites 
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.

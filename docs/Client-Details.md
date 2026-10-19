@@ -40,6 +40,13 @@ validated with the Java validator using `tx.fhir.org` as the terminology server.
 and response objects may also be checked using the validator against defined logical models
 in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)).
 
+## Must Support Tests
+
+CRD clients are required to demonstrate support for some elements which appear only
+under certain conditions. See the **[Client Must Support](Client-Must-Support)**
+section for details on what Inferno checks for and the underlying requirements
+that drive those tests.
+
 ## CRD Server Simulation
 
 ### Simulated CRD Server in the CRD Client v2.0.1 Suite
