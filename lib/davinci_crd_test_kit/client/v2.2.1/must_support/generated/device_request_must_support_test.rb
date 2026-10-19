@@ -33,8 +33,8 @@ module DaVinciCRDTestKit
         - `authoredOn`
         - `basedOn`
         - `code[x]`
-        - `code[x].extension:BillingOptions`
         - `code[x]:codeCodeableConcept`
+        - `code[x]:codeCodeableConcept.extension:BillingOptions`
         - `code[x]:codeReference`
         - `contained`
         - `extension:Coverage-Information`

@@ -59,8 +59,8 @@ module DaVinciCRDTestKit
         - `identifier`
         - `intent`
         - `medication[x]`
-        - `medication[x].extension:BillingOptions`
         - `medication[x]:medicationCodeableConcept`
+        - `medication[x]:medicationCodeableConcept.extension:BillingOptions`
         - `medication[x]:medicationReference`
         - `performer`
         - `priorPrescription`

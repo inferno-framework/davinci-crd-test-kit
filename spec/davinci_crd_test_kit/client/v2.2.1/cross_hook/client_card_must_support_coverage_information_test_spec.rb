@@ -66,7 +66,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCardMustSupportCoverageInformation
 
       result = run(runnable)
       expect(result.result).to eq('fail')
-      expect(result.result_message).to match(/Extension.extension:dependency/)
+      expect(result.result_message).to include('extension:dependency')
     end
 
     it 'passes when all must support elements are present' do

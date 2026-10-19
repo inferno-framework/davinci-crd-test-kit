@@ -37,8 +37,8 @@ module DaVinciCRDTestKit
         - `identifier`
         - `occurrence[x]`
         - `payload`
-        - `payload.extension.value[x].extension:BillingOptions`
         - `payload.extension:codeableConcept`
+        - `payload.extension:codeableConcept.value[x].extension:BillingOptions`
         - `reasonCode`
         - `reasonReference`
         - `recipient`
