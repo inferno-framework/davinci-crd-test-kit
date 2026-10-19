@@ -11,6 +11,8 @@
   - :path: endpoint
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/StructureDefinition/Endpoint
   - :path: location
     :types:
     - Reference

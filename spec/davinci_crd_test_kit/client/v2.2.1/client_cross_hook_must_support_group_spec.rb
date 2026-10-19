@@ -116,7 +116,9 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
       definitions.flat_map { |definition| definition[:profiles] }.each do |profile|
         metadata = DaVinciCRDTestKit::ProfileMetadata.merged(ig_version, profile[:profile_keys])
         DaVinciCRDTestKit::MustSupportReferences.reference_elements(metadata).each do |element|
-          Array(element[:target_profiles]).each do |target_profile|
+          (Array(element[:target_profiles]) + Array(element[:allowed_target_profiles])).each do |target_profile|
+            next if DaVinciCRDTestKit::MustSupportReferences.base_resource_type(target_profile)
+
             expect(DaVinciCRDTestKit::ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource)
               .to be_present, "no metadata for #{target_profile}, targeted by #{element[:path]}"
           end

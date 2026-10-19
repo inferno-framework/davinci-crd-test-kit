@@ -1,6 +1,7 @@
 require 'inferno'
 require 'yaml'
 require_relative 'crd_must_support_metadata_extractor'
+require_relative '../cross_suite/must_support_references'
 require_relative '../cross_suite/profile_metadata'
 
 module DaVinciCRDTestKit
@@ -127,9 +128,12 @@ module DaVinciCRDTestKit
         end
       end
 
+      # Base FHIR resource definitions are identified by their URL alone, so they need no stub.
       def target_profile_urls(metadata)
-        metadata.must_supports[:elements].flat_map { |element| Array(element[:target_profiles]) }
+        metadata.must_supports[:elements]
+          .flat_map { |element| Array(element[:target_profiles]) + Array(element[:allowed_target_profiles]) }
           .map { |target_profile| target_profile.split('|').first }
+          .reject { |url| MustSupportReferences.base_resource_type(url) }
       end
 
       def stub_key(profile)

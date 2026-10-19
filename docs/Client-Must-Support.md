@@ -19,8 +19,8 @@ least once.
 
 ## CRD Must Support Definitions for Clients
 
-The 2.2.1 version of the CRD defines [must support reqiurements](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#mustsupport)
-for clients as 
+The 2.2.1 version of the CRD IG defines [must support requirements](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#mustsupport)
+for clients as:
 - **Data Source**: "If the CRD client maintains a mustSupport data element and
   surfaces it to users, then it **SHALL** be exposed in their FHIR interface when the data exists and privacy constraints permit." ([§conf-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3))
   CRD clients act as data sources when they send data in the hook request, so Inferno
@@ -42,9 +42,9 @@ the [CRD hook profiles](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)
 as well as any CRD-defined profiles that those profiles reference. This includes
 the following profiles:
 
-- [CRD Appointment with Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)
-  and [CRD Appointment without Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
-- [CRD Communication Request](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
+- [CRD Appointment with Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)
+  and [CRD Appointment without Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
+- [CRD Communication Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
 - [CRD Coverage](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-coverage.html)
 - [CRD Device](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-device.html)
 - [CRD Device Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-devicerequest.html)
@@ -56,9 +56,16 @@ the following profiles:
 - [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
 - [CRD Patient](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-patient.html)
 - [CRD Practitioner](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-practitioner.html)
+- [HRex PractitionerRole Profile](https://hl7.org/fhir/us/davinci-hrex/1.2.0/StructureDefinition-hrex-practitionerrole.html)
 - [CRD Service Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-servicerequest.html)
 - [CRD Vision Prescription](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-visionprescription.html)
 
+For each of these profiles, Inferno performs two checks as described below.
+
+#### Must Support Element Presence
+
+Inferno looks across all resources provided within the hook request bodies (`context`
+or `prefetch`) and confirms that it sees examples of each element flagged as must support.
 Per the [CRD must support requirement](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3)
 on CRD clients when acting as data sources a CRD client needs to support an element
 only when it "maintains a mustSupport data element and surfaces it to users". Thus
@@ -68,31 +75,44 @@ below for details).
 
 #### Must Support References
 
-Must support elements of the [Reference](https://hl7.org/fhir/R4/references.html)
-type are subject to additional requirements:
-- Inferno must be able to resolve at least one observed reference and follow it
-  to an actual resource, which can be provided either within the `context` or
-  `prefetch` fields of the hook request, or obtained via a FHIR read during
-  the hook invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
-  section for details).
-- If some of the element's target profiles are themselves marked must support
-  or the element has only one target profile, Inferno must find resources that
-  conform to each of those profiles within the set of referenced resources that
-  it was able to resolve and obtain.
+To verify support for must support elements of the [Reference](https://hl7.org/fhir/R4/references.html)
+type, Inferno must also be able to resolve observed references and follow them to actual
+resources that conform to certain profiles.
 
-Inferno will pass these tests without checking them when
-- the element is never populated (since the element is must support, testers will
-  have to attest that the CRD client does not make use of the element - see the
-  [Elements](#elements) section below).
-- the tester has attested that the resource type for the profile is not
-  supported (see the [Resource types](#resource-types) section below).
+When resolving references, Inferno first looks for the referenced resource
+within the `context` or `prefetch` fields of the hook request and falls back to obtaining
+the resource via a FHIR read during the hook invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
+section for details).
 
-Not all references must resolve and conform to a required profile: Inferno must only
+Using the resolved references, Inferno then confirms support for one or more
+target profiles:
+- When there is a single target profile allowed, Inferno verifies that it
+  can find a resolved reference that conforms to that profile.
+- When there are multiple target profiles and at least one has a must support flag,
+  Inferno verifies that for each profile with the must support flag, it can find a
+  resolved reference that conforms to that profile.
+- Otherwise, Inferno verifies that it can find a resolved reference that conforms
+  to at least one of the listed profiles.
+
+There are two exclusions that Inferno makes when performing these checks. In both cases
+the check is considered to have passed:
+- When checking an element, if the target element is never populated, the Inferno will
+  consider the requirement to be met vacuously. Because the Reference element is must
+  support, the [Must Support Element Presence](#must-support-element-presence)
+  test will confirm whether support for this element needs to be demonstrated. If it
+  does, then future runs of the reference test will find a populated example to check.
+  If it does not, then pass is the correct result.
+- When checking a specific profile, Inferno will not look for a resolved reference
+  that conforms to the profile when the tester has attested via the test inputs
+  that the profile's resource type is not supported by the CRD client (see the
+  [Resource types](#resource-types) section below).
+
+Note that not all references must resolve and conform to a required profile: Inferno must only
 find one for each reference element and target profile. For this reason, detailed
-conformance validation errors are not returned. While this can eliminate known messages
-it also makes it challenging to determine what caused the failure. The following
-information is available to help testers determine what Inferno looked at and why
-it did not find all the examples it needed:
+conformance validation errors are not returned. While this avoids reporting errors for
+references that do not matter to the result, it also makes it harder to determine what
+caused the failure. The following information is available to help testers determine
+what Inferno looked at and why it did not find all the examples it needed:
 - The result message will name each element and target profile that was not
   demonstrated.
 - The Requests tab for the test will include all the hook invocations that contain
@@ -100,21 +120,21 @@ it did not find all the examples it needed:
   that Inferno made to obtain referenced resources that did not appear in the
   hook request body.
 
-
 Additionally, the following is a list of reasons that Inferno can consider a populated
-reference element to not represent a passing example:
+Reference element to not represent an example of a reference that resolves to a certain profile:
 - It is a logical reference, carrying only an `identifier` or `display` without a `reference`.
 - Its `reference` is neither a contained reference (`#id`), a relative `Type/id` reference, nor an absolute URL.
 - It points to a contained resource whose id does not match any resource in `contained`.
 - The resource it points to was neither carried in the hook request (in `context`
   or `prefetch`) nor successfully read by Inferno while processing that hook request.
-  Reads made while processing a different hook request are not used. Check the Requests
-  tab of the test for the FHIR reads considered and see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
+  Check the Requests tab of the test for the FHIR reads considered and see the
+  [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
   section for details on how Inferno reads these resources.
-- The resource it resolved to is not the resource type the target profile constrains.
-- The resource it resolved to does not conform to the target profile. You can validate
-  the resource against the profile manually using services such as [validator.fhir.org](https://validator.fhir.org/)
-  to see why.
+- The resource it resolved to is not the resource type the target profile constrains
+  (or, when any one of several target profiles will do, none of their types).
+- The resource it resolved to does not conform to the target profile (or to any of
+  the options). You can validate the resource against the profile manually using services
+  such as [validator.fhir.org](https://validator.fhir.org/) to see why.
 
 ### Responses
 
@@ -126,7 +146,7 @@ The relevant must support elements are the must support sub-extensions within th
 All other information within the coverage information system action represents
 echoed information.
 
-Note that the[coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+Note that the [coverage-information extensions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
 provided as a part of Inferno's mocked responses do not include all must support
 elements, so testers will need to provide responses for Inferno to use that include
 examples of all must support elements to pass these tests.
@@ -139,9 +159,10 @@ in the future.
 When looking for must support elements Inferno will consider resources in all
 requests and responses exchanged by Inferno and the CRD client during sub-groups
 of the "Hooks" group and the "Additional Hook Invocations for Cross Hook Support
-Demonstration" group. This includes any FHIR read interactions that Inferno
-performed to obtain resources that were not present within the `prefetch` field
-of a hook request. Resources exchanged during sub-groups of the "Scenarios" group
+Demonstration" group. The must support element tests consider resources within the
+`context` and `prefetch` fields of hook requests. The must support reference tests
+additionally consider resources obtained by FHIR read interactions that Inferno
+performed while processing those hook requests. Resources exchanged during sub-groups of the "Scenarios" group
 are not included in the analysis as those tests are more lax in their verification
 of request content and response handling.
 
@@ -161,8 +182,11 @@ ways, one for resource types and the other for elements as described below.
 ### Resource Types
 
 When running the "Must Support" group, testers are asked to indicate which resource
-types the CRD client supports. When a the tester indicates that a resource type
-is not supported, the tests will fail if one is observed. The tests will also
+types the CRD client supports. When the tester indicates that a resource type
+is not supported, the tests will fail if one is observed. They will also fail if
+the CRD client invokes a hook whose requests always carry that resource type:
+`appointment-book` for Appointment, and `encounter-start` or `encounter-discharge`
+for Encounter. The tests will also
 not check for demonstration of must support references pointing to resources
 of that type. For must support references that can refer to the unsupported
 resource type, testers will still need to attest that the CRD client does not
@@ -177,13 +201,13 @@ supporting types respectively.
 For order types, testers will select all types of orders that the system supports
 placing in the "Order types supported by the CRD client" input. Those selected will
 be expected to appear within at least one invocation of a hook. Note that any
-supported hook also must appear within an `order-sign` hook invocation due to
+supported order type also must appear within an `order-sign` hook invocation due to
 requirement [hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-3). The CRD order types include:
 
-- [CRD Communication Request](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
+- [CRD Communication Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)
 - [CRD Device Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-devicerequest.html)
 - [CRD Medication Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-medicationrequest.html)
-- [CRD Nutrition Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/)
+- [CRD Nutrition Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-nutritionorder.html)
 - [CRD Service Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-servicerequest.html)
 - [CRD Vision Prescription](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-visionprescription.html)
 
@@ -194,20 +218,22 @@ within supporting resource types. If the CRD client does not support representin
 information using one of the supporting resource types, then they can certify
 this by unchecking one of the boxes in the "Supporting resource types populated
 by the CRD client" input. Those that remain selected will be expected to appear
-within at least one invocation of a hook. The CRD supporting types include:
+within at least one invocation of a hook. The supporting types include:
 
-- [CRD Appointment with Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)
-  and [CRD Appointment without Order](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
+- [CRD Appointment with Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)
+  and [CRD Appointment without Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-no-order.html)
 - [CRD Device](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-device.html)
 - [CRD Encounter](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-encounter.html)
 - [CRD Location](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-location.html)
 - [CRD Medication](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-medication.html)
 - [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
 - [CRD Practitioner](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-practitioner.html)
+- [HRex PractitionerRole Profile](https://hl7.org/fhir/us/davinci-hrex/1.2.0/StructureDefinition-hrex-practitionerrole.html)
 
 #### Always required types
 
-Two resource types are always required and must appear within every hook request:
+Two resource types are always required, and Inferno expects to observe at least one
+instance of each:
 - [CRD Coverage](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-coverage.html)
 - [CRD Patient](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-patient.html)
 
@@ -220,7 +246,7 @@ were not. When some were not observed, Inferno will display a "User Action Requi
 dialog listing all of the must support elements that were not observed. If the
 CRD client does not make use of all of the listed elements as defined in CRD
 requirement [§conf-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3),
-then the test can confirm this by using the **true** link in the dialog to pass
+then the tester can confirm this by using the **true** link in the dialog to pass
 the tests. Otherwise, the tester will use the **false** link in the dialog and the
 test will fail. To review the elements Inferno did not observe after completing the
 test, testers can look at the Messages tab for the corresponding test which will

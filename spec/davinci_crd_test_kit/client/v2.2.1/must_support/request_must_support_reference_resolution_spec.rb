@@ -89,13 +89,35 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to include('No hook requests received')
   end
 
-  it 'passes when no instances of the resource type were observed' do
+  it 'fails when no instances of an expected resource type were observed' do
     create_hook_request([])
 
     result = run(vision_prescription_test, all_types_selected)
 
+    expect(result.result).to eq('fail')
+    expect(result.result_message)
+      .to include('The tester indicated the CRD client supports the `VisionPrescription` resource type')
+  end
+
+  it 'fails when no instances of a resource type every CRD client must support were observed' do
+    create_hook_request([])
+    coverage_test = Class.new(described_class) do
+      config(options: { ig_version: 'v2.2.1', profiles: [{ resource_type: 'Coverage', profile_keys: ['coverage'] }] })
+    end
+
+    result = run(coverage_test, all_types_selected)
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('CRD clients are required to support the `Coverage` resource type')
+  end
+
+  it 'passes when no instances were observed of a resource type the tester declared unsupported' do
+    create_hook_request([])
+
+    result = run(vision_prescription_test, all_types_selected(order_types_supported: ['ServiceRequest'].to_json))
+
     expect(result.result).to eq('pass')
-    expect(result.result_message).to include('No instances of VisionPrescription observed')
+    expect(result.result_message).to include('No instances of VisionPrescription observed, and none expected')
   end
 
   it 'passes when references resolve to resources in the request or read while processing it' do
@@ -163,6 +185,20 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
+  end
+
+  it 'validates against the version of each target profile the metadata was generated from' do
+    profile_urls = []
+    allow_any_instance_of(vision_prescription_test).to receive(:resource_is_valid?) do |_test, profile_url:, **|
+      profile_urls << profile_url
+      true
+    end
+    create_hook_request([vision_prescription], read: [encounter, practitioner])
+
+    run(vision_prescription_test, without_practitioner_role)
+
+    expect(profile_urls).to include('http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner|2.2.1')
+    expect(profile_urls).to all(include('|'))
   end
 
   describe 'when resources are identified by fullUrl' do
@@ -264,6 +300,99 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('pass')
+  end
+
+  describe 'an element none of whose several target profiles must each be demonstrated' do
+    let(:encounter_test) do
+      Class.new(described_class) do
+        config(options: { ig_version: 'v2.2.1',
+                          profiles: [{ resource_type: 'Encounter', profile_keys: ['encounter'] }] })
+      end
+    end
+    let(:appointment) { { resourceType: 'Appointment', id: 'a1' } }
+
+    def encounter_with_appointment(reference)
+      { resourceType: 'Encounter', id: 'e1', appointment: [{ reference: }] }
+    end
+
+    before do
+      allow_any_instance_of(encounter_test).to receive(:resource_is_valid?).and_return(true)
+    end
+
+    it 'passes when a reference resolves to a resource conforming to any one of them' do
+      create_hook_request([encounter_with_appointment('Appointment/a1')], read: [appointment])
+
+      expect(run(encounter_test, all_types_selected).result).to eq('pass')
+    end
+
+    it 'skips when the only resolved resource is of a type none of them constrain' do
+      create_hook_request([encounter_with_appointment('Patient/p1')])
+
+      result = run(encounter_test, all_types_selected)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message)
+        .to include('`appointment` using any of profiles [CRD Appointment with Order](')
+    end
+
+    it 'skips when the resolved resource conforms to none of them' do
+      allow_any_instance_of(encounter_test).to receive(:resource_is_valid?).and_return(false)
+      create_hook_request([encounter_with_appointment('Appointment/a1')], read: [appointment])
+
+      expect(run(encounter_test, all_types_selected).result).to eq('skip')
+    end
+
+    it 'does not check the element when the tester declared every target type unsupported' do
+      create_hook_request([encounter_with_appointment('Patient/p1')])
+
+      supporting_types = (DaVinciCRDTestKit::Generator::MustSupportTestGenerator::SUPPORTING_TYPE_OPTIONS -
+                          ['Appointment']).to_json
+      result = run(encounter_test, all_types_selected(supporting_types_supported: supporting_types))
+
+      expect(result.result).to eq('pass')
+    end
+  end
+
+  describe 'a target that is a base FHIR resource definition' do
+    let(:practitioner_role_test) do
+      Class.new(described_class) do
+        config(options: { ig_version: 'v2.2.1',
+                          profiles: [{ resource_type: 'PractitionerRole', profile_keys: ['practitioner_role'] }] })
+      end
+    end
+    let(:endpoint) { { resourceType: 'Endpoint', id: 'ep1' } }
+
+    def role_with_endpoint(reference)
+      { resourceType: 'PractitionerRole', id: 'role1', endpoint: [{ reference: }] }
+    end
+
+    it 'validates a resource of that type against the base definition' do
+      profile_urls = []
+      allow_any_instance_of(practitioner_role_test).to receive(:resource_is_valid?) do |_test, profile_url:, **|
+        profile_urls << profile_url
+        true
+      end
+      create_hook_request([role_with_endpoint('Endpoint/ep1')], read: [endpoint])
+
+      expect(run(practitioner_role_test, all_types_selected).result).to eq('pass')
+      expect(profile_urls).to eq(['http://hl7.org/fhir/StructureDefinition/Endpoint|4.0.1'])
+    end
+
+    it 'skips when the resource of that type does not conform to the base definition' do
+      allow_any_instance_of(practitioner_role_test).to receive(:resource_is_valid?).and_return(false)
+      create_hook_request([role_with_endpoint('Endpoint/ep1')], read: [endpoint])
+
+      expect(run(practitioner_role_test, all_types_selected).result).to eq('skip')
+    end
+
+    it 'skips when the reference resolves to a resource of another type' do
+      create_hook_request([role_with_endpoint('Patient/p1')])
+
+      result = run(practitioner_role_test, all_types_selected)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('`endpoint` using profile [Endpoint](https://hl7.org/fhir/R4/endpoint.html)')
+    end
   end
 
   describe 'request association' do

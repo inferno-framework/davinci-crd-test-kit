@@ -31,10 +31,19 @@ module DaVinciCRDTestKit
       end
     end
 
+    BASE_DEFINITION_PREFIX = 'http://hl7.org/fhir/StructureDefinition/'.freeze
+
     module_function
 
     def reference_elements(metadata)
       Array(metadata&.must_supports&.dig(:elements)).select { |element| Array(element[:types]).include?('Reference') }
+    end
+
+    # The resource type a base FHIR resource definition describes, or nil for any other profile.
+    # Base definitions have no generated metadata, so their type is read from the URL.
+    def base_resource_type(target_profile)
+      url = target_profile.to_s.split('|').first.to_s
+      url.delete_prefix(BASE_DEFINITION_PREFIX) if url.start_with?(BASE_DEFINITION_PREFIX)
     end
   end
 end

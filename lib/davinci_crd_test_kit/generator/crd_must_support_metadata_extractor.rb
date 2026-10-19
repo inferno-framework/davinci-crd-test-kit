@@ -82,6 +82,21 @@ module DaVinciCRDTestKit
         UNRESOLVABLE_VALUE_SETS[pattern_element.binding&.valueSet&.split('|')&.first]
       end
 
+      # A reference that may point to any resource type, which constrains nothing.
+      ANY_RESOURCE_TARGET = 'http://hl7.org/fhir/StructureDefinition/Resource'.freeze
+
+      # inferno_core keeps only the target profiles that must each be demonstrated, dropping the rest
+      # along with any base FHIR resource definitions. When none qualify, every target is kept under
+      # its own key instead, so a resolved reference can still be checked against one of them.
+      def handle_type_must_support_target_profiles(type, metadata)
+        super
+        targets = Array(type.targetProfile)
+        return if metadata[:target_profiles].present? || targets.blank?
+        return if targets.any? { |target| target.split('|').first == ANY_RESOURCE_TARGET }
+
+        metadata[:allowed_target_profiles] = targets.dup
+      end
+
       def must_supports
         @expanded_must_supports ||= # rubocop:disable Naming/MemoizedInstanceVariableName
           super.merge(elements: super[:elements].flat_map { |element| with_timing(element) },

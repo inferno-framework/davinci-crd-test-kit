@@ -18,6 +18,9 @@ module DaVinciCRDTestKit
 
       id :crd_v221_request_must_support_reference_resolution
 
+      # The FHIR version the CRD IG is built on, which base FHIR resource definitions belong to.
+      FHIR_VERSION = '4.0.1'.freeze
+
       # Where the pages of each IG version that target profiles come from are published, keyed by
       # the IG's canonical base and the profile version. The published paths do not follow a single
       # pattern (US Core 7.0.0 lives under STU7), so they are listed explicitly.
@@ -42,19 +45,25 @@ module DaVinciCRDTestKit
           "#{description_intro}\n\n#{sections.join("\n\n")}"
         end
 
-        # Each element, with the target profiles it must be demonstrated for as a sublist beneath it.
+        # Each element, with the target profiles it must be demonstrated for as a sublist beneath it,
+        # or the target profiles any one of which will do.
         def reference_list(ig_version, metadata)
           MustSupportReferences.reference_elements(metadata).map do |element|
-            targets = Array(element[:target_profiles]).map do |target_profile|
-              "  - #{target_profile_link(ig_version, target_profile)}"
-            end
-            ["- `#{element[:path]}`", *targets].join("\n")
+            required = Array(element[:target_profiles])
+            targets = required.presence || Array(element[:allowed_target_profiles])
+            heading = "- `#{element[:path]}`#{', any one of:' if required.blank? && targets.length > 1}"
+            lines = targets.map { |target_profile| "  - #{target_profile_link(ig_version, target_profile)}" }
+            [heading, *lines].join("\n")
           end.join("\n")
         end
 
-        # The target profile's name, linked to its page in the published IG. A profile whose IG
+        # The target profile's name, linked to its page in the published IG. A base FHIR resource
+        # definition links to the resource's page in the FHIR specification, and a profile whose IG
         # version has no known page location is linked by its canonical URL instead.
         def target_profile_link(ig_version, target_profile)
+          base_type = MustSupportReferences.base_resource_type(target_profile)
+          return "[#{base_type}](https://hl7.org/fhir/R4/#{base_type.downcase}.html)" if base_type.present?
+
           target_metadata = ProfileMetadata.for_profile_url(ig_version, target_profile)
           url = target_profile.split('|').first
           return "[#{url}](#{url})" if target_metadata.blank?
@@ -73,18 +82,23 @@ module DaVinciCRDTestKit
             For a must support Reference element, this means that the referenced resource can be retrieved.
             Additionally, when some of the element's target profiles are themselves marked must support
             or the element has only one target profile, references to resources conforming to each of
-            those profiles must be observed.
+            those profiles must be observed. Otherwise, a referenced resource must conform to any one of
+            the element's target profiles.
 
             During this test, Inferno will check that for each must support Reference element listed
             below that was populated, at least one of its references resolved to a resource
-            conforming to each target profile listed for the element. Target profiles for resource types
-            the tester indicated the CRD client does not support are not checked.
+            conforming to each target profile listed for the element, or to any one of them where the
+            list says so. Target profiles for resource types the tester indicated the CRD client does not support are
+            not checked.
 
             Inferno obtains the resources needed to perform these checks during the hook request by
             performing a FHIR read of any references in must support elements that aren't already
             present in the `context` or `prefetch` fields of the hook request. See the wiki's
             documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
             for details on how Inferno gets these resources.
+
+            If no instances of the resource type were observed, the test fails unless the tester
+            indicated that the CRD client does not support the resource type.
 
             Inferno will consider the same hook requests as the must support
             element tests: those made during the latest run of each `Hooks` subgroup and the
@@ -109,20 +123,22 @@ module DaVinciCRDTestKit
         config.options[:ig_version]
       end
 
-      # Each must support Reference element paired with each of its target profiles, so that every
-      # target has to be demonstrated. An element without target profiles only has to resolve.
+      # Each must support Reference element paired with the profiles a resolved reference may conform
+      # to. Every target profile that must be demonstrated is a target of its own; otherwise any one of
+      # the element's allowed target profiles will do. An element with neither only has to resolve.
       def reference_targets(metadata)
         MustSupportReferences.reference_elements(metadata).flat_map do |element|
-          (element[:target_profiles].presence || [nil]).map do |target_profile|
-            { path: element[:path], target_profile:, target_type: target_type(target_profile) }
+          if element[:target_profiles].present?
+            element[:target_profiles].map { |target_profile| { path: element[:path], profiles: [target_profile] } }
+          else
+            [{ path: element[:path], profiles: Array(element[:allowed_target_profiles]) }]
           end
         end
       end
 
       def target_type(target_profile)
-        return if target_profile.blank?
-
-        ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource
+        MustSupportReferences.base_resource_type(target_profile) ||
+          ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource
       end
 
       # For each hook request, its resources and every resource available to resolve references
@@ -223,10 +239,28 @@ module DaVinciCRDTestKit
       end
 
       def conforms?(resource, target)
-        return false if target[:target_type].present? && resource.resourceType != target[:target_type]
-        return true if target[:target_profile].blank?
+        target[:profiles].blank? || target[:profiles].any? { |target_profile| conforms_to?(resource, target_profile) }
+      end
 
-        resource_is_valid?(resource:, profile_url: target[:target_profile], add_messages_to_runnable: false)
+      def conforms_to?(resource, target_profile)
+        type = target_type(target_profile)
+        return false if type.present? && resource.resourceType != type
+
+        resource_is_valid?(resource:, profile_url: versioned(target_profile), add_messages_to_runnable: false)
+      end
+
+      # Target profiles carry a version only when the IG pinned one, typically for profiles from
+      # other IGs. Several versions of the CRD, HRex, and US Core IGs can be loaded into the validator
+      # at once, so the version of the profile the metadata was generated from is always given, and
+      # base FHIR resource definitions get the FHIR version the CRD IG is built on.
+      def versioned(target_profile)
+        url, version = target_profile.split('|')
+        version ||= if MustSupportReferences.base_resource_type(url)
+                      FHIR_VERSION
+                    else
+                      ProfileMetadata.for_profile_url(ig_version, url)&.profile_version
+                    end
+        version.present? ? "#{url}|#{version}" : url
       end
 
       # The validator is the slow part, so each distinct resolved resource is checked once and the
@@ -240,15 +274,25 @@ module DaVinciCRDTestKit
         metadata = self.class.metadata_for(ig_version, profile)
         navigator = MustSupportReferences::Navigator.new(metadata)
 
-        reference_targets(metadata).filter_map do |target|
-          next if target[:target_type].present? && declared_unsupported?(target[:target_type])
-
+        reference_targets(metadata).filter_map { |target| with_supported_profiles(target) }.filter_map do |target|
           attempts = reference_attempts(navigator, profile[:resource_type], target[:path])
           consulted_reads.concat(attempts.filter_map { |attempt| attempt[:read] })
           next if attempts.blank? || target_resolved?(attempts, target)
 
           target
         end
+      end
+
+      # Drops the target profiles for resource types the tester declared unsupported, or the whole
+      # target when none are left.
+      def with_supported_profiles(target)
+        supported = target[:profiles].reject do |target_profile|
+          type = target_type(target_profile)
+          type.present? && declared_unsupported?(type)
+        end
+        return if target[:profiles].present? && supported.blank?
+
+        target.merge(profiles: supported)
       end
 
       def relevant_requests
@@ -273,24 +317,36 @@ module DaVinciCRDTestKit
       end
 
       def target_description(target)
-        return "`#{target[:path]}`" if target[:target_profile].blank?
+        links = target[:profiles].map { |target_profile| target_profile_link(target_profile) }
+        return "`#{target[:path]}`" if links.blank?
+        return "`#{target[:path]}` using profile #{links.first}" if links.one?
 
-        "`#{target[:path]}` using profile #{target_profile_link(target[:target_profile])}"
+        "`#{target[:path]}` using any of profiles " \
+          "#{links.to_sentence(two_words_connector: ' or ', last_word_connector: ', or ')}"
       end
 
       def target_profile_link(target_profile)
         self.class.target_profile_link(ig_version, target_profile)
       end
 
+      # With no instances observed there are no references to check, which is only acceptable when the
+      # tester declared the types unsupported, the same as for the must support element tests.
+      def check_unobserved_types
+        resource_types = profile_resource_types.uniq
+        return if (resource_types - observed_types).length < resource_types.length
+
+        missing = resource_types.select { |resource_type| expected?(resource_type) }
+        assert missing.blank?, missing.map { |resource_type| missing_type_message(resource_type) }.join(' ')
+
+        pass "No instances of #{resource_types.to_sentence} observed, and none expected: " \
+             "#{DECLARED_UNSUPPORTED_REASON}."
+      end
+
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
         associate_requests(relevant_requests)
 
-        resource_types = profile_resource_types
-        unobserved_types = resource_types - observed_types
-        pass_if unobserved_types == resource_types,
-                "No instances of #{resource_types.uniq.to_sentence} observed, so there are no must support " \
-                'references to check.'
+        check_unobserved_types
 
         unresolved = config.options[:profiles].flat_map { |profile| unresolved_targets(profile) }
         requests.concat(consulted_reads.uniq(&:id))

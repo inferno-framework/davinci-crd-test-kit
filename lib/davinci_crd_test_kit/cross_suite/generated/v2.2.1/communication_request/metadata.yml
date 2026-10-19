@@ -34,6 +34,13 @@
   - :path: reasonReference
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference|7.0.0
+    - http://hl7.org/fhir/StructureDefinition/Observation
   - :path: recipient
     :types:
     - Reference

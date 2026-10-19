@@ -17,8 +17,6 @@ module DaVinciCRDTestKit
 
       id :crd_v221_request_must_support_with_attestation_option
 
-      DECLARED_UNSUPPORTED_REASON =
-        'the tester indicated that the CRD client does not support this resource type'.freeze
       MISMATCH_KINDS = [:invoked_hook_type, :unexpected_type, :missing_type].freeze
 
       # The type matters: Inferno parses a checkbox input's stored JSON into an array, and without
@@ -166,17 +164,6 @@ module DaVinciCRDTestKit
         config.options[:ig_version]
       end
 
-      # A type is expected unless the tester deselected it; a type no input governs is required of
-      # every CRD client. Deselecting a type whose hook was invoked is caught separately as a
-      # contradiction.
-      def expected?(resource_type)
-        !declared_unsupported?(resource_type)
-      end
-
-      def required_of_every_client?(resource_type)
-        selected_types(resource_type).nil?
-      end
-
       def invoked_requiring_hooks(resource_type)
         Array(requiring_hooks(resource_type)).select { |hook_tag| hook_invoked?(hook_tag) }
       end
@@ -245,16 +232,7 @@ module DaVinciCRDTestKit
           "Observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests made by the " \
           "CRD client, but #{DECLARED_UNSUPPORTED_REASON}."
         else
-          "#{missing_type_reason(entry[:resource_type])} the `#{entry[:resource_type]}` " \
-          'resource type, but no instances were observed in the hook requests made.'
-        end
-      end
-
-      def missing_type_reason(resource_type)
-        if required_of_every_client?(resource_type)
-          'CRD clients are required to support'
-        else
-          'The tester indicated the CRD client supports'
+          missing_type_message(entry[:resource_type])
         end
       end
 

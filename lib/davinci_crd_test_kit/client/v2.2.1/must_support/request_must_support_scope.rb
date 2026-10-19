@@ -5,6 +5,9 @@ module DaVinciCRDTestKit
     # The hook requests the request must support tests look at, and the resource types the tester
     # declared the CRD client supports.
     module RequestMustSupportScope
+      DECLARED_UNSUPPORTED_REASON =
+        'the tester indicated that the CRD client does not support this resource type'.freeze
+
       # Reads the requests directly rather than going through `load_tagged_requests`, which would
       # also associate every cross hook request with this test's own result. Only the relevant ones
       # are associated, by `associate_requests`.
@@ -36,6 +39,27 @@ module DaVinciCRDTestKit
 
       def declared_unsupported?(resource_type)
         selected_types(resource_type)&.exclude?(resource_type) || false
+      end
+
+      # A type is expected unless the tester deselected it; a type no input governs is required of
+      # every CRD client. Deselecting a type whose hook was invoked is caught separately, by the must
+      # support element tests, as a contradiction.
+      def expected?(resource_type)
+        !declared_unsupported?(resource_type)
+      end
+
+      def required_of_every_client?(resource_type)
+        selected_types(resource_type).nil?
+      end
+
+      def missing_type_message(resource_type)
+        reason = if required_of_every_client?(resource_type)
+                   'CRD clients are required to support'
+                 else
+                   'The tester indicated the CRD client supports'
+                 end
+
+        "#{reason} the `#{resource_type}` resource type, but no instances were observed in the hook requests made."
       end
     end
   end

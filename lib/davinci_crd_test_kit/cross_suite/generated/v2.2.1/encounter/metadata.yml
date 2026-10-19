@@ -20,12 +20,19 @@
   - :path: appointment
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-with-order
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-appointment-no-order
   - :path: class
   - :path: contained
   - :path: diagnosis
   - :path: diagnosis.condition
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure|7.0.0
   - :path: hospitalization
   - :path: hospitalization.dischargeDisposition
   - :path: identifier
