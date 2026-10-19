@@ -40,7 +40,9 @@ module DaVinciCRDTestKit
           { key: 'encounter', package: :crd, id: 'profile-encounter' },
           # Supporting profiles.
           { key: 'coverage', package: :crd, id: 'profile-coverage' },
+          { key: 'device', package: :crd, id: 'profile-device' },
           { key: 'location', package: :crd, id: 'profile-location' },
+          { key: 'medication', package: :crd, id: 'profile-medication' },
           { key: 'organization', package: :crd, id: 'profile-organization' },
           { key: 'patient', package: :crd, id: 'profile-patient' },
           { key: 'practitioner', package: :crd, id: 'profile-practitioner' },

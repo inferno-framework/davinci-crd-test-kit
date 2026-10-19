@@ -1,31 +1,33 @@
 require_relative '../../cross_hook/client_card_must_support_coverage_information_test'
 require_relative '../../cross_hook/client_order_types_signed_test'
-require_relative 'vision_prescription_must_support_test'
-require_relative 'vision_prescription_reference_resolution_test'
-require_relative 'service_request_must_support_test'
-require_relative 'service_request_reference_resolution_test'
-require_relative 'nutrition_order_must_support_test'
-require_relative 'nutrition_order_reference_resolution_test'
-require_relative 'medication_request_must_support_test'
-require_relative 'medication_request_reference_resolution_test'
-require_relative 'device_request_must_support_test'
-require_relative 'device_request_reference_resolution_test'
-require_relative 'communication_request_must_support_test'
-require_relative 'communication_request_reference_resolution_test'
 require_relative 'appointment_must_support_test'
 require_relative 'appointment_reference_resolution_test'
-require_relative 'encounter_must_support_test'
-require_relative 'encounter_reference_resolution_test'
+require_relative 'communication_request_must_support_test'
+require_relative 'communication_request_reference_resolution_test'
 require_relative 'coverage_must_support_test'
 require_relative 'coverage_reference_resolution_test'
+require_relative 'device_must_support_test'
+require_relative 'device_request_must_support_test'
+require_relative 'device_request_reference_resolution_test'
+require_relative 'encounter_must_support_test'
+require_relative 'encounter_reference_resolution_test'
 require_relative 'location_must_support_test'
 require_relative 'location_reference_resolution_test'
+require_relative 'medication_must_support_test'
+require_relative 'medication_request_must_support_test'
+require_relative 'medication_request_reference_resolution_test'
+require_relative 'nutrition_order_must_support_test'
+require_relative 'nutrition_order_reference_resolution_test'
 require_relative 'organization_must_support_test'
 require_relative 'organization_reference_resolution_test'
 require_relative 'patient_must_support_test'
 require_relative 'practitioner_must_support_test'
 require_relative 'practitioner_role_must_support_test'
 require_relative 'practitioner_role_reference_resolution_test'
+require_relative 'service_request_must_support_test'
+require_relative 'service_request_reference_resolution_test'
+require_relative 'vision_prescription_must_support_test'
+require_relative 'vision_prescription_reference_resolution_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -48,27 +50,29 @@ module DaVinciCRDTestKit
       input_order :order_types_supported, :supporting_types_supported
 
       ORDER_TYPE_OPTIONS = [
-        { label: 'VisionPrescription', value: 'VisionPrescription' },
-        { label: 'ServiceRequest', value: 'ServiceRequest' },
-        { label: 'NutritionOrder', value: 'NutritionOrder' },
-        { label: 'MedicationRequest', value: 'MedicationRequest' },
+        { label: 'CommunicationRequest', value: 'CommunicationRequest' },
         { label: 'DeviceRequest', value: 'DeviceRequest' },
-        { label: 'CommunicationRequest', value: 'CommunicationRequest' }
+        { label: 'MedicationRequest', value: 'MedicationRequest' },
+        { label: 'NutritionOrder', value: 'NutritionOrder' },
+        { label: 'ServiceRequest', value: 'ServiceRequest' },
+        { label: 'VisionPrescription', value: 'VisionPrescription' }
       ].freeze
 
       # Patient and Coverage are required of every CRD client, so they are not listed here.
       SUPPORTING_TYPE_OPTIONS = [
+        { label: 'Appointment', value: 'Appointment' },
+        { label: 'Device', value: 'Device' },
         { label: 'Encounter', value: 'Encounter' },
         { label: 'Location', value: 'Location' },
+        { label: 'Medication', value: 'Medication' },
         { label: 'Organization', value: 'Organization' },
         { label: 'Practitioner', value: 'Practitioner' },
         { label: 'PractitionerRole', value: 'PractitionerRole' }
       ].freeze
 
-      # A resource type only a non-required hook would carry is not expected when that hook was
-      # never invoked, so its test passes rather than asking the tester to attest. A type that is also
-      # in one of the lists above is expected when selected, and invoking one of its hooks while it is
-      # deselected fails as a contradiction.
+      # The hooks whose requests always carry a supporting resource type. Whether the type is expected
+      # is decided by the input above, but invoking one of these hooks while the type is deselected
+      # fails as a contradiction.
       REQUIRING_HOOKS = {
         'Appointment' => [APPOINTMENT_BOOK_TAG],
         'Encounter' => [ENCOUNTER_START_TAG, ENCOUNTER_DISCHARGE_TAG]
@@ -109,40 +113,45 @@ module DaVinciCRDTestKit
           observed across the hook requests the CRD client made, and that the must support elements on
           them were populated.
 
-          Inferno expects to see a resource type when a hook is invoked where the resource type must appear
-          in the context or the type is selected in the **Order types supported by the CRD Client** or
-          **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
+          Inferno expects to see a resource type when it is selected in the **Order types supported by the
+          CRD client** or **Supporting resource types populated by the CRD client** input, and always expects
+          the `Patient` and `Coverage` resource types, which CRD clients are required to support. A
+          tester who deselects a resource type must not invoke the hooks whose requests always carry it:
+          `appointment-book` for `Appointment`, and `encounter-start` and `encounter-discharge` for
+          `Encounter`. Inferno will fail without
           further analysis if an expected resource type is not observed or vice-versa. When a resource type
           was observed but some of its must support elements were not, the tester is asked to attest
           that the CRD client does not capture the represented data or does not surface it to users.
         DESCRIPTION
 
-        test from: :crd_v221_vision_prescription_must_support
-        test from: :crd_v221_vision_prescription_must_support_reference_resolution
-        test from: :crd_v221_service_request_must_support
-        test from: :crd_v221_service_request_must_support_reference_resolution
-        test from: :crd_v221_nutrition_order_must_support
-        test from: :crd_v221_nutrition_order_must_support_reference_resolution
-        test from: :crd_v221_medication_request_must_support
-        test from: :crd_v221_medication_request_must_support_reference_resolution
-        test from: :crd_v221_device_request_must_support
-        test from: :crd_v221_device_request_must_support_reference_resolution
-        test from: :crd_v221_communication_request_must_support
-        test from: :crd_v221_communication_request_must_support_reference_resolution
         test from: :crd_v221_appointment_must_support
         test from: :crd_v221_appointment_must_support_reference_resolution
-        test from: :crd_v221_encounter_must_support
-        test from: :crd_v221_encounter_must_support_reference_resolution
+        test from: :crd_v221_communication_request_must_support
+        test from: :crd_v221_communication_request_must_support_reference_resolution
         test from: :crd_v221_coverage_must_support
         test from: :crd_v221_coverage_must_support_reference_resolution
+        test from: :crd_v221_device_must_support
+        test from: :crd_v221_device_request_must_support
+        test from: :crd_v221_device_request_must_support_reference_resolution
+        test from: :crd_v221_encounter_must_support
+        test from: :crd_v221_encounter_must_support_reference_resolution
         test from: :crd_v221_location_must_support
         test from: :crd_v221_location_must_support_reference_resolution
+        test from: :crd_v221_medication_must_support
+        test from: :crd_v221_medication_request_must_support
+        test from: :crd_v221_medication_request_must_support_reference_resolution
+        test from: :crd_v221_nutrition_order_must_support
+        test from: :crd_v221_nutrition_order_must_support_reference_resolution
         test from: :crd_v221_organization_must_support
         test from: :crd_v221_organization_must_support_reference_resolution
         test from: :crd_v221_patient_must_support
         test from: :crd_v221_practitioner_must_support
         test from: :crd_v221_practitioner_role_must_support
         test from: :crd_v221_practitioner_role_must_support_reference_resolution
+        test from: :crd_v221_service_request_must_support
+        test from: :crd_v221_service_request_must_support_reference_resolution
+        test from: :crd_v221_vision_prescription_must_support
+        test from: :crd_v221_vision_prescription_must_support_reference_resolution
         test from: :crd_v221_client_order_types_signed
       end
 

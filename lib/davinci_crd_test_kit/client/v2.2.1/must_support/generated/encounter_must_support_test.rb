@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         During this test, Inferno will check whether all must support elements defined in the
         profile(s) listed below are demonstrated within hook requests made during this session.
         This check may vacuously pass if the tester has attested that this resource type is not
-        supported by the CRD client or if the relevant hooks are not invoked.
+        supported by the CRD client.
 
         If any must support elements are not demonstrated, the tester will have the option to attest
         that these elements are not supported by the CRD client or surfaced to its users. Testers

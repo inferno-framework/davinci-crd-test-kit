@@ -71,7 +71,7 @@ Some tests will fail, including
 - Client tests 1.2.x.3.01 and 1.4.1.3.01 validating that the hook requests structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
-- Some client must support tests will fail, including any attestations of missing elements for which "false" was answered, test "1.4.2.1.27 Observed order types were submitted as draftOrders on the order-sign hook", and must support reference resolution tests for CRD Vision Prescription, CRD Vision Prescription, CRD Nutrition Order, CRD Device Request, CRD Communication Request, CRD Appointment, and CRD Encounter.
+- Some client must support tests will fail, including any attestations of missing elements for which "false" was answered, test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook", and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription.
 - Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
 
 ### Additional Optional Steps for Long-running Hook Request

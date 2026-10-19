@@ -33,10 +33,9 @@ module DaVinciCRDTestKit
 <%= supporting_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
       ].freeze
 
-      # A resource type only a non-required hook would carry is not expected when that hook was
-      # never invoked, so its test passes rather than asking the tester to attest. A type that is also
-      # in one of the lists above is expected when selected, and invoking one of its hooks while it is
-      # deselected fails as a contradiction.
+      # The hooks whose requests always carry a supporting resource type. Whether the type is expected
+      # is decided by the input above, but invoking one of these hooks while the type is deselected
+      # fails as a contradiction.
       REQUIRING_HOOKS = {
 <%= requiring_hooks.map { |type, tags| "        '#{type}' => [#{tags.join(', ')}]" }.join(",\n") %>
       }.freeze
@@ -76,9 +75,12 @@ module DaVinciCRDTestKit
           observed across the hook requests the CRD client made, and that the must support elements on
           them were populated.
 
-          Inferno expects to see a resource type when a hook is invoked where the resource type must appear
-          in the context or the type is selected in the **Order types supported by the CRD Client** or
-          **Supporting resource types populated by the Health IT Module** input. Inferno will fail without
+          Inferno expects to see a resource type when it is selected in the **Order types supported by the
+          CRD client** or **Supporting resource types populated by the CRD client** input, and always expects
+          the `Patient` and `Coverage` resource types, which CRD clients are required to support. A
+          tester who deselects a resource type must not invoke the hooks whose requests always carry it:
+          `appointment-book` for `Appointment`, and `encounter-start` and `encounter-discharge` for
+          `Encounter`. Inferno will fail without
           further analysis if an expected resource type is not observed or vice-versa. When a resource type
           was observed but some of its must support elements were not, the tester is asked to attest
           that the CRD client does not capture the represented data or does not surface it to users.

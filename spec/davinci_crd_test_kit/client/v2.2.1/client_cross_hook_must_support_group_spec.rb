@@ -41,9 +41,9 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
 
   it 'holds one test per resource type, a reference test per type with must support references, ' \
      'and the order signing test in the Requests group' do
-    expect(definitions.length).to eq(14)
+    expect(definitions.length).to eq(16)
     expect(reference_tests.length).to eq(12)
-    expect(requests_group.tests.length).to eq(27)
+    expect(requests_group.tests.length).to eq(29)
     expect(requests_group.tests.last.id.to_s).to end_with(generator::ORDER_TYPES_SIGNED_TEST_ID)
   end
 
@@ -133,11 +133,20 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     end
 
     it 'gives each supporting profile its own test' do
-      supporting_ids = [:crd_v221_coverage_must_support, :crd_v221_location_must_support,
+      supporting_ids = [:crd_v221_coverage_must_support, :crd_v221_device_must_support,
+                        :crd_v221_location_must_support, :crd_v221_medication_must_support,
                         :crd_v221_organization_must_support, :crd_v221_patient_must_support,
                         :crd_v221_practitioner_must_support, :crd_v221_practitioner_role_must_support]
 
       expect(definition_ids).to include(*supporting_ids.map(&:to_s))
+    end
+
+    # Whether a type is expected is decided by the inputs alone, so a type carried by particular
+    # hooks has to be one the tester can deselect.
+    it 'lets the tester deselect every type that particular hooks carry' do
+      selectable = generator::ORDER_TYPE_OPTIONS + generator::SUPPORTING_TYPE_OPTIONS
+
+      expect(selectable).to include(*generator::REQUIRING_HOOKS.keys)
     end
 
     it 'flags every non request type as a supporting profile' do
@@ -164,7 +173,9 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     it 'names the profile each supporting profile test covers' do
       {
         crd_v221_coverage_must_support: 'CRD Coverage',
+        crd_v221_device_must_support: 'CRD Device',
         crd_v221_location_must_support: 'CRD Location',
+        crd_v221_medication_must_support: 'CRD Medication',
         crd_v221_organization_must_support: 'CRD Organization',
         crd_v221_patient_must_support: 'CRD Patient',
         crd_v221_practitioner_must_support: 'CRD Practitioner',

@@ -100,7 +100,7 @@ module DaVinciCRDTestKit
             During this test, Inferno will check whether all must support elements defined in the
             profile(s) listed below are demonstrated within hook requests made during this session.
             This check may vacuously pass if the tester has attested that this resource type is not
-            supported by the CRD client or if the relevant hooks are not invoked.
+            supported by the CRD client.
 
             If any must support elements are not demonstrated, the tester will have the option to attest
             that these elements are not supported by the CRD client or surfaced to its users. Testers
@@ -162,18 +162,15 @@ module DaVinciCRDTestKit
         config.options[:ig_version]
       end
 
-      # A type the tester selected is expected, as is a type governed only by requiring hooks once one
-      # of them was invoked. A type governed by neither an input nor hooks is required of every CRD
-      # client. Deselecting a type whose hook was invoked is caught separately as a contradiction.
+      # A type is expected unless the tester deselected it; a type no input governs is required of
+      # every CRD client. Deselecting a type whose hook was invoked is caught separately as a
+      # contradiction.
       def expected?(resource_type)
-        return false if declared_unsupported?(resource_type)
-        return true if selected_types(resource_type)&.include?(resource_type)
-
-        requiring_hooks(resource_type).nil? || required_by_invoked_hook?(resource_type)
+        !declared_unsupported?(resource_type)
       end
 
       def required_of_every_client?(resource_type)
-        selected_types(resource_type).nil? && requiring_hooks(resource_type).nil?
+        selected_types(resource_type).nil?
       end
 
       def invoked_requiring_hooks(resource_type)
@@ -194,16 +191,7 @@ module DaVinciCRDTestKit
         must_support_requests.any? { |request| request.tags.include?(hook_tag) }
       end
 
-      def not_expected_reason(resource_type)
-        reasons = []
-        reasons << DECLARED_UNSUPPORTED_REASON if declared_unsupported?(resource_type)
-        hooks = requiring_hooks(resource_type)
-        reasons << "no #{hooks.join(' or ')} hook was invoked" if hooks.present?
-        reasons.join(' and ')
-      end
-
-      # Only a type the tester declared unsupported contradicts what they said. A hook gated type can
-      # turn up in another hook's request, so absent a declaration it is checked as normal.
+      # Only a type the tester declared unsupported contradicts what they said.
       def declared_type_mismatch(resource_type, resources)
         return :invoked_hook_type if declared_unsupported?(resource_type) && required_by_invoked_hook?(resource_type)
         return :unexpected_type if resources.present? && declared_unsupported?(resource_type)
@@ -261,11 +249,8 @@ module DaVinciCRDTestKit
       def missing_type_reason(resource_type)
         if required_of_every_client?(resource_type)
           'CRD clients are required to support'
-        elsif selected_types(resource_type)&.include?(resource_type)
-          'The tester indicated the CRD client supports'
         else
-          "The CRD client invoked the #{hook_list(invoked_requiring_hooks(resource_type))} hook(s), " \
-            'which are expected to include'
+          'The tester indicated the CRD client supports'
         end
       end
 
@@ -281,7 +266,7 @@ module DaVinciCRDTestKit
         return 'All must support elements were observed.' if vacuous.blank?
 
         "No instances of #{vacuous.to_sentence} observed, and none expected: " \
-          "#{vacuous.map { |resource_type| not_expected_reason(resource_type) }.uniq.join('; ')}."
+          "#{DECLARED_UNSUPPORTED_REASON}."
       end
 
       def log_info_messages(unobserved)

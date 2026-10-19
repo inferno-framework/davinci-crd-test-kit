@@ -271,6 +271,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
         'CommunicationRequest' => [resources::COMMUNICATION_REQUEST],
         'Encounter' => [resources::ENCOUNTER],
         'Coverage' => [resources::COVERAGE],
+        'Device' => [resources::DEVICE],
+        'Medication' => [resources::MEDICATION],
         'Location' => [resources::LOCATION],
         'Organization' => [resources::ORGANIZATION],
         'Patient' => [resources::PATIENT],
@@ -308,30 +310,35 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
                             tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag])
     end
 
-    it 'passes without an attestation when no hook requiring the type was invoked' do
+    # Encounter.appointment is must support, so an Appointment can be expected without the
+    # appointment-book hook ever being invoked.
+    it 'expects Appointment when selected even though appointment-book was never invoked' do
       hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
 
       result = run(appointment_test, all_types_selected)
 
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Appointment`')
+    end
+
+    it 'passes without an attestation when Appointment was deselected and appointment-book never invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(appointment_test,
+                   all_types_selected(supporting_types_supported: %w[Encounter Practitioner].to_json))
+
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Appointment observed')
-      expect(result.result_message).to include('appointment-book')
     end
 
-    it 'fails when the hook requiring the type was invoked but the type never appeared' do
+    it 'fails when Appointment was deselected but appointment-book was invoked' do
       hook_request(DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG)
 
-      result = run(appointment_test, all_types_selected)
+      result = run(appointment_test,
+                   all_types_selected(supporting_types_supported: %w[Encounter Practitioner].to_json))
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('`Appointment` resource type, but no instances')
-    end
-
-    it 'still checks a hook gated type that turned up in another hook request' do
-      create_request(hook_request_body(prefetch: { appointment: { resourceType: 'Appointment', id: 'a1',
-                                                                  status: 'booked' } }))
-
-      expect(run(appointment_test, all_types_selected).result).to eq('wait')
+      expect(result.result_message).to include('invoked the `appointment-book` hook(s)')
     end
 
     it 'passes without an attestation when the tester did not select the type' do
@@ -413,8 +420,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       result = run(encounter_test, supporting_types_supported: [].to_json)
 
       expect(result.result).to eq('pass')
-      expect(result.result_message)
-        .to include('does not support this resource type and no encounter-start or encounter-discharge hook')
+      expect(result.result_message).to include('does not support this resource type')
     end
 
     it 'fails when an unselected type is observed alongside an invoked requiring hook' do
