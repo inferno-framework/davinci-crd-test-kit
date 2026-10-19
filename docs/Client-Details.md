@@ -154,11 +154,18 @@ In the 2.2.1 version of the CRD IG, clients are [required to support prefetch](h
 and to be able to provide the complete minimal data set via this mechanism. Inferno therefore assumes
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
 during a hook invocation. However, clients are still required to allow servers to access data via FHIR
-APIs. During a hook invocation, Inferno will use the provided `fhirServer` and
-`fhirAuthorization.access_token` to request resources outside the standard prefetch data
-set that it needs to validate other requirements, including
+APIs. During a hook invocation, Inferno will perform FHIR read interactions to request resources outside
+the standard prefetch data set that it needs to validate other requirements, including
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.
 - Parent Location resources of those provided via prefetch via the `partOf` element.
+- Resources referenced in must support elements that don't appear within the `context` or `prefetch`
+  fields of the hook request.
+
+When requesting data, Inferno will only attept to read literal references. It will use the Bearer
+token provided in the `fhirAuthorization.access_token` field of the hook request as long as the
+reference points to a resource on the `fhirServer` indicated in the hook request, as determined
+by [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references). If it does
+not, Inferno does not include an access token on the read request.
 
 During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
 tester-specified resource. Whereas the other resources listed above must be accessible, Inferno

@@ -18,6 +18,15 @@ module DaVinciCRDTestKit
 
       id :crd_v221_request_must_support_reference_resolution
 
+      # Where the pages of each IG version that target profiles come from are published, keyed by
+      # the IG's canonical base and the profile version. The published paths do not follow a single
+      # pattern (US Core 7.0.0 lives under STU7), so they are listed explicitly.
+      PROFILE_PAGE_BASES = {
+        ['http://hl7.org/fhir/us/davinci-crd', '2.2.1'] => 'https://hl7.org/fhir/us/davinci-crd/2.2.1/en',
+        ['http://hl7.org/fhir/us/davinci-hrex', '1.2.0'] => 'https://hl7.org/fhir/us/davinci-hrex/1.2.0',
+        ['http://hl7.org/fhir/us/core', '7.0.0'] => 'https://hl7.org/fhir/us/core/STU7'
+      }.freeze
+
       # The type matters: Inferno parses a checkbox input's stored JSON into an array, and without
       # it the raw string arrives instead.
       input :order_types_supported, optional: true, type: 'checkbox'
@@ -27,17 +36,33 @@ module DaVinciCRDTestKit
         def build_description(options)
           sections = options[:profiles].map do |profile|
             metadata = metadata_for(options[:ig_version], profile)
-            "### #{title_for(metadata, profile)}\n\n#{reference_list(metadata)}"
+            "### #{title_for(metadata, profile)}\n\n#{reference_list(options[:ig_version], metadata)}"
           end
 
           "#{description_intro}\n\n#{sections.join("\n\n")}"
         end
 
-        def reference_list(metadata)
+        # Each element, with the target profiles it must be demonstrated for as a sublist beneath it.
+        def reference_list(ig_version, metadata)
           MustSupportReferences.reference_elements(metadata).map do |element|
-            targets = Array(element[:target_profiles]).map { |target_profile| "`#{target_profile}`" }
-            "- `#{element[:path]}`#{": #{targets.join(', ')}" if targets.present?}"
+            targets = Array(element[:target_profiles]).map do |target_profile|
+              "  - #{target_profile_link(ig_version, target_profile)}"
+            end
+            ["- `#{element[:path]}`", *targets].join("\n")
           end.join("\n")
+        end
+
+        # The target profile's name, linked to its page in the published IG. A profile whose IG
+        # version has no known page location is linked by its canonical URL instead.
+        def target_profile_link(ig_version, target_profile)
+          target_metadata = ProfileMetadata.for_profile_url(ig_version, target_profile)
+          url = target_profile.split('|').first
+          return "[#{url}](#{url})" if target_metadata.blank?
+
+          base, id = url.split('/StructureDefinition/')
+          page_base = PROFILE_PAGE_BASES[[base, target_metadata.profile_version]]
+          page = page_base.present? ? "#{page_base}/StructureDefinition-#{id}.html" : url
+          "[#{target_metadata.profile_name}](#{page})"
         end
 
         def description_intro
@@ -45,31 +70,23 @@ module DaVinciCRDTestKit
             The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3)
             that when a client "maintains a mustSupport data element and surfaces it to users, then it
             SHALL be exposed in their FHIR interface when the data exists and privacy constraints permit."
-            For a must support Reference element, this means that the referenced resource can be
-            retrieved and conforms to the profiles the element targets.
+            For a must support Reference element, this means that the referenced resource can be retrieved.
+            Additionally, when some of the element's target profiles are themselves marked must support
+            or the element has only one target profile, references to resources conforming to each of
+            those profiles must be observed.
 
             During this test, Inferno will check that for each must support Reference element listed
-            below that was populated with a literal reference, at least one of those references
-            resolved to a resource conforming to each target profile listed for the element. Target
-            profiles for resource types the tester indicated the CRD client does not support are not
-            checked.
+            below that was populated, at least one of its references resolved to a resource
+            conforming to each target profile listed for the element. Target profiles for resource types
+            the tester indicated the CRD client does not support are not checked.
 
-            A CRD server can only retrieve data from the CRD client's FHIR server while it is processing
-            a hook request, so Inferno reads the referenced resources as each hook request arrives.
-            Using the `fhirServer` and `fhirAuthorization` provided in the request, Inferno reads each
-            resource referenced from a must support Reference element of a resource in the `context`
-            or `prefetch`, and the resources referenced in turn from those it reads. References to
-            resources on other servers are read from those servers without the access token, which
-            is only for the `fhirServer`.
+            Inferno obtains the resources needed to perform these checks during the hook request by
+            performing a FHIR read of any references in must support elements that aren't already
+            present in the `context` or `prefetch` fields of the hook request. See the wiki's
+            documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
+            for details on how Inferno gets these resources.
 
-            Resources and references are matched by absolute URL. A resource in a Bundle is
-            identified by the entry's `fullUrl`, and any other resource is assumed to be on the
-            `fhirServer`. A relative reference is resolved against the server of the resource holding
-            it. A reference resolves when it points to a contained resource, to a resource carried in
-            the same hook request, or to a resource Inferno read while processing it.
-
-            The test will skip if a must support Reference element was populated but none of its
-            references resolved. Inferno will consider the same hook requests as the must support
+            Inferno will consider the same hook requests as the must support
             element tests: those made during the latest run of each `Hooks` subgroup and the
             `Additional Hook Invocations for Cross Hook Support Demonstration` group.
           INTRO
@@ -176,6 +193,10 @@ module DaVinciCRDTestKit
 
       # The resource a reference resolved to and where it came from, or why it did not resolve.
       def resolve(reference, entry, request_data)
+        if reference.reference.blank?
+          return { failure: 'it has no literal `reference`, only an identifier or display, so Inferno could not ' \
+                            'resolve it' }
+        end
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
         base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]
@@ -219,7 +240,7 @@ module DaVinciCRDTestKit
         hook_request_data.flat_map do |request_data|
           request_data[:resources].select { |entry| entry[:resource].resourceType == resource_type }
             .flat_map do |entry|
-              navigator.literal_references(entry[:resource], path).map do |reference|
+              navigator.references(entry[:resource], path).map do |reference|
                 resolve(reference, entry, request_data).merge(reference: reference.reference)
               end
             end
@@ -278,7 +299,13 @@ module DaVinciCRDTestKit
       end
 
       def target_description(target)
-        "`#{target[:path]}`#{" (#{target[:target_profile]})" if target[:target_profile].present?}"
+        return "`#{target[:path]}`" if target[:target_profile].blank?
+
+        "`#{target[:path]}` using profile #{target_profile_link(target[:target_profile])}"
+      end
+
+      def target_profile_link(target_profile)
+        self.class.target_profile_link(ig_version, target_profile)
       end
 
       def log_unresolved(unresolved)
@@ -300,7 +327,7 @@ module DaVinciCRDTestKit
             "resolved from #{attempt[:source]}, but is a #{attempt[:resource].resourceType} rather than a " \
               "#{target[:target_type]}"
           else
-            "resolved from #{attempt[:source]}, but does not conform to #{target[:target_profile]}"
+            "resolved from #{attempt[:source]}, but does not conform to #{target_profile_link(target[:target_profile])}"
           end
 
         "#{attempt_reference(attempt)} #{reason}"
@@ -309,6 +336,7 @@ module DaVinciCRDTestKit
       # A relative reference is shown with the absolute URL it was resolved as, so that it is clear
       # which server it was looked up on.
       def attempt_reference(attempt)
+        return 'A logical reference' if attempt[:reference].blank?
         return "`#{attempt[:reference]}`" if attempt[:url].blank? || attempt[:url] == attempt[:reference]
 
         "`#{attempt[:reference]}` (as `#{attempt[:url]}`)"

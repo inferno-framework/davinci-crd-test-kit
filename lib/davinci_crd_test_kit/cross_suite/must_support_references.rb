@@ -19,10 +19,15 @@ module DaVinciCRDTestKit
         @metadata = metadata
       end
 
+      # Every reference at the path, including logical ones carrying just an identifier or a display.
+      def references(resource, path)
+        resolve_path(resource, path).select { |value| value.is_a?(FHIR::Reference) }
+      end
+
       # Only literal references can be resolved, so those carrying just an identifier or a display
       # are left out.
       def literal_references(resource, path)
-        resolve_path(resource, path).select { |value| value.is_a?(FHIR::Reference) && value.reference.present? }
+        references(resource, path).select { |reference| reference.reference.present? }
       end
     end
 

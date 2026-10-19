@@ -9,38 +9,31 @@ module DaVinciCRDTestKit
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3)
         that when a client "maintains a mustSupport data element and surfaces it to users, then it
         SHALL be exposed in their FHIR interface when the data exists and privacy constraints permit."
-        For a must support Reference element, this means that the referenced resource can be
-        retrieved and conforms to the profiles the element targets.
+        For a must support Reference element, this means that the referenced resource can be retrieved.
+        Additionally, when some of the element's target profiles are themselves marked must support
+        or the element has only one target profile, references to resources conforming to each of
+        those profiles must be observed.
 
         During this test, Inferno will check that for each must support Reference element listed
-        below that was populated with a literal reference, at least one of those references
-        resolved to a resource conforming to each target profile listed for the element. Target
-        profiles for resource types the tester indicated the CRD client does not support are not
-        checked.
+        below that was populated, at least one of its references resolved to a resource
+        conforming to each target profile listed for the element. Target profiles for resource types
+        the tester indicated the CRD client does not support are not checked.
 
-        A CRD server can only retrieve data from the CRD client's FHIR server while it is processing
-        a hook request, so Inferno reads the referenced resources as each hook request arrives.
-        Using the `fhirServer` and `fhirAuthorization` provided in the request, Inferno reads each
-        resource referenced from a must support Reference element of a resource in the `context`
-        or `prefetch`, and the resources referenced in turn from those it reads. References to
-        resources on other servers are read from those servers without the access token, which
-        is only for the `fhirServer`.
+        Inferno obtains the resources needed to perform these checks during the hook request by
+        performing a FHIR read of any references in must support elements that aren't already
+        present in the `context` or `prefetch` fields of the hook request. See the wiki's
+        documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
+        for details on how Inferno gets these resources.
 
-        Resources and references are matched by absolute URL. A resource in a Bundle is
-        identified by the entry's `fullUrl`, and any other resource is assumed to be on the
-        `fhirServer`. A relative reference is resolved against the server of the resource holding
-        it. A reference resolves when it points to a contained resource, to a resource carried in
-        the same hook request, or to a resource Inferno read while processing it.
-
-        The test will skip if a must support Reference element was populated but none of its
-        references resolved. Inferno will consider the same hook requests as the must support
+        Inferno will consider the same hook requests as the must support
         element tests: those made during the latest run of each `Hooks` subgroup and the
         `Additional Hook Invocations for Cross Hook Support Demonstration` group.
 
 
         ### CRD Location
 
-        - `managingOrganization`: `http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-organization`
+        - `managingOrganization`
+          - [CRD Organization](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
       DESCRIPTION
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'

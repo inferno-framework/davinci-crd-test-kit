@@ -7,10 +7,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:receiving_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:fhir_server) { 'https://example/r4' }
-  let(:practitioner_profile) { 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner' }
-  let(:practitioner_role_profile) do
-    'http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/hrex-practitionerrole'
-  end
   let(:vision_prescription_test) do
     Class.new(described_class) do
       config(options: { ig_version: 'v2.2.1',
@@ -122,8 +118,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, all_types_selected)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to include("`prescriber` (#{practitioner_role_profile})")
-    expect(result.result_message).to_not include("(#{practitioner_profile})")
+    expect(result.result_message).to include('`prescriber` using profile [HRex PractitionerRole Profile](')
+    expect(result.result_message).to_not include('[CRD Practitioner](')
   end
 
   it 'explains a reference that resolved to a resource of a different type than the target' do
@@ -185,8 +181,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to include("`prescriber` (#{practitioner_profile})")
-    nonconforming = %r{`Practitioner/pr1` \(as `\S+`\) resolved .*, but does not conform to #{practitioner_profile}}
+    expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
+    nonconforming = %r{`Practitioner/pr1` \(as `\S+`\) resolved .*, but does not conform to \[CRD Practitioner\]\(}
     expect(messages_for(vision_prescription_test).map(&:message)).to include(a_string_matching(nonconforming))
   end
 
@@ -272,14 +268,25 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to include("`prescriber` (#{practitioner_profile})")
+    expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
   end
 
-  it 'ignores must support elements that were never populated with a literal reference' do
+  it 'does not count a must support element populated only with logical references' do
     order = vision_prescription(prescriber: nil).merge(prescriber: { display: 'Dr. Smith' })
     create_hook_request([order], read: [encounter])
 
-    result = run(vision_prescription_test, all_types_selected)
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
+    expect(messages_for(vision_prescription_test).map(&:message).join).to include('A logical reference not resolved')
+  end
+
+  it 'passes when a logical reference sits alongside a literal one that resolves' do
+    logical = vision_prescription(prescriber: nil).merge(prescriber: { display: 'Dr. Smith' })
+    create_hook_request([logical, vision_prescription], read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('pass')
   end
