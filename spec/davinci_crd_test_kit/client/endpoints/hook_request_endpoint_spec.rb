@@ -260,6 +260,32 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(filtered_response['cards']).to eq([guideline_card])
       expect(filtered_response['systemActions']).to eq([other_action])
     end
+
+    it 'removes systemActions when filtering coverage-info leaves it empty' do
+      allow(endpoint).to receive(:request_body).and_return(
+        'extension' => { 'davinci-crd.configuration' => { 'coverage-info' => false } }
+      )
+
+      response_body = { 'cards' => [], 'systemActions' => [coverage_info_action] }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to eq({ 'cards' => [] })
+    end
+
+    it 'removes an empty systemActions array when no configuration is provided' do
+      allow(endpoint).to receive(:request_body).and_return({})
+
+      response_body = {
+        'cards' => [guideline_card.merge('suggestions' => [{ 'label' => 'none', 'actions' => [] }])],
+        'systemActions' => []
+      }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to_not have_key('systemActions')
+      expect(filtered_response['cards'].first['suggestions'].first['actions']).to eq([])
+    end
   end
 
   describe 'When fetching data during a hook invocation' do

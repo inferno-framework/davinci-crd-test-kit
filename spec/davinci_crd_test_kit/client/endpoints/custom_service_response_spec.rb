@@ -414,9 +414,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       card_response = JSON.parse(last_response.body)
       expect(card_response['extension']).to be_nil
       cards = card_response['cards']
-      actions = card_response['systemActions']
       expect(cards.length).to eq(0)
-      expect(actions.length).to eq(0)
+      expect(card_response).to_not have_key('systemActions')
     end
 
     it 'returns success and includes the default card when no other cards selected' do
@@ -445,11 +444,10 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       card_response = JSON.parse(last_response.body)
       expect(card_response['extension']).to be_nil
       cards = card_response['cards']
-      actions = card_response['systemActions']
       expect(cards.length).to eq(1)
       expect(cards[0]['suggestions']).to be_present
       expect(cards[0]['extension']).to be_nil
-      expect(actions.length).to eq(0)
+      expect(card_response).to_not have_key('systemActions')
     end
 
     it 'returns success and does not include the default card when inclusion criteria is met on another card' do
@@ -479,10 +477,9 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       card_response = JSON.parse(last_response.body)
       expect(card_response['extension']).to be_nil
       cards = card_response['cards']
-      actions = card_response['systemActions']
       expect(cards.length).to eq(1)
       expect(cards[0]['suggestions']).to be_nil
-      expect(actions.length).to eq(0)
+      expect(card_response).to_not have_key('systemActions')
     end
 
     it 'returns success and includes cards and actions when inclusion criteria is met' do
@@ -771,9 +768,8 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       card_response = JSON.parse(last_response.body)
       expect(card_response['extension']).to be_nil
       cards = card_response['cards']
-      actions = card_response['systemActions']
       expect(cards.length).to eq(1)
-      expect(actions.length).to eq(0)
+      expect(card_response).to_not have_key('systemActions')
       suggestion = cards[0]['suggestions']&.first
       expect(suggestion).to be_present
       expect(suggestion['actions'].length).to eq(3)
@@ -1070,7 +1066,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         header('Authorization', "Bearer #{token}")
         post_json(server_endpoint, body)
         expect(last_response).to be_ok
-        expect(JSON.parse(last_response.body)['systemActions'].length).to eq(0)
+        expect(JSON.parse(last_response.body)).to_not have_key('systemActions')
       end
 
       describe 'when posting to the v221 prefetch-subset endpoint' do
