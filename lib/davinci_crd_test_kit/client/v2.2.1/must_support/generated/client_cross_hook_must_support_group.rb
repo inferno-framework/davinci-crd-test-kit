@@ -43,6 +43,9 @@ module DaVinciCRDTestKit
         When re-running these groups, remember that requests made during the prior execution will fall
         out of scope of this analysis, so elements only demonstrated during that execution will need to
         be demonstrated again during the new test run.
+
+        For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+        page in the CRD Test Kit wiki.
       DESCRIPTION
 
       run_as_group
@@ -122,6 +125,10 @@ module DaVinciCRDTestKit
           further analysis if an expected resource type is not observed or vice-versa. When a resource type
           was observed but some of its must support elements were not, the tester is asked to attest
           that the CRD client does not capture the represented data or does not surface it to users.
+
+          For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+          page and specifically the [Requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#requests)
+          section in the CRD Test Kit wiki.
         DESCRIPTION
 
         test from: :crd_v221_appointment_must_support
@@ -161,6 +168,10 @@ module DaVinciCRDTestKit
         description <<~DESCRIPTION
           These tests check that the CRD client supports the response types and the must support
           elements within them that CRD clients are required to support when returned by a CRD server.
+
+          For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+          page and specifically the [Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#responses)
+          section in the CRD Test Kit wiki.
         DESCRIPTION
 
         test from: :crd_v221_client_card_must_support_coverage_information

@@ -27,6 +27,10 @@ module DaVinciCRDTestKit
         no longer be considered and must support elements demonstrated only during that prior run must
         be re-demonstrated on the new run or a subsequent one.
 
+        For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+        page and specifically the [Requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#requests)
+        section in the CRD Test Kit wiki.
+
 
         ### [CRD Organization](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-organization.html)
 

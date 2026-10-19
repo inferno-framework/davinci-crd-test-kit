@@ -29,6 +29,10 @@ module DaVinciCRDTestKit
         element tests: those made during the latest run of each `Hooks` subgroup and the
         `Additional Hook Invocations for Cross Hook Support Demonstration` group.
 
+        For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+        page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)
+        section in the CRD Test Kit wiki.
+
 
         ### CRD Appointment
 
