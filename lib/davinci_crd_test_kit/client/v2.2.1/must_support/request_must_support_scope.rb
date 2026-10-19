@@ -6,10 +6,22 @@ module DaVinciCRDTestKit
     # declared the CRD client supports.
     module RequestMustSupportScope
       # Reads the requests directly rather than going through `load_tagged_requests`, which would
-      # also associate every cross hook request with this test's own result.
+      # also associate every cross hook request with this test's own result. Only the relevant ones
+      # are associated, by `associate_requests`.
       def must_support_requests
         @must_support_requests ||=
           Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [CROSS_HOOK_ANALYSIS_TAG])
+      end
+
+      def profile_resource_types
+        config.options[:profiles].map { |profile| profile[:resource_type] }
+      end
+
+      # Attaches the requests that carried the resource types under test to this test's result so
+      # the tester can see what was considered. When none did, every considered request is attached,
+      # since together they are the evidence that the types were absent.
+      def associate_requests(relevant_requests)
+        requests.concat(relevant_requests.presence || must_support_requests)
       end
 
       # nil when the type is required of every CRD client, so no input governs it. A CRD client need not

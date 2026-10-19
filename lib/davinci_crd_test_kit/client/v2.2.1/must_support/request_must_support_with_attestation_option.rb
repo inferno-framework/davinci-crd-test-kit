@@ -133,14 +133,29 @@ module DaVinciCRDTestKit
         cached = scratch[:must_support_extraction]
         return cached if cached && cached[:request_ids] == request_ids
 
-        scratch[:must_support_extraction] = {
-          request_ids:,
-          resources_by_type: fhir_resources_by_type(must_support_requests)
-        }
+        scratch[:must_support_extraction] = { request_ids:, **extract(must_support_requests) }
+      end
+
+      # The resources of each type, and the ids of the requests that carried them, so that each test
+      # can associate just the requests holding the types it checks.
+      def extract(requests)
+        requests.each_with_object({ resources_by_type: {}, request_ids_by_type: {} }) do |request, extracted|
+          fhir_resources_by_type([request]).each do |resource_type, resources|
+            (extracted[:resources_by_type][resource_type] ||= []).concat(resources)
+            (extracted[:request_ids_by_type][resource_type] ||= []) << request.id
+          end
+        end
       end
 
       def resources_by_type
         extraction[:resources_by_type]
+      end
+
+      def relevant_requests
+        request_ids = profile_resource_types.flat_map do |resource_type|
+          Array(extraction[:request_ids_by_type][resource_type])
+        end
+        must_support_requests.select { |request| request_ids.include?(request.id) }
       end
 
       def ig_version
@@ -315,6 +330,7 @@ module DaVinciCRDTestKit
 
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
+        associate_requests(relevant_requests)
 
         unobserved = gather_unobserved
         check_declared_types(unobserved)

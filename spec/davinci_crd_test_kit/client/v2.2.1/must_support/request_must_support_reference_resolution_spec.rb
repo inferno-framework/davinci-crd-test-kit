@@ -38,14 +38,15 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     body = { hook: 'order-sign', hookInstance: hook_instance, fhirServer: fhir_server,
              context: { draftOrders: bundle_of(orders) },
              prefetch: { patient:, others: bundle_of(prefetched) } }
-    repo_create(:request, test_session_id: test_session.id, request_body: body.to_json, result: receiving_result,
-                          tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
+    hook_request = repo_create(:request, test_session_id: test_session.id, request_body: body.to_json,
+                                         result: receiving_result, tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
     fetch_tags = [DaVinciCRDTestKit::DATA_FETCH_TAG,
                   DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance),
                   DaVinciCRDTestKit::MUST_SUPPORT_REFERENCE_FETCH_TAG]
     read.each { |resource| create_read(resource, 200, fetch_tags) }
     failed_reads.each { |resource| create_read(resource, 404, fetch_tags) }
     external_reads.each { |url, resource| create_read(resource, 200, fetch_tags, url:) }
+    hook_request
   end
 
   def bundle_of(resources)
@@ -58,6 +59,15 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
   def create_read(resource, status, tags, url: "#{fhir_server}/#{resource[:resourceType]}/#{resource[:id]}")
     repo_create(:request, test_session_id: test_session.id, verb: 'get', direction: 'outgoing', url:, status:,
                           response_body: resource.to_json, result: receiving_result, tags:)
+  end
+
+  # The result returned by `run` does not carry its requests, so they are read back from the database.
+  def attached_request_ids(result)
+    Inferno::Repositories::Results::Model.find(id: result.id).requests.map(&:id)
+  end
+
+  def attached_urls(result)
+    Inferno::Repositories::Results::Model.find(id: result.id).requests.map(&:url)
   end
 
   def all_types_selected(inputs = {})
@@ -272,5 +282,56 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, all_types_selected)
 
     expect(result.result).to eq('pass')
+  end
+
+  describe 'request association' do
+    it 'attaches only the hook requests carrying the resource type under test' do
+      with_order = create_hook_request([vision_prescription], read: [encounter, practitioner, practitioner_role])
+      without_order = create_hook_request([])
+
+      vision_prescription_result = run(vision_prescription_test, all_types_selected)
+
+      expect(attached_request_ids(vision_prescription_result)).to include(with_order.id)
+      expect(attached_request_ids(vision_prescription_result)).to_not include(without_order.id)
+    end
+
+    it 'attaches every considered hook request when none carried the resource type' do
+      requests = [create_hook_request([]), create_hook_request([])]
+
+      vision_prescription_result = run(vision_prescription_test, all_types_selected)
+
+      expect(attached_request_ids(vision_prescription_result)).to match_array(requests.map(&:id))
+    end
+
+    it 'attaches the reads that references from the resource type resolved to' do
+      hook_request = create_hook_request([vision_prescription], read: [encounter, practitioner])
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(attached_urls(result)).to contain_exactly(
+        hook_request.url, "#{fhir_server}/Encounter/e1", "#{fhir_server}/Practitioner/pr1"
+      )
+    end
+
+    it 'attaches the failed read of a reference that did not resolve' do
+      hook_request = create_hook_request([vision_prescription], read: [encounter], failed_reads: [practitioner])
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(result.result).to eq('skip')
+      expect(attached_urls(result)).to contain_exactly(
+        hook_request.url, "#{fhir_server}/Encounter/e1", "#{fhir_server}/Practitioner/pr1"
+      )
+    end
+
+    it 'does not attach reads no reference from the resource type pointed to' do
+      unrelated = { resourceType: 'Organization', id: 'o1' }
+      hook_request = create_hook_request([vision_prescription], read: [encounter, practitioner, unrelated])
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(attached_urls(result)).to_not include("#{fhir_server}/Organization/o1")
+      expect(attached_urls(result)).to include(hook_request.url)
+    end
   end
 end

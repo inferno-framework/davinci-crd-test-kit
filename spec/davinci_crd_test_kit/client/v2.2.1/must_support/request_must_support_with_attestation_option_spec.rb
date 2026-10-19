@@ -38,6 +38,11 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     end
   end
 
+  # The result returned by `run` does not carry its requests, so they are read back from the database.
+  def attached_request_ids(result)
+    Inferno::Repositories::Results::Model.find(id: result.id).requests.map(&:id)
+  end
+
   def all_types_selected(inputs = {})
     generator = DaVinciCRDTestKit::Generator::MustSupportTestGenerator
     {
@@ -105,6 +110,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(messages.map(&:message)).to include(
         a_string_matching(/Unobserved must support element for CRD Service Request: reasonReference/)
       )
+    end
+
+    it 'attaches the requests it examined while waiting for an attestation' do
+      result = run(service_request_test, all_types_selected)
+
+      expect(result.result).to eq('wait')
+      expect(attached_request_ids(result).length).to eq(1)
     end
 
     it 'offers both attestation links as outputs' do
@@ -213,15 +225,37 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   end
 
   describe 'request association' do
-    before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
+    let(:location_test) { test_for([{ resource_type: 'Location', profile_keys: ['location'] }]) }
+    let!(:service_request_request) do
+      create_request(hook_request_body(context: draft_orders(complete_service_request)))
+    end
+    let!(:location_request) do
+      create_request(hook_request_body(prefetch: { location: DaVinciCRDTestKit::CompleteResources::LOCATION }))
+    end
 
-    it 'does not attach the cross hook requests to its own result' do
-      result = run(service_request_test, all_types_selected)
+    it 'attaches only the hook requests carrying the resource type under test' do
+      service_request_result = run(service_request_test, all_types_selected)
 
-      expect(Inferno::Repositories::Requests.new.tagged_requests(
-        test_session.id, [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG]
-      ).length).to eq(1)
-      expect(result.requests).to be_empty
+      expect(attached_request_ids(service_request_result)).to eq([service_request_request.id])
+    end
+
+    it 'attaches each test its own requests when the extraction is shared' do
+      scratch = {}
+      service_request_result = run(service_request_test, all_types_selected, scratch)
+      location_result = run(location_test, all_types_selected, scratch)
+
+      expect(attached_request_ids(service_request_result)).to eq([service_request_request.id])
+      expect(attached_request_ids(location_result)).to eq([location_request.id])
+    end
+
+    it 'attaches every considered hook request when none carried the resource type' do
+      vision_prescription_test = test_for([{ resource_type: 'VisionPrescription',
+                                             profile_keys: ['vision_prescription'] }])
+
+      vision_prescription_result = run(vision_prescription_test, all_types_selected)
+
+      expect(attached_request_ids(vision_prescription_result))
+        .to contain_exactly(service_request_request.id, location_request.id)
     end
   end
 

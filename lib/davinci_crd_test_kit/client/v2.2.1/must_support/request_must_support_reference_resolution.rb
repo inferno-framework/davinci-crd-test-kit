@@ -116,7 +116,7 @@ module DaVinciCRDTestKit
           reads = reads_by_tag[TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])]
           available = available_from_reads(reads, fhir_server)
           resources.each { |entry| available[entry[:identity]] = entry.merge(source: 'the hook request') }
-          { fhir_server:, resources:, available: }
+          { request:, fhir_server:, resources:, available:, reads: }
         end
       end
 
@@ -148,7 +148,7 @@ module DaVinciCRDTestKit
                      'a read made from its server without the access token'
                    end
           identified_read_resources(read, fhir_server).each do |identity, resource|
-            available[identity] ||= { identity:, resource:, source: }
+            available[identity] ||= { identity:, resource:, source:, read: }
           end
         end
       end
@@ -185,7 +185,13 @@ module DaVinciCRDTestKit
                             'resolve it' }
         end
 
-        request_data[:available][url]&.merge(url:) || { url:, failure: unresolved_reason(url, request_data) }
+        request_data[:available][url]&.merge(url:) ||
+          { url:, failure: unresolved_reason(url, request_data), read: read_of(url, request_data) }
+      end
+
+      # The read made for a reference that did not resolve, if one was attempted, which shows why.
+      def read_of(url, request_data)
+        request_data[:reads].find { |read| read.url == url }
       end
 
       def unresolved_reason(url, request_data)
@@ -243,10 +249,26 @@ module DaVinciCRDTestKit
           next if target[:target_type].present? && declared_unsupported?(target[:target_type])
 
           attempts = reference_attempts(navigator, profile[:resource_type], target[:path])
+          consulted_reads.concat(attempts.filter_map { |attempt| attempt[:read] })
           next if attempts.blank? || target_resolved?(attempts, target)
 
           target.merge(title:, attempts:)
         end
+      end
+
+      def relevant_requests
+        hook_request_data.filter_map do |request_data|
+          carried = request_data[:resources].any? do |entry|
+            profile_resource_types.include?(entry[:resource].resourceType)
+          end
+          request_data[:request] if carried
+        end
+      end
+
+      # The reads that references from the resource type under test resolved to or failed on, which
+      # are attached alongside the hook requests as the evidence for the result.
+      def consulted_reads
+        @consulted_reads ||= []
       end
 
       def observed_types
@@ -294,14 +316,16 @@ module DaVinciCRDTestKit
 
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
+        associate_requests(relevant_requests)
 
-        resource_types = config.options[:profiles].map { |profile| profile[:resource_type] }
+        resource_types = profile_resource_types
         unobserved_types = resource_types - observed_types
         pass_if unobserved_types == resource_types,
                 "No instances of #{resource_types.uniq.to_sentence} observed, so there are no must support " \
                 'references to check.'
 
         unresolved = config.options[:profiles].flat_map { |profile| unresolved_targets(profile) }
+        requests.concat(consulted_reads.uniq(&:id))
         log_unresolved(unresolved)
 
         skip_if unresolved.present?,
