@@ -21,6 +21,30 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
+  verify-test-generation:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ["3.3.6"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Verify test generation is up to date
+        run: |
+          bundle exec rake crd:generate
+          GENERATED_DIRS="lib/davinci_crd_test_kit/cross_suite/generated lib/davinci_crd_test_kit/client/v2.2.1/must_support/generated"
+          if [[ -n "$(git status --porcelain $GENERATED_DIRS)" ]]; then
+            echo "Generated tests are outdated. Run 'bundle exec rake crd:generate' and commit the changes."
+            git status $GENERATED_DIRS
+            git diff $GENERATED_DIRS
+            exit 1
+          fi
+
   test:
     needs: build
     runs-on: ubuntu-latest
