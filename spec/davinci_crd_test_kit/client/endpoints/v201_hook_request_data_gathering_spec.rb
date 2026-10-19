@@ -90,7 +90,7 @@ RSpec.describe DaVinciCRDTestKit::V201HookRequestDataGathering do
       expect(module_instance.analyzed_resources[external_reference]).to eq(patient_example)
       expect(external_request).to have_been_made.once
       expect(module_instance).to have_received(:persist_query_request)
-        .with(anything, anything, request_headers: {})
+        .with(anything, anything, url: external_reference, request_headers: {})
     end
 
     it 'requests references with the access token (local absolute reference)' do

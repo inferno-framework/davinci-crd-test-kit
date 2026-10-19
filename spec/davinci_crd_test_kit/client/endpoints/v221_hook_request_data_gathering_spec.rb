@@ -212,7 +212,8 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
       expect(payer_request).to have_been_made.once
       expect(module_instance).to have_received(:persist_query_request)
-        .with(anything, include(DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG), request_headers: {})
+        .with(anything, include(DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG), url: crd_coverage['payor'].first['reference'],
+                                                                         request_headers: {})
     end
 
     it 'reads a parent location from its server without the access token' do
@@ -226,7 +227,8 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
       expect(parent_request).to have_been_made.once
       expect(module_instance).to have_received(:persist_query_request)
-        .with(anything, include(DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG), request_headers: {})
+        .with(anything, include(DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG), url: external_parent,
+                                                                               request_headers: {})
     end
   end
 
@@ -284,7 +286,23 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       module_instance.request_additional_fhir_data
 
       expect(module_instance).to have_received(:persist_query_request)
-        .with(anything, must_support_fetch_tags, request_headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' }).twice
+        .with(anything, must_support_fetch_tags, url: anything,
+                                                 request_headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' }).twice
+    end
+
+    it 'records a redirected read under the URL requested' do
+      redirected_url = "#{fhir_server}/PractitionerRole/moved"
+      stub_request(:get, practitioner_role_example_reference_absolute)
+        .to_return(status: 301, headers: { 'Location' => redirected_url })
+      stub_request(:get, redirected_url).to_return(status: 200, body: practitioner_role_example.to_json)
+
+      module_instance.request_additional_fhir_data
+
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, must_support_fetch_tags, url: practitioner_role_example_reference_absolute,
+                                                 request_headers: anything).once
+      expect(module_instance).to_not have_received(:persist_query_request)
+        .with(anything, anything, url: redirected_url, request_headers: anything)
     end
 
     it 'does not read resources carried in the request or contained' do
@@ -333,7 +351,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         module_instance.request_additional_fhir_data
 
         expect(module_instance).to have_received(:persist_query_request)
-          .with(anything, must_support_fetch_tags, request_headers: {}).once
+          .with(anything, must_support_fetch_tags, url: external_practitioner_url, request_headers: {}).once
       end
 
       it 'keeps reading from the FHIR server after the other server times out' do

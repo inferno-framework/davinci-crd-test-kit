@@ -38,10 +38,12 @@ module DaVinciCRDTestKit
       reference = normalize_reference(reference)
       fetched_references << reference
       external = absolute_url?(reference)
-      response = execute_request(reference, connection: external ? external_connection : fhir_server_connection)
+      connection = external ? external_connection : fhir_server_connection
+      response = execute_request(reference, connection:)
       return nil unless response.present?
 
-      persist_query_request(response, fetch_tags(additional_tag), request_headers: external ? {} : data_request_headers)
+      persist_query_request(response, fetch_tags(additional_tag), url: requested_url(reference, connection),
+                                                                  request_headers: external ? {} : data_request_headers)
       return nil unless response.status.to_s.starts_with?('2')
 
       begin
@@ -146,12 +148,18 @@ module DaVinciCRDTestKit
       error.is_a?(Faraday::TimeoutError) || error.wrapped_exception.is_a?(Net::OpenTimeout)
     end
 
-    def persist_query_request(response, tags, request_headers: data_request_headers)
+    # Redirects are followed, and, as Inferno's FHIR client does, the read is recorded under the URL
+    # requested rather than the one it ended at, so that tests can match a reference to its read.
+    def requested_url(query, connection)
+      connection.build_exclusive_url(query).to_s
+    end
+
+    def persist_query_request(response, tags, url:, request_headers: data_request_headers)
       inferno_request_headers = request_headers.map { |name, value| { name:, value: } }
       inferno_response_headers = response.headers&.map { |name, value| { name:, value: } }
       requests_repo.create(
         verb: 'GET',
-        url: response.env.url.to_s,
+        url:,
         direction: 'outgoing',
         status: response.status,
         request_body: response.env.request_body,
@@ -169,7 +177,8 @@ module DaVinciCRDTestKit
       response = execute_request(query)
       return nil unless response.present?
 
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_data_fetch_tag])
+      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_data_fetch_tag],
+                            url: requested_url(query, fhir_server_connection))
       return nil unless response.status.to_s.starts_with?('2')
 
       FHIR.from_contents(response.body)
