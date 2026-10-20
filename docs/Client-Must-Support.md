@@ -124,6 +124,8 @@ Additionally, the following is a list of reasons that Inferno can consider a pop
 Reference element to not represent an example of a reference that resolves to a certain profile:
 - It is a logical reference, carrying only an `identifier` or `display` without a `reference`.
 - Its `reference` is neither a contained reference (`#id`), a relative `Type/id` reference, nor an absolute URL.
+- It is a versioned reference (`Type/id/_history/vid`, relative or absolute), which
+  Inferno does not currently resolve.
 - It points to a contained resource whose id does not match any resource in `contained`.
 - The resource it points to was neither carried in the hook request (in `context`
   or `prefetch`) nor successfully read by Inferno while processing that hook request.

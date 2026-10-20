@@ -58,7 +58,7 @@ module DaVinciCRDTestKit
             **Card Display Attestation**:
 
             I attest that the following CDS response types returned were processed by the
-            client system and displayed to the user:
+            CRD client and displayed to the user:
 
             #{format_responded_response_types}
 

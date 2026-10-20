@@ -63,7 +63,7 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. group "3.6 encounter-discharge" in the "complete prefetch" session
    1. group "3.6 encounter-discharge" in the "subset prefetch" session
    1. Once all complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
-   1. A series of "User Action Required" dialogs will appear asking for attestation that the client system does not support must support elements that were not observed. Attest with a mix of true and false answers.
+   1. A series of "User Action Required" dialogs will appear asking for attestation that the CRD client does not support must support elements that were not observed. Attest with a mix of true and false answers.
 1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
 
 Some tests will fail, including

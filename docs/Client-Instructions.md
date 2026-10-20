@@ -1,7 +1,7 @@
 # Da Vinci CRD Client v2.0.1 Test Suite Testing Instructions
 
 This document provides a step-by-step guide for using the Da Vinci CRD Client v2.0.1 Test Suite to test
-a **CRD client system**, including instructions for a [demonstration execution](#demonstration-execution)
+a **CRD client**, including instructions for a [demonstration execution](#demonstration-execution)
 against a public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
 
 ## Quick Start
@@ -49,7 +49,7 @@ group as described in [Quick Start](#quick-start).
 ### Customizing Responses
 
 The "Custom response template for [hook name] hook requests" input can be used to customize the hook
-responses to better fit the configuration of the tested client system. When this input is populated,
+responses to better fit the configuration of the tested CRD client. When this input is populated,
 the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
@@ -90,9 +90,9 @@ no details or provided, those tests will be skipped.
 To run them, follow these steps:
 1. Choose group "2 FHIR API" and click the "RUN ALL TESTS" button in the upper right.
 1. Provide the inputs as detailed above and click the "SUBMIT" button to start the test execution.
-1. A "User Action Required" dialog will appear asking for the tested client system to perform
+1. A "User Action Required" dialog will appear asking for the tested CRD client to perform
    an EHR launch sequence for Inferno. Perform the launch using the indicated details.
-1. A second "User Action Required" dialog will appear asking for the tested client system to
+1. A second "User Action Required" dialog will appear asking for the tested CRD client to
    authorize access. Click the link and perform the authorization for the configured scopes.
 1. Once authorization is complete, Inferno will submit FHIR API requests and verify the responses.
 
