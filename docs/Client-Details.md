@@ -114,7 +114,11 @@ are not tested by Inferno.
 
 The one exception is `Coverages`, which are obtained via the same search advertized in
 [Inferno's prefetch templates](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/routes/cds-services.json).
-  
+
+These requests are made before Inferno returns the hook response. Each one fails if the server
+does not respond within 10 seconds, so that a slow or unresponsive server cannot hold the response
+indefinitely.
+
 ##### Specific elements targeted
 
 While the CRD STU2 IG does not provide precise definitions of the FHIR elements that constitute the minimum
@@ -171,8 +175,11 @@ the standard prefetch data set that it needs to validate other requirements, inc
 
 Inferno makes these reads before returning the hook response, so when a hook request contains
 many references to resources not included in the request or the CRD client's FHIR server responds
-slowly Inferno's response can be delayed. Inferno will stop requesting data from FHIR servers
-that fail to respond within 10 seconds.
+slowly Inferno's response can be delayed. To bound the delay, every FHIR request Inferno makes
+during a hook invocation, including the `Coverage` search made when no Coverage is prefetched, fails
+if the server does not respond within 10 seconds. Once a server has timed out while
+Inferno is reading must support references, Inferno makes no further must support reads from that
+server for the rest of the hook request.
 
 When requesting data, Inferno will only attempt to read literal references. It will use the Bearer
 token provided in the `fhirAuthorization.access_token` field of the hook request as long as the
