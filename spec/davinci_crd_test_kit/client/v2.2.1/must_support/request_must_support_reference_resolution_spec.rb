@@ -90,17 +90,17 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to include('No hook requests received')
   end
 
-  it 'fails when no instances of an expected resource type were observed' do
+  it 'skips when no instances of an expected resource type were observed' do
     create_hook_request([])
 
     result = run(vision_prescription_test, all_types_selected)
 
-    expect(result.result).to eq('fail')
+    expect(result.result).to eq('skip')
     expect(result.result_message)
       .to include('The tester indicated the CRD client supports the `VisionPrescription` resource type')
   end
 
-  it 'fails when no instances of a resource type every CRD client must support were observed' do
+  it 'skips when no instances of a resource type every CRD client must support were observed' do
     create_hook_request([])
     coverage_test = Class.new(described_class) do
       config(options: { ig_version: 'v2.2.1', profiles: [{ resource_type: 'Coverage', profile_keys: ['coverage'] }] })
@@ -108,7 +108,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
     result = run(coverage_test, all_types_selected)
 
-    expect(result.result).to eq('fail')
+    expect(result.result).to eq('skip')
     expect(result.result_message).to include('CRD clients are required to support the `Coverage` resource type')
   end
 

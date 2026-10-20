@@ -77,7 +77,8 @@ below for details).
 
 To verify support for must support elements of the [Reference](https://hl7.org/fhir/R4/references.html)
 type, Inferno must also be able to resolve observed references and follow them to actual
-resources that conform to certain profiles.
+resources that conform to certain profiles. If Inferno cannot find all the examples it
+needs to see for a referencing resource type, the test will skip.
 
 When resolving references, Inferno first looks for the referenced resource
 within the `context` or `prefetch` fields of the hook request and falls back to obtaining
@@ -111,7 +112,7 @@ Note that not all references must resolve and conform to a required profile: Inf
 find one for each reference element and target profile. For this reason, detailed
 conformance validation errors are not returned. While this avoids reporting errors for
 references that do not matter to the result, it also makes it harder to determine what
-caused the failure. The following information is available to help testers determine
+caused the tests to not pass. The following information is available to help testers determine
 what Inferno looked at and why it did not find all the examples it needed:
 - The result message will name each element and target profile that was not
   demonstrated.
@@ -255,7 +256,7 @@ test, testers can look at the Messages tab for the corresponding test which will
 include an "info" message for each element that Inferno did not observe regardless
 of the tester's choice of attestation.
 
-When a test fails because supported elements were not demonstrated, testers may
+When a test fails or skips because supported elements were not demonstrated, testers may
 re-run tests within the suite to demonstrate the additional elements and pass
 the tests on a subsequent run. First, the tester can run or re-run
 interaction tests and send requests that demonstrate the missing elements (and any

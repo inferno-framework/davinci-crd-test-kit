@@ -88,8 +88,9 @@ module DaVinciCRDTestKit
             During this test, Inferno will check that for each must support Reference element listed
             below that was populated, at least one of its references resolved to a resource
             conforming to each target profile listed for the element, or to any one of them where the
-            list says so. Target profiles for resource types the tester indicated the CRD client does not support are
-            not checked.
+            list says so. Target profiles for resource types the tester indicated the CRD client does
+            not support are not checked. The test will skip if Inferno does not observe all of the
+            required references, indicating that additional data is needed to demonstrate conformance.
 
             Inferno obtains the resources needed to perform these checks during the hook request by
             performing a FHIR read of any references in must support elements that aren't already
@@ -97,7 +98,7 @@ module DaVinciCRDTestKit
             documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
             for details on how Inferno gets these resources.
 
-            If no instances of the resource type were observed, the test fails unless the tester
+            If no instances of the resource type were observed, the test skips unless the tester
             indicated that the CRD client does not support the resource type.
 
             Inferno will consider the same hook requests as the must support
@@ -332,7 +333,7 @@ module DaVinciCRDTestKit
         return if (resource_types - observed_types).length < resource_types.length
 
         missing = resource_types.select { |resource_type| expected?(resource_type) }
-        assert missing.blank?, missing.map { |resource_type| missing_type_message(resource_type) }.join(' ')
+        skip_if missing.present?, missing.map { |resource_type| missing_type_message(resource_type) }.join(' ')
 
         pass "No instances of #{resource_types.to_sentence} observed, and none expected: " \
              "#{DECLARED_UNSUPPORTED_REASON}."
