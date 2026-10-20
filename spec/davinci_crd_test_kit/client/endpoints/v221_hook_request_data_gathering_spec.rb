@@ -199,6 +199,29 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
     end
   end
 
+  describe 'when a step of gathering additional data fails unexpectedly' do
+    before do
+      allow(module_instance).to receive_messages(request_body: order_sign_request,
+                                                 include_in_cross_hook_analysis?: true)
+      allow(module_instance).to receive(:request_coverage_payer).and_raise(NoMethodError, 'unexpected')
+      allow(module_instance).to receive(:request_parent_locations)
+      allow(module_instance).to receive(:request_must_support_references)
+      allow(Inferno::Application['logger']).to receive(:error)
+    end
+
+    it 'logs the failure rather than raising it' do
+      expect { module_instance.request_additional_fhir_data }.to_not raise_error
+      expect(Inferno::Application['logger']).to have_received(:error).with(/reading the Coverage payer failed/)
+    end
+
+    it 'still runs the remaining steps' do
+      module_instance.request_additional_fhir_data
+
+      expect(module_instance).to have_received(:request_parent_locations)
+      expect(module_instance).to have_received(:request_must_support_references)
+    end
+  end
+
   describe 'when reading references to other servers outside must support analysis' do
     def stub_tokenless_get(url, body)
       stub_request(:get, url)
@@ -310,8 +333,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       }.as_json
     end
     let(:must_support_fetch_tags) do
-      [DaVinciCRDTestKit::DATA_FETCH_TAG, DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag('instance-1'),
-       DaVinciCRDTestKit::MUST_SUPPORT_REFERENCE_FETCH_TAG]
+      [DaVinciCRDTestKit::DATA_FETCH_TAG, DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag('instance-1')]
     end
 
     let!(:practitioner_role_request) do
@@ -334,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       expect(practitioner_request).to_not have_been_made
     end
 
-    it 'tags each read as a must support reference fetch for the hook instance' do
+    it 'tags each read as a data fetch for the hook instance' do
       module_instance.request_additional_fhir_data
 
       expect(module_instance).to have_received(:persist_query_request)
@@ -423,6 +445,19 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         hook_request['prefetch']['others'] = {
           'resourceType' => 'Bundle',
           'entry' => [{ 'fullUrl' => external_practitioner_url, 'resource' => practitioner_example }]
+        }
+        external_request = stub_request(:get, external_practitioner_url)
+
+        module_instance.request_additional_fhir_data
+
+        expect(external_request).to_not have_been_made
+      end
+
+      it 'does not read it when the fullUrl is an equivalent form of the reference' do
+        hook_request['prefetch']['others'] = {
+          'resourceType' => 'Bundle',
+          'entry' => [{ 'fullUrl' => 'HTTPS://Elsewhere.Example:443/r4/Practitioner/other',
+                        'resource' => practitioner_example }]
         }
         external_request = stub_request(:get, external_practitioner_url)
 

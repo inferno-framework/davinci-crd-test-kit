@@ -99,7 +99,12 @@ module DaVinciCRDTestKit
             for details on how Inferno gets these resources.
 
             If no instances of the resource type were observed, the test skips unless the tester
-            indicated that the CRD client does not support the resource type.
+            indicated that the CRD client does not support the resource type. Resolution of references
+            requires the ability to determine an identity for the referencing resource including
+            the source FHIR server. The absence of this information for referencing resources may cause
+            this test to produce an inaccurate pass result. Since CRD conformance rules require this
+            information (`fhirServer` on the hook request, `fullUrl` in Bundle entries, and `id` on resource)
+            other tests will fail in this case.
 
             Inferno will consider the same hook requests as the must support
             element tests: those made during the latest run of each `Hooks` subgroup and the
@@ -162,7 +167,7 @@ module DaVinciCRDTestKit
         resources = []
         ResourceIdentity.each_identified_resource(request_body) do |identity, raw_resource|
           resource = to_fhir_resource(raw_resource)
-          resources << { identity:, resource: } if resource.present?
+          resources << { identity: ResourceIdentity.normalized_url(identity), resource: } if resource.present?
         end
         resources.uniq { |entry| entry[:identity] }
       end
@@ -190,7 +195,7 @@ module DaVinciCRDTestKit
         resource = FHIR.from_contents(read.response_body.to_s)
         return bundle_identified_resources(resource, fhir_server) if resource.is_a?(FHIR::Bundle)
 
-        ResourceIdentity.names?(read.url, resource) ? [[read.url, resource]] : []
+        ResourceIdentity.names?(read.url, resource) ? [[ResourceIdentity.normalized_url(read.url), resource]] : []
       rescue JSON::ParserError
         []
       end
@@ -198,7 +203,7 @@ module DaVinciCRDTestKit
       def bundle_identified_resources(bundle, fhir_server)
         identified = []
         ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server, nil) do |identity, raw|
-          identified << [identity, to_fhir_resource(raw)]
+          identified << [ResourceIdentity.normalized_url(identity), to_fhir_resource(raw)]
         end
         identified
       end
@@ -210,10 +215,11 @@ module DaVinciCRDTestKit
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
         base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]
-        url = ResourceIdentity.absolute_reference(reference.reference, base)
+        url = ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference.reference, base))
         return {} if url.blank?
 
-        request_data[:available][url] || { read: request_data[:reads].find { |read| read.url == url } }
+        request_data[:available][url] ||
+          { read: request_data[:reads].find { |read| ResourceIdentity.normalized_url(read.url) == url } }
       end
 
       def resolve_contained(reference, resource)
@@ -307,7 +313,16 @@ module DaVinciCRDTestKit
         @consulted_reads ||= []
       end
 
+      # Counted the same way as for the must support element tests, so the two agree on which types
+      # were observed. That includes resources that could not be identified by absolute URL, such as
+      # those in a hook request without a `fhirServer`, whose references cannot be checked (see
+      # #check_unidentified_types).
       def observed_types
+        fhir_resources_by_type(must_support_requests).keys
+      end
+
+      # The types of the resources whose references can be checked, those identified by absolute URL.
+      def identified_types
         hook_request_data.flat_map do |request_data|
           request_data[:resources].map { |entry| entry[:resource].resourceType }
         end.uniq
@@ -339,11 +354,23 @@ module DaVinciCRDTestKit
              "#{DECLARED_UNSUPPORTED_REASON}."
       end
 
+      # References are resolved against the URL identifying the resource holding them, so when no
+      # instance of an observed type could be identified, none of its references could be checked.
+      # That calls for hook requests with the details needed, not a pass on references never examined.
+      def check_unidentified_types
+        unidentified = (profile_resource_types.uniq & observed_types) - identified_types
+        skip_if unidentified.present?,
+                "Instances of #{unidentified.map { |resource_type| "`#{resource_type}`" }.to_sentence} were " \
+                'observed, but none could be identified by absolute URL, so their references could not be ' \
+                'checked. Include `fhirServer` in hook requests, and an id or `fullUrl` for each resource.'
+      end
+
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
         associate_requests(relevant_requests)
 
         check_unobserved_types
+        check_unidentified_types
 
         unresolved = config.options[:profiles].flat_map { |profile| unresolved_targets(profile) }
         requests.concat(consulted_reads.uniq(&:id))

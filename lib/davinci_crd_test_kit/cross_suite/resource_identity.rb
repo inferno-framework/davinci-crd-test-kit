@@ -114,6 +114,28 @@ module DaVinciCRDTestKit
       reference.to_s.match?(SCHEME_PATTERN)
     end
 
+    # A single spelling for equivalent http(s) URLs, so that they can be compared as strings: the
+    # host is lowercased and a default port dropped, since RFC 3986 treats those forms as the same
+    # server (Ruby's URI lowercases the scheme and omits a default port when writing the URL). The
+    # path is case-sensitive and kept as given. Any other value is returned unchanged.
+    def normalized_url(url)
+      return url unless http_url?(url)
+
+      uri = URI.parse(url.to_s)
+      return url if uri.host.blank?
+
+      uri.host = uri.host.downcase
+      uri.to_s
+    rescue URI::InvalidURIError
+      url
+    end
+
+    # Whether the reference is an absolute http(s) URL. Other schemes, such as `urn:uuid:`, name a
+    # resource without saying where it can be read from.
+    def http_url?(reference)
+      reference.to_s.match?(%r{\A(?i:https?)://})
+    end
+
     # Whether the URL is a RESTful http(s) URL to a single resource, and so can be read.
     def readable?(url)
       url.to_s.match?(RESTFUL_URL_PATTERN)

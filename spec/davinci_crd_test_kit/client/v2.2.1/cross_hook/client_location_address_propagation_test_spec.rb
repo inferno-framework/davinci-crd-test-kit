@@ -200,6 +200,22 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
     end
 
+    it 'resolves a relative partOf reference of a location with a urn fullUrl against the FHIR server' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+                              { 'fullUrl' => 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', 'resource' => child }
+                            ] } }
+                          })
+      create_parent_location_fetch_request(location: parent_location_with_address)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
+      expect(result_messages.map(&:message).join).to_not include('could not be fetched')
+    end
+
     it 'resolves the partOf reference of a fetched parent against the server it was read from' do
       allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
       elsewhere = 'https://elsewhere.example/fhir'

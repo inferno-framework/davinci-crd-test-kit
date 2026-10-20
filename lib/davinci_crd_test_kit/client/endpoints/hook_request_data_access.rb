@@ -11,14 +11,43 @@ module DaVinciCRDTestKit
     # hold the response indefinitely.
     FHIR_SERVER_TIMEOUT_SECONDS = 10
 
+    # Runs a step that reads data only so that later tests can check it. Such a step must not cost
+    # the CRD client its hook response, so an unexpected error is logged rather than raised, and the
+    # tests that rely on the step report what it did not record. Those reports would read as the CRD
+    # client's fault, so the waiting test is also given a warning naming the internal error.
+    def continue_after_failure(step)
+      yield
+    rescue StandardError => e
+      Inferno::Application['logger'].error("Hook request #{request_body&.dig('hookInstance')}: " \
+                                           "#{step} failed: #{e.full_message}")
+      warn_waiting_test_of_failure(step, e)
+      nil
+    end
+
+    # The warning carries only the error's message, since the full trace is in the server log.
+    def warn_waiting_test_of_failure(step, error)
+      return unless respond_to?(:result) && result.present?
+
+      Inferno::Repositories::Messages.new.create(
+        result_id: result.id,
+        type: 'warning',
+        message: "Inferno encountered an internal error while #{step} for hook request " \
+                 "`#{request_body&.dig('hookInstance')}`: `#{error.class}: #{error.message}`. Tests " \
+                 'that check this data may report it as missing even though the CRD client is not at ' \
+                 'fault. Re-sending the request may not help; please report this issue.'
+      )
+    rescue StandardError => e
+      Inferno::Application['logger'].error("Could not record the failure of #{step}: #{e.full_message}")
+    end
+
     def hook_instance_data_fetch_tag
       @hook_instance_data_fetch_tag ||= TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
     end
 
     # turn absolute references into relative if
-    # for the fhir server indicated in the request
+    # for the fhir server indicated in the request, and give any other in its normalized form
     def normalize_reference(reference)
-      ResourceIdentity.relative_to(reference, request_body['fhirServer']) || reference
+      ResourceIdentity.relative_to(reference, request_body['fhirServer']) || ResourceIdentity.normalized_url(reference)
     end
 
     # A reference to a server other than the FHIR server named in the request is read without the
@@ -108,6 +137,8 @@ module DaVinciCRDTestKit
     end
 
     def execute_request(query, connection: fhir_server_connection)
+      return unreadable_scheme_response(query) if unreadable_scheme?(query)
+
       connection&.get(query)
     rescue Faraday::Error, URI::InvalidURIError => e
       timed_out_servers << server_for(query, connection) if timeout?(e)
@@ -116,6 +147,18 @@ module DaVinciCRDTestKit
       #          is to persist the request anyway with a status of nil, using the error message as response body
       url = ResourceIdentity.absolute_url?(query) ? query : connection.url_prefix.to_s
       Faraday::Response.new(response_body: e.message, url:)
+    end
+
+    # An absolute reference with a scheme other than http(s), such as `urn:uuid:`, names a resource
+    # without saying where it can be read from, so no request is made for it.
+    def unreadable_scheme?(query)
+      ResourceIdentity.absolute_url?(query) && !ResourceIdentity.http_url?(query)
+    end
+
+    # Recorded like a request that got no response, so that tests report the reference as not read.
+    def unreadable_scheme_response(query)
+      Faraday::Response.new(response_body: "Inferno cannot read `#{query}`: only http(s) URLs can be read.",
+                            url: query.to_s)
     end
 
     # The servers that have timed out while processing this request, each identified by scheme,
@@ -144,8 +187,10 @@ module DaVinciCRDTestKit
 
     # Redirects are followed, and, as Inferno's FHIR client does, the read is recorded under the URL
     # requested rather than the one it ended at, so that tests can match a reference to its read.
-    # A query that is not a valid URL is recorded as given.
+    # A query that is not a valid URL, or cannot be read, is recorded as given.
     def requested_url(query, connection)
+      return query.to_s if unreadable_scheme?(query)
+
       connection.build_exclusive_url(query).to_s
     rescue URI::InvalidURIError
       query.to_s

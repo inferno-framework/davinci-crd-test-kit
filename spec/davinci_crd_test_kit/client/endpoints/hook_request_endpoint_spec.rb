@@ -365,6 +365,35 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(cov_request).to_not have_been_made
       end
 
+      it 'still returns the hook response when gathering data for later verification fails' do
+        allow(test).to receive(:suite).and_return(suite)
+        allow_any_instance_of(described_class).to receive(:request_coverage_payer).and_raise(NoMethodError, 'boom')
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        waiting_result = run(test, cds_jwt_iss: example_client_url,
+                                   order_sign_response_approach: 'custom',
+                                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards']).to be_present
+
+        messages = Inferno::Repositories::Messages.new.messages_for_result(waiting_result.id)
+        hook_instance = order_sign_hook_request['hookInstance']
+        expect(messages.map(&:type)).to include('warning')
+        expect(messages.map(&:message).join)
+          .to include("internal error while reading the Coverage payer for hook request `#{hook_instance}`")
+          .and include('NoMethodError: boom')
+      end
+
       it 'fetches the coverage payer when coverage with a payer reference is in the prefetch' do
         allow(test).to receive(:suite).and_return(suite)
         payer_org_url = "#{fhir_server}/Organization/example-payer"

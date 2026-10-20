@@ -60,10 +60,13 @@ module DaVinciCRDTestKit
       end
 
       # The identity of the Location a `partOf` reference names, resolved against the base of the
-      # Location holding it, following the FHIR rules for resolving references. A reference with no
+      # Location holding it, following the FHIR rules for resolving references. As when Inferno read
+      # the parent during the hook request, a prefetched Location whose identity is not a RESTful URL,
+      # such as a `urn:uuid:` fullUrl, falls back to its request's FHIR server. A reference with no
       # absolute form is used as given.
       def parent_identity(reference, child_identity)
-        ResourceIdentity.absolute_reference(reference, ResourceIdentity.base_for(child_identity)) || reference
+        base = ResourceIdentity.base_for(child_identity) || prefetched_location_fhir_servers[child_identity]
+        ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference, base)) || reference
       end
 
       # skip profile check if in the prefetch hash (done elsewhere) or already checked
@@ -92,7 +95,7 @@ module DaVinciCRDTestKit
         @loaded_requests ||= load_requests_for_cross_hook_analysis
       end
 
-      # The prefetched Locations of every hook request, keyed by the absolute URL identifying each (see
+      # The prefetched Locations of every hook request, keyed by the normalized absolute URL identifying each (see
       # ResourceIdentity), or by `Location/id` when the request gives nothing to make one from.
       def prefetched_location_hash
         @prefetched_location_hash ||= build_prefetched_locations_hash
@@ -115,14 +118,25 @@ module DaVinciCRDTestKit
           location = entry.resource
           next unless location.is_a?(FHIR::Location) && location.id.present?
 
-          location_hash[prefetched_location_identity(entry, fhir_server)] ||= location
+          add_prefetched_location(location_hash, prefetched_location_identity(entry, fhir_server), location,
+                                  fhir_server)
         end
+      end
+
+      def add_prefetched_location(location_hash, identity, location, fhir_server)
+        location_hash[identity] ||= location
+        prefetched_location_fhir_servers[identity] ||= fhir_server
+      end
+
+      # The FHIR server of the hook request that carried each prefetched Location, by identity.
+      def prefetched_location_fhir_servers
+        @prefetched_location_fhir_servers ||= {}
       end
 
       # A Location given without a fullUrl is taken to be on the request's FHIR server.
       def prefetched_location_identity(entry, fhir_server)
-        entry.fullUrl.presence || ResourceIdentity.restful_identity(entry.resource, fhir_server) ||
-          "Location/#{entry.resource.id}"
+        identity = entry.fullUrl.presence || ResourceIdentity.restful_identity(entry.resource, fhir_server)
+        ResourceIdentity.normalized_url(identity) || "Location/#{entry.resource.id}"
       end
 
       def extract_prefetched_location_bundle(request_body)
@@ -134,7 +148,7 @@ module DaVinciCRDTestKit
         FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
       end
 
-      # The parent Locations read during hook requests, keyed by the URL each was read from. A read
+      # The parent Locations read during hook requests, keyed by the normalized URL each was read from. A read
       # only counts when it returned the Location that URL names.
       def fetched_location_hash
         @fetched_location_hash ||= build_fetched_locations_hash
@@ -145,7 +159,7 @@ module DaVinciCRDTestKit
           location = FHIR.from_contents(request.response_body)
           next unless location.is_a?(FHIR::Location) && ResourceIdentity.names?(request.url, location)
 
-          location_hash[request.url] ||= location
+          location_hash[ResourceIdentity.normalized_url(request.url)] ||= location
         rescue JSON::ParserError
           next
         end

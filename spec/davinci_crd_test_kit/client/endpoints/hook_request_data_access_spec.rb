@@ -98,6 +98,14 @@ RSpec.describe DaVinciCRDTestKit::HookRequestDataAccess do
       expect(read).to have_been_made.once
     end
 
+    it 'records a reference with a scheme other than http(s) as not read, without making a request' do
+      reference = 'urn:uuid:9f1c6a52-1d7b-4c9e-8a43-2f0e5b6d7c81'
+
+      expect(module_instance.fetch_reference(reference)).to be_nil
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(have_attributes(status: nil), anything, url: reference, request_headers: {})
+    end
+
     it 'records a reference that is not a valid url without raising' do
       reference = 'https://elsewhere.example/r4/Organization/not valid'
 

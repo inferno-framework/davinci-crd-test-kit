@@ -29,7 +29,12 @@ module DaVinciCRDTestKit
         for details on how Inferno gets these resources.
 
         If no instances of the resource type were observed, the test skips unless the tester
-        indicated that the CRD client does not support the resource type.
+        indicated that the CRD client does not support the resource type. Resolution of references
+        requires the ability to determine an identity for the referencing resource including
+        the source FHIR server. The absence of this information for referencing resources may cause
+        this test to produce an inaccurate pass result. Since CRD conformance rules require this
+        information (`fhirServer` on the hook request, `fullUrl` in Bundle entries, and `id` on resource)
+        other tests will fail in this case.
 
         Inferno will consider the same hook requests as the must support
         element tests: those made during the latest run of each `Hooks` subgroup and the

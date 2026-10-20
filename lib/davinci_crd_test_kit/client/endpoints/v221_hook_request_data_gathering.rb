@@ -13,11 +13,14 @@ module DaVinciCRDTestKit
     MUST_SUPPORT_IG_VERSION = 'v2.2.1'.freeze
 
     # gather additional fhir resources not requested via prefetch
-    # not used for response generation, but verified later
+    # not used for response generation, but verified later, so a failure in one step is logged and
+    # the others still run (see #continue_after_failure)
     def request_additional_fhir_data
-      request_coverage_payer
-      request_parent_locations
-      request_must_support_references if include_in_cross_hook_analysis?
+      continue_after_failure('reading the Coverage payer') { request_coverage_payer }
+      continue_after_failure('reading parent Locations') { request_parent_locations }
+      return unless include_in_cross_hook_analysis?
+
+      continue_after_failure('reading must support references') { request_must_support_references }
     end
 
     # Reads the resources referenced from the must support Reference elements of the resources in
@@ -26,8 +29,8 @@ module DaVinciCRDTestKit
     # to be read now. Must support requirements are satisfied by the resources the request carries,
     # so references within the resources read are not followed.
     #
-    # Resources and references are compared by absolute URL (see ResourceIdentity), so a resource
-    # the request already carries, or that was already read for it, is not read again. A reference
+    # Resources and references are compared by normalized absolute URL (see ResourceIdentity), so a
+    # resource the request already carries, or that was already read for it, is not read again. A reference
     # to a server other than the `fhirServer` is read from that server without the access token.
     # Once a server has timed out, further reads from it would likely time out too, so no more are
     # attempted from that server.
@@ -35,7 +38,7 @@ module DaVinciCRDTestKit
       carried = Set.new
       to_read = []
       ResourceIdentity.each_identified_resource(request_body) do |identity, raw_resource|
-        carried << identity
+        carried << ResourceIdentity.normalized_url(identity)
         to_read.concat(must_support_references_to_read(HookRequestResourceExtraction.to_fhir_resource(raw_resource),
                                                        identity))
       end
@@ -44,7 +47,7 @@ module DaVinciCRDTestKit
         next if carried.include?(url) || fetched_references.include?(normalize_reference(url))
         next if server_timed_out?(url)
 
-        fetch_reference(url, additional_tag: MUST_SUPPORT_REFERENCE_FETCH_TAG)
+        fetch_reference(url)
       end
     end
 
@@ -58,7 +61,7 @@ module DaVinciCRDTestKit
       navigator = MustSupportReferences::Navigator.new(metadata)
       MustSupportReferences.reference_elements(metadata).flat_map do |element|
         navigator.literal_references(resource, element[:path]).filter_map do |reference|
-          url = ResourceIdentity.absolute_reference(reference.reference, base)
+          url = ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference.reference, base))
           url if ResourceIdentity.readable?(url)
         end
       end.uniq
@@ -100,11 +103,12 @@ module DaVinciCRDTestKit
       full_url.presence || ResourceIdentity.restful_identity(prefetched_coverage_resource, fhir_server_base)
     end
 
-    # The absolute form of a reference held by the resource identified by the given URL, following
-    # the FHIR rules for resolving references, or the reference as given when it has no absolute form.
+    # The normalized absolute form of a reference held by the resource identified by the given URL,
+    # following the FHIR rules for resolving references, or the reference as given when it has no
+    # absolute form.
     def resolved_reference(reference, holder_identity)
       base = ResourceIdentity.base_for(holder_identity) || fhir_server_base
-      ResourceIdentity.absolute_reference(reference, base) || reference
+      ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference, base)) || reference
     end
 
     def fhir_server_base
@@ -124,7 +128,7 @@ module DaVinciCRDTestKit
       FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
     end
 
-    # The prefetched Locations and their ancestors, keyed by the absolute URL identifying each (see
+    # The prefetched Locations and their ancestors, keyed by the normalized absolute URL identifying each (see
     # ResourceIdentity), or by `Location/id` when the request gives nothing to make one from.
     def prefetched_locations_and_parents_hash
       prefetched_location_bundle&.entry&.each_with_object({}) do |entry, hash|
@@ -137,7 +141,7 @@ module DaVinciCRDTestKit
     def add_location_to_hash(location, location_hash, identity = nil)
       return unless location.is_a?(FHIR::Location) && location.id.present?
 
-      identity ||= location_identity(location)
+      identity = ResourceIdentity.normalized_url(identity || location_identity(location))
       return if location_hash.key?(identity)
 
       location_hash[identity] = location

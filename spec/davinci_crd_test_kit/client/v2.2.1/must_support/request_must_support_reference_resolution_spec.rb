@@ -36,8 +36,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     hook_request = repo_create(:request, test_session_id: test_session.id, request_body: body.to_json,
                                          result: receiving_result, tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
     fetch_tags = [DaVinciCRDTestKit::DATA_FETCH_TAG,
-                  DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance),
-                  DaVinciCRDTestKit::MUST_SUPPORT_REFERENCE_FETCH_TAG]
+                  DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance)]
     read.each { |resource| create_read(resource, 200, fetch_tags) }
     failed_reads.each { |resource| create_read(resource, 404, fetch_tags) }
     # Reads from other servers are made without the access token, so lack the data fetch tag.
@@ -112,6 +111,29 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to include('CRD clients are required to support the `Coverage` resource type')
   end
 
+  # The must support element test counts such an instance, so this test must not report the type as
+  # unobserved, but with no identity to resolve its references against none could be checked.
+  it 'skips when instances were observed but none could be identified by absolute URL' do
+    create_hook_request([vision_prescription.except(:id)])
+
+    result = run(vision_prescription_test, all_types_selected)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to_not include('no instances were observed')
+    expect(result.result_message)
+      .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
+  end
+
+  it 'checks the references of identified instances when only some could be identified' do
+    create_hook_request([vision_prescription.except(:id), vision_prescription,
+                         vision_prescription(prescriber: 'PractitionerRole/role1')],
+                        read: [encounter, practitioner, practitioner_role])
+
+    result = run(vision_prescription_test, all_types_selected)
+
+    expect(result.result).to eq('pass')
+  end
+
   it 'passes when no instances were observed of a resource type the tester declared unsupported' do
     create_hook_request([])
 
@@ -124,6 +146,17 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
   it 'passes when references resolve to resources in the request or read while processing it' do
     create_hook_request([vision_prescription, vision_prescription(prescriber: 'PractitionerRole/role1')],
                         read: [encounter, practitioner, practitioner_role])
+
+    result = run(vision_prescription_test, all_types_selected)
+
+    expect(result.result).to eq('pass')
+  end
+
+  it 'resolves references to reads recorded under an equivalent form of the url' do
+    create_hook_request([vision_prescription(encounter: { reference: 'HTTPS://EXAMPLE:443/r4/Encounter/e1' }),
+                         vision_prescription(prescriber: 'PractitionerRole/role1')],
+                        read: [encounter, practitioner_role],
+                        external_reads: { 'https://Example/r4/Practitioner/pr1' => practitioner })
 
     result = run(vision_prescription_test, all_types_selected)
 
