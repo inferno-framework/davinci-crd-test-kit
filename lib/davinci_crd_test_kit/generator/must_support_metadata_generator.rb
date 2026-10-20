@@ -106,7 +106,9 @@ module DaVinciCRDTestKit
           extensions: Array(must_supports[:extensions]).sort_by { |extension| extension[:id].to_s },
           slices: slices.sort_by { |slice| slice[:slice_id].to_s },
           elements: Array(must_supports[:elements]).sort_by { |element| element[:path].to_s },
-          choices: Array(must_supports[:choices]).sort_by { |choice| choice[:paths].to_a.first.to_s },
+          choices: Array(must_supports[:choices]).sort_by do |choice|
+            [choice[:element].to_s, (choice[:paths] || choice[:slice_names]).to_a.first.to_s]
+          end,
           recursive_elements: Array(must_supports[:recursive_elements]).sort
         }
       end

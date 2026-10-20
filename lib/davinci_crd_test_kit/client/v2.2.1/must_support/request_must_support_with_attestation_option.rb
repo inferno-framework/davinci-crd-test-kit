@@ -49,7 +49,13 @@ module DaVinciCRDTestKit
         end
 
         def choice_paths(metadata)
-          Array(metadata.must_supports[:choices]).flat_map { |choice| Array(choice[:paths]) }
+          Array(metadata.must_supports[:choices]).flat_map { |choice| choice_locations(choice) }
+        end
+
+        # A choice lists its locations as element paths or, for slices, as slice ids.
+        def choice_locations(choice)
+          Array(choice[:paths]) +
+            Array(choice[:slice_names]).map { |slice_id| Inferno::DSL::MustSupportStrings.without_resource_type(slice_id) }
         end
 
         def choice_section(metadata)
@@ -60,7 +66,7 @@ module DaVinciCRDTestKit
         end
 
         def choice_entry(choice)
-          locations = Array(choice[:paths]).map { |path| "  - `#{path}`" }.join("\n")
+          locations = choice_locations(choice).map { |path| "  - `#{path}`" }.join("\n")
 
           "- `#{choice[:element]}`, on any one of:\n#{locations}"
         end

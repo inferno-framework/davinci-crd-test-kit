@@ -68,6 +68,12 @@
         :code: community
       - :system: http://terminology.hl7.org/CodeSystem/medicationrequest-category
         :code: discharge
+  - :slice_id: MedicationRequest.dosageInstruction.timing.repeat.bounds[x]:boundsPeriod
+    :slice_name: boundsPeriod
+    :path: dosageInstruction.timing.repeat.bounds[x]
+    :discriminator:
+      :type: type
+      :code: Period
   - :slice_id: MedicationRequest.medication[x]:medicationCodeableConcept
     :slice_name: medicationCodeableConcept
     :path: medication[x]
@@ -100,7 +106,6 @@
   - :path: dosageInstruction.timing
   - :path: dosageInstruction.timing.event
   - :path: dosageInstruction.timing.repeat
-  - :path: dosageInstruction.timing.repeat.bounds[x]:boundsPeriod
   - :path: dosageInstruction.timing.repeat.count
   - :path: dosageInstruction.timing.repeat.duration
   - :path: dosageInstruction.timing.repeat.durationUnit
