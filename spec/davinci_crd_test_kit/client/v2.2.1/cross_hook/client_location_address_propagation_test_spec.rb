@@ -57,8 +57,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       status:,
       headers: [],
       tags: [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG,
-             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance),
-             DaVinciCRDTestKit::DATA_FETCH_TAG]
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance)]
     )
   end
 

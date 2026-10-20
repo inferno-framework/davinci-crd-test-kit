@@ -123,8 +123,9 @@ of [minimal prefetch templates](https://build.fhir.org/ig/HL7/davinci-crd/en/Bin
 The elements indicated in those prefetch templates informed the set of elements that Inferno looks in to determine
 what references to fetch.
 
-Any literal reference, relative or absolute, Inferno will attempt to read using the provided access token.
-Non-literal references will be ignored.
+Any literal reference, relative or absolute, Inferno will attempt to read. The provided access token
+will be sent when the reference is to a resource on the `fhirServer` indicated in the hook
+request body, otherwise it will not be sent. Non-literal references will be ignored.
 
 #### CDS Hooks Responses
 
@@ -172,7 +173,9 @@ When requesting data, Inferno will only attept to read literal references. It wi
 token provided in the `fhirAuthorization.access_token` field of the hook request as long as the
 reference points to a resource on the `fhirServer` indicated in the hook request, as determined
 by [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references). If it does
-not, Inferno does not include an access token on the read request.
+not, Inferno does not include an access token on the read request. Such reads will not
+count as evidence that Inferno can access data from the CRD client's FHIR server during
+a hook request.
 
 During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
 tester-specified resource. Whereas the other resources listed above must be accessible, Inferno

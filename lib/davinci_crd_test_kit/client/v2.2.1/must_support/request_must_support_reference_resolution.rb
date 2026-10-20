@@ -150,7 +150,7 @@ module DaVinciCRDTestKit
 
           fhir_server = ResourceIdentity.fhir_server_base(request_body)
           resources = request_fhir_resources(request_body)
-          reads = reads_by_tag[TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])]
+          reads = reads_for(request_body['hookInstance'])
           available = available_from_reads(reads, fhir_server)
           resources.each { |entry| available[entry[:identity]] = entry }
           { request:, fhir_server:, resources:, available:, reads: }
@@ -166,15 +166,11 @@ module DaVinciCRDTestKit
         resources.uniq { |entry| entry[:identity] }
       end
 
-      # The data fetches made while processing every hook request, keyed by the hook instance tag
-      # that ties them to the request they were made for.
-      def reads_by_tag
-        @reads_by_tag ||=
-          Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [DATA_FETCH_TAG])
-            .each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |request, by_tag|
-              request.tags.select { |tag| tag.start_with?(HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX) }
-                .each { |tag| by_tag[tag] << request }
-            end
+      # The data fetches made while processing the hook request with the given instance, whether
+      # or not they used the access token.
+      def reads_for(hook_instance)
+        Inferno::Repositories::Requests.new
+          .tagged_requests(test_session_id, [TagMethods.hook_instance_data_fetch_tag(hook_instance)])
       end
 
       def available_from_reads(reads, fhir_server)

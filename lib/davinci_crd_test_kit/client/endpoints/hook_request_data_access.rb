@@ -32,8 +32,9 @@ module DaVinciCRDTestKit
       response = execute_request(reference, connection:)
       return nil unless response.present?
 
-      persist_query_request(response, fetch_tags(additional_tag), url: requested_url(reference, connection),
-                                                                  request_headers: external ? {} : data_request_headers)
+      persist_query_request(response, fetch_tags(additional_tag, with_token: !external),
+                            url: requested_url(reference, connection),
+                            request_headers: external ? {} : data_request_headers)
       return nil unless response.status.to_s.starts_with?('2')
 
       begin
@@ -43,8 +44,10 @@ module DaVinciCRDTestKit
       end
     end
 
-    def fetch_tags(additional_tag)
-      [DATA_FETCH_TAG, hook_instance_data_fetch_tag, additional_tag].compact_blank
+    # Every read carries the hook instance tag. Only reads made with the access token carry
+    # DATA_FETCH_TAG, since that tag is what shows the token gave access to the CRD client's data.
+    def fetch_tags(additional_tag, with_token:)
+      [(DATA_FETCH_TAG if with_token), hook_instance_data_fetch_tag, additional_tag].compact_blank
     end
 
     def fetched_references

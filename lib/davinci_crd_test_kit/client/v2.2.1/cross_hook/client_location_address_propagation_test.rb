@@ -119,7 +119,7 @@ module DaVinciCRDTestKit
       end
 
       def build_fetched_locations_hash
-        load_tagged_requests(PARENT_LOCATION_FETCH_TAG, DATA_FETCH_TAG).each_with_object({}) do |request, location_hash|
+        load_tagged_requests(PARENT_LOCATION_FETCH_TAG).each_with_object({}) do |request, location_hash|
           add_location_to_hash(FHIR.from_contents(request.response_body), location_hash)
         rescue JSON::ParserError
           next

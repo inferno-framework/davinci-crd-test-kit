@@ -40,7 +40,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
                   DaVinciCRDTestKit::MUST_SUPPORT_REFERENCE_FETCH_TAG]
     read.each { |resource| create_read(resource, 200, fetch_tags) }
     failed_reads.each { |resource| create_read(resource, 404, fetch_tags) }
-    external_reads.each { |url, resource| create_read(resource, 200, fetch_tags, url:) }
+    # Reads from other servers are made without the access token, so lack the data fetch tag.
+    external_reads.each { |url, resource| create_read(resource, 200, fetch_tags - [DaVinciCRDTestKit::DATA_FETCH_TAG], url:) }
     hook_request
   end
 

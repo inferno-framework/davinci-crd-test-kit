@@ -345,13 +345,14 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(external_request).to have_been_made.once
       end
 
-      it 'records that no access token was sent' do
+      it 'records that no access token was sent, leaving off the tag for reads made with it' do
         stub_request(:get, external_practitioner_url).to_return(status: 200, body: practitioner_example.to_json)
 
         module_instance.request_additional_fhir_data
 
         expect(module_instance).to have_received(:persist_query_request)
-          .with(anything, must_support_fetch_tags, url: external_practitioner_url, request_headers: {}).once
+          .with(anything, must_support_fetch_tags - [DaVinciCRDTestKit::DATA_FETCH_TAG],
+                url: external_practitioner_url, request_headers: {}).once
       end
 
       it 'keeps reading from the FHIR server after the other server times out' do
