@@ -21,9 +21,10 @@ module DaVinciCRDTestKit
     end
 
     # Reads the resources referenced from the must support Reference elements of the resources in
-    # the request, and from those of each resource read in turn, so that the must support reference
-    # tests can later check that they resolved. Inferno cannot reach the CRD client's FHIR server
-    # once the hook request is over, so they have to be read now.
+    # the request, so that the must support reference tests can later check that they resolved.
+    # Inferno cannot reach the CRD client's FHIR server once the hook request is over, so they have
+    # to be read now. Must support requirements are satisfied by the resources the request carries,
+    # so references within the resources read are not followed.
     #
     # Resources and references are compared by absolute URL (see ResourceIdentity), so a resource
     # the request already carries, or that was already read for it, is not read again. A reference
@@ -39,12 +40,11 @@ module DaVinciCRDTestKit
                                                        identity))
       end
 
-      while (url = to_read.shift)
+      to_read.each do |url|
         next if carried.include?(url) || fetched_references.include?(normalize_reference(url))
         next if server_timed_out?(url)
 
-        resource = fetch_reference(url, additional_tag: MUST_SUPPORT_REFERENCE_FETCH_TAG, parse_as_fhir: true)
-        to_read.concat(must_support_references_to_read(resource, url))
+        fetch_reference(url, additional_tag: MUST_SUPPORT_REFERENCE_FETCH_TAG)
       end
     end
 

@@ -275,11 +275,11 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       allow(module_instance).to receive_messages(request_body: hook_request, include_in_cross_hook_analysis?: true)
     end
 
-    it 'reads references within must support elements and follows those within what it reads' do
+    it 'reads references within must support elements without following those within what it reads' do
       module_instance.request_additional_fhir_data
 
       expect(practitioner_role_request).to have_been_made.once
-      expect(practitioner_request).to have_been_made.once
+      expect(practitioner_request).to_not have_been_made
     end
 
     it 'tags each read as a must support reference fetch for the hook instance' do
@@ -287,7 +287,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
       expect(module_instance).to have_received(:persist_query_request)
         .with(anything, must_support_fetch_tags, url: anything,
-                                                 request_headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' }).twice
+                                                 request_headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' }).once
     end
 
     it 'records a redirected read under the URL requested' do
@@ -389,22 +389,17 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
           .to_return(status: 200, body: body.to_json)
       end
 
-      # The PractitionerRole read from the other server in turn references its Practitioner
-      # relatively, so that is read from the other server too.
       it 'reads its relative references from that server without the access token' do
         entry = hook_request['context']['draftOrders']['entry'].first
         entry['fullUrl'] = "#{elsewhere}/ServiceRequest/sr1"
         entry['resource']['requester'] = { 'reference' => practitioner_role_example_reference_relative }
         role_request = stub_tokenless_get("#{elsewhere}/#{practitioner_role_example_reference_relative}",
                                           practitioner_role_example)
-        practitioner_elsewhere = stub_tokenless_get("#{elsewhere}/#{practitioner_example_reference_relative}",
-                                                    practitioner_example)
         stub_request(:get, "#{elsewhere}/#{patient_example_reference_relative}").to_return(status: 404)
 
         module_instance.request_additional_fhir_data
 
         expect(role_request).to have_been_made.once
-        expect(practitioner_elsewhere).to have_been_made.once
         expect(practitioner_role_request).to_not have_been_made
       end
     end
