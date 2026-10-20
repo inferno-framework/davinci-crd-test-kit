@@ -1,3 +1,4 @@
+require_relative '../../cross_suite/resource_identity'
 require_relative '../../cross_suite/tags'
 
 module DaVinciCRDTestKit
@@ -14,30 +15,19 @@ module DaVinciCRDTestKit
       @hook_instance_data_fetch_tag ||= TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
     end
 
-    # A normalized reference that is still absolute points to a server other than the FHIR server
-    # named in the request.
-    def absolute_url?(reference)
-      reference.match?(%r{\Ahttps?://})
-    end
-
     # turn absolute references into relative if
     # for the fhir server indicated in the request
     def normalize_reference(reference)
-      server = "#{request_body['fhirServer']&.chomp('/')}/"
-
-      if request_body['fhirServer'].present? && reference.starts_with?(server)
-        reference[server.length..]
-      else
-        reference
-      end
+      ResourceIdentity.relative_to(reference, request_body['fhirServer']) || reference
     end
 
     # A reference to a server other than the FHIR server named in the request is read without the
-    # access token, which is only for that FHIR server.
+    # access token, which is only for that FHIR server. A normalized reference that is still
+    # absolute points to such a server.
     def fetch_reference(reference, additional_tag: nil, parse_as_fhir: false)
       reference = normalize_reference(reference)
       fetched_references << reference
-      external = absolute_url?(reference)
+      external = ResourceIdentity.absolute_url?(reference)
       connection = external ? external_connection : fhir_server_connection
       response = execute_request(reference, connection:)
       return nil unless response.present?
@@ -116,12 +106,12 @@ module DaVinciCRDTestKit
 
     def execute_request(query, connection: fhir_server_connection)
       connection&.get(query)
-    rescue Faraday::Error => e
+    rescue Faraday::Error, URI::InvalidURIError => e
       timed_out_servers << server_for(query, connection) if timeout?(e)
       # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
       #          no clean way to persist that information for the Inferno test to check later. The solution here
       #          is to persist the request anyway with a status of nil, using the error message as response body
-      url = query.to_s.match?(%r{\Ahttps?://}) ? query : connection.url_prefix.to_s
+      url = ResourceIdentity.absolute_url?(query) ? query : connection.url_prefix.to_s
       Faraday::Response.new(response_body: e.message, url:)
     end
 
@@ -132,8 +122,8 @@ module DaVinciCRDTestKit
     end
 
     def server_for(query, connection = fhir_server_connection)
-      uri = query.to_s.match?(%r{\Ahttps?://}) ? URI(query.to_s) : connection&.url_prefix
-      "#{uri.scheme}://#{uri.host}:#{uri.port}" if uri.present?
+      uri = ResourceIdentity.absolute_url?(query) ? URI(query.to_s) : connection&.url_prefix
+      "#{uri.scheme}://#{uri.host&.downcase}:#{uri.port}" if uri.present?
     rescue URI::InvalidURIError
       nil
     end
@@ -145,13 +135,17 @@ module DaVinciCRDTestKit
     # Faraday reports a read timeout as a TimeoutError, but a connection timeout as a
     # ConnectionFailed wrapping Net::OpenTimeout.
     def timeout?(error)
-      error.is_a?(Faraday::TimeoutError) || error.wrapped_exception.is_a?(Net::OpenTimeout)
+      error.is_a?(Faraday::TimeoutError) ||
+        (error.is_a?(Faraday::Error) && error.wrapped_exception.is_a?(Net::OpenTimeout))
     end
 
     # Redirects are followed, and, as Inferno's FHIR client does, the read is recorded under the URL
     # requested rather than the one it ended at, so that tests can match a reference to its read.
+    # A query that is not a valid URL is recorded as given.
     def requested_url(query, connection)
       connection.build_exclusive_url(query).to_s
+    rescue URI::InvalidURIError
+      query.to_s
     end
 
     def persist_query_request(response, tags, url:, request_headers: data_request_headers)

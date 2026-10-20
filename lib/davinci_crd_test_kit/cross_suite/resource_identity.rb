@@ -10,7 +10,9 @@ module DaVinciCRDTestKit
   # the FHIR rules for resolving references.
   module ResourceIdentity
     RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}\z}
-    RESTFUL_URL_PATTERN = %r{\Ahttps?://\S+/([A-Z][A-Za-z]+)/([A-Za-z0-9\-.]{1,64})\z}
+    RESTFUL_URL_PATTERN = %r{\A(?i:https?)://\S+/([A-Z][A-Za-z]+)/([A-Za-z0-9\-.]{1,64})\z}
+    # A URI scheme, as RFC 3986 defines it. Schemes are case-insensitive.
+    SCHEME_PATTERN = /\A[a-z][a-z0-9+\-.]*:/i
 
     module_function
 
@@ -105,10 +107,11 @@ module DaVinciCRDTestKit
       "#{base.chomp('/')}/#{reference}" if base.present? && reference.match?(RELATIVE_REFERENCE_PATTERN)
     end
 
+    # Whether the reference is an absolute URL rather than one relative to a base. Decided by the
+    # scheme alone, so that a reference naming its own scheme is never taken to be on the request's
+    # FHIR server, even when it is not otherwise a valid URL.
     def absolute_url?(reference)
-      URI.parse(reference.to_s).absolute?
-    rescue URI::InvalidURIError
-      false
+      reference.to_s.match?(SCHEME_PATTERN)
     end
 
     # Whether the URL is a RESTful http(s) URL to a single resource, and so can be read.
@@ -123,7 +126,31 @@ module DaVinciCRDTestKit
     end
 
     def on_server?(url, base)
-      base.present? && url.to_s.start_with?("#{base.chomp('/')}/")
+      relative_to(url, base).present?
+    end
+
+    # The part of an absolute URL that follows the given base, or nil when the URL is not on that
+    # base. The scheme and host are compared ignoring case, and a default port matches an omitted
+    # one, since RFC 3986 treats those forms as the same server. The path is case-sensitive.
+    def relative_to(url, base)
+      return if base.blank? || !absolute_url?(url)
+
+      uri = URI.parse(url.to_s)
+      base_uri = URI.parse(base.to_s)
+      return unless same_server?(uri, base_uri)
+
+      base_path = "#{base_uri.path.chomp('/')}/"
+      return unless uri.path.start_with?(base_path)
+
+      relative = uri.path.delete_prefix(base_path)
+      uri.query.nil? ? relative : "#{relative}?#{uri.query}"
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def same_server?(uri, other_uri)
+      uri.host.present? &&
+        [uri.scheme, uri.host.downcase, uri.port] == [other_uri.scheme, other_uri.host&.downcase, other_uri.port]
     end
   end
 end
