@@ -49,13 +49,13 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(module_instance.prefetched_locations_and_parents_hash).to be_nil
       end
 
-      it 'returns a hash keyed by relative reference for each location' do
+      it 'returns a hash keyed by the absolute url identifying each location' do
         order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
         result = module_instance.prefetched_locations_and_parents_hash
         expect(result.size).to eq(2)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location_example_reference_absolute]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_absolute]).to be_a(FHIR::Location)
       end
 
       it 'skips bundle entries without an id' do
@@ -66,7 +66,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(result.size).to eq(2)
       end
 
-      it 'deduplicates entries with the same relative reference' do
+      it 'deduplicates entries identifying the same location' do
         location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
         order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
@@ -87,14 +87,18 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
         result = module_instance.prefetched_locations_and_parents_hash
         expect(result.size).to eq(2)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location_example_reference_absolute]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_absolute]).to be_a(FHIR::Location)
         expect(parent_request).to have_been_made.once
       end
     end
 
     describe '#add_location_to_hash' do
       let(:location_hash) { {} }
+
+      before do
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      end
 
       it 'does nothing when given a non-Location resource' do
         module_instance.add_location_to_hash(nil, location_hash)
@@ -107,13 +111,13 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(location_hash).to be_empty
       end
 
-      it 'adds a valid Location to the hash keyed by relative reference' do
+      it 'adds a valid Location to the hash keyed by the absolute url identifying it' do
         module_instance.add_location_to_hash(location_fhir, location_hash)
-        expect(location_hash[location_example_reference_relative]).to eq(location_fhir)
+        expect(location_hash[location_example_reference_absolute]).to eq(location_fhir)
       end
 
       it 'does not re-add a Location already present in the hash' do
-        location_hash[location_example_reference_relative] = location_fhir
+        location_hash[location_example_reference_absolute] = location_fhir
         module_instance.add_location_to_hash(location_fhir, location_hash)
         expect(location_hash.size).to eq(1)
       end
@@ -127,8 +131,8 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
         module_instance.add_location_to_hash(location_with_parent, location_hash)
         expect(location_hash.size).to eq(2)
-        expect(location_hash[location_example_reference_relative]).to eq(location_with_parent)
-        expect(location_hash[location2_example_reference_relative]).to eq(location2_fhir)
+        expect(location_hash[location_example_reference_absolute]).to eq(location_with_parent)
+        expect(location_hash[location2_example_reference_absolute]).to eq(location2_fhir)
         expect(loc_request).to have_been_made.once
       end
     end
@@ -139,8 +143,8 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
         result = module_instance.request_parent_locations
         expect(result).to be_a(Hash)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
+        expect(result[location_example_reference_absolute]).to be_a(FHIR::Location)
+        expect(result[location2_example_reference_absolute]).to be_a(FHIR::Location)
       end
     end
   end
@@ -214,6 +218,54 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       expect(module_instance).to have_received(:persist_query_request)
         .with(anything, include(DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG), url: crd_coverage['payor'].first['reference'],
                                                                          request_headers: {})
+    end
+
+    it 'reads a relative payer reference from the server of the prefetched Coverage fullUrl' do
+      elsewhere = 'https://elsewhere.example/r4'
+      coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
+      entry = { 'fullUrl' => "#{elsewhere}/Coverage/#{coverage['id']}", 'resource' => coverage }
+      order_sign_request['prefetch'] = { 'coverage' => { 'resourceType' => 'Bundle', 'type' => 'searchset',
+                                                         'entry' => [entry] } }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      payer_request = stub_tokenless_get("#{elsewhere}/#{organization_example_reference_relative}",
+                                         organization_example)
+
+      module_instance.request_coverage_payer
+
+      expect(payer_request).to have_been_made.once
+    end
+
+    it 'reads a relative payer reference from the FHIR server with the access token' do
+      coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
+      order_sign_request['prefetch'] = { 'coverage' => coverage }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      payer_request = stub_request(:get, organization_example_reference_absolute)
+        .with(headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' })
+        .to_return(status: 200, body: organization_example.to_json)
+
+      module_instance.request_coverage_payer
+
+      expect(payer_request).to have_been_made.once
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, include(DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG, DaVinciCRDTestKit::DATA_FETCH_TAG),
+              url: organization_example_reference_absolute, request_headers: anything)
+    end
+
+    it 'reads the relative parent of a parent location from the server that parent was read from' do
+      external_parent = 'https://elsewhere.example/r4/Location/parent'
+      location = location_example.merge('partOf' => { 'reference' => external_parent })
+      parent = location2_example.merge('id' => 'parent', 'partOf' => { 'reference' => 'Location/grandparent' })
+      order_sign_request['prefetch'] = { 'locations' => location }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      stub_tokenless_get(external_parent, parent)
+      grandparent_request = stub_tokenless_get('https://elsewhere.example/r4/Location/grandparent',
+                                               location2_example.merge('id' => 'grandparent'))
+
+      result = module_instance.request_parent_locations
+
+      expect(grandparent_request).to have_been_made.once
+      expect(result.keys).to contain_exactly(location_example_reference_absolute, external_parent,
+                                             'https://elsewhere.example/r4/Location/grandparent')
     end
 
     it 'reads a parent location from its server without the access token' do

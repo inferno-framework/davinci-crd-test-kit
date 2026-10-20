@@ -90,7 +90,25 @@ module DaVinciCRDTestKit
       coverage_resource = prefetched_coverage_resource
       return unless coverage_resource.present? && coverage_resource.payor.first&.reference.present?
 
-      fetch_reference(coverage_resource.payor.first.reference, additional_tag: PAYER_ORG_FETCH_TAG)
+      fetch_reference(resolved_reference(coverage_resource.payor.first.reference, prefetched_coverage_identity),
+                      additional_tag: PAYER_ORG_FETCH_TAG)
+    end
+
+    # The absolute URL identifying the prefetched Coverage (see ResourceIdentity).
+    def prefetched_coverage_identity
+      full_url = prefetched_coverage.entry.first&.fullUrl if prefetched_coverage.is_a?(FHIR::Bundle)
+      full_url.presence || ResourceIdentity.restful_identity(prefetched_coverage_resource, fhir_server_base)
+    end
+
+    # The absolute form of a reference held by the resource identified by the given URL, following
+    # the FHIR rules for resolving references, or the reference as given when it has no absolute form.
+    def resolved_reference(reference, holder_identity)
+      base = ResourceIdentity.base_for(holder_identity) || fhir_server_base
+      ResourceIdentity.absolute_reference(reference, base) || reference
+    end
+
+    def fhir_server_base
+      ResourceIdentity.fhir_server_base(request_body)
     end
 
     def request_parent_locations
@@ -106,25 +124,35 @@ module DaVinciCRDTestKit
       FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
     end
 
+    # The prefetched Locations and their ancestors, keyed by the absolute URL identifying each (see
+    # ResourceIdentity), or by `Location/id` when the request gives nothing to make one from.
     def prefetched_locations_and_parents_hash
       prefetched_location_bundle&.entry&.each_with_object({}) do |entry, hash|
-        add_location_to_hash(entry.resource, hash)
+        add_location_to_hash(entry.resource, hash, entry.fullUrl.presence)
       end
     end
 
-    def add_location_to_hash(location, location_hash)
+    # A parent is identified by the URL it was read from, so its own `partOf` resolves against the
+    # server it came from.
+    def add_location_to_hash(location, location_hash, identity = nil)
       return unless location.is_a?(FHIR::Location) && location.id.present?
 
-      relative_reference = "#{location.resourceType}/#{location.id}"
-      return if location_hash.key?(relative_reference)
+      identity ||= location_identity(location)
+      return if location_hash.key?(identity)
 
-      location_hash[relative_reference] = location
+      location_hash[identity] = location
       return unless location.partOf&.reference.present?
 
-      parent_location = fetch_reference(location.partOf.reference,
+      parent_reference = resolved_reference(location.partOf.reference, identity)
+      parent_location = fetch_reference(parent_reference,
                                         additional_tag: PARENT_LOCATION_FETCH_TAG,
                                         parse_as_fhir: true)
-      add_location_to_hash(parent_location, location_hash)
+      add_location_to_hash(parent_location, location_hash, parent_reference)
+    end
+
+    # A Location given without a fullUrl is taken to be on the request's FHIR server.
+    def location_identity(location)
+      ResourceIdentity.restful_identity(location, fhir_server_base) || "Location/#{location.id}"
     end
   end
 end

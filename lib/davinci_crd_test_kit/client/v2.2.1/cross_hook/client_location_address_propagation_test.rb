@@ -1,3 +1,4 @@
+require_relative '../../../cross_suite/resource_identity'
 require_relative '../../../cross_suite/tags'
 require_relative '../../tagged_request_load_helper'
 
@@ -28,27 +29,27 @@ module DaVinciCRDTestKit
         skip_if loaded_requests.blank?, 'No hook requests received.'
         pass_if prefetched_location_hash.blank?, 'No Location resources in use, so verification not needed.'
 
-        prefetched_location_hash.each_value do |location|
-          check_location_address_propagation(location)
+        prefetched_location_hash.each do |identity, location|
+          check_location_address_propagation(location, identity)
         end
 
         assert_no_error_messages('Address propagation issues found. See Messages for details.')
       end
 
       # checks that the location has an address if a parent also has an address
-      def check_location_address_propagation(location, root_id = location.id)
+      def check_location_address_propagation(location, identity, root_id = location.id)
         return if location.address.present?
         return unless location.partOf.present? && location.partOf.reference.present?
 
-        parent = prefetched_location_hash[location.partOf.reference]
-        parent = fetched_location_hash[location.partOf.reference] unless parent.present?
+        parent_identity = parent_identity(location.partOf.reference, identity)
+        parent = prefetched_location_hash[parent_identity] || fetched_location_hash[parent_identity]
         if parent.present?
-          check_location_conformance(parent, root_id)
+          check_location_conformance(parent, parent_identity, root_id)
           if parent.address.present?
             add_message('error', "Address missing on prefetched 'Location/#{root_id}': " \
                                  "parent 'Location/#{parent.id}' has an address.")
           else
-            check_location_address_propagation(parent, root_id)
+            check_location_address_propagation(parent, parent_identity, root_id)
           end
         else
           add_message('error', "Unable to check address propagation prefetched 'Location/#{root_id}': " \
@@ -58,12 +59,18 @@ module DaVinciCRDTestKit
         nil
       end
 
-      # skip profile check if in the prefetch hash (done elsewhere) or already checked
-      def check_location_conformance(location, root_id)
-        key = "Location/#{location.id}"
-        return if prefetched_location_hash.key?(key) || fetched_locations_checked_for_conformance.key?(key)
+      # The identity of the Location a `partOf` reference names, resolved against the base of the
+      # Location holding it, following the FHIR rules for resolving references. A reference with no
+      # absolute form is used as given.
+      def parent_identity(reference, child_identity)
+        ResourceIdentity.absolute_reference(reference, ResourceIdentity.base_for(child_identity)) || reference
+      end
 
-        fetched_locations_checked_for_conformance[key] = location
+      # skip profile check if in the prefetch hash (done elsewhere) or already checked
+      def check_location_conformance(location, identity, root_id)
+        return if prefetched_location_hash.key?(identity) || fetched_locations_checked_for_conformance.key?(identity)
+
+        fetched_locations_checked_for_conformance[identity] = location
         validator_response_details = []
         return if resource_is_valid?(resource: location, profile_url: 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location|2.2.1',
                                      add_messages_to_runnable: false, validator_response_details:)
@@ -85,6 +92,8 @@ module DaVinciCRDTestKit
         @loaded_requests ||= load_requests_for_cross_hook_analysis
       end
 
+      # The prefetched Locations of every hook request, keyed by the absolute URL identifying each (see
+      # ResourceIdentity), or by `Location/id` when the request gives nothing to make one from.
       def prefetched_location_hash
         @prefetched_location_hash ||= build_prefetched_locations_hash
       end
@@ -94,15 +103,26 @@ module DaVinciCRDTestKit
           request_body = JSON.parse(request.request_body)
           next unless request_body.is_a?(Hash)
 
-          prefetched_location_bundle = extract_prefetched_location_bundle(request_body)
-          next unless prefetched_location_bundle.present?
-
-          prefetched_location_bundle.entry.each do |entry|
-            add_location_to_hash(entry.resource, location_hash)
-          end
+          add_prefetched_locations(request_body, location_hash)
         rescue JSON::ParserError
           next
         end
+      end
+
+      def add_prefetched_locations(request_body, location_hash)
+        fhir_server = ResourceIdentity.fhir_server_base(request_body)
+        extract_prefetched_location_bundle(request_body)&.entry&.each do |entry|
+          location = entry.resource
+          next unless location.is_a?(FHIR::Location) && location.id.present?
+
+          location_hash[prefetched_location_identity(entry, fhir_server)] ||= location
+        end
+      end
+
+      # A Location given without a fullUrl is taken to be on the request's FHIR server.
+      def prefetched_location_identity(entry, fhir_server)
+        entry.fullUrl.presence || ResourceIdentity.restful_identity(entry.resource, fhir_server) ||
+          "Location/#{entry.resource.id}"
       end
 
       def extract_prefetched_location_bundle(request_body)
@@ -114,25 +134,21 @@ module DaVinciCRDTestKit
         FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
       end
 
+      # The parent Locations read during hook requests, keyed by the URL each was read from. A read
+      # only counts when it returned the Location that URL names.
       def fetched_location_hash
         @fetched_location_hash ||= build_fetched_locations_hash
       end
 
       def build_fetched_locations_hash
         load_tagged_requests(PARENT_LOCATION_FETCH_TAG).each_with_object({}) do |request, location_hash|
-          add_location_to_hash(FHIR.from_contents(request.response_body), location_hash)
+          location = FHIR.from_contents(request.response_body)
+          next unless location.is_a?(FHIR::Location) && ResourceIdentity.names?(request.url, location)
+
+          location_hash[request.url] ||= location
         rescue JSON::ParserError
           next
         end
-      end
-
-      def add_location_to_hash(location, location_hash)
-        return unless location.is_a?(FHIR::Location) && location.id.present?
-
-        relative_reference = "#{location.resourceType}/#{location.id}"
-        return if location_hash.key?(relative_reference)
-
-        location_hash[relative_reference] = location
       end
     end
   end
