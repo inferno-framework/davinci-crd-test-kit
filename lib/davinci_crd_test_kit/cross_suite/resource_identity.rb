@@ -11,6 +11,9 @@ module DaVinciCRDTestKit
   module ResourceIdentity
     RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}\z}
     RESTFUL_URL_PATTERN = %r{\A(?i:https?)://\S+/([A-Z][A-Za-z]+)/([A-Za-z0-9\-.]{1,64})\z}
+    # The shape of a RESTful http(s) URL to a resource, `[base]/Type/id`, capturing the base. Only the
+    # shape matters for finding the base, so the id is not held to FHIR's character rules.
+    RESTFUL_BASE_PATTERN = %r{\A((?i:https?)://[^/\s]+(?:/\S*)?)/[A-Z][A-Za-z]+/[^/\s]+\z}
     # A URI scheme, as RFC 3986 defines it. Schemes are case-insensitive.
     SCHEME_PATTERN = /\A[a-z][a-z0-9+\-.]*:/i
 
@@ -87,14 +90,7 @@ module DaVinciCRDTestKit
     # The server a resource identified by the given URL is held on, or nil when the URL is not a
     # RESTful http(s) URL.
     def base_for(identity)
-      return if identity.blank?
-
-      parsed = URI.parse(identity)
-      return unless ['http', 'https'].include?(parsed.scheme)
-
-      identity.split('/')[0..-3].join('/')
-    rescue URI::InvalidURIError
-      nil
+      identity.to_s.match(RESTFUL_BASE_PATTERN)&.captures&.first
     end
 
     # The absolute form of a literal reference held by a resource on the given base server: an

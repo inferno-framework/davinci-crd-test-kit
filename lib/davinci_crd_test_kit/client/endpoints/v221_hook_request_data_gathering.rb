@@ -81,10 +81,16 @@ module DaVinciCRDTestKit
 
     def prefetched_coverage_resource
       if prefetched_coverage.is_a?(FHIR::Bundle)
-        prefetched_coverage.entry.first&.resource
-      else
+        prefetched_coverage_entry&.resource
+      elsif prefetched_coverage.is_a?(FHIR::Coverage)
         prefetched_coverage
       end
+    end
+
+    # A search Bundle can hold entries other than Coverages, such as an OperationOutcome, so the
+    # first Coverage is used rather than the first entry.
+    def prefetched_coverage_entry
+      prefetched_coverage.entry.find { |entry| entry.resource.is_a?(FHIR::Coverage) }
     end
 
     def request_coverage_payer
@@ -99,7 +105,7 @@ module DaVinciCRDTestKit
 
     # The absolute URL identifying the prefetched Coverage (see ResourceIdentity).
     def prefetched_coverage_identity
-      full_url = prefetched_coverage.entry.first&.fullUrl if prefetched_coverage.is_a?(FHIR::Bundle)
+      full_url = prefetched_coverage_entry&.fullUrl if prefetched_coverage.is_a?(FHIR::Bundle)
       full_url.presence || ResourceIdentity.restful_identity(prefetched_coverage_resource, fhir_server_base)
     end
 

@@ -258,6 +258,25 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       expect(payer_request).to have_been_made.once
     end
 
+    it 'reads the payer of the first Coverage in a prefetched Bundle that holds other entries' do
+      coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
+      outcome = { 'resourceType' => 'OperationOutcome',
+                  'issue' => [{ 'severity' => 'information', 'code' => 'informational' }] }
+      order_sign_request['prefetch'] = {
+        'coverage' => { 'resourceType' => 'Bundle', 'type' => 'searchset',
+                        'entry' => [{ 'resource' => outcome }, { 'resource' => coverage }] }
+      }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+      allow(Inferno::Application['logger']).to receive(:error)
+      payer_request = stub_request(:get, organization_example_reference_absolute)
+        .to_return(status: 200, body: organization_example.to_json)
+
+      module_instance.request_additional_fhir_data
+
+      expect(payer_request).to have_been_made.once
+      expect(Inferno::Application['logger']).to_not have_received(:error)
+    end
+
     it 'reads a relative payer reference from the FHIR server with the access token' do
       coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
       order_sign_request['prefetch'] = { 'coverage' => coverage }
