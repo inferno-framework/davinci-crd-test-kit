@@ -1,0 +1,3799 @@
+{
+  "hookInstance": "must-support-demo-0001",
+  "fhirServer": "http://localhost:4567/custom/crd_server_v221/fhir",
+  "hook": "order-sign",
+  "fhirAuthorization": {
+    "access_token": "SAMPLE_TOKEN",
+    "token_type": "Bearer",
+    "expires_in": 300,
+    "scope": "user/*.rs",
+    "subject": "cds-service4"
+  },
+  "context": {
+    "userId": "Practitioner/ms-practitioner",
+    "patientId": "ms-patient",
+    "encounterId": "ms-encounter",
+    "draftOrders": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/ServiceRequest/ms-service-request-1",
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "id": "ms-service-request-1",
+            "status": "draft",
+            "intent": "order",
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "identifier": [
+              {
+                "system": "http://example.org",
+                "value": "sr-1"
+              }
+            ],
+            "doNotPerform": false,
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "requester": {
+              "reference": "#pr1"
+            },
+            "occurrencePeriod": {
+              "start": "2026-01-01T00:00:00Z"
+            },
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "108252007"
+                  }
+                ]
+              }
+            ],
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Practitioner",
+                "id": "pr1",
+                "identifier": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/us-npi",
+                    "value": "1234567893"
+                  },
+                  {
+                    "system": "urn:oid:2.16.840.1.113883.4.4",
+                    "value": "123456789"
+                  }
+                ],
+                "name": [
+                  {
+                    "family": "Smith",
+                    "given": [
+                      "John"
+                    ]
+                  }
+                ],
+                "telecom": [
+                  {
+                    "system": "phone",
+                    "value": "555-0100"
+                  }
+                ],
+                "address": [
+                  {
+                    "use": "work",
+                    "type": "both",
+                    "line": [
+                      "1 Main St"
+                    ],
+                    "city": "Boston",
+                    "state": "MA",
+                    "postalCode": "02101",
+                    "country": "US"
+                  }
+                ]
+              }
+            ],
+            "quantityQuantity": {
+              "value": 1
+            },
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              }
+            ],
+            "locationReference": [
+              {
+                "reference": "Location/ms-location"
+              }
+            ],
+            "performer": [
+              {
+                "reference": "Practitioner/ms-practitioner"
+              },
+              {
+                "reference": "PractitionerRole/ms-practitioner-role"
+              },
+              {
+                "reference": "Organization/ms-organization"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "1234"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "code": "x"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "performerType": {
+              "coding": [
+                {
+                  "system": "http://nucc.org/provider-taxonomy",
+                  "code": "207Q00000X"
+                }
+              ]
+            },
+            "locationCode": [
+              {
+                "coding": [
+                  {
+                    "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                    "code": "11"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "https://www.nubc.org/CodeSystem/TypeOfBill",
+                    "code": "0111"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "282N00000X"
+                  }
+                ]
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/icd-10-cm",
+                    "code": "A00"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/ServiceRequest/ms-service-request-2",
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "id": "ms-service-request-2",
+            "status": "draft",
+            "intent": "order",
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "identifier": [
+              {
+                "system": "http://example.org",
+                "value": "sr-1"
+              }
+            ],
+            "doNotPerform": false,
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "requester": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "occurrenceTiming": {
+              "event": [
+                "2026-01-01T00:00:00Z"
+              ],
+              "repeat": {
+                "boundsPeriod": {
+                  "start": "2026-01-01",
+                  "end": "2026-02-01"
+                },
+                "count": 3,
+                "duration": 30,
+                "durationUnit": "min",
+                "frequency": 2,
+                "period": 1,
+                "periodUnit": "d"
+              }
+            },
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "108252007"
+                  }
+                ]
+              }
+            ],
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "quantityQuantity": {
+              "value": 1
+            },
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              }
+            ],
+            "locationReference": [
+              {
+                "reference": "Location/ms-location"
+              }
+            ],
+            "performer": [
+              {
+                "reference": "Practitioner/ms-practitioner"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "1234"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "code": "x"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "performerType": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/codeOptions",
+                  "valueCanonical": "http://hl7.org/fhir/ValueSet/participant-role"
+                }
+              ]
+            },
+            "locationCode": [
+              {
+                "coding": [
+                  {
+                    "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+                    "code": "11"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "https://www.nubc.org/CodeSystem/TypeOfBill",
+                    "code": "0111"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "282N00000X"
+                  }
+                ]
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/icd-10-cm",
+                    "code": "A00"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/DeviceRequest/ms-device-request-1",
+          "resource": {
+            "resourceType": "DeviceRequest",
+            "id": "ms-device-request-1",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/dr",
+                "value": "dr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "performer": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "occurrenceDateTime": "2026-01-02T00:00:00Z",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "code": "p"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ],
+            "codeCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "1234"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "code": "x"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/DeviceRequest/ms-device-request-2",
+          "resource": {
+            "resourceType": "DeviceRequest",
+            "id": "ms-device-request-2",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/dr",
+                "value": "dr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "requester": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "performer": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "occurrenceDateTime": "2026-01-02T00:00:00Z",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "parameter": [
+              {
+                "code": {
+                  "coding": [
+                    {
+                      "code": "p"
+                    }
+                  ]
+                }
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ],
+            "codeReference": {
+              "reference": "Device/ms-device"
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/MedicationRequest/ms-medication-request-1",
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "ms-medication-request-1",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/mr",
+                "value": "mr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "performer": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "reportedBoolean": false,
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                    "code": "community"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "priorPrescription": {
+              "reference": "MedicationRequest/ms-prior-medication-request"
+            },
+            "substitution": {
+              "allowedBoolean": true
+            },
+            "dosageInstruction": [
+              {
+                "text": "take one",
+                "timing": {
+                  "event": [
+                    "2026-01-01T00:00:00Z"
+                  ],
+                  "repeat": {
+                    "boundsPeriod": {
+                      "start": "2026-01-01",
+                      "end": "2026-02-01"
+                    },
+                    "count": 3,
+                    "duration": 30,
+                    "durationUnit": "min",
+                    "frequency": 2,
+                    "period": 1,
+                    "periodUnit": "d"
+                  }
+                },
+                "doseAndRate": [
+                  {
+                    "doseQuantity": {
+                      "value": 1,
+                      "unit": "tab"
+                    }
+                  }
+                ]
+              }
+            ],
+            "dispenseRequest": {
+              "numberOfRepeatsAllowed": 2,
+              "quantity": {
+                "value": 30,
+                "unit": "tab"
+              },
+              "performer": {
+                "reference": "Organization/ms-organization"
+              }
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ],
+            "medicationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "1234"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "code": "x"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/MedicationRequest/ms-medication-request-2",
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "ms-medication-request-2",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/mr",
+                "value": "mr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "performer": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+                    "code": "community"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "priorPrescription": {
+              "reference": "MedicationRequest/ms-prior-medication-request"
+            },
+            "substitution": {
+              "allowedBoolean": true
+            },
+            "dosageInstruction": [
+              {
+                "text": "take one",
+                "timing": {
+                  "event": [
+                    "2026-01-01T00:00:00Z"
+                  ],
+                  "repeat": {
+                    "boundsPeriod": {
+                      "start": "2026-01-01",
+                      "end": "2026-02-01"
+                    },
+                    "count": 3,
+                    "duration": 30,
+                    "durationUnit": "min",
+                    "frequency": 2,
+                    "period": 1,
+                    "periodUnit": "d"
+                  }
+                },
+                "doseAndRate": [
+                  {
+                    "doseQuantity": {
+                      "value": 1,
+                      "unit": "tab"
+                    }
+                  }
+                ]
+              }
+            ],
+            "dispenseRequest": {
+              "numberOfRepeatsAllowed": 2,
+              "quantity": {
+                "value": 30,
+                "unit": "tab"
+              },
+              "performer": {
+                "reference": "Organization/ms-organization"
+              }
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ],
+            "medicationReference": {
+              "reference": "Medication/ms-medication"
+            },
+            "reportedReference": {
+              "reference": "Practitioner/ms-practitioner"
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/CommunicationRequest/ms-communication-request-1",
+          "resource": {
+            "resourceType": "CommunicationRequest",
+            "id": "ms-communication-request-1",
+            "status": "draft",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/cr",
+                "value": "cr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "sender": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "recipient": [
+              {
+                "reference": "Practitioner/ms-practitioner"
+              },
+              {
+                "reference": "PractitionerRole/ms-practitioner-role"
+              },
+              {
+                "reference": "Organization/ms-organization"
+              }
+            ],
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "occurrenceDateTime": "2026-01-02T00:00:00Z",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "payload": [
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "pc"
+                        }
+                      ],
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "code": "x"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "contentString": "note"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/CommunicationRequest/ms-communication-request-2",
+          "resource": {
+            "resourceType": "CommunicationRequest",
+            "id": "ms-communication-request-2",
+            "status": "draft",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/cr",
+                "value": "cr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "requester": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "sender": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "recipient": [
+              {
+                "reference": "Practitioner/ms-practitioner"
+              }
+            ],
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "occurrenceDateTime": "2026-01-02T00:00:00Z",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "payload": [
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "pc"
+                        }
+                      ],
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "code": "x"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "contentString": "note"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/CommunicationRequest/ms-communication-request-3",
+          "resource": {
+            "resourceType": "CommunicationRequest",
+            "id": "ms-communication-request-3",
+            "status": "draft",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/cr",
+                "value": "cr-1"
+              }
+            ],
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "sender": {
+              "reference": "Organization/ms-organization"
+            },
+            "recipient": [
+              {
+                "reference": "Practitioner/ms-practitioner"
+              }
+            ],
+            "authoredOn": "2026-01-01T00:00:00Z",
+            "occurrenceDateTime": "2026-01-02T00:00:00Z",
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request"
+              }
+            ],
+            "reasonCode": [
+              {
+                "coding": [
+                  {
+                    "code": "rc"
+                  }
+                ]
+              }
+            ],
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "payload": [
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-CommunicationRequest.payload.content",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "pc"
+                        }
+                      ],
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                          "valueCodeableConcept": {
+                            "coding": [
+                              {
+                                "code": "x"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "contentString": "note"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/NutritionOrder/ms-nutrition-order-1",
+          "resource": {
+            "resourceType": "NutritionOrder",
+            "id": "ms-nutrition-order-1",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/no",
+                "value": "no-1"
+              }
+            ],
+            "patient": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "dateTime": "2026-01-01",
+            "orderer": {
+              "reference": "#pr1"
+            },
+            "allergyIntolerance": [
+              {
+                "reference": "AllergyIntolerance/ms-allergy"
+              }
+            ],
+            "foodPreferenceModifier": [
+              {
+                "coding": [
+                  {
+                    "code": "dairy-free"
+                  }
+                ]
+              }
+            ],
+            "excludeFoodModifier": [
+              {
+                "coding": [
+                  {
+                    "code": "nuts"
+                  }
+                ]
+              }
+            ],
+            "oralDiet": {
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "code": "diabetic"
+                    }
+                  ]
+                }
+              ],
+              "schedule": [
+                {
+                  "event": [
+                    "2026-01-01T00:00:00Z"
+                  ],
+                  "repeat": {
+                    "boundsPeriod": {
+                      "start": "2026-01-01",
+                      "end": "2026-02-01"
+                    },
+                    "count": 3,
+                    "duration": 30,
+                    "durationUnit": "min",
+                    "frequency": 2,
+                    "period": 1,
+                    "periodUnit": "d"
+                  }
+                }
+              ],
+              "nutrient": [
+                {
+                  "modifier": {
+                    "coding": [
+                      {
+                        "code": "carb"
+                      }
+                    ]
+                  },
+                  "amount": {
+                    "value": 50,
+                    "unit": "g"
+                  }
+                }
+              ],
+              "texture": [
+                {
+                  "modifier": {
+                    "coding": [
+                      {
+                        "code": "pureed"
+                      }
+                    ]
+                  },
+                  "foodType": {
+                    "coding": [
+                      {
+                        "code": "meat"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "supplement": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "code": "protein"
+                    }
+                  ]
+                },
+                "quantity": {
+                  "value": 1,
+                  "unit": "can"
+                },
+                "schedule": [
+                  {
+                    "repeat": {
+                      "frequency": 1,
+                      "period": 1,
+                      "periodUnit": "d"
+                    }
+                  }
+                ]
+              }
+            ],
+            "enteralFormula": {
+              "baseFormulaType": {
+                "coding": [
+                  {
+                    "code": "formula"
+                  }
+                ]
+              },
+              "additiveType": {
+                "coding": [
+                  {
+                    "code": "additive"
+                  }
+                ]
+              },
+              "caloricDensity": {
+                "value": 1,
+                "unit": "cal/mL"
+              },
+              "routeofAdministration": {
+                "coding": [
+                  {
+                    "code": "NG"
+                  }
+                ]
+              },
+              "administration": [
+                {
+                  "schedule": {
+                    "repeat": {
+                      "frequency": 1,
+                      "period": 1,
+                      "periodUnit": "d"
+                    }
+                  },
+                  "quantity": {
+                    "value": 100,
+                    "unit": "mL"
+                  },
+                  "rateRatio": {
+                    "numerator": {
+                      "value": 100,
+                      "unit": "mL"
+                    },
+                    "denominator": {
+                      "value": 1,
+                      "unit": "h"
+                    }
+                  }
+                }
+              ]
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Practitioner",
+                "id": "pr1",
+                "identifier": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/us-npi",
+                    "value": "1234567893"
+                  },
+                  {
+                    "system": "urn:oid:2.16.840.1.113883.4.4",
+                    "value": "123456789"
+                  }
+                ],
+                "name": [
+                  {
+                    "family": "Smith",
+                    "given": [
+                      "John"
+                    ]
+                  }
+                ],
+                "telecom": [
+                  {
+                    "system": "phone",
+                    "value": "555-0100"
+                  }
+                ],
+                "address": [
+                  {
+                    "use": "work",
+                    "type": "both",
+                    "line": [
+                      "1 Main St"
+                    ],
+                    "city": "Boston",
+                    "state": "MA",
+                    "postalCode": "02101",
+                    "country": "US"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/NutritionOrder/ms-nutrition-order-2",
+          "resource": {
+            "resourceType": "NutritionOrder",
+            "id": "ms-nutrition-order-2",
+            "status": "draft",
+            "intent": "order",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/no",
+                "value": "no-1"
+              }
+            ],
+            "patient": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "dateTime": "2026-01-01",
+            "orderer": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "allergyIntolerance": [
+              {
+                "reference": "AllergyIntolerance/ms-allergy"
+              }
+            ],
+            "foodPreferenceModifier": [
+              {
+                "coding": [
+                  {
+                    "code": "dairy-free"
+                  }
+                ]
+              }
+            ],
+            "excludeFoodModifier": [
+              {
+                "coding": [
+                  {
+                    "code": "nuts"
+                  }
+                ]
+              }
+            ],
+            "oralDiet": {
+              "type": [
+                {
+                  "coding": [
+                    {
+                      "code": "diabetic"
+                    }
+                  ]
+                }
+              ],
+              "schedule": [
+                {
+                  "event": [
+                    "2026-01-01T00:00:00Z"
+                  ],
+                  "repeat": {
+                    "boundsPeriod": {
+                      "start": "2026-01-01",
+                      "end": "2026-02-01"
+                    },
+                    "count": 3,
+                    "duration": 30,
+                    "durationUnit": "min",
+                    "frequency": 2,
+                    "period": 1,
+                    "periodUnit": "d"
+                  }
+                }
+              ],
+              "nutrient": [
+                {
+                  "modifier": {
+                    "coding": [
+                      {
+                        "code": "carb"
+                      }
+                    ]
+                  },
+                  "amount": {
+                    "value": 50,
+                    "unit": "g"
+                  }
+                }
+              ],
+              "texture": [
+                {
+                  "modifier": {
+                    "coding": [
+                      {
+                        "code": "pureed"
+                      }
+                    ]
+                  },
+                  "foodType": {
+                    "coding": [
+                      {
+                        "code": "meat"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "supplement": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "code": "protein"
+                    }
+                  ]
+                },
+                "quantity": {
+                  "value": 1,
+                  "unit": "can"
+                },
+                "schedule": [
+                  {
+                    "repeat": {
+                      "frequency": 1,
+                      "period": 1,
+                      "periodUnit": "d"
+                    }
+                  }
+                ]
+              }
+            ],
+            "enteralFormula": {
+              "baseFormulaType": {
+                "coding": [
+                  {
+                    "code": "formula"
+                  }
+                ]
+              },
+              "additiveType": {
+                "coding": [
+                  {
+                    "code": "additive"
+                  }
+                ]
+              },
+              "caloricDensity": {
+                "value": 1,
+                "unit": "cal/mL"
+              },
+              "routeofAdministration": {
+                "coding": [
+                  {
+                    "code": "NG"
+                  }
+                ]
+              },
+              "administration": [
+                {
+                  "schedule": {
+                    "repeat": {
+                      "frequency": 1,
+                      "period": 1,
+                      "periodUnit": "d"
+                    }
+                  },
+                  "quantity": {
+                    "value": 100,
+                    "unit": "mL"
+                  },
+                  "rateRatio": {
+                    "numerator": {
+                      "value": 100,
+                      "unit": "mL"
+                    },
+                    "denominator": {
+                      "value": 1,
+                      "unit": "h"
+                    }
+                  }
+                }
+              ]
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/VisionPrescription/ms-vision-prescription-1",
+          "resource": {
+            "resourceType": "VisionPrescription",
+            "id": "ms-vision-prescription-1",
+            "status": "active",
+            "created": "2026-01-01T00:00:00Z",
+            "dateWritten": "2026-01-01T00:00:00Z",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/vp",
+                "value": "vp-1"
+              }
+            ],
+            "patient": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "prescriber": {
+              "reference": "#pr1"
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Practitioner",
+                "id": "pr1",
+                "identifier": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/us-npi",
+                    "value": "1234567893"
+                  },
+                  {
+                    "system": "urn:oid:2.16.840.1.113883.4.4",
+                    "value": "123456789"
+                  }
+                ],
+                "name": [
+                  {
+                    "family": "Smith",
+                    "given": [
+                      "John"
+                    ]
+                  }
+                ],
+                "telecom": [
+                  {
+                    "system": "phone",
+                    "value": "555-0100"
+                  }
+                ],
+                "address": [
+                  {
+                    "use": "work",
+                    "type": "both",
+                    "line": [
+                      "1 Main St"
+                    ],
+                    "city": "Boston",
+                    "state": "MA",
+                    "postalCode": "02101",
+                    "country": "US"
+                  }
+                ]
+              }
+            ],
+            "lensSpecification": [
+              {
+                "product": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/ex-visionprescriptionproduct",
+                      "code": "lens"
+                    }
+                  ]
+                },
+                "eye": "right",
+                "sphere": -2.0,
+                "cylinder": -0.5,
+                "axis": 180,
+                "add": 1.5,
+                "power": 1.0,
+                "backCurve": 8.6,
+                "diameter": 14.0,
+                "duration": {
+                  "value": 1,
+                  "unit": "month"
+                },
+                "prism": [
+                  {
+                    "amount": 0.5,
+                    "base": "up"
+                  }
+                ],
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "x"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/VisionPrescription/ms-vision-prescription-2",
+          "resource": {
+            "resourceType": "VisionPrescription",
+            "id": "ms-vision-prescription-2",
+            "status": "active",
+            "created": "2026-01-01T00:00:00Z",
+            "dateWritten": "2026-01-01T00:00:00Z",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/vp",
+                "value": "vp-1"
+              }
+            ],
+            "patient": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "prescriber": {
+              "reference": "PractitionerRole/ms-practitioner-role"
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-request-category",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "rc"
+                    }
+                  ]
+                }
+              }
+            ],
+            "lensSpecification": [
+              {
+                "product": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/ex-visionprescriptionproduct",
+                      "code": "lens"
+                    }
+                  ]
+                },
+                "eye": "right",
+                "sphere": -2.0,
+                "cylinder": -0.5,
+                "axis": 180,
+                "add": 1.5,
+                "power": 1.0,
+                "backCurve": 8.6,
+                "diameter": 14.0,
+                "duration": {
+                  "value": 1,
+                  "unit": "month"
+                },
+                "prism": [
+                  {
+                    "amount": 0.5,
+                    "base": "up"
+                  }
+                ],
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "x"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "prefetch": {
+    "patient": {
+      "resourceType": "Patient",
+      "id": "ms-patient",
+      "gender": "female",
+      "birthDate": "1980-01-01",
+      "identifier": [
+        {
+          "system": "https://inferno.healthit.gov/identifiers/mrn",
+          "value": "m-1"
+        }
+      ],
+      "name": [
+        {
+          "family": "Doe",
+          "given": [
+            "Jane"
+          ]
+        }
+      ],
+      "telecom": [
+        {
+          "system": "phone",
+          "value": "555-0100",
+          "use": "home"
+        }
+      ],
+      "address": [
+        {
+          "use": "home",
+          "type": "both",
+          "line": [
+            "1 Main St"
+          ],
+          "city": "Boston",
+          "state": "MA",
+          "postalCode": "02101",
+          "country": "US"
+        }
+      ],
+      "communication": [
+        {
+          "language": {
+            "coding": [
+              {
+                "system": "urn:ietf:bcp:47",
+                "code": "en"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "encounter": {
+      "resourceType": "Encounter",
+      "id": "ms-encounter",
+      "status": "in-progress",
+      "meta": {
+        "lastUpdated": "2026-01-01T00:00:00Z"
+      },
+      "identifier": [
+        {
+          "system": "https://inferno.healthit.gov/identifiers/enc",
+          "value": "e-1"
+        }
+      ],
+      "class": {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+        "code": "AMB"
+      },
+      "type": [
+        {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "162673000"
+            }
+          ]
+        }
+      ],
+      "serviceType": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/service-type",
+            "code": "57"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "code": "x"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "subject": {
+        "reference": "Patient/ms-patient"
+      },
+      "participant": [
+        {
+          "type": [
+            {
+              "coding": [
+                {
+                  "code": "ATND"
+                }
+              ]
+            }
+          ],
+          "period": {
+            "start": "2026-01-01T00:00:00Z"
+          },
+          "individual": {
+            "reference": "Practitioner/ms-practitioner"
+          }
+        }
+      ],
+      "appointment": [
+        {
+          "reference": "Appointment/ms-appointment"
+        }
+      ],
+      "period": {
+        "start": "2026-01-01T00:00:00Z"
+      },
+      "length": {
+        "value": 30,
+        "unit": "min"
+      },
+      "reasonCode": [
+        {
+          "coding": [
+            {
+              "code": "rc"
+            }
+          ]
+        }
+      ],
+      "reasonReference": [
+        {
+          "reference": "Condition/ms-condition-problem"
+        },
+        {
+          "reference": "Condition/ms-condition-diagnosis"
+        },
+        {
+          "reference": "#cond1"
+        }
+      ],
+      "diagnosis": [
+        {
+          "condition": {
+            "reference": "Condition/ms-condition-diagnosis"
+          }
+        }
+      ],
+      "hospitalization": {
+        "dischargeDisposition": {
+          "coding": [
+            {
+              "code": "home"
+            }
+          ]
+        }
+      },
+      "location": [
+        {
+          "location": {
+            "reference": "Location/ms-location"
+          },
+          "status": "active",
+          "period": {
+            "start": "2026-01-01T00:00:00Z"
+          }
+        }
+      ],
+      "serviceProvider": {
+        "reference": "Organization/ms-organization"
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+          "extension": [
+            {
+              "url": "coverage",
+              "valueReference": {
+                "reference": "Coverage/ms-coverage"
+              }
+            },
+            {
+              "url": "covered",
+              "valueCode": "covered"
+            },
+            {
+              "url": "date",
+              "valueDate": "2026-05-14"
+            },
+            {
+              "url": "coverage-assertion-id",
+              "valueString": "ms-assertion-1"
+            }
+          ]
+        }
+      ],
+      "contained": [
+        {
+          "resourceType": "Condition",
+          "id": "cond1",
+          "meta": {
+            "profile": [
+              "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+            ]
+          },
+          "clinicalStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "active"
+              }
+            ]
+          },
+          "verificationStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                "code": "confirmed"
+              }
+            ]
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                  "code": "problem-list-item"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "38341003",
+                "display": "Hypertensive disorder"
+              }
+            ]
+          },
+          "subject": {
+            "reference": "Patient/ms-patient"
+          },
+          "onsetDateTime": "2025-01-01",
+          "recordedDate": "2025-01-01"
+        }
+      ]
+    },
+    "coverage": {
+      "resourceType": "Bundle",
+      "type": "searchset",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Coverage/ms-coverage",
+          "resource": {
+            "resourceType": "Coverage",
+            "id": "ms-coverage",
+            "status": "active",
+            "identifier": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                      "code": "MB"
+                    }
+                  ]
+                },
+                "system": "https://inferno.healthit.gov/identifiers/member",
+                "value": "mem-1"
+              }
+            ],
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                  "code": "EHCPOL"
+                }
+              ]
+            },
+            "policyHolder": {
+              "reference": "Patient/ms-patient"
+            },
+            "subscriber": {
+              "reference": "Patient/ms-patient"
+            },
+            "subscriberId": "sub-1",
+            "beneficiary": {
+              "reference": "Patient/ms-patient"
+            },
+            "dependent": "01",
+            "relationship": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+                  "code": "self"
+                }
+              ]
+            },
+            "period": {
+              "start": "2026-01-01"
+            },
+            "payor": [
+              {
+                "reference": "Organization/ms-payer"
+              }
+            ],
+            "class": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
+                      "code": "group"
+                    }
+                  ]
+                },
+                "value": "grp-1",
+                "name": "Group Plan"
+              },
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
+                      "code": "plan"
+                    }
+                  ]
+                },
+                "value": "pln-1",
+                "name": "Gold Plan"
+              }
+            ],
+            "order": 1,
+            "network": "net-1"
+          }
+        }
+      ]
+    },
+    "practitioners": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Practitioner/ms-practitioner",
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "ms-practitioner",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1234567893"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.4.4",
+                "value": "123456789"
+              }
+            ],
+            "name": [
+              {
+                "family": "Smith",
+                "given": [
+                  "John"
+                ]
+              }
+            ],
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "555-0100"
+              }
+            ],
+            "address": [
+              {
+                "use": "work",
+                "type": "both",
+                "line": [
+                  "1 Main St"
+                ],
+                "city": "Boston",
+                "state": "MA",
+                "postalCode": "02101",
+                "country": "US"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "practitionerRoles": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/PractitionerRole/ms-practitioner-role",
+          "resource": {
+            "resourceType": "PractitionerRole",
+            "id": "ms-practitioner-role",
+            "practitioner": {
+              "reference": "Practitioner/ms-practitioner"
+            },
+            "organization": {
+              "reference": "Organization/ms-organization"
+            },
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "207Q00000X"
+                  }
+                ]
+              }
+            ],
+            "specialty": [
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "207Q00000X"
+                  }
+                ]
+              }
+            ],
+            "location": [
+              {
+                "reference": "Location/ms-location"
+              }
+            ],
+            "endpoint": [
+              {
+                "reference": "Endpoint/ms-endpoint"
+              }
+            ],
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "555-0100"
+              }
+            ],
+            "active": true
+          }
+        }
+      ]
+    },
+    "organizations": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Organization/ms-organization",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "ms-organization",
+            "active": true,
+            "name": "Acme Health",
+            "identifier": [
+              {
+                "system": "http://hl7.org/fhir/sid/us-npi",
+                "value": "1234567893"
+              },
+              {
+                "system": "urn:oid:2.16.840.1.113883.4.4",
+                "value": "123456789"
+              }
+            ],
+            "address": [
+              {
+                "use": "work",
+                "type": "both",
+                "line": [
+                  "1 Main St"
+                ],
+                "city": "Boston",
+                "state": "MA",
+                "postalCode": "02101",
+                "country": "US"
+              }
+            ],
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "555-0100"
+              }
+            ],
+            "partOf": {
+              "reference": "Organization/ms-payer"
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Organization/ms-payer",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "ms-payer",
+            "active": true,
+            "name": "Acme Payer",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/payer-id",
+                "value": "payer-1"
+              }
+            ],
+            "address": [
+              {
+                "use": "work",
+                "type": "both",
+                "line": [
+                  "1 Main St"
+                ],
+                "city": "Boston",
+                "state": "MA",
+                "postalCode": "02101",
+                "country": "US"
+              }
+            ],
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "555-0100"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "locations": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Location/ms-location",
+          "resource": {
+            "resourceType": "Location",
+            "id": "ms-location",
+            "status": "active",
+            "name": "Main Clinic",
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "HOSP"
+                  }
+                ]
+              }
+            ],
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/loc",
+                "value": "l-1"
+              }
+            ],
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "555-0100"
+              }
+            ],
+            "managingOrganization": {
+              "reference": "Organization/ms-organization"
+            },
+            "address": {
+              "type": "physical",
+              "line": [
+                "1 Main St"
+              ],
+              "city": "Boston",
+              "state": "MA",
+              "postalCode": "02101",
+              "country": "US"
+            }
+          }
+        }
+      ]
+    },
+    "devices": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Device/ms-device",
+          "resource": {
+            "resourceType": "Device",
+            "id": "ms-device",
+            "udiCarrier": [
+              {
+                "deviceIdentifier": "00844588003288"
+              }
+            ],
+            "property": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "code": "t"
+                    }
+                  ]
+                },
+                "valueQuantity": [
+                  {
+                    "value": 1
+                  }
+                ]
+              },
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "code": "t"
+                    }
+                  ]
+                },
+                "valueCode": [
+                  {
+                    "coding": [
+                      {
+                        "code": "c"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "code": "x"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "medications": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Medication/ms-medication",
+          "resource": {
+            "resourceType": "Medication",
+            "id": "ms-medication",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "1234"
+                }
+              ],
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "code": "x"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "appointments": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Appointment/ms-appointment",
+          "resource": {
+            "resourceType": "Appointment",
+            "id": "ms-appointment",
+            "status": "booked",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/appt",
+                "value": "a-1"
+              }
+            ],
+            "serviceCategory": [
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "108252007"
+                  }
+                ]
+              }
+            ],
+            "serviceType": [
+              {
+                "coding": [
+                  {
+                    "code": "st"
+                  }
+                ],
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "x"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "specialty": [
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "207Q00000X"
+                  }
+                ]
+              }
+            ],
+            "appointmentType": {
+              "coding": [
+                {
+                  "code": "ROUTINE"
+                }
+              ]
+            },
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "start": "2026-01-01T09:00:00Z",
+            "end": "2026-01-01T09:30:00Z",
+            "requestedPeriod": [
+              {
+                "start": "2026-01-01T09:00:00Z"
+              }
+            ],
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request",
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "ServiceRequest/sr2"
+                    }
+                  }
+                ]
+              }
+            ],
+            "participant": [
+              {
+                "type": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "PPRF"
+                      }
+                    ]
+                  }
+                ],
+                "actor": {
+                  "reference": "#appointment-practitioner"
+                },
+                "status": "accepted"
+              },
+              {
+                "actor": {
+                  "reference": "#appointment-patient"
+                },
+                "status": "accepted"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              },
+              {
+                "resourceType": "Patient",
+                "id": "appointment-patient",
+                "gender": "female",
+                "birthDate": "1980-01-01",
+                "identifier": [
+                  {
+                    "system": "https://inferno.healthit.gov/identifiers/mrn",
+                    "value": "m-1"
+                  }
+                ],
+                "name": [
+                  {
+                    "family": "Doe",
+                    "given": [
+                      "Jane"
+                    ]
+                  }
+                ],
+                "telecom": [
+                  {
+                    "system": "phone",
+                    "value": "555-0100",
+                    "use": "home"
+                  }
+                ],
+                "address": [
+                  {
+                    "use": "home",
+                    "type": "both",
+                    "line": [
+                      "1 Main St"
+                    ],
+                    "city": "Boston",
+                    "state": "MA",
+                    "postalCode": "02101",
+                    "country": "US"
+                  }
+                ],
+                "communication": [
+                  {
+                    "language": {
+                      "coding": [
+                        {
+                          "system": "urn:ietf:bcp:47",
+                          "code": "en"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "resourceType": "Practitioner",
+                "id": "appointment-practitioner",
+                "identifier": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/us-npi",
+                    "value": "1234567893"
+                  },
+                  {
+                    "system": "urn:oid:2.16.840.1.113883.4.4",
+                    "value": "123456789"
+                  }
+                ],
+                "name": [
+                  {
+                    "family": "Smith",
+                    "given": [
+                      "John"
+                    ]
+                  }
+                ],
+                "telecom": [
+                  {
+                    "system": "phone",
+                    "value": "555-0100"
+                  }
+                ],
+                "address": [
+                  {
+                    "use": "work",
+                    "type": "both",
+                    "line": [
+                      "1 Main St"
+                    ],
+                    "city": "Boston",
+                    "state": "MA",
+                    "postalCode": "02101",
+                    "country": "US"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Appointment/ms-appointment-literal-participants",
+          "resource": {
+            "resourceType": "Appointment",
+            "id": "ms-appointment-literal-participants",
+            "status": "booked",
+            "identifier": [
+              {
+                "system": "https://inferno.healthit.gov/identifiers/appt",
+                "value": "a-1"
+              }
+            ],
+            "serviceCategory": [
+              {
+                "coding": [
+                  {
+                    "system": "https://codesystem.x12.org/005010/1365",
+                    "code": "1"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "AMB"
+                  }
+                ]
+              },
+              {
+                "coding": [
+                  {
+                    "system": "http://snomed.info/sct",
+                    "code": "108252007"
+                  }
+                ]
+              }
+            ],
+            "serviceType": [
+              {
+                "coding": [
+                  {
+                    "code": "st"
+                  }
+                ],
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "code": "x"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "specialty": [
+              {
+                "coding": [
+                  {
+                    "system": "http://nucc.org/provider-taxonomy",
+                    "code": "207Q00000X"
+                  }
+                ]
+              }
+            ],
+            "appointmentType": {
+              "coding": [
+                {
+                  "code": "ROUTINE"
+                }
+              ]
+            },
+            "reasonReference": [
+              {
+                "reference": "Condition/ms-condition-problem"
+              },
+              {
+                "reference": "#cond1"
+              }
+            ],
+            "start": "2026-01-01T09:00:00Z",
+            "end": "2026-01-01T09:30:00Z",
+            "requestedPeriod": [
+              {
+                "start": "2026-01-01T09:00:00Z"
+              }
+            ],
+            "basedOn": [
+              {
+                "reference": "ServiceRequest/ms-prior-service-request",
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/alternate-reference",
+                    "valueReference": {
+                      "reference": "ServiceRequest/sr2"
+                    }
+                  }
+                ]
+              }
+            ],
+            "participant": [
+              {
+                "type": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                        "code": "PPRF"
+                      }
+                    ]
+                  }
+                ],
+                "actor": {
+                  "reference": "Practitioner/ms-practitioner"
+                },
+                "status": "accepted"
+              },
+              {
+                "actor": {
+                  "reference": "Patient/ms-patient"
+                },
+                "status": "accepted"
+              }
+            ],
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+                "extension": [
+                  {
+                    "url": "coverage",
+                    "valueReference": {
+                      "reference": "Coverage/ms-coverage"
+                    }
+                  },
+                  {
+                    "url": "covered",
+                    "valueCode": "covered"
+                  },
+                  {
+                    "url": "date",
+                    "valueDate": "2026-05-14"
+                  },
+                  {
+                    "url": "coverage-assertion-id",
+                    "valueString": "ms-assertion-1"
+                  }
+                ]
+              }
+            ],
+            "contained": [
+              {
+                "resourceType": "Condition",
+                "id": "cond1",
+                "meta": {
+                  "profile": [
+                    "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+                  ]
+                },
+                "clinicalStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                      "code": "active"
+                    }
+                  ]
+                },
+                "verificationStatus": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                      "code": "confirmed"
+                    }
+                  ]
+                },
+                "category": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                        "code": "problem-list-item"
+                      }
+                    ]
+                  }
+                ],
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "38341003",
+                      "display": "Hypertensive disorder"
+                    }
+                  ]
+                },
+                "subject": {
+                  "reference": "Patient/ms-patient"
+                },
+                "onsetDateTime": "2025-01-01",
+                "recordedDate": "2025-01-01"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "conditions": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Condition/ms-condition-problem",
+          "resource": {
+            "resourceType": "Condition",
+            "id": "ms-condition-problem",
+            "meta": {
+              "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns"
+              ]
+            },
+            "clinicalStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                  "code": "active"
+                }
+              ]
+            },
+            "verificationStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                  "code": "confirmed"
+                }
+              ]
+            },
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                    "code": "problem-list-item"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "38341003",
+                  "display": "Hypertensive disorder"
+                }
+              ]
+            },
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "onsetDateTime": "2025-01-01",
+            "recordedDate": "2025-01-01"
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Condition/ms-condition-diagnosis",
+          "resource": {
+            "resourceType": "Condition",
+            "id": "ms-condition-diagnosis",
+            "meta": {
+              "profile": [
+                "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis"
+              ]
+            },
+            "clinicalStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                  "code": "active"
+                }
+              ]
+            },
+            "verificationStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                  "code": "confirmed"
+                }
+              ]
+            },
+            "category": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                    "code": "encounter-diagnosis"
+                  }
+                ]
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "44054006",
+                  "display": "Diabetes mellitus type 2"
+                }
+              ]
+            },
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "onsetDateTime": "2025-01-01",
+            "recordedDate": "2026-05-14"
+          }
+        }
+      ]
+    },
+    "allergies": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/AllergyIntolerance/ms-allergy",
+          "resource": {
+            "resourceType": "AllergyIntolerance",
+            "id": "ms-allergy",
+            "clinicalStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+                  "code": "active"
+                }
+              ]
+            },
+            "verificationStatus": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+                  "code": "confirmed"
+                }
+              ]
+            },
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "91935009",
+                  "display": "Allergy to peanut"
+                }
+              ]
+            },
+            "patient": {
+              "reference": "Patient/ms-patient"
+            }
+          }
+        }
+      ]
+    },
+    "endpoints": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/Endpoint/ms-endpoint",
+          "resource": {
+            "resourceType": "Endpoint",
+            "id": "ms-endpoint",
+            "status": "active",
+            "connectionType": {
+              "system": "http://terminology.hl7.org/CodeSystem/endpoint-connection-type",
+              "code": "hl7-fhir-rest"
+            },
+            "payloadType": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/endpoint-payload-type",
+                    "code": "any"
+                  }
+                ]
+              }
+            ],
+            "address": "https://inferno.healthit.gov/suites/custom/crd_server_v221/fhir"
+          }
+        }
+      ]
+    },
+    "priorOrders": {
+      "resourceType": "Bundle",
+      "type": "collection",
+      "entry": [
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/ServiceRequest/ms-prior-service-request",
+          "resource": {
+            "resourceType": "ServiceRequest",
+            "id": "ms-prior-service-request",
+            "status": "completed",
+            "intent": "order",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://www.ama-assn.org/go/cpt",
+                  "code": "99213"
+                }
+              ]
+            },
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "authoredOn": "2026-01-01",
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            }
+          }
+        },
+        {
+          "fullUrl": "http://localhost:4567/custom/crd_server_v221/fhir/MedicationRequest/ms-prior-medication-request",
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "ms-prior-medication-request",
+            "status": "completed",
+            "intent": "order",
+            "medicationCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+                  "code": "314076",
+                  "display": "lisinopril 10 MG Oral Tablet"
+                }
+              ]
+            },
+            "subject": {
+              "reference": "Patient/ms-patient"
+            },
+            "encounter": {
+              "reference": "Encounter/ms-encounter"
+            },
+            "authoredOn": "2026-01-01",
+            "requester": {
+              "reference": "Practitioner/ms-practitioner"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

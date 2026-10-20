@@ -18,7 +18,8 @@ module DaVinciCRDTestKit
         section of the CRD Test Kit wiki for details on what requests Inferno will make while processing
         a hook invocation. Note that requests made to a FHIR endpoint other than the `fhirServer`
         indicated in the hook request body do not send the provided access token and do not serve as
-        evidence that the CRD client can make FHIR data available for the purposes of this test. To
+        evidence that the CRD client can make FHIR data available for the purposes of this test.
+        These requests will not be listed in the Requests tab of this test after execution. To
         pass this test, send hook requests that include references to resources on the CRD client's
         FHIR server within the set that Inferno will fetch as detailed in the wiki.
       )
