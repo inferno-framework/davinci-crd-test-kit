@@ -95,6 +95,14 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(result.result_message).to include('does not capture')
     end
 
+    it 'links the profile page in the attestation' do
+      result = run(service_request_test, all_types_selected)
+
+      expect(result.result_message).to include(
+        '(http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-servicerequest.html)'
+      )
+    end
+
     it 'reports the number of instances it looked at' do
       result = run(service_request_test, all_types_selected)
 

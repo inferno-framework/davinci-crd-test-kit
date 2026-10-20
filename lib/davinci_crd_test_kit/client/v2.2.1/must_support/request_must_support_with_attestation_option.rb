@@ -30,13 +30,10 @@ module DaVinciCRDTestKit
       class << self
         def build_description(options)
           sections = options[:profiles].map do |profile|
-            parts = profile[:profile_keys].map { |key| ProfileMetadata.for(options[:ig_version], key) }
-            heading = parts.map { |one| "[#{one.profile_name}](#{profile_page_url(one)})" }.to_sentence(
-              two_words_connector: ' or ', last_word_connector: ', or '
-            )
             metadata = metadata_for(options[:ig_version], profile)
+            multiple_profiles = profile[:profile_keys].length > 1
 
-            "### #{heading}\n\n#{multiple_profiles_note if parts.length > 1}" \
+            "### #{profile_links(options[:ig_version], profile)}\n\n#{multiple_profiles_note if multiple_profiles}" \
               "#{element_list(metadata)}#{choice_section(metadata)}"
           end
 
@@ -87,6 +84,14 @@ module DaVinciCRDTestKit
             an instance of either of them. A CRD client that supports only one of these profiles can
             attest to non-support of the related elements.
           NOTE
+        end
+
+        # Each of the profile's names, linked to its page in the IG.
+        def profile_links(ig_version, profile)
+          profile[:profile_keys].map do |key|
+            metadata = ProfileMetadata.for(ig_version, key)
+            "[#{metadata.profile_name}](#{profile_page_url(metadata)})"
+          end.to_sentence(two_words_connector: ' or ', last_word_connector: ', or ')
         end
 
         def profile_page_url(metadata)
@@ -215,7 +220,8 @@ module DaVinciCRDTestKit
           )
           next if missing.blank?
 
-          { kind: :unobserved_elements, title:, resource_type:, count: resources.length, missing: }
+          { kind: :unobserved_elements, title:, resource_type:, count: resources.length, missing:,
+            profile_links: self.class.profile_links(ig_version, profile) }
         end
       end
 
@@ -285,7 +291,7 @@ module DaVinciCRDTestKit
       def attestation_section(entry)
         <<~SECTION.chomp
           Inferno observed #{entry[:count]} `#{entry[:resource_type]}` instance(s) in the hook requests
-          made by the CRD client, but the following #{entry[:title]} must support elements were not
+          made by the CRD client, but the following #{entry[:profile_links]} must support elements were not
           observed on any of them#{nutrition_order_schedule_note if entry[:resource_type] == 'NutritionOrder'}:
 
           #{entry[:missing].map { |element| "- `#{element}`" }.join("\n")}
