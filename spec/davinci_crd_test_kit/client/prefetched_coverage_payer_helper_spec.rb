@@ -46,6 +46,19 @@ RSpec.describe DaVinciCRDTestKit::PrefetchedCoveragePayerHelper do
     end
   end
 
+  describe '#coverage_payer_reference' do
+    it 'returns the reference of the first payer' do
+      coverage = { 'payor' => [{ 'reference' => 'Organization/a' }, { 'reference' => 'Organization/b' }] }
+      expect(helper.coverage_payer_reference(coverage)).to eq('Organization/a')
+    end
+
+    it 'returns nil when the payer is missing or not a reference object holding a string' do
+      [nil, [], 'Organization/a', ['Organization/a'], [{}], [{ 'reference' => 7 }]].each do |payor|
+        expect(helper.coverage_payer_reference({ 'payor' => payor })).to be_nil, "for #{payor.inspect}"
+      end
+    end
+  end
+
   describe '#prefetched_coverage' do
     it 'returns a Coverage prefetched on its own' do
       expect(helper.prefetched_coverage({ 'prefetch' => { 'coverage' => coverage } })).to eq(coverage)

@@ -96,7 +96,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          payer_organization_reference = coverage.dig('payor', 0, 'reference')
+          payer_organization_reference = coverage_payer_reference(coverage)
           if payer_organization_reference.blank?
             add_request_message('error', 'Coverage has no payer reference.', request_index)
             next

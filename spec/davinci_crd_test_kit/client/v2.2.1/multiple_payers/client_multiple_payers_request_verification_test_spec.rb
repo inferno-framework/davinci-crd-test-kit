@@ -290,6 +290,16 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
       expect(result_messages).to_not include(a_string_including("Inferno failed to retrieve the Coverage's payer"))
     end
 
+    it 'fails rather than raising when the payer of the prefetched Coverage is not a reference object' do
+      primary_request_body['prefetch']['coverage']['entry'][0]['resource']['payor'] = ['Organization/primary']
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(a_string_including('(Request 1) Coverage has no payer reference'))
+    end
+
     it 'fails when Inferno could not read the payer of the prefetched Coverage' do
       primary_request_body['hookInstance'] = 'hook-instance-without-payer-read'
       stub_requests([hook_request(primary_request_body, complete_service_url)])

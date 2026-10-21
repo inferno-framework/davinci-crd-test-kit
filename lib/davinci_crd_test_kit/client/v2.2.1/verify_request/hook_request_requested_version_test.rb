@@ -28,6 +28,12 @@ module DaVinciCRDTestKit
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
 
+          unless request_body.is_a?(Hash)
+            add_request_message('error', "Request body must be a JSON object, got #{request_body.class}.",
+                                request_index)
+            next
+          end
+
           if request_body.key?('extension') && !request_body['extension'].is_a?(Hash)
             add_request_message('error',
                                 "`extension` must be a JSON object, got #{request_body['extension'].class}.",

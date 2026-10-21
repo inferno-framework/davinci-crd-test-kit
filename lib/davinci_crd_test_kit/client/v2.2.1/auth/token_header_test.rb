@@ -14,6 +14,7 @@ module DaVinciCRDTestKit
         requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
         including the following:
         - The `alg`, `kid`, and `typ` fields are required.
+        - The `alg` and `kid` fields must be strings.
         - The `typ` field must be "JWT".
         - The key used to sign the token must be present in the JWKS.
       )
@@ -51,6 +52,12 @@ module DaVinciCRDTestKit
             next
           end
 
+          unless algorithm.is_a?(String)
+            add_request_message('error', "Token header `alg` field must be a string, got #{algorithm.to_json}", index)
+            auth_tokens_jwk_json << nil
+            next
+          end
+
           if algorithm == 'none'
             add_request_message('error', 'Token header `alg` field cannot be set to none', index)
             auth_tokens_jwk_json << nil
@@ -72,6 +79,12 @@ module DaVinciCRDTestKit
           end
 
           kid = header['kid']
+          unless kid.is_a?(String)
+            add_request_message('error', "Token header `kid` field must be a string, got #{kid.to_json}", index)
+            auth_tokens_jwk_json << nil
+            next
+          end
+
           if crd_jwks_keys[index].nil?
             add_request_message('error', 'No JWKS keys available for this request', index)
             auth_tokens_jwk_json << nil

@@ -181,6 +181,19 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result_messages.map(&:message).join).to include('Coverage has no payer reference')
   end
 
+  it 'fails rather than raising when the payer is not given as a reference object' do
+    [['Organization/inferno-payer-org'], 'Organization/inferno-payer-org', [{ 'reference' => 7 }]].each do |payor|
+      body = hook_request_body.deep_merge(
+        'prefetch' => { 'coverage' => { 'entry' => [{ 'resource' => coverage_resource.merge('payor' => payor) }] } }
+      )
+      create_hook_request(body:)
+    end
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).grep(/Coverage has no payer reference/).size).to eq(3)
+  end
+
   it 'fails when Inferno did not successfully retrieve the payer during hook processing' do
     create_hook_request
     # No payer fetch request stored

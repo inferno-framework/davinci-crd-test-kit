@@ -81,6 +81,14 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestRequestedVersionTest do
     expect(entity_result_message.message).to include('expected a String, got Float')
   end
 
+  it 'fails when the request body is a JSON array rather than an object' do
+    allow(test).to receive(:suite).and_return(suite)
+    create_hook_request(body: [base_request_body].to_json)
+    result = run(test)
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to include('Request body must be a JSON object, got Array')
+  end
+
   it 'fails when the extension field is an array rather than an object' do
     allow(test).to receive(:suite).and_return(suite)
     body = base_request_body.merge('extension' => [{ 'davinci-crd.requestedVersion' => '2.2' }])

@@ -37,6 +37,14 @@ module DaVinciCRDTestKit
         .find { |resource| resource.is_a?(Hash) && resource['resourceType'] == 'Coverage' }
     end
 
+    # the reference to the Coverage's first payer, or nil when it does not have one as a string
+    def coverage_payer_reference(coverage)
+      payor = coverage['payor']
+      first_payor = payor.first if payor.is_a?(Array)
+      reference = first_payor['reference'] if first_payor.is_a?(Hash)
+      reference if reference.is_a?(String)
+    end
+
     def load_payer_request_for_hook_request(request_body)
       hook_data_fetch_tag = TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
       load_tagged_requests(PAYER_ORG_FETCH_TAG, hook_data_fetch_tag).first
