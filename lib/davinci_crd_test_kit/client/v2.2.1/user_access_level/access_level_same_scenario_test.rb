@@ -18,9 +18,14 @@ module DaVinciCRDTestKit
         Inferno simulated CRD server, with the same content. See
         [Matching Requests in the User Access Level Scoping Scenario](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#matching-requests-in-the-user-access-level-scoping-scenario)
         for what is compared for each hook, and where those details are taken from.
+        This check is necessary to ensure that any changes in access observed by Inferno happen
+        due to the difference in the user and not another mechanism.
 
         This test does not check any other aspect of the requests for conformance.
       )
+
+      verifies_requirements 'cds-hooks_3.0.0-ballot@63', 'cds-hooks_3.0.0-ballot@64',
+                            'cds-hooks_3.0.0-ballot@173'
 
       ORDER_CONTENT_FIELDS = ['code', 'medicationCodeableConcept', 'medicationReference',
                               'codeCodeableConcept', 'codeReference'].freeze
