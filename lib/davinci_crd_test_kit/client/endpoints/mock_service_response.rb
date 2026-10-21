@@ -1,3 +1,5 @@
+require_relative '../prefetched_coverage_value'
+
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
@@ -180,7 +182,7 @@ module DaVinciCRDTestKit
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
-      prefetched_coverage =  extract_prefetched_coverage(request_body['prefetch'])
+      prefetched_coverage = PrefetchedCoverageValue.find(request_body['prefetch'])
       if prefetched_coverage.present?
         coverage_or_bundle = FHIR.from_contents(prefetched_coverage.to_json)
         coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
@@ -196,12 +198,6 @@ module DaVinciCRDTestKit
           )
         end
       end
-    end
-
-    def extract_prefetched_coverage(prefetch)
-      return nil unless prefetch.is_a?(Hash)
-
-      prefetch.values_at('coverage', 'cov').find { |value| value.is_a?(Hash) && value.present? }
     end
 
     def get_context_resource(update_resource_id)

@@ -1,5 +1,6 @@
 require_relative '../cross_suite/tags'
 require_relative 'client_base_urls'
+require_relative 'prefetched_coverage_value'
 
 module DaVinciCRDTestKit
   # Checks of the Coverage prefetched in a hook request against the payer Organization registered
@@ -17,24 +18,21 @@ module DaVinciCRDTestKit
       end
     end
 
-    # the prefetched coverage value, under the key used by either Inferno service
-    def prefetched_coverage_value(request_body)
-      prefetch = request_body['prefetch']
-      return unless prefetch.is_a?(Hash)
-
-      prefetch.values_at('coverage', 'cov').find { |value| value.is_a?(Hash) && value.present? }
-    end
-
-    # The Coverage the payer is read from while processing the hook request: either the prefetched value
-    # itself when given as a Coverage, or the first Coverage in a prefetched Bundle. A Coverage given
-    # outside a Bundle is reported by the prefetch completeness check, so it is still checked here.
-    def prefetched_coverage(request_body)
-      coverage_value = prefetched_coverage_value(request_body)
-      return if coverage_value.nil?
-      return coverage_value if coverage_value['resourceType'] == 'Coverage'
+    # The Coverages prefetched in the request: either the prefetched value itself when given as a
+    # Coverage, or the Coverages in a prefetched Bundle. A Coverage given outside a Bundle is reported
+    # by the prefetch completeness check, so it is still checked here.
+    def prefetched_coverages(request_body)
+      coverage_value = PrefetchedCoverageValue.find(request_body['prefetch'])
+      return [] if coverage_value.nil?
+      return [coverage_value] if coverage_value['resourceType'] == 'Coverage'
 
       Array(coverage_value['entry']).filter_map { |entry| entry['resource'] if entry.is_a?(Hash) }
-        .find { |resource| resource.is_a?(Hash) && resource['resourceType'] == 'Coverage' }
+        .select { |resource| resource.is_a?(Hash) && resource['resourceType'] == 'Coverage' }
+    end
+
+    # the Coverage the payer is read from while processing the hook request
+    def prefetched_coverage(request_body)
+      prefetched_coverages(request_body).first
     end
 
     # the reference to the Coverage's first payer, or nil when it does not have one as a string

@@ -21,31 +21,6 @@ RSpec.describe DaVinciCRDTestKit::PrefetchedCoveragePayerHelper do
     end
   end
 
-  describe '#prefetched_coverage_value' do
-    it 'uses the complete service key when both keys hold objects' do
-      other = { 'resourceType' => 'Bundle', 'entry' => [] }
-      expect(helper.prefetched_coverage_value({ 'prefetch' => { 'coverage' => coverage_bundle, 'cov' => other } }))
-        .to eq(coverage_bundle)
-    end
-
-    it 'uses the subset service key when the complete service key is empty or not an object' do
-      [nil, {}, [], '', 'Coverage/1', [coverage]].each do |bad_value|
-        body = { 'prefetch' => { 'coverage' => bad_value, 'cov' => coverage_bundle } }
-        expect(helper.prefetched_coverage_value(body)).to eq(coverage_bundle), "for #{bad_value.inspect}"
-      end
-    end
-
-    it 'returns nil when neither key holds an object' do
-      expect(helper.prefetched_coverage_value({ 'prefetch' => { 'coverage' => 'Coverage/1', 'cov' => [] } }))
-        .to be_nil
-    end
-
-    it 'returns nil when the prefetch is missing or not an object' do
-      expect(helper.prefetched_coverage_value({})).to be_nil
-      expect(helper.prefetched_coverage_value({ 'prefetch' => ['coverage'] })).to be_nil
-    end
-  end
-
   describe '#coverage_payer_reference' do
     it 'returns the reference of the first payer' do
       coverage = { 'payor' => [{ 'reference' => 'Organization/a' }, { 'reference' => 'Organization/b' }] }
@@ -56,6 +31,26 @@ RSpec.describe DaVinciCRDTestKit::PrefetchedCoveragePayerHelper do
       [nil, [], 'Organization/a', ['Organization/a'], [{}], [{ 'reference' => 7 }]].each do |payor|
         expect(helper.coverage_payer_reference({ 'payor' => payor })).to be_nil, "for #{payor.inspect}"
       end
+    end
+  end
+
+  describe '#prefetched_coverages' do
+    it 'returns a Coverage prefetched on its own' do
+      expect(helper.prefetched_coverages({ 'prefetch' => { 'coverage' => coverage } })).to eq([coverage])
+    end
+
+    it 'returns every Coverage in a prefetched Bundle, skipping malformed entries and other types' do
+      second = { 'resourceType' => 'Coverage', 'id' => 'cov-2' }
+      bundle = {
+        'resourceType' => 'Bundle',
+        'entry' => [{ 'resource' => coverage }, 'not an entry', { 'resource' => 'Coverage/1' },
+                    { 'resource' => { 'resourceType' => 'Patient' } }, { 'resource' => second }]
+      }
+      expect(helper.prefetched_coverages({ 'prefetch' => { 'cov' => bundle } })).to eq([coverage, second])
+    end
+
+    it 'returns nothing when no coverage was prefetched' do
+      expect(helper.prefetched_coverages({})).to eq([])
     end
   end
 

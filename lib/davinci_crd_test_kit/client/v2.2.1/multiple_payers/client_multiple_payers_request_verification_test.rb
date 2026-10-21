@@ -99,7 +99,7 @@ module DaVinciCRDTestKit
       end
 
       def single_prefetched_coverage?(request_body, request_index)
-        coverage_count = prefetched_coverage_count(request_body)
+        coverage_count = prefetched_coverages(request_body).size
         return true if coverage_count == 1
 
         message = if coverage_count.zero?
@@ -110,16 +110,6 @@ module DaVinciCRDTestKit
                   end
         add_request_message('error', message, request_index)
         false
-      end
-
-      def prefetched_coverage_count(request_body)
-        coverage_value = prefetched_coverage_value(request_body)
-        return 0 if coverage_value.blank?
-        return 1 if coverage_value['resourceType'] == 'Coverage'
-
-        Array(coverage_value['entry']).count do |entry|
-          entry.is_a?(Hash) && entry['resource'].is_a?(Hash) && entry['resource']['resourceType'] == 'Coverage'
-        end
       end
 
       def check_solitary_request(request_body)
@@ -138,7 +128,7 @@ module DaVinciCRDTestKit
       end
 
       def check_distinct_payers(hook_requests)
-        return if hook_requests.map { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }.uniq.length == 2
+        return if hook_requests.map { |request| prefetch_target(request) }.uniq.length == 2
 
         add_message('error',
                     'Both hook requests were made to the same Inferno simulated CRD server. Each request ' \
