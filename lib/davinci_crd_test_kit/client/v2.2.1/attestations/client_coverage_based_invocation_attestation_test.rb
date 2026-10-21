@@ -8,9 +8,9 @@ module DaVinciCRDTestKit
       title ATTESTATION_TITLE
       description %(
         During this test, the tester will confirm that the Health IT module invokes hooks on multiple payer
-        services in parallel if more than one invocation is needed based on the patient's active coverages.
-        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
-        test.
+        services in parallel and displays the results simultaneously if more than one invocation is needed
+        based on the patient's active coverages. To see the specifics of the attested requirements, click
+        the "View Specification Requirements" link for this test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
@@ -20,7 +20,8 @@ module DaVinciCRDTestKit
             title: ATTESTATION_TITLE,
             description: %(
               I attest that the Health IT module invokes hooks on multiple payer services in
-              parallel if more than one invocation is needed based on the patient's active coverages.
+              parallel and displays the results simultaneously if more than one invocation
+              is needed based on the patient's active coverages.
             ),
             type: 'radio',
             default: 'false',

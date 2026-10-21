@@ -7,8 +7,8 @@ module DaVinciCRDTestKit
       ATTESTATION_TITLE = 'Health IT module does not set additional expectations for data elements'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module does not set expectations for data
-        elements beyond those the CRD specification requires.
+        During this test, the tester will confirm that the Health IT module uses standard elements and does
+        not set expectations for data elements beyond those the CRD specification requires.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
       )
@@ -20,8 +20,8 @@ module DaVinciCRDTestKit
       input :data_element_expectations_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module does not set expectations for data elements beyond those the CRD
-              specification requires.
+              I attest that the Health IT module uses standard elements and does not set expectations for
+              data elements beyond those the CRD specification requires.
             ),
             type: 'radio',
             default: 'false',
