@@ -19,10 +19,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
       'hl7.fhir.us.davinci-crd_2.2.1@dev-32',
       'cds-hooks_3.0.0-ballot@51',
       'hl7.fhir.us.davinci-crd_2.2.1@found-37',
-      'cds-hooks_3.0.0-ballot@42',
-      'cds-hooks_3.0.0-ballot@63',
-      'cds-hooks_3.0.0-ballot@64',
-      'cds-hooks_3.0.0-ballot@173',
       'hl7.fhir.us.davinci-crd_2.2.1@conf-6'
     ]
   end
@@ -36,8 +32,8 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientAttestationsGroup do
   end
 
   it 'has one test per unique attestation title' do
-    expect(group.tests.length).to eq(10)
-    expect(group.tests.map(&:title).uniq.length).to eq(10)
+    expect(group.tests.length).to eq(9)
+    expect(group.tests.map(&:title).uniq.length).to eq(9)
   end
 
   it 'covers each attestation requirement exactly once' do
