@@ -2,6 +2,7 @@ require_relative 'must_support/generated/client_cross_hook_must_support_group'
 require_relative 'cross_hook/client_location_address_propagation_test'
 require_relative 'cross_hook/client_fhirpath_collection_as_comma_delimited_string_test'
 require_relative 'cross_hook/client_hook_instances_unique_test'
+require_relative 'cross_hook/client_jwt_ids_unique_test'
 require_relative 'cross_hook/client_prefetch_complete_and_subset_test'
 require_relative 'client_cross_hook_interaction_group'
 
@@ -39,6 +40,7 @@ module DaVinciCRDTestKit
         test from: :crd_v221_client_fhir_path_collection_as_comma_delimited_string
         test from: :crd_v221_client_hook_instances_unique
         test from: :crd_v221_client_prefetch_complete_and_subset
+        test from: :crd_v221_client_jwt_ids_unique
       end
     end
   end
