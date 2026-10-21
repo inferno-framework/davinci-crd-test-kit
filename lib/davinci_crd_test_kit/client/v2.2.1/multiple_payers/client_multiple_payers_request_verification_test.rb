@@ -214,7 +214,7 @@ module DaVinciCRDTestKit
           check_request_pair(hook_requests, request_bodies)
         end
 
-        assert_no_error_messages('Received hook requests do not demonstrate solicitation of coverage ' \
+        assert_no_error_messages('Received hook requests do not demonstrate conformant solicitation of coverage ' \
                                  'information from a single payer. See Messages for details.')
       end
     end
