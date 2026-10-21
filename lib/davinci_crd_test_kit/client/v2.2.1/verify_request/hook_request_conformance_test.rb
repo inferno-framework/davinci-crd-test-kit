@@ -21,8 +21,8 @@ module DaVinciCRDTestKit
 
       output :url, :smart_auth_info
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@3', 'cds-hooks_3.0.0-ballot@214', 'cds-hooks_3.0.0-ballot@222',
-                            'cds-hooks_3.0.0-ballot@223', 'cds-hooks_3.0.0-ballot@224',
+      verifies_requirements 'cds-hooks_3.0.0-ballot@3', 'cds-hooks_3.0.0-ballot@53', 'cds-hooks_3.0.0-ballot@214',
+                            'cds-hooks_3.0.0-ballot@222', 'cds-hooks_3.0.0-ballot@223', 'cds-hooks_3.0.0-ballot@224',
                             'hl7.fhir.us.davinci-crd_2.2.1@dev-12', 'hl7.fhir.us.davinci-crd_2.2.1@found-20',
                             'hl7.fhir.us.davinci-crd_2.2.1@found-36-A',
                             'hl7.fhir.us.davinci-crd_2.2.1@hook-20', 'hl7.fhir.us.davinci-crd_2.2.1@hook-21'
