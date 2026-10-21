@@ -58,9 +58,14 @@ module DaVinciCRDTestKit
       # because it stops at the type boundary.
       # - https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-timing.html
       TIMING_MUST_SUPPORTS = [
-        'event', 'repeat', 'repeat.bounds[x]:boundsPeriod', 'repeat.count', 'repeat.duration',
-        'repeat.durationUnit', 'repeat.frequency', 'repeat.period', 'repeat.periodUnit'
+        'event', 'repeat', 'repeat.count', 'repeat.duration', 'repeat.durationUnit', 'repeat.frequency',
+        'repeat.period', 'repeat.periodUnit'
       ].freeze
+
+      # The CRD Timing profile type slices repeat.bounds[x] and makes only the Period slice must support.
+      TIMING_BOUNDS_SLICE_PATH = 'repeat.bounds[x]'.freeze
+      TIMING_BOUNDS_SLICE_NAME = 'boundsPeriod'.freeze
+      TIMING_BOUNDS_SLICE_ELEMENT = "#{TIMING_BOUNDS_SLICE_PATH}:#{TIMING_BOUNDS_SLICE_NAME}".freeze
 
       # Elements across the CRD profiles whose type is the CRD Timing profile.
       TIMING_ELEMENT_PATHS = [
@@ -82,10 +87,30 @@ module DaVinciCRDTestKit
         UNRESOLVABLE_VALUE_SETS[pattern_element.binding&.valueSet&.split('|')&.first]
       end
 
+      # A reference that may point to any resource type, which constrains nothing.
+      ANY_RESOURCE_TARGET = 'http://hl7.org/fhir/StructureDefinition/Resource'.freeze
+
+      # inferno_core keeps only the target profiles that must each be demonstrated, dropping the rest
+      # along with any base FHIR resource definitions. When none qualify, every target is kept under
+      # its own key instead, so a resolved reference can still be checked against one of them.
+      def handle_type_must_support_target_profiles(type, metadata)
+        super
+        targets = Array(type.targetProfile)
+        return if metadata[:target_profiles].present? || targets.blank?
+        return if targets.any? { |target| target.split('|').first == ANY_RESOURCE_TARGET }
+
+        metadata[:allowed_target_profiles] = targets.dup
+      end
+
       def must_supports
         @expanded_must_supports ||= # rubocop:disable Naming/MemoizedInstanceVariableName
-          super.merge(elements: super[:elements].flat_map { |element| with_timing(element) },
-                      choices: super[:choices].to_a + timing_choices(super[:elements]))
+          begin
+            base = super
+            timing_paths = TIMING_ELEMENT_PATHS & base[:elements].map { |element| element[:path] }
+            base.merge(elements: base[:elements].flat_map { |element| with_timing(element) },
+                       slices: base[:slices].to_a + timing_paths.map { |path| timing_bounds_slice(path) },
+                       choices: base[:choices].to_a + timing_choices(base[:elements]))
+          end
       end
 
       def with_timing(element)
@@ -94,13 +119,28 @@ module DaVinciCRDTestKit
         [element] + TIMING_MUST_SUPPORTS.map { |sub_path| { path: "#{element[:path]}.#{sub_path}" } }
       end
 
+      def timing_bounds_slice(timing_path)
+        {
+          slice_id: timing_bounds_slice_id(timing_path),
+          slice_name: TIMING_BOUNDS_SLICE_NAME,
+          path: "#{timing_path}.#{TIMING_BOUNDS_SLICE_PATH}",
+          discriminator: { type: 'type', code: 'Period' }
+        }
+      end
+
+      def timing_bounds_slice_id(timing_path)
+        "#{resource}.#{timing_path}.#{TIMING_BOUNDS_SLICE_ELEMENT}"
+      end
+
+      # The bounds slice shares its name across locations, so its choice identifies the slices by id.
       def timing_choices(elements)
         locations = INTERCHANGEABLE_TIMING_PATHS & elements.map { |element| element[:path] }
         return [] if locations.length < 2
 
         TIMING_MUST_SUPPORTS.map do |sub_path|
           { element: sub_path, paths: locations.map { |location| "#{location}.#{sub_path}" } }
-        end
+        end + [{ element: TIMING_BOUNDS_SLICE_ELEMENT,
+                 slice_names: locations.map { |location| timing_bounds_slice_id(location) } }]
       end
     end
   end

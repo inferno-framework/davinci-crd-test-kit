@@ -6,9 +6,9 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_long_running_receive_request
-      title 'Client invokes any hook'
+      title 'CRD client invokes any hook'
       description %(
-        During this test, Inferno will wait while the client makes a single hook requests of any type.
+        During this test, Inferno will wait while the CRD client makes a single hook requests of any type.
         Inferno will return a [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
         but only after pausing for a configured amount of time, which must be 5 seconds or longer. The details
         of the request and its response do not matter for the purposes of this test and they will not be
@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),

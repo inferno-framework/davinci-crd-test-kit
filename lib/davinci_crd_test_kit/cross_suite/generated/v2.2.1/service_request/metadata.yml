@@ -115,6 +115,12 @@
       :path: ''
       :values:
       - :system: http://nucc.org/provider-taxonomy
+  - :slice_id: ServiceRequest.occurrenceTiming.repeat.bounds[x]:boundsPeriod
+    :slice_name: boundsPeriod
+    :path: occurrenceTiming.repeat.bounds[x]
+    :discriminator:
+      :type: type
+      :code: Period
   - :slice_id: ServiceRequest.reasonCode.coding:ICD10
     :slice_name: ICD10
     :path: reasonCode.coding
@@ -128,6 +134,9 @@
   - :path: basedOn
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medicationrequest
   - :path: category
   - :path: code
   - :path: contained
@@ -151,7 +160,6 @@
     :original_path: occurrence[x]
   - :path: occurrenceTiming.event
   - :path: occurrenceTiming.repeat
-  - :path: occurrenceTiming.repeat.bounds[x]:boundsPeriod
   - :path: occurrenceTiming.repeat.count
   - :path: occurrenceTiming.repeat.duration
   - :path: occurrenceTiming.repeat.durationUnit
@@ -171,6 +179,13 @@
   - :path: reasonReference
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-note|7.0.0
+    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference|7.0.0
+    - http://hl7.org/fhir/StructureDefinition/Observation
   - :path: requester
     :types:
     - Reference

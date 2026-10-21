@@ -13,10 +13,10 @@ module DaVinciCRDTestKit
         During this test, Inferno will check whether all must support elements defined in the
         profile(s) listed below are demonstrated within hook requests made during this session.
         This check may vacuously pass if the tester has attested that this resource type is not
-        supported by the client system or if the relevant hooks are not invoked.
+        supported by the CRD client.
 
         If any must support elements are not demonstrated, the tester will have the option to attest
-        that these elements are not supported by the client system or surfaced to its users. Testers
+        that these elements are not supported by the CRD client or surfaced to its users. Testers
         must setup scenarios in which the "data exists and privacy constraints permit" Inferno to view
         the must support information.
 
@@ -26,6 +26,10 @@ module DaVinciCRDTestKit
         subgroups. If any of the considered groups are re-run, then requests made during prior runs will
         no longer be considered and must support elements demonstrated only during that prior run must
         be re-demonstrated on the new run or a subsequent one.
+
+        For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+        page and specifically the [Requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#requests)
+        section in the CRD Test Kit wiki.
 
 
         ### [CRD Medication Request](http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-medicationrequest.html)
@@ -59,8 +63,8 @@ module DaVinciCRDTestKit
         - `identifier`
         - `intent`
         - `medication[x]`
-        - `medication[x].extension:BillingOptions`
         - `medication[x]:medicationCodeableConcept`
+        - `medication[x]:medicationCodeableConcept.extension:BillingOptions`
         - `medication[x]:medicationReference`
         - `performer`
         - `priorPrescription`

@@ -7,7 +7,7 @@ end
 
 namespace :crd do
   desc 'Regenerate must support metadata and the must support tests that read it'
-  task :generate_must_support_metadata do
+  task :generate do
     require_relative 'lib/davinci_crd_test_kit/generator/must_support_metadata_generator'
     DaVinciCRDTestKit::Generator::MustSupportMetadataGenerator.new.run
 

@@ -6,11 +6,11 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_unknown_content_receive_request
-      title 'Client invokes any hook'
+      title 'CRD client invokes any hook'
       description %(
-        During this test, Inferno will wait while the client makes a single hook request of any type.
+        During this test, Inferno will wait while the CRD client makes a single hook request of any type.
         Inferno will return a fixed [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-        containing a coverage information system action along with content that the client is not
+        containing a coverage information system action along with content that the CRD client is not
         expected to recognize: an element added to the system action and a custom extension added to
         the response, both with randomly generated names. This content is added at the CRD response
         level rather than within the FHIR resources carried in the response, and testers cannot change
@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),
@@ -50,7 +50,7 @@ module DaVinciCRDTestKit
             a response.
 
             The response will include coverage information alongside an element and a
-            custom extension whose names are not defined by CRD or CDS Hooks. Clients
+            custom extension whose names are not defined by CRD or CDS Hooks. CRD clients
             must ignore the content they do not recognize and process the coverage
             information as usual. Testers will be asked to attest that this was
             demonstrated in the next test.

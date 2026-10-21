@@ -8,17 +8,17 @@ module DaVinciCRDTestKit
       include TaggedRequestLoadHelper
       include CrossHookHelper
 
-      title 'Client can provide both the complete standard prefetch data set and a subset'
+      title 'CRD client can provide both the complete standard prefetch data set and a subset'
       id :crd_v221_client_prefetch_complete_and_subset
       description <<~DESCRIPTION
-        The CRD IG requires clients to be able to prefetch a standard set of resources that
+        The CRD IG requires that CRD clients be able to prefetch a standard set of resources that
         payers are expected to need to evaluate coverage requirements. They are also
         required to be able to prefetch a subset of these standard prefetch requirements
         if a payer requests fewer in their service discovery responses because the payer
         does not always need the complete set of standard prefetch resources to evaluate
         coverage.
 
-        During this test, Inferno will verify that the client has demonstrated requests
+        During this test, Inferno will verify that the CRD client has demonstrated requests
         - made against both of Inferno's simulated CRD servers,
           one of which requests the all standard prefetch resources while the
           other requests only a subset.
@@ -58,7 +58,8 @@ module DaVinciCRDTestKit
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)
 
         skip_if error_messages?,
-                'The client did not demonstrate both complete and subset prefetch capability. See Messages for details.'
+                'The CRD client did not demonstrate both complete and subset prefetch capability. ' \
+                'See Messages for details.'
       end
 
       def check_for_demonstration(requests, completeness_tests, target_name)

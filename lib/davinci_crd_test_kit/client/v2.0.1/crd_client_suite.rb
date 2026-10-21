@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
       id :crd_client
       title 'Da Vinci CRD Client v2.0.1 Test Suite'
       description <<~DESCRIPTION
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
+        The Da Vinci CRD Client Test Suite tests the conformance of CRD clients
         to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
         Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
 
@@ -30,7 +30,7 @@ module DaVinciCRDTestKit
       DESCRIPTION
 
       suite_summary <<~SUMMARY
-        The Da Vinci CRD Client Test Suite tests the conformance of client systems
+        The Da Vinci CRD Client Test Suite tests the conformance of CRD clients
         to [version 2.0.1 of the Da Vinci Coverage Requirements Discovery (CRD)
         Implementation Guide](https://hl7.org/fhir/us/davinci-crd/STU2).
       SUMMARY

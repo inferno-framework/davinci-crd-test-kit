@@ -14,16 +14,16 @@ module DaVinciCRDTestKit
         As a part of registration, CRD clients and servers agree on a set of scopes that the server needs
         to obtain all data that goes into creating hook responses. For the purposes of simulating a
         payer CRD server acting as a part of these tests that evaluate conformance to the CRD specification,
-        Inferno requires access to all US Core resource types. While in a real exchange scenario, a CRD client
-        organization might well reject such a set of scopes as too large, for the purposes of testing, the client
-        must grant these scopes in order for Inferno to verify its conformance.
+        Inferno requires access to all US Core resource types. While in a real exchange scenario, an organization
+        operating CRD clients might well reject such a set of scopes as too large, for the purposes of testing,
+        the CRD client must grant these scopes in order for Inferno to verify its conformance.
 
         During this test, Inferno will verify that the requested scopes covering all resource types profiled in
-        the selected version of the US Core IG are granted and no more. Clients may choose to grant either user scopes
-        or patient scopes. If choosing patient scopes, note that the token is used by default for complete testing
-        of the client's US Core FHIR API, so either that single patient would need to
+        the selected version of the US Core IG are granted and no more. The CRD client may choose to grant either user
+        scopes or patient scopes. If choosing patient scopes, note that the token is used by default for complete
+        testing of the CRD client's US Core FHIR API, so either that single patient would need to
         demonstrate all US Core resources and must support elements or another access token would need
-        to be provided when testing the client's FHIR API.
+        to be provided when testing the CRD client's FHIR API.
       )
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-21'

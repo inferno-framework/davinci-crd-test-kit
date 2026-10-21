@@ -1,7 +1,7 @@
 # Da Vinci CRD Client v2.2.1 Test Suite Testing Instructions
 
 This document provides a step-by-step guide for using the Da Vinci CRD Client v2.2.1 Test Suite to test
-a **CRD client system**, including instructions for a [demonstration execution](#demonstration-execution)
+a **CRD client**, including instructions for a [demonstration execution](#demonstration-execution)
 against the public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
 
 ## Pre-execution Setup and Required Information
@@ -102,7 +102,7 @@ group as described in [Quick Start](#quick-start).
 ### Customizing Responses
 
 The "Custom response template for [hook name] hook requests" input can be used to customize the hook
-responses to better fit the configuration of the tested client system. When this input is populated,
+responses to better fit the configuration of the tested CRD client. When this input is populated,
 the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
@@ -124,7 +124,7 @@ demonstrated.
 Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue their workflow during long-running
 responses. Inferno will pause for a specified number of seconds (at least 5) before responding to a hook
 invocation made during this test to allow testers to verify and demonstrate this capability in the tested
-client system.
+CRD client.
 
 ### User Access Level Scoping
 
@@ -298,7 +298,7 @@ The old [crd-request-generator public CRD reference client](https://crd-request-
 supports the order-sign hook and can be used to demonstrate suite execution with the
 following steps. Note that this reference implementation has not been updated for the
 2.2.1 version of the CRD IG so many failures are expected during this execution. However,
-it can give you a sense for what executing the Inferno tests against a client system will
+it can give you a sense for what executing the Inferno tests against a CRD client will
 look like.
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using the default "US Core Version",

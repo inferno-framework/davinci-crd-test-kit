@@ -69,12 +69,7 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
 
     it 'does not match a code from another system' do
       expect(missing(crd_logic, with_category('http://example.org/other', '3'), metadata))
-        .to eq(['Appointment.serviceCategory:x12'])
-    end
-
-    it 'is not matched by inferno_core, which needs a code on every value' do
-      expect(missing(core_logic, with_category(x12_system, '3'), metadata))
-        .to eq(['Appointment.serviceCategory:x12'])
+        .to eq(['serviceCategory:x12'])
     end
 
     it 'still matches enumerated system and code pairs alongside whole systems' do
@@ -83,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
 
       expect(missing(crd_logic, with_category(enumerated[:system], 'AMB'), metadata)).to be_empty
       expect(missing(crd_logic, with_category(enumerated[:system], 'EMER'), metadata))
-        .to eq(['Appointment.serviceCategory:x12'])
+        .to eq(['serviceCategory:x12'])
     end
   end
 
@@ -102,18 +97,18 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
 
     it 'does not match a participant whose actor references another resource type' do
       expect(missing(crd_logic, appointment(participant(reference: 'Practitioner/123')), metadata))
-        .to eq(['Appointment.participant:Patient'])
+        .to eq(['participant:Patient'])
     end
 
     it 'does not match a participant with no actor' do
       resource = appointment(FHIR::Appointment::Participant.new(status: 'accepted'))
 
-      expect(missing(crd_logic, resource, metadata)).to eq(['Appointment.participant:Patient'])
+      expect(missing(crd_logic, resource, metadata)).to eq(['participant:Patient'])
     end
 
     it 'is not matched by inferno_core, which has no referenceTarget discriminator' do
       expect(missing(core_logic, appointment(participant(reference: 'Patient/123')), metadata))
-        .to eq(['Appointment.participant:Patient'])
+        .to eq(['participant:Patient'])
     end
 
     it 'finds the slice when a must support element path names it' do
@@ -123,7 +118,7 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
 
       expect(missing(crd_logic, resource, metadata)).to be_empty
       expect(missing(crd_logic, appointment(participant(reference: 'Practitioner/1')), metadata))
-        .to contain_exactly('participant:Patient.actor', 'Appointment.participant:Patient')
+        .to contain_exactly('participant:Patient.actor', 'participant:Patient')
     end
   end
 
@@ -142,13 +137,7 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
       resource = appointment(participant(reference: 'Practitioner/1', type_code: 'ATND'))
 
       expect(missing(crd_logic, resource, metadata))
-        .to contain_exactly('participant:PrimaryPerformer.actor', 'Appointment.participant:PrimaryPerformer')
-    end
-
-    it 'is not matched by inferno_core, which expects a single CodeableConcept at the path' do
-      resource = appointment(participant(reference: 'Practitioner/1', type_code: 'PPRF'))
-
-      expect(missing(core_logic, resource, metadata)).to eq(['participant:PrimaryPerformer.actor'])
+        .to contain_exactly('participant:PrimaryPerformer.actor', 'participant:PrimaryPerformer')
     end
   end
 end

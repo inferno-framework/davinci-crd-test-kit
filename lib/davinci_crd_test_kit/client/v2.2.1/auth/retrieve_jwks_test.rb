@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       description %(
         During this test, Inferno will verify that for each request the JWKS can be retrieved from the JWKS uri if
         it is present in the `jku` field within the JWT token header. Additionally, keys will be extracted and
-        outputted for use in subsequent tests. If the client does not provide a uri in the `jku` field,
+        outputted for use in subsequent tests. If the CRD client does not provide a uri in the `jku` field,
         Inferno will use the JWK Set provided out of band as a part of the "Registration" group, either
         retrieving it from a url or, if provided directly, extracting keys from the raw JWKS JSON.
       )
@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
             description: %(
-            The client's registered JWK Set, provided during the "Registration" group, containing
+            The CRD client's registered JWK Set, provided during the "Registration" group, containing
             it's public key. Used only when a request was received with a JWT without the `jku`
             header. May be either a publicly accessible url containing the JWKS, or the raw JWKS
             JSON. Run or re-run the "Registration" group to set or change this value.
@@ -42,7 +42,7 @@ module DaVinciCRDTestKit
         auth_token_headers = JSON.parse(auth_token_headers_json) # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
         skip_if cds_jwk_set.blank? && cds_jwk_set_input_needed?(auth_token_headers),
-                "JWK Set must be inputted if the client's JWK Set is not available"
+                "JWK Set must be inputted if the CRD client's JWK Set is not available"
 
         crd_jwks_keys_json = []
         auth_token_headers.each_with_index do |token_header, index|
@@ -93,7 +93,7 @@ module DaVinciCRDTestKit
 
           kid_uniqueness = keys.map { |key| key['kid'] }.uniq.length == keys.length
           if kid_uniqueness.blank?
-            add_request_message('error', "`kid` must be unique within the client's JWK Set.", index)
+            add_request_message('error', "`kid` must be unique within the CRD client's JWK Set.", index)
             crd_jwks_keys_json << nil
             next
           end

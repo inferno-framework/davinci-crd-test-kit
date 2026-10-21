@@ -11,13 +11,13 @@ module DaVinciCRDTestKit
         - Subset Prefetch Service Discovery Endpoint: #{ClientURLs.prefetch_subset_discovery_url}
 
         During this test, the tester will confirm that these two endpoints
-        have been registered by the client as trusted CRD servers that can access the CRD client's
+        have been registered by the CRD client as trusted CRD servers that can access the CRD client's
         FHIR server and that they have each been
         - Associated with a particular payer organization (used to check that the
-          hook requests are sent by the client system to the appropriate payers based on
+          hook requests are sent by the CRD client to the appropriate payers based on
           the Patient's coverage).
         - Granted patient- or user-level read and search access to all US Core resource
-          types in the selected US Core version (required to verify the client's support
+          types in the selected US Core version (required to verify the CRD client's support
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
           hook request field).
       )
@@ -83,7 +83,7 @@ module DaVinciCRDTestKit
             **Registration of Inferno as a trusted CRD server**:
 
             I attest that the following Inferno CRD servers have been registered as trusted
-            within the client system:
+            within the CRD client:
 
             - Complete Prefetch Service Discovery Endpoint: `#{discovery_url}`
               - Services on this CRD server will be invoked for patients with a primary coverage issued by the payer

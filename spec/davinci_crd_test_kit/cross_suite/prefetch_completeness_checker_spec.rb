@@ -634,6 +634,64 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
     end
   end
 
+  describe 'prefetched resource index' do
+    let(:service_request) { { 'resourceType' => 'ServiceRequest', 'id' => 'sr-1' } }
+
+    def indexed(prefetch)
+      order_sign_request['prefetch'] = prefetch
+      make_checker(order_sign_request, {}).send(:prefetched_resources)
+    end
+
+    it 'indexes each resource in an array value under a prefetch key' do
+      index = indexed({ 'orders' => [service_request, crd_patient_example] })
+
+      expect(index.keys).to contain_exactly("#{base_fhir_url}/ServiceRequest/sr-1", "#{base_fhir_url}/Patient/example")
+      expect(index["#{base_fhir_url}/ServiceRequest/sr-1"]).to be(service_request)
+    end
+
+    it 'indexes the entries of a Bundle nested in a prefetch Bundle entry, but not the nested Bundle itself' do
+      inner_bundle = { 'resourceType' => 'Bundle', 'id' => 'inner', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      outer_bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Bundle/inner', 'resource' => inner_bundle }
+      ] }
+      index = indexed({ 'bundles' => outer_bundle })
+
+      expect(index.keys).to contain_exactly('https://elsewhere.example/r4/Patient/example')
+      expect(index['https://elsewhere.example/r4/Patient/example']).to be(crd_patient_example)
+    end
+
+    it 'indexes an entry without a fullUrl by fhirServer and Type/id, and one with a fullUrl by that fullUrl' do
+      bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'resource' => service_request },
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      index = indexed({ 'mixed' => bundle })
+
+      expect(index.keys).to contain_exactly("#{base_fhir_url}/ServiceRequest/sr-1",
+                                            'https://elsewhere.example/r4/Patient/example')
+    end
+
+    it 'keeps the first resource indexed under an identity' do
+      later = crd_patient_example.merge('gender' => 'unknown')
+      index = indexed({ 'patient' => crd_patient_example, 'patients' => [later] })
+
+      expect(index["#{base_fhir_url}/Patient/example"]).to be(crd_patient_example)
+    end
+
+    it 'finds a resource from a nested Bundle by its type and id' do
+      inner_bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      order_sign_request['prefetch'] = { 'bundles' => { 'resourceType' => 'Bundle',
+                                                        'entry' => [{ 'resource' => inner_bundle }] } }
+      checker = make_checker(order_sign_request, {})
+
+      expect(checker.prefetched_resource('Patient/example')).to be(crd_patient_example)
+    end
+  end
+
   describe '#instantiated_prefetch_templates' do
     it 'is empty before any methods are called' do
       checker = make_checker(order_sign_request, {})

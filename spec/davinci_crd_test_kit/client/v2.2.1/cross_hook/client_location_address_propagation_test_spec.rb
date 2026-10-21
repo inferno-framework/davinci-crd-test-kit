@@ -7,6 +7,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
   let(:result) { repo_create(:result, test_session_id: test_session.id) }
   let(:hook_name) { 'order-sign' }
   let(:hook_instance) { 'd1577c69-dfbe-44ad-ba6d-3e05e953b2ea' }
+  let(:fhir_server) { 'https://example.com/fhir' }
 
   let(:test) do
     Class.new(described_class) do
@@ -32,6 +33,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
     { 'resourceType' => 'Location', 'id' => 'parent-1' }
   end
 
+  # Hook requests name the FHIR server that parent locations are read from.
   def create_hook_request(body:, tags: [hook_name, DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG])
     repo_create(
       :request,
@@ -39,26 +41,26 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       url: "https://example.com/cds-services/#{hook_name}-service",
       result:,
       test_session_id: test_session.id,
-      request_body: body.is_a?(Hash) ? body.to_json : body,
+      request_body: body.is_a?(Hash) ? { 'fhirServer' => fhir_server }.merge(body).to_json : body,
       status: 200,
       headers: [],
       tags:
     )
   end
 
-  def create_parent_location_fetch_request(location:, status: 200, instance: hook_instance)
+  def create_parent_location_fetch_request(location:, status: 200, instance: hook_instance,
+                                           url: "#{fhir_server}/Location/#{location['id']}")
     repo_create(
       :request,
       direction: 'outgoing',
-      url: "https://example.com/fhir/Location/#{location['id']}",
+      url:,
       result:,
       test_session_id: test_session.id,
       response_body: location.is_a?(Hash) ? location.to_json : location,
       status:,
       headers: [],
       tags: [DaVinciCRDTestKit::PARENT_LOCATION_FETCH_TAG,
-             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance),
-             DaVinciCRDTestKit::DATA_FETCH_TAG]
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance)]
     )
   end
 
@@ -169,6 +171,112 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       expect(run(test).result).to eq('pass')
     end
 
+    it 'resolves an absolute partOf reference to a prefetched parent' do
+      child = location_without_address.merge('partOf' => { 'reference' => "#{fhir_server}/Location/parent-1" })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => location_bundle(child, parent_location_with_address) }
+                          })
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
+    end
+
+    it 'resolves a relative partOf reference against the base of the prefetched entry fullUrl' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      elsewhere = 'https://elsewhere.example/fhir'
+      child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+                              { 'fullUrl' => "#{elsewhere}/Location/loc-2", 'resource' => child }
+                            ] } }
+                          })
+      create_parent_location_fetch_request(location: parent_location_without_address)
+      create_parent_location_fetch_request(location: parent_location_with_address,
+                                           url: "#{elsewhere}/Location/parent-1")
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
+    end
+
+    it 'resolves a relative partOf reference of a location with a urn fullUrl against the FHIR server' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+                              { 'fullUrl' => 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', 'resource' => child }
+                            ] } }
+                          })
+      create_parent_location_fetch_request(location: parent_location_with_address)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
+      expect(result_messages.map(&:message).join).to_not include('could not be fetched')
+    end
+
+    # The prefetched parent is identified by its urn fullUrl, so it is not the `Location/parent-1` on the FHIR
+    # server that the child's relative reference names.
+    describe 'when the child and parent are both prefetched with urn fullUrls' do
+      let(:child) { location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' }) }
+
+      before do
+        create_hook_request(body: {
+                              'hookInstance' => hook_instance, 'hook' => hook_name,
+                              'prefetch' => { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+                                { 'fullUrl' => 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', 'resource' => child },
+                                { 'fullUrl' => 'urn:uuid:9e3c2b7d-1a4f-4c6e-8b5d-2f7a9c1e4b60',
+                                  'resource' => parent_location_with_address }
+                              ] } }
+                            })
+      end
+
+      it 'does not resolve the relative partOf reference to the prefetched parent' do
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message).join).to match(%r{Location/parent-1.*could not be fetched})
+        expect(result_messages.map(&:message).join).to_not include('has an address')
+      end
+
+      it 'resolves the relative partOf reference to the parent read from the FHIR server' do
+        allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+        create_parent_location_fetch_request(location: parent_location_without_address)
+        expect(run(test).result).to eq('pass')
+      end
+    end
+
+    it 'resolves the partOf reference of a fetched parent against the server it was read from' do
+      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      elsewhere = 'https://elsewhere.example/fhir'
+      child = location_without_address.merge('partOf' => { 'reference' => "#{elsewhere}/Location/middle" })
+      middle = { 'resourceType' => 'Location', 'id' => 'middle', 'partOf' => { 'reference' => 'Location/top' } }
+      top = { 'resourceType' => 'Location', 'id' => 'top', 'address' => { 'line' => ['1 Top St'] } }
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => location_bundle(child) }
+                          })
+      create_parent_location_fetch_request(location: middle, url: "#{elsewhere}/Location/middle")
+      create_parent_location_fetch_request(location: top, url: "#{elsewhere}/Location/top")
+      create_parent_location_fetch_request(location: top.except('address'))
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include("parent 'Location/top' has an address")
+    end
+
+    it 'ignores a fetched location that is not the one its url names' do
+      child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => location_bundle(child) }
+                          })
+      create_parent_location_fetch_request(location: parent_location_with_address.merge('id' => 'other'),
+                                           url: "#{fhir_server}/Location/parent-1")
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join).to include('could not be fetched')
+    end
+
     it 'handles a single prefetched Location (not a Bundle)' do
       create_hook_request(body: {
                             'hookInstance' => hook_instance, 'hook' => hook_name,
@@ -232,7 +340,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
         false
       end
       location = FHIR.from_contents(parent_location_without_address.to_json)
-      instance.check_location_conformance(location, 'loc-2')
+      instance.check_location_conformance(location, "#{fhir_server}/Location/parent-1", 'loc-2')
       expect(instance.messages).to include(a_hash_including(message: a_string_including('Missing required field')))
     end
 
@@ -248,7 +356,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
         false
       end
       location = FHIR.from_contents(parent_location_without_address.to_json)
-      instance.check_location_conformance(location, 'loc-2')
+      instance.check_location_conformance(location, "#{fhir_server}/Location/parent-1", 'loc-2')
       expect(instance.messages).to_not include(a_hash_including(message: a_string_including('Filtered out issue')))
     end
 

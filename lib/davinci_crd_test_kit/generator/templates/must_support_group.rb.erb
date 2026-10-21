@@ -1,7 +1,7 @@
-require_relative 'cross_hook/client_card_must_support_coverage_information_test'
-require_relative 'cross_hook/client_order_types_signed_test'
+require_relative '../../cross_hook/client_card_must_support_coverage_information_test'
+require_relative '../../cross_hook/client_order_types_signed_test'
 <%- test_file_names.each do |file_name| -%>
-require_relative 'must_support/generated/<%= file_name %>'
+require_relative '<%= file_name %>'
 <%- end -%>
 
 module DaVinciCRDTestKit
@@ -10,18 +10,17 @@ module DaVinciCRDTestKit
       title 'Must Support'
       id :<%= group_id %>
       description <<~DESCRIPTION
-        These tests check that the CRD profiles which can be sent within a hook request were
-        observed across the hook requests the client made, and that the must support elements on
-        them were populated.
+        These tests check that the CRD client supports the must support elements of the CRD profiles
+        that it sends within hook requests and that it receives within hook responses.
 
-        Each resource type is checked separately. Use the inputs below to say which types the
-        client system supports; a type left unchecked is not expected to appear. Where a type was
-        observed but some of its must support elements were not, the tester is asked to attest that
-        the client system cannot populate them.
+        All requests made during the latest runs of each "Hooks" sub-groups and the "Additional Hook
+        Invocations for Cross Hook Support Demonstration" group above are included in this analysis.
+        When re-running these groups, remember that requests made during the prior execution will fall
+        out of scope of this analysis, so elements only demonstrated during that execution will need to
+        be demonstrated again during the new test run.
 
-        Requests made during the "Additional Hook Invocations for Cross Hook Support
-        Demonstration" group above are included in this analysis, so anything not covered by the
-        Hooks tests can be demonstrated there and this group re-run on its own.
+        For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+        page in the CRD Test Kit wiki.
       DESCRIPTION
 
       run_as_group
@@ -37,18 +36,19 @@ module DaVinciCRDTestKit
 <%= supporting_type_options.map { |type| "        { label: '#{type}', value: '#{type}' }" }.join(",\n") %>
       ].freeze
 
-      # A resource type only a non-required hook would carry is not expected when that hook was
-      # never invoked, so its test passes rather than asking the tester to attest.
+      # The hooks whose requests always carry a supporting resource type. Whether the type is expected
+      # is decided by the input above, but invoking one of these hooks while the type is deselected
+      # fails as a contradiction.
       REQUIRING_HOOKS = {
 <%= requiring_hooks.map { |type, tags| "        '#{type}' => [#{tags.join(', ')}]" }.join(",\n") %>
       }.freeze
 
       input :order_types_supported,
-            title: 'Order types supported by the client system',
+            title: 'Order types supported by the CRD client',
             description: %(
-              Select the resource types that the client system supports placing orders for.
+              Select the resource types that the CRD client supports placing orders for.
               Inferno will expect those order types to be demonstrated within hook requests.
-              By unchecking a resource type, the tester attests that the client system does
+              By unchecking a resource type, the tester attests that the CRD client does
               not support placing orders for the kind of request represented by that FHIR resource type.
             ),
             type: 'checkbox',
@@ -56,25 +56,63 @@ module DaVinciCRDTestKit
             optional: true,
             options: { list_options: ORDER_TYPE_OPTIONS }
       input :supporting_types_supported,
-            title: 'Supporting resource types populated by the client system',
+            title: 'Supporting resource types populated by the CRD client',
             description: %(
-              Select the resource types that the client system supports when representing information
+              Select the resource types that the CRD client supports when representing information
               related to requests sent as a part of CRD. Inferno will expect those order types to be
               demonstrated within hook requests. By unchecking a resource type, the tester attests
-              that the client system does not support the information represented by the resource type
-              or does not surface it to users. `Patient` and `Coverage` resource types are required of
-              every client and are always checked.
+              that the CRD client does not support the information represented by the resource type
+              or does not surface it to users. `Patient` and `Coverage` resource types are always
+              checked because CRD clients are required to support them.
             ),
             type: 'checkbox',
             default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
             optional: true,
             options: { list_options: SUPPORTING_TYPE_OPTIONS }
 
+      group do
+        title 'Requests'
+        id :<%= requests_group_id %>
+        description <<~DESCRIPTION
+          These tests check that the CRD profiles which can be sent within a hook request were
+          observed across the hook requests the CRD client made, and that the must support elements on
+          them were populated.
+
+          Inferno expects to see a resource type when it is selected in the **Order types supported by the
+          CRD client** or **Supporting resource types populated by the CRD client** input, and always expects
+          the `Patient` and `Coverage` resource types, which CRD clients are required to support. A
+          tester who deselects a resource type must not invoke the hooks whose requests always carry it:
+          `appointment-book` for `Appointment`, and `encounter-start` and `encounter-discharge` for
+          `Encounter`. Inferno will fail without
+          further analysis if an expected resource type is not observed or vice-versa. When a resource type
+          was observed but some of its must support elements were not, the tester is asked to attest
+          that the CRD client does not capture the represented data or does not surface it to users.
+
+          For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+          page and specifically the [Requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#requests)
+          section in the CRD Test Kit wiki.
+        DESCRIPTION
+
 <%- test_ids.each do |test_id| -%>
-      test from: :<%= test_id %>
+        test from: :<%= test_id %>
 <%- end -%>
-      test from: :<%= order_types_signed_test_id %>
-      test from: :<%= coverage_information_test_id %>
+        test from: :<%= order_types_signed_test_id %>
+      end
+
+      group do
+        title 'Responses'
+        id :<%= responses_group_id %>
+        description <<~DESCRIPTION
+          These tests check that the CRD client supports the response types and the must support
+          elements within them that CRD clients are required to support when returned by a CRD server.
+
+          For additional details on this group, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
+          page and specifically the [Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#responses)
+          section in the CRD Test Kit wiki.
+        DESCRIPTION
+
+        test from: :<%= coverage_information_test_id %>
+      end
     end
   end
 end

@@ -252,6 +252,20 @@ module DaVinciCRDTestKit
       contained: [CONTAINED_CONDITION]
     }.freeze
 
+    DEVICE = {
+      resourceType: 'Device', id: 'd1',
+      udiCarrier: [{ deviceIdentifier: '00844588003288' }],
+      property: [{ type: { coding: [{ code: 't' }] }, valueQuantity: [{ value: 1 }] },
+                 { type: { coding: [{ code: 't' }] }, valueCode: [{ coding: [{ code: 'c' }] }] }],
+      extension: [BILLING_OPTIONS]
+    }.freeze
+
+    MEDICATION = {
+      resourceType: 'Medication', id: 'm1',
+      code: { coding: [{ system: 'http://www.nlm.nih.gov/research/umls/rxnorm', code: '1234' }],
+              extension: [BILLING_OPTIONS] }
+    }.freeze
+
     # DeviceRequest and MedicationRequest each carry a choice element whose two arms are separately
     # must support, so they take two instances to demonstrate fully.
     DEVICE_REQUEST_BASE = {

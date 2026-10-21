@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       id :crd_v221_client_multiple_payers_hook
       description <<~DESCRIPTION
         The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#hook-invocation-for-multi-coverage-patients)
-        that clients request coverage information details from at most one payer for each request.
+        that CRD clients request coverage information details from at most one payer for each request.
         During this scenario the tester will perform a workflow that triggers a hook invocation
         for a patient that has two coverages each associated with a payer tied to a different Inferno
         simulated CRD endpoint. Inferno will verify that the hook requests it receives solicit coverage

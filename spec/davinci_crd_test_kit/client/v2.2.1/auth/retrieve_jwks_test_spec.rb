@@ -128,7 +128,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header_no_jku.to_json])
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match("JWK Set must be inputted if the client's JWK Set is not available")
+    expect(result.result_message).to match("JWK Set must be inputted if the CRD client's JWK Set is not available")
   end
 
   it 'does not skip when all headers have jku even if no jwk_set is provided' do
@@ -201,7 +201,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       .to_return(status: 200, body: jwks_hash_dup_kids.to_json)
     result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
-    expect(entity_result_message.message).to include("`kid` must be unique within the client's JWK Set.")
+    expect(entity_result_message.message).to include("`kid` must be unique within the CRD client's JWK Set.")
     expect(jwks_request).to have_been_made
     expect(session_output(:crd_jwks_keys_json)).to eq([nil])
   end

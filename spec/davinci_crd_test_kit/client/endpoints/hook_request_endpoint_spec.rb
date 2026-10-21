@@ -260,6 +260,32 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       expect(filtered_response['cards']).to eq([guideline_card])
       expect(filtered_response['systemActions']).to eq([other_action])
     end
+
+    it 'removes systemActions when filtering coverage-info leaves it empty' do
+      allow(endpoint).to receive(:request_body).and_return(
+        'extension' => { 'davinci-crd.configuration' => { 'coverage-info' => false } }
+      )
+
+      response_body = { 'cards' => [], 'systemActions' => [coverage_info_action] }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to eq({ 'cards' => [] })
+    end
+
+    it 'removes an empty systemActions array when no configuration is provided' do
+      allow(endpoint).to receive(:request_body).and_return({})
+
+      response_body = {
+        'cards' => [guideline_card.merge('suggestions' => [{ 'label' => 'none', 'actions' => [] }])],
+        'systemActions' => []
+      }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to_not have_key('systemActions')
+      expect(filtered_response['cards'].first['suggestions'].first['actions']).to eq([])
+    end
   end
 
   describe 'When fetching data during a hook invocation' do
@@ -337,6 +363,35 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(pat_request).to_not have_been_made
         expect(p_request).to_not have_been_made
         expect(cov_request).to_not have_been_made
+      end
+
+      it 'still returns the hook response when gathering data for later verification fails' do
+        allow(test).to receive(:suite).and_return(suite)
+        allow_any_instance_of(described_class).to receive(:request_coverage_payer).and_raise(NoMethodError, 'boom')
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        waiting_result = run(test, cds_jwt_iss: example_client_url,
+                                   order_sign_response_approach: 'custom',
+                                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards']).to be_present
+
+        messages = Inferno::Repositories::Messages.new.messages_for_result(waiting_result.id)
+        hook_instance = order_sign_hook_request['hookInstance']
+        expect(messages.map(&:type)).to include('warning')
+        expect(messages.map(&:message).join)
+          .to include("internal error while reading the Coverage payer for hook request `#{hook_instance}`")
+          .and include('NoMethodError: boom')
       end
 
       it 'fetches the coverage payer when coverage with a payer reference is in the prefetch' do
@@ -538,12 +593,14 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       end
     end
 
-    it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do
+    it 'does not make the v2.0.1 response generation data fetches when requestedVersion extension specifies 2.2' do
       allow(test).to receive(:suite).and_return(suite)
+      # v2.2.1 reads must support references instead, such as the draft order's orderer, which this
+      # example does not look at. Stubs declared later take precedence, so the ones below still record
+      # their own requests.
+      stub_request(:get, %r{\A#{fhir_server}/}).to_return(status: 404)
       pat_request = stub_request(:get, patient_example_reference_absolute)
         .to_return(status: 200, body: patient_example.to_json)
-      p_request = stub_request(:get, practitioner_example_reference_absolute)
-        .to_return(status: 200, body: practitioner_example.to_json)
       cov_request = stub_request(:get, coverage_search_url)
         .to_return(status: 200, body: crd_coverage_bundle.to_json)
 
@@ -566,7 +623,6 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
       expect(last_response).to be_ok
       expect(pat_request).to_not have_been_made
-      expect(p_request).to_not have_been_made
       expect(cov_request).to_not have_been_made
     end
   end

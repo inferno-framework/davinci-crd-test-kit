@@ -1,4 +1,4 @@
-require_relative '../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_group'
 require_relative '../../../../lib/davinci_crd_test_kit/generator/must_support_test_generator'
 
 RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
@@ -10,16 +10,46 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
   let(:conf3) { generator::CONF_3 }
   let(:hook3) { generator::HOOK_3 }
 
-  # The must support tests, excluding the pre-existing coverage information card test.
+  let(:requests_group) { group.groups.find { |child| child.id.to_s.end_with?(generator::REQUESTS_GROUP_ID) } }
+  let(:responses_group) { group.groups.find { |child| child.id.to_s.end_with?(generator::RESPONSES_GROUP_ID) } }
+  let(:all_tests) { group.groups.flat_map(&:tests) }
+
+  # The generated must support tests, excluding the order signing test.
   let(:must_support_tests) do
-    group.tests.select { |test| test.id.to_s.end_with?(*definition_ids) }
+    requests_group.tests.select { |test| test.id.to_s.end_with?(*definition_ids) }
   end
 
   let(:definition_ids) { definitions.map { |definition| definition[:id].to_s } }
 
-  it 'holds one test per resource type plus the order signing and coverage information tests' do
-    expect(definitions.length).to eq(14)
-    expect(group.tests.length).to eq(16)
+  let(:reference_tests) do
+    requests_group.tests.select { |test| test.id.to_s.end_with?('_reference_resolution') }
+  end
+
+  it 'places each reference test directly after the element test for the same resource type' do
+    ids = requests_group.tests.map { |test| test.id.to_s.split('-').last }
+
+    reference_tests.each do |test|
+      id = test.id.to_s.split('-').last
+      expect(ids[ids.index(id) - 1]).to eq(id.delete_suffix('_reference_resolution'))
+    end
+  end
+
+  it 'splits its tests into a Requests and a Responses group' do
+    expect(group.tests).to be_empty
+    expect(group.groups.map(&:title)).to eq(%w[Requests Responses])
+  end
+
+  it 'holds one test per resource type, a reference test per type with must support references, ' \
+     'and the order signing test in the Requests group' do
+    expect(definitions.length).to eq(16)
+    expect(reference_tests.length).to eq(12)
+    expect(requests_group.tests.length).to eq(29)
+    expect(requests_group.tests.last.id.to_s).to end_with(generator::ORDER_TYPES_SIGNED_TEST_ID)
+  end
+
+  it 'holds the coverage information test in the Responses group' do
+    expect(responses_group.tests.map { |test| test.id.to_s.split('-').last })
+      .to eq([generator::COVERAGE_INFORMATION_TEST_ID])
   end
 
   # Each test issues its own attestation, so a tester answers for one resource type at a time
@@ -30,8 +60,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
   end
 
   it 'gives every test a unique id and title' do
-    expect(group.tests.map(&:id).uniq.length).to eq(group.tests.length)
-    expect(group.tests.map(&:title).uniq.length).to eq(group.tests.length)
+    expect(all_tests.map(&:id).uniq.length).to eq(all_tests.length)
+    expect(all_tests.map(&:title).uniq.length).to eq(all_tests.length)
   end
 
   describe 'requirement coverage' do
@@ -82,6 +112,20 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
                                         'Organization', 'Patient', 'Practitioner', 'PractitionerRole')
     end
 
+    it 'can find the resource type of every must support reference target profile' do
+      definitions.flat_map { |definition| definition[:profiles] }.each do |profile|
+        metadata = DaVinciCRDTestKit::ProfileMetadata.merged(ig_version, profile[:profile_keys])
+        DaVinciCRDTestKit::MustSupportReferences.reference_elements(metadata).each do |element|
+          (Array(element[:target_profiles]) + Array(element[:allowed_target_profiles])).each do |target_profile|
+            next if DaVinciCRDTestKit::MustSupportReferences.base_resource_type(target_profile)
+
+            expect(DaVinciCRDTestKit::ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource)
+              .to be_present, "no metadata for #{target_profile}, targeted by #{element[:path]}"
+          end
+        end
+      end
+    end
+
     it 'checks Appointment against both Appointment profiles' do
       appointment = definitions
         .find { |definition| definition[:id] == :crd_v221_appointment_must_support }
@@ -91,11 +135,20 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     end
 
     it 'gives each supporting profile its own test' do
-      supporting_ids = [:crd_v221_coverage_must_support, :crd_v221_location_must_support,
+      supporting_ids = [:crd_v221_coverage_must_support, :crd_v221_device_must_support,
+                        :crd_v221_location_must_support, :crd_v221_medication_must_support,
                         :crd_v221_organization_must_support, :crd_v221_patient_must_support,
                         :crd_v221_practitioner_must_support, :crd_v221_practitioner_role_must_support]
 
       expect(definition_ids).to include(*supporting_ids.map(&:to_s))
+    end
+
+    # Whether a type is expected is decided by the inputs alone, so a type carried by particular
+    # hooks has to be one the tester can deselect.
+    it 'lets the tester deselect every type that particular hooks carry' do
+      selectable = generator::ORDER_TYPE_OPTIONS + generator::SUPPORTING_TYPE_OPTIONS
+
+      expect(selectable).to include(*generator::REQUIRING_HOOKS.keys)
     end
 
     it 'flags every non request type as a supporting profile' do
@@ -122,13 +175,15 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCrossHookMustSupportGroup do
     it 'names the profile each supporting profile test covers' do
       {
         crd_v221_coverage_must_support: 'CRD Coverage',
+        crd_v221_device_must_support: 'CRD Device',
         crd_v221_location_must_support: 'CRD Location',
+        crd_v221_medication_must_support: 'CRD Medication',
         crd_v221_organization_must_support: 'CRD Organization',
         crd_v221_patient_must_support: 'CRD Patient',
         crd_v221_practitioner_must_support: 'CRD Practitioner',
         crd_v221_practitioner_role_must_support: 'HRex PractitionerRole Profile'
       }.each do |test_id, profile_name|
-        test = group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
+        test = requests_group.tests.find { |candidate| candidate.id.to_s.end_with?(test_id.to_s) }
 
         expect(test).to_not be_nil, "#{test_id} not found"
         expect(test.description).to include("### [#{profile_name}](")

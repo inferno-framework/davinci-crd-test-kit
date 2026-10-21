@@ -1,5 +1,6 @@
 require_relative 'fhirpath_on_cds_request'
 require_relative 'replace_tokens'
+require_relative 'resource_identity'
 require 'uri'
 
 module DaVinciCRDTestKit
@@ -378,43 +379,11 @@ module DaVinciCRDTestKit
       @prefetched_resources ||= {}
     end
 
+    # Prefetched resources are indexed by the absolute URL identifying them, the first one wins.
     def extract_prefetched_resources
-      return unless hook_request['prefetch'].is_a?(Hash)
-
-      hook_request['prefetch'].each_value do |prefetch_resource|
-        next unless prefetch_resource.is_a?(Hash) && prefetch_resource['resourceType'].present?
-
-        if prefetch_resource['resourceType'] == 'Bundle'
-          extract_resources_from_prefetched_bundle(prefetch_resource)
-        else
-          extract_prefetched_resource_instance(prefetch_resource)
-        end
+      ResourceIdentity.each_identified_prefetch_resource(hook_request) do |identity, resource|
+        prefetched_resources[identity] = resource unless prefetched_resources.key?(identity)
       end
-    end
-
-    def extract_resources_from_prefetched_bundle(bundle)
-      bundle['entry']&.each do |entry|
-        next unless entry.is_a?(Hash) && entry['resource'].present?
-
-        if entry['fullUrl'].present?
-          prefetched_resources[entry['fullUrl']] = entry['resource'] unless prefetched_resources.key?(entry['fullUrl'])
-        else
-          extract_prefetched_resource_instance(entry['resource'])
-        end
-      end
-    end
-
-    # no fullUrl available, so assume that it is a restful FHIR url
-    # relative to the fhirServer of the hook request
-    def extract_prefetched_resource_instance(resource_instance)
-      return unless resource_instance['id'].present? &&
-                    resource_instance['resourceType'].present? &&
-                    base_fhir_server.present?
-
-      key = "#{base_fhir_server}#{resource_instance['resourceType']}/#{resource_instance['id']}"
-      return if prefetched_resources.key?(key)
-
-      prefetched_resources[key] = resource_instance
     end
 
     # ends with a slash so that relative references can be appended to form the

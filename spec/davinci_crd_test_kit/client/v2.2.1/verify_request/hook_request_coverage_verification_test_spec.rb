@@ -65,8 +65,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
       status:,
       headers: [],
       tags: [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG,
-             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance),
-             DaVinciCRDTestKit::DATA_FETCH_TAG]
+             DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance)]
     )
   end
 

@@ -37,6 +37,14 @@
   - :path: participant.actor
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/StructureDefinition/Patient|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/Practitioner|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/PractitionerRole|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/RelatedPerson|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/Device|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/HealthcareService|4.0.1
+    - http://hl7.org/fhir/StructureDefinition/Location|4.0.1
   - :path: participant.status
   - :path: participant:Patient.actor
     :types:
@@ -47,6 +55,10 @@
   - :path: participant:PrimaryPerformer.actor
     :types:
     - Reference
+    :allowed_target_profiles:
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner
+    - http://hl7.org/fhir/us/davinci-hrex/StructureDefinition/hrex-practitionerrole
+    - http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-location
   - :path: participant:PrimaryPerformer.status
   - :path: requestedPeriod
   - :path: start

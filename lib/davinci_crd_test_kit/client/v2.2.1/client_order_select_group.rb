@@ -67,11 +67,14 @@ module DaVinciCRDTestKit
 
       group do
         title 'Interaction'
+        id :crd_v221_order_select_interaction
+
         test from: :crd_v221_order_select_request
       end
 
       group do
         title 'Response Handling'
+        id :crd_v221_order_select_responses
 
         test from: :crd_v221_card_display_attest_test
         test from: :crd_v221_inferno_response_validation
@@ -79,6 +82,8 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
+        id :crd_v221_order_select_requests
+
         test from: :crd_v221_hook_request_conformance do
           verifies_requirements(*HookRequestConformanceTest.verifies_requirements,
                                 'hl7.fhir.us.davinci-crd_2.2.1@hook-35',
@@ -100,6 +105,8 @@ module DaVinciCRDTestKit
 
       group do
         title 'Authorization'
+        id :crd_v221_order_select_auth
+
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header

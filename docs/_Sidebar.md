@@ -9,6 +9,7 @@
 *   [Client v2.0.1 Testing Instructions](Client-Instructions)
 *   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
 *   [Simulated CRD Server Responses](Controlling-Simulated-Responses)
+*   [Client Must Support Tests](Client-Must-Support)
 
 **Server Suites**
 *   [Server Testing Details](Server-Details)

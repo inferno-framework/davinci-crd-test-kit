@@ -1,9 +1,12 @@
-require_relative '../../cross_suite/tags'
 require_relative '../../cross_suite/hook_request_resource_extraction'
+require_relative 'hook_request_data_access'
 
 module DaVinciCRDTestKit
-  # Make requests to client's FHIR server to use in building responses
-  module GatherResponseGenerationData
+  # CRD v2.0.1: reads the resources named in the hook context, and follows the references at a fixed
+  # set of paths within them, so that the CRD client's FHIR access is exercised and recorded.
+  module V201HookRequestDataGathering
+    include HookRequestDataAccess
+
     REFERENCES_TO_READ_BY_RESOURCE_TYPE = {
       Appointment: [
         'basedOn',
@@ -46,10 +49,6 @@ module DaVinciCRDTestKit
         'location'
       ]
     }.freeze
-
-    def hook_instance_data_fetch_tag
-      @hook_instance_data_fetch_tag ||= TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
-    end
 
     def gather_appointment_book_data
       appointment_book_to_read = []
@@ -168,34 +167,6 @@ module DaVinciCRDTestKit
       find_references_to_read(resource, to_read_list)
     end
 
-    # turn absolute references into relative if
-    # for the fhir server indicated in the request
-    def normalize_reference(reference)
-      server = "#{request_body['fhirServer']&.chomp('/')}/"
-
-      if request_body['fhirServer'].present? && reference.starts_with?(server)
-        reference[server.length..]
-      else
-        reference
-      end
-    end
-
-    def fetch_reference(reference, additional_tag: nil, parse_as_fhir: false)
-      response = execute_request(reference)
-      return nil unless response.present?
-
-      tags = [DATA_FETCH_TAG, hook_instance_data_fetch_tag]
-      tags << additional_tag if additional_tag.present?
-      persist_query_request(response, tags)
-      return nil unless response.status.to_s.starts_with?('2')
-
-      begin
-        parse_as_fhir ? FHIR.from_contents(response.body) : JSON.parse(response.body)
-      rescue JSON::ParserError
-        nil
-      end
-    end
-
     def find_references_to_read(resource, to_read_list)
       references_to_read = REFERENCES_TO_READ_BY_RESOURCE_TYPE[resource['resourceType']&.to_sym]
       return [] unless references_to_read.present?
@@ -227,88 +198,6 @@ module DaVinciCRDTestKit
       reference_objects.map { |entry| entry['reference'] if entry.present? }.compact
     end
 
-    def request_coverage
-      @request_coverage ||= find_coverage_for_request
-    end
-
-    def prefetched_coverage
-      @prefetched_coverage ||=
-        if request_body.dig('prefetch', 'coverage').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
-        elsif request_body.dig('prefetch', 'cov').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'cov').to_json)
-        end
-    end
-
-    def find_coverage_for_request
-      resource =
-        if prefetched_coverage.present?
-          prefetched_coverage
-        else
-          query_for_coverages
-        end
-
-      return unless resource.is_a?(FHIR::Bundle)
-
-      resource.entry&.first&.resource
-    end
-
-    def fhir_server_connection
-      @fhir_server_connection ||=
-        if request_body['fhirServer'].present? &&
-           request_body['fhirAuthorization'].present? &&
-           request_body['fhirAuthorization']['access_token'].present?
-          Faraday.new(url: request_body['fhirServer'], request: { open_timeout: 10 },
-                      headers: data_request_headers) do |f|
-            f.request :url_encoded
-            f.use FaradayMiddleware::FollowRedirects
-          end
-        end
-    end
-
-    def data_request_headers
-      @data_request_headers ||=
-        { 'Authorization' => "Bearer #{request_body['fhirAuthorization']['access_token']}" }
-    end
-
-    def execute_request(query)
-      fhir_server_connection&.get(query)
-    rescue Faraday::Error => e
-      # Warning: This is a hack. If there is an error with the request such that we never get a response, we have
-      #          no clean way to persist that information for the Inferno test to check later. The solution here
-      #          is to persist the request anyway with a status of nil, using the error message as response body
-      Faraday::Response.new(response_body: e.message, url: fhir_server_connection.url_prefix.to_s)
-    end
-
-    def persist_query_request(response, tags)
-      inferno_request_headers = data_request_headers.map { |name, value| { name:, value: } }
-      inferno_response_headers = response.headers&.map { |name, value| { name:, value: } }
-      requests_repo.create(
-        verb: 'GET',
-        url: response.env.url.to_s,
-        direction: 'outgoing',
-        status: response.status,
-        request_body: response.env.request_body,
-        response_body: response.env.response_body,
-        test_session_id: test_run.test_session_id,
-        result_id: result.id,
-        request_headers: inferno_request_headers,
-        response_headers: inferno_response_headers,
-        tags:
-      )
-    end
-
-    def query_for_coverages
-      query = "Coverage?patient=#{request_body.dig('context', 'patientId')}&status=active"
-      response = execute_request(query)
-      return nil unless response.present?
-
-      persist_query_request(response, [DATA_FETCH_TAG, hook_instance_data_fetch_tag])
-      return nil unless response.status.to_s.starts_with?('2')
-
-      FHIR.from_contents(response.body)
-    end
-
     def analyzed_resources
       @analyzed_resources ||= {}
     end
@@ -325,77 +214,6 @@ module DaVinciCRDTestKit
 
     def resource_has_required_details?(resource)
       resource.is_a?(Hash) && resource['resourceType'].present? && resource['id'].present?
-    end
-
-    # gather additional fhir resources not requested via prefetch
-    # not used for response generation, but verified later
-    def request_additional_fhir_data
-      request_coverage_payer
-      request_parent_locations
-    end
-
-    def request_access_level_target
-      return if access_level_target_reference.blank?
-
-      fetch_reference(normalize_reference(access_level_target_reference),
-                      additional_tag: ACCESS_LEVEL_TARGET_FETCH_TAG)
-    end
-
-    def access_level_target_reference
-      JSON.parse(result.input_json)
-        .find { |input| input['name'].include?('access_level_target_reference') }
-        &.dig('value')
-    end
-
-    def prefetched_coverage_resource
-      if prefetched_coverage.is_a?(FHIR::Bundle)
-        prefetched_coverage.entry.first&.resource
-      else
-        prefetched_coverage
-      end
-    end
-
-    def request_coverage_payer
-      return unless prefetched_coverage.present?
-
-      coverage_resource = prefetched_coverage_resource
-      return unless coverage_resource.present? && coverage_resource.payor.first&.reference.present?
-
-      fetch_reference(coverage_resource.payor.first.reference, additional_tag: PAYER_ORG_FETCH_TAG)
-    end
-
-    def request_parent_locations
-      prefetched_locations_and_parents_hash
-    end
-
-    def prefetched_location_bundle
-      locations_data = request_body.dig('prefetch', 'locations') || request_body.dig('prefetch', 'locs')
-      locations = FHIR.from_contents(locations_data.to_json) if locations_data.present?
-      return locations if locations.is_a?(FHIR::Bundle)
-      return nil unless locations.is_a?(FHIR::Location)
-
-      FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
-    end
-
-    def prefetched_locations_and_parents_hash
-      prefetched_location_bundle&.entry&.each_with_object({}) do |entry, hash|
-        add_location_to_hash(entry.resource, hash)
-      end
-    end
-
-    def add_location_to_hash(location, location_hash)
-      return unless location.is_a?(FHIR::Location) && location.id.present?
-
-      relative_reference = "#{location.resourceType}/#{location.id}"
-      return if location_hash.key?(relative_reference)
-
-      location_hash[relative_reference] = location
-      return unless location.partOf&.reference.present?
-
-      parent_location = fetch_reference(location.partOf.reference,
-                                        additional_tag: PARENT_LOCATION_FETCH_TAG,
-                                        parse_as_fhir: true)
-      add_location_to_hash(parent_location, location_hash)
     end
   end
 end

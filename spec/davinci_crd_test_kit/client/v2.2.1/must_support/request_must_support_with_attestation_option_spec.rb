@@ -1,4 +1,4 @@
-require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_must_support_group'
+require_relative '../../../../../lib/davinci_crd_test_kit/client/v2.2.1/client_cross_hook_group'
 require_relative '../../../../../lib/davinci_crd_test_kit/generator/must_support_test_generator'
 require_relative 'complete_resources'
 
@@ -36,6 +36,11 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
     Class.new(described_class) do
       config(options: { ig_version: 'v2.2.1', profiles: })
     end
+  end
+
+  # The result returned by `run` does not carry its requests, so they are read back from the database.
+  def attached_request_ids(result)
+    Inferno::Repositories::Results::Model.find(id: result.id).requests.map(&:id)
   end
 
   def all_types_selected(inputs = {})
@@ -90,6 +95,14 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(result.result_message).to include('does not capture')
     end
 
+    it 'links the profile page in the attestation' do
+      result = run(service_request_test, all_types_selected)
+
+      expect(result.result_message).to include(
+        '(http://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-servicerequest.html)'
+      )
+    end
+
     it 'reports the number of instances it looked at' do
       result = run(service_request_test, all_types_selected)
 
@@ -105,6 +118,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
       expect(messages.map(&:message)).to include(
         a_string_matching(/Unobserved must support element for CRD Service Request: reasonReference/)
       )
+    end
+
+    it 'attaches the requests it examined while waiting for an attestation' do
+      result = run(service_request_test, all_types_selected)
+
+      expect(result.result).to eq('wait')
+      expect(attached_request_ids(result).length).to eq(1)
     end
 
     it 'offers both attestation links as outputs' do
@@ -213,15 +233,37 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   end
 
   describe 'request association' do
-    before { create_request(hook_request_body(context: draft_orders(complete_service_request))) }
+    let(:location_test) { test_for([{ resource_type: 'Location', profile_keys: ['location'] }]) }
+    let!(:service_request_request) do
+      create_request(hook_request_body(context: draft_orders(complete_service_request)))
+    end
+    let!(:location_request) do
+      create_request(hook_request_body(prefetch: { location: DaVinciCRDTestKit::CompleteResources::LOCATION }))
+    end
 
-    it 'does not attach the cross hook requests to its own result' do
-      result = run(service_request_test, all_types_selected)
+    it 'attaches only the hook requests carrying the resource type under test' do
+      service_request_result = run(service_request_test, all_types_selected)
 
-      expect(Inferno::Repositories::Requests.new.tagged_requests(
-        test_session.id, [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG]
-      ).length).to eq(1)
-      expect(result.requests).to be_empty
+      expect(attached_request_ids(service_request_result)).to eq([service_request_request.id])
+    end
+
+    it 'attaches each test its own requests when the extraction is shared' do
+      scratch = {}
+      service_request_result = run(service_request_test, all_types_selected, scratch)
+      location_result = run(location_test, all_types_selected, scratch)
+
+      expect(attached_request_ids(service_request_result)).to eq([service_request_request.id])
+      expect(attached_request_ids(location_result)).to eq([location_request.id])
+    end
+
+    it 'attaches every considered hook request when none carried the resource type' do
+      vision_prescription_test = test_for([{ resource_type: 'VisionPrescription',
+                                             profile_keys: ['vision_prescription'] }])
+
+      vision_prescription_result = run(vision_prescription_test, all_types_selected)
+
+      expect(attached_request_ids(vision_prescription_result))
+        .to contain_exactly(service_request_request.id, location_request.id)
     end
   end
 
@@ -237,6 +279,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
         'CommunicationRequest' => [resources::COMMUNICATION_REQUEST],
         'Encounter' => [resources::ENCOUNTER],
         'Coverage' => [resources::COVERAGE],
+        'Device' => [resources::DEVICE],
+        'Medication' => [resources::MEDICATION],
         'Location' => [resources::LOCATION],
         'Organization' => [resources::ORGANIZATION],
         'Patient' => [resources::PATIENT],
@@ -274,30 +318,35 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
                             tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag])
     end
 
-    it 'passes without an attestation when no hook requiring the type was invoked' do
+    # Encounter.appointment is must support, so an Appointment can be expected without the
+    # appointment-book hook ever being invoked.
+    it 'expects Appointment when selected even though appointment-book was never invoked' do
       hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
 
       result = run(appointment_test, all_types_selected)
 
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Appointment`')
+    end
+
+    it 'passes without an attestation when Appointment was deselected and appointment-book never invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(appointment_test,
+                   all_types_selected(supporting_types_supported: %w[Encounter Practitioner].to_json))
+
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Appointment observed')
-      expect(result.result_message).to include('appointment-book')
     end
 
-    it 'fails when the hook requiring the type was invoked but the type never appeared' do
+    it 'fails when Appointment was deselected but appointment-book was invoked' do
       hook_request(DaVinciCRDTestKit::APPOINTMENT_BOOK_TAG)
 
-      result = run(appointment_test, all_types_selected)
+      result = run(appointment_test,
+                   all_types_selected(supporting_types_supported: %w[Encounter Practitioner].to_json))
 
       expect(result.result).to eq('fail')
-      expect(result.result_message).to include('`Appointment` resource type, but no instances')
-    end
-
-    it 'still checks a hook gated type that turned up in another hook request' do
-      create_request(hook_request_body(prefetch: { appointment: { resourceType: 'Appointment', id: 'a1',
-                                                                  status: 'booked' } }))
-
-      expect(run(appointment_test, all_types_selected).result).to eq('wait')
+      expect(result.result_message).to include('invoked the `appointment-book` hook(s)')
     end
 
     it 'passes without an attestation when the tester did not select the type' do
@@ -330,6 +379,74 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
 
       expect(result.result).to eq('pass')
       expect(result.result_message).to include('No instances of Location observed')
+    end
+  end
+
+  # When a type is both selectable and gated on hooks, selecting it makes it expected, and invoking
+  # one of its hooks while it is deselected contradicts the tester's declaration.
+  describe 'a type governed by both an input and requiring hooks' do
+    let(:encounter_test) { test_for([{ resource_type: 'Encounter', profile_keys: ['encounter'] }]) }
+    let(:encounter) { { resourceType: 'Encounter', id: 'e1', status: 'in-progress' } }
+
+    def hook_request(hook_tag, prefetch: { patient: { resourceType: 'Patient' } })
+      repo_create(:request, test_session_id: test_session.id, result: receiving_result,
+                            request_body: hook_request_body(prefetch:),
+                            tags: [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag])
+    end
+
+    it 'expects the type when selected even though no requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(encounter_test, supporting_types_supported: ['Encounter'].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Encounter`')
+    end
+
+    it 'fails when a requiring hook was invoked but the type was not selected' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG)
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('invoked the `encounter-start` hook(s)')
+      expect(result.result_message).to include('does not support this resource type')
+    end
+
+    it 'expects the type when selected and a requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG)
+
+      result = run(encounter_test, supporting_types_supported: ['Encounter'].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('The tester indicated the CRD client supports the `Encounter`')
+    end
+
+    it 'passes vacuously when neither selected nor required by an invoked hook' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG)
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('pass')
+      expect(result.result_message).to include('does not support this resource type')
+    end
+
+    it 'fails when an unselected type is observed alongside an invoked requiring hook' do
+      hook_request(DaVinciCRDTestKit::ENCOUNTER_START_TAG, prefetch: { encounter: })
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('invoked the `encounter-start` hook(s)')
+    end
+
+    it 'fails when an unselected type is observed and no requiring hook was invoked' do
+      hook_request(DaVinciCRDTestKit::ORDER_SIGN_TAG, prefetch: { encounter: })
+
+      result = run(encounter_test, supporting_types_supported: [].to_json)
+
+      expect(result.result).to eq('fail')
+      expect(result.result_message).to include('Observed 1 `Encounter` instance')
     end
   end
 

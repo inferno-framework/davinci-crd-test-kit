@@ -27,6 +27,24 @@
     :discriminator:
       :type: type
       :code: Ratio
+  - :slice_id: NutritionOrder.enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
+    :slice_name: boundsPeriod
+    :path: enteralFormula.administration.schedule.repeat.bounds[x]
+    :discriminator:
+      :type: type
+      :code: Period
+  - :slice_id: NutritionOrder.oralDiet.schedule.repeat.bounds[x]:boundsPeriod
+    :slice_name: boundsPeriod
+    :path: oralDiet.schedule.repeat.bounds[x]
+    :discriminator:
+      :type: type
+      :code: Period
+  - :slice_id: NutritionOrder.supplement.schedule.repeat.bounds[x]:boundsPeriod
+    :slice_name: boundsPeriod
+    :path: supplement.schedule.repeat.bounds[x]
+    :discriminator:
+      :type: type
+      :code: Period
   :elements:
   - :path: allergyIntolerance
     :types:
@@ -47,7 +65,6 @@
   - :path: enteralFormula.administration.schedule
   - :path: enteralFormula.administration.schedule.event
   - :path: enteralFormula.administration.schedule.repeat
-  - :path: enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
   - :path: enteralFormula.administration.schedule.repeat.count
   - :path: enteralFormula.administration.schedule.repeat.duration
   - :path: enteralFormula.administration.schedule.repeat.durationUnit
@@ -66,7 +83,6 @@
   - :path: oralDiet.schedule
   - :path: oralDiet.schedule.event
   - :path: oralDiet.schedule.repeat
-  - :path: oralDiet.schedule.repeat.bounds[x]:boundsPeriod
   - :path: oralDiet.schedule.repeat.count
   - :path: oralDiet.schedule.repeat.duration
   - :path: oralDiet.schedule.repeat.durationUnit
@@ -94,7 +110,6 @@
   - :path: supplement.schedule
   - :path: supplement.schedule.event
   - :path: supplement.schedule.repeat
-  - :path: supplement.schedule.repeat.bounds[x]:boundsPeriod
   - :path: supplement.schedule.repeat.count
   - :path: supplement.schedule.repeat.duration
   - :path: supplement.schedule.repeat.durationUnit
@@ -114,10 +129,10 @@
     - supplement.schedule.repeat
     - enteralFormula.administration.schedule.repeat
   - :element: repeat.bounds[x]:boundsPeriod
-    :paths:
-    - oralDiet.schedule.repeat.bounds[x]:boundsPeriod
-    - supplement.schedule.repeat.bounds[x]:boundsPeriod
-    - enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
+    :slice_names:
+    - NutritionOrder.oralDiet.schedule.repeat.bounds[x]:boundsPeriod
+    - NutritionOrder.supplement.schedule.repeat.bounds[x]:boundsPeriod
+    - NutritionOrder.enteralFormula.administration.schedule.repeat.bounds[x]:boundsPeriod
   - :element: repeat.count
     :paths:
     - oralDiet.schedule.repeat.count

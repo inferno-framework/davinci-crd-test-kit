@@ -98,6 +98,18 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
     expect(result.result_message).to include('expected at most one for each of the two payers')
   end
 
+  it 'fails when a hook request has no body' do
+    stub_requests([
+                    hook_request(primary_request_body, complete_service_url),
+                    Inferno::Entities::Request.new(url: subset_service_url, request_body: nil)
+                  ])
+
+    result = run(test)
+
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('do not contain valid JSON bodies')
+  end
+
   it 'passes when a single request solicits coverage information' do
     stub_requests([hook_request(primary_request_body, complete_service_url)])
 

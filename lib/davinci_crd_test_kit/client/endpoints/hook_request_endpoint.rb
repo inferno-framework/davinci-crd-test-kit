@@ -1,4 +1,5 @@
-require_relative 'gather_response_generation_data'
+require_relative 'v201_hook_request_data_gathering'
+require_relative 'v221_hook_request_data_gathering'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
 require_relative 'scenario_service_response'
@@ -8,7 +9,8 @@ require_relative '../../cross_suite/tags'
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint
     include DaVinciCRDTestKit::MockServiceResponse
-    include DaVinciCRDTestKit::GatherResponseGenerationData
+    include DaVinciCRDTestKit::V201HookRequestDataGathering
+    include DaVinciCRDTestKit::V221HookRequestDataGathering
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
     include DaVinciCRDTestKit::ScenarioServiceResponse
@@ -83,7 +85,7 @@ module DaVinciCRDTestKit
                             code: 400,
                             outcome_code: 'value')
       elsif invoked_hook != requested_hook
-        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
+        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the CRD client " \
                             "requested the #{requested_hook} hook.",
                             code: 400,
                             outcome_code: 'value')
@@ -114,7 +116,9 @@ module DaVinciCRDTestKit
         send(:"gather_#{requested_hook&.gsub('-', '_')}_data")
         request_coverage
       elsif ig_version == 'v221'
-        request_access_level_target if user_access_level_group?
+        if user_access_level_group?
+          continue_after_failure('reading the access level target') { request_access_level_target }
+        end
         request_additional_fhir_data
       end
       response_body = apply_hook_configuration(hook_response)
@@ -147,20 +151,25 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def apply_hook_configuration(response_body) # rubocop:disable Metrics/CyclomaticComplexity
-      return response_body unless response_body.present? && coverage_info_disabled?
+    def apply_hook_configuration(response_body)
+      return response_body unless response_body.present?
 
+      remove_coverage_information(response_body) if coverage_info_disabled?
+
+      # CDS Hooks requires systemActions, if present, to be non-empty
+      response_body.delete 'systemActions' if response_body['systemActions'].blank?
+
+      response_body
+    end
+
+    def remove_coverage_information(response_body)
       cards = response_body['cards']
       response_body['cards'] = cards.reject { |card| coverage_info_card_type?(card) } if cards.is_a?(Array)
 
       system_actions = response_body['systemActions']
-      if system_actions.is_a?(Array)
-        response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
-      end
+      return unless system_actions.is_a?(Array)
 
-      response_body.delete 'systemActions' if response_body['systemActions'].blank?
-
-      response_body
+      response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
     end
 
     def coverage_info_disabled?
@@ -203,7 +212,11 @@ module DaVinciCRDTestKit
     end
 
     def cross_hook_tag
-      CROSS_HOOK_ANALYSIS_TAG if test.config.options[:include_in_cross_hook_analysis]
+      CROSS_HOOK_ANALYSIS_TAG if include_in_cross_hook_analysis?
+    end
+
+    def include_in_cross_hook_analysis?
+      test.config.options[:include_in_cross_hook_analysis].present?
     end
 
     def hook_error_response(error_message, code: 400, outcome_code: 'invalid')

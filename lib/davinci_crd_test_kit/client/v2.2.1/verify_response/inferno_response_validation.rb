@@ -12,15 +12,15 @@ module DaVinciCRDTestKit
       title 'Hook responses have the correct structure and content'
       description %(
         During this test, Inferno will verify that each hook response built by Inferno's simulated CRD servers
-        and returned to the client conforms to CDS Hooks and CRD requirements. These responses must be conformant
-        for the client to demonstrate its ability to accept and process valid CRD responses.
+        and returned to the CRD client conforms to CDS Hooks and CRD requirements. These responses must be conformant
+        for the CRD client to demonstrate its ability to accept and process valid CRD responses.
         To prevent the injection of non-standard information into Inferno responses, these validations will
         strictly check that all extensions are allowed at the locations they appear by the CRD specification.
 
         If this test fails when the tester provided a custom response template, adjust the
         provided template and the submitted requests so that the response built by Inferno
         is conformant. If this test fails when Inferno mocked the response based on selected
-        card types, first ensure that the client's request is conformant. If the request is conformant
+        card types, first ensure that the CRD client's request is conformant. If the request is conformant
         but Inferno's response(s) are still not conformant, please report this failure to the
         Inferno team via [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
         For more details on how Inferno builds responses, see the

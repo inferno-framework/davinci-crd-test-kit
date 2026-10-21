@@ -365,7 +365,7 @@ RSpec.describe DaVinciCRDTestKit::V201::HookRequestValidPrefetchTest do
 
       result = run(test, contexts: [appointment_book_context].to_json, prefetches: [appointment_book_prefetch].to_json)
       expect(result.result).to eq('fail')
-      expect(entity_result_message(test)).to include('Client sent non-requested Prefetch field `unrequested`')
+      expect(entity_result_message(test)).to include('CRD client sent non-requested Prefetch field `unrequested`')
     end
   end
 

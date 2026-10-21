@@ -1,106 +1,8 @@
-require_relative '../../../../lib/davinci_crd_test_kit/client/endpoints/gather_response_generation_data'
-require_relative '../../../../lib/davinci_crd_test_kit/cross_suite/tags'
+require_relative '../../../../lib/davinci_crd_test_kit/client/endpoints/v201_hook_request_data_gathering'
+require_relative 'hook_request_data_fixtures'
 
-RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
-  let(:module_instance) do
-    Class.new do
-      include DaVinciCRDTestKit::GatherResponseGenerationData
-
-      def request_body
-        nil
-      end
-    end.new
-  end
-
-  let(:fhir_server) { 'https://example/r4' }
-  let(:patient_example_reference_relative) { 'Patient/example' }
-  let(:patient_example_reference_absolute) { "#{fhir_server}/#{patient_example_reference_relative}" }
-  let(:patient_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_patient_example.json')))
-  end
-  let(:organization_example_reference_relative) { 'Organization/example' }
-  let(:organization_example_reference_absolute) { "#{fhir_server}/#{organization_example_reference_relative}" }
-  let(:organization_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_organization_example.json')))
-  end
-  let(:practitioner_example_reference_relative) { 'Practitioner/example' }
-  let(:practitioner_example_reference_absolute) { "#{fhir_server}/#{practitioner_example_reference_relative}" }
-  let(:practitioner_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_practitioner_example.json')))
-  end
-  let(:practitioner_role_example_reference_relative) { 'PractitionerRole/example' }
-  let(:practitioner_role_example_reference_absolute) do
-    "#{fhir_server}/#{practitioner_role_example_reference_relative}"
-  end
-  let(:practitioner_role_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_practitioner_role_example.json')))
-  end
-  let(:location_example_reference_relative) { 'Location/example' }
-  let(:location_example_reference_absolute) do
-    "#{fhir_server}/#{location_example_reference_relative}"
-  end
-  let(:location_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_location_example.json')))
-  end
-  let(:location2_example_reference_relative) { 'Location/example2' }
-  let(:location2_example_reference_absolute) do
-    "#{fhir_server}/#{location2_example_reference_relative}"
-  end
-  let(:location2_example) do
-    loc = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_location_example.json')))
-    loc['id'] = 'example2'
-    loc
-  end
-  let(:encounter_example_reference_relative) { 'Encounter/example' }
-  let(:encounter_example_reference_absolute) do
-    "#{fhir_server}/#{encounter_example_reference_relative}"
-  end
-  let(:encounter_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_encounter_example.json')))
-  end
-  let(:service_request_example_reference_relative) { 'ServiceRequest/example' }
-  let(:service_request_example_reference_absolute) do
-    "#{fhir_server}/#{service_request_example_reference_relative}"
-  end
-  let(:service_request_example) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_service_request_example.json')))
-  end
-  let(:crd_coverage) do
-    JSON.parse(File.read(File.join(
-                           __dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json'
-                         )))
-  end
-  let(:crd_coverage_bundle) do
-    bundle = FHIR::Bundle.new(type: 'searchset')
-    bundle.entry.append(FHIR::Bundle::Entry.new(
-                          fullUrl: 'https://example.com/base/Coverage/coverage_example',
-                          resource: FHIR.from_contents(crd_coverage.to_json)
-                        ))
-    bundle
-  end
-  let(:coverage_search_url) { "#{fhir_server}/Coverage?patient=example&status=active" }
-  let(:appointment_book_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'appointment_book_hook_request.json')))
-  end
-  let(:encounter_start_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'encounter_start_hook_request.json')))
-  end
-  let(:encounter_discharge_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'encounter_discharge_hook_request.json')))
-  end
-  let(:order_select_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'order_select_hook_request.json')))
-  end
-  let(:order_sign_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'order_sign_hook_request.json')))
-  end
-  let(:order_dispatch_request) do
-    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'order_dispatch_hook_request.json')))
-  end
-
-  before do
-    allow(module_instance).to(receive(:persist_query_request))
-  end
+RSpec.describe DaVinciCRDTestKit::V201HookRequestDataGathering do
+  include_context 'with hook request data fixtures'
 
   describe 'when deciding what data to fetch' do
     it 'does not fetch data that has been prefetched (relative reference)' do
@@ -176,16 +78,30 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(local_request).to have_been_made.once
     end
 
-    it 'requests references (external absolute refrence)' do
+    it 'requests references without the access token (external absolute refrence)' do
       external_reference = "https://another.server/r4/#{patient_example_reference_relative}"
       allow(module_instance).to receive(:request_body).and_return(order_sign_request)
 
       external_request = stub_request(:get, external_reference)
+        .with { |request| request.headers.keys.none? { |name| name.casecmp?('Authorization') } }
         .to_return(status: 200, body: patient_example.to_json)
 
       module_instance.gather_data_for_request([external_reference], [])
       expect(module_instance.analyzed_resources[external_reference]).to eq(patient_example)
       expect(external_request).to have_been_made.once
+      expect(module_instance).to have_received(:persist_query_request)
+        .with(anything, anything, url: external_reference, request_headers: {})
+    end
+
+    it 'requests references with the access token (local absolute reference)' do
+      allow(module_instance).to receive_messages(request_body: order_sign_request)
+
+      local_request = stub_request(:get, patient_example_reference_absolute)
+        .with(headers: { 'Authorization' => 'Bearer SAMPLE_TOKEN' })
+        .to_return(status: 200, body: patient_example.to_json)
+
+      module_instance.gather_data_for_request([patient_example_reference_absolute], [])
+      expect(local_request).to have_been_made.once
     end
 
     it 'follows a redirect when fetching a reference' do
@@ -306,62 +222,6 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
     end
   end
 
-  describe 'when fetching coverage resources' do
-    it 'queries if no prefetch data present' do
-      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-
-      cov_request = stub_request(:get, coverage_search_url)
-        .to_return(status: 200, body: crd_coverage_bundle.to_json)
-
-      coverage = module_instance.request_coverage
-      expect(coverage.is_a?(FHIR::Coverage)).to be(true)
-      expect(coverage.id).to eq('coverage_example')
-      expect(cov_request).to have_been_made.once
-    end
-
-    it 'queries if no prefetch data present but can handle finding nothing' do
-      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-
-      crd_coverage_bundle.entry.pop
-      cov_request = stub_request(:get, coverage_search_url)
-        .to_return(status: 200, body: crd_coverage_bundle.to_json)
-
-      coverage = module_instance.request_coverage
-      expect(coverage).to be_nil
-      expect(cov_request).to have_been_made.once
-    end
-
-    it 'does not query if prefetch data present' do
-      cov_request = stub_request(:get, coverage_search_url)
-        .to_return(status: 200, body: crd_coverage_bundle.to_json)
-
-      crd_coverage_bundle.entry.first.resource.id = 'prefetch_coverage'
-      order_sign_request['prefetch'] = {
-        'coverage' => JSON.parse(crd_coverage_bundle.to_json)
-      }
-      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-
-      coverage = module_instance.request_coverage
-      expect(coverage.is_a?(FHIR::Coverage)).to be(true)
-      expect(coverage.id).to eq('prefetch_coverage')
-      expect(cov_request).to_not have_been_made
-    end
-
-    it 'finds no coverage if the prefetch data is bad' do
-      cov_request = stub_request(:get, coverage_search_url)
-        .to_return(status: 200, body: crd_coverage_bundle.to_json)
-
-      order_sign_request['prefetch'] = {
-        'coverage' => JSON.parse(crd_coverage.to_json)
-      }
-      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-
-      coverage = module_instance.request_coverage
-      expect(coverage).to be_nil
-      expect(cov_request).to_not have_been_made
-    end
-  end
-
   describe 'when identifying prefetched resources' do
     it 'handles requests with no prefetch' do
       allow(module_instance).to receive(:request_body).and_return(order_sign_request)
@@ -404,147 +264,6 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(module_instance.prefetched_resources.size).to be(2)
       expect(module_instance.prefetched_resources['Patient/123']).to be_present
       expect(module_instance.prefetched_resources['Coverage/456']).to be_present
-    end
-  end
-
-  describe 'when handling prefetched location data' do
-    let(:location_fhir) { FHIR.from_contents(location_example.to_json) }
-    let(:location2_fhir) { FHIR.from_contents(location2_example.to_json) }
-    let(:location_prefetch_bundle) do
-      bundle = FHIR::Bundle.new(type: 'searchset')
-      bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
-      bundle.entry << FHIR::Bundle::Entry.new(resource: location2_fhir)
-      bundle
-    end
-
-    describe '#prefetched_location_bundle' do
-      it 'returns nil when no locations in prefetch' do
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        expect(module_instance.prefetched_location_bundle).to be_nil
-      end
-
-      it 'returns the bundle when prefetch contains a location bundle' do
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.prefetched_location_bundle
-        expect(result).to be_a(FHIR::Bundle)
-        expect(result.entry.count).to eq(2)
-      end
-
-      it 'wraps a single prefetched Location in a Bundle' do
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_fhir.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.prefetched_location_bundle
-        expect(result).to be_a(FHIR::Bundle)
-        expect(result.entry.first.resource.id).to eq('example')
-      end
-
-      it 'returns nil when prefetch locations is neither a Bundle nor a Location' do
-        order_sign_request['prefetch'] = { 'locations' => { 'resourceType' => 'Patient', 'id' => '1' } }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        expect(module_instance.prefetched_location_bundle).to be_nil
-      end
-    end
-
-    describe '#prefetched_locations_and_parents_hash' do
-      it 'returns nil when no locations in prefetch' do
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        expect(module_instance.prefetched_locations_and_parents_hash).to be_nil
-      end
-
-      it 'returns a hash keyed by relative reference for each location' do
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.prefetched_locations_and_parents_hash
-        expect(result.size).to eq(2)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
-      end
-
-      it 'skips bundle entries without an id' do
-        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: FHIR::Location.new(name: 'no-id'))
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.prefetched_locations_and_parents_hash
-        expect(result.size).to eq(2)
-      end
-
-      it 'deduplicates entries with the same relative reference' do
-        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.prefetched_locations_and_parents_hash
-        expect(result.size).to eq(2)
-      end
-
-      it 'fetches and includes parent locations when a prefetched location has partOf' do
-        location_with_parent = FHIR.from_contents(location_example.to_json)
-        location_with_parent.partOf = FHIR::Reference.new(reference: location2_example_reference_relative)
-        bundle = FHIR::Bundle.new(type: 'searchset')
-        bundle.entry << FHIR::Bundle::Entry.new(resource: location_with_parent)
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-
-        parent_request = stub_request(:get, location2_example_reference_absolute)
-          .to_return(status: 200, body: location2_example.to_json)
-
-        result = module_instance.prefetched_locations_and_parents_hash
-        expect(result.size).to eq(2)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
-        expect(parent_request).to have_been_made.once
-      end
-    end
-
-    describe '#add_location_to_hash' do
-      let(:location_hash) { {} }
-
-      it 'does nothing when given a non-Location resource' do
-        module_instance.add_location_to_hash(nil, location_hash)
-        module_instance.add_location_to_hash('not a location', location_hash)
-        expect(location_hash).to be_empty
-      end
-
-      it 'does nothing when the Location has no id' do
-        module_instance.add_location_to_hash(FHIR::Location.new, location_hash)
-        expect(location_hash).to be_empty
-      end
-
-      it 'adds a valid Location to the hash keyed by relative reference' do
-        module_instance.add_location_to_hash(location_fhir, location_hash)
-        expect(location_hash[location_example_reference_relative]).to eq(location_fhir)
-      end
-
-      it 'does not re-add a Location already present in the hash' do
-        location_hash[location_example_reference_relative] = location_fhir
-        module_instance.add_location_to_hash(location_fhir, location_hash)
-        expect(location_hash.size).to eq(1)
-      end
-
-      it 'fetches and recursively adds the parent location when partOf is present' do
-        location_with_parent = FHIR.from_contents(location_example.to_json)
-        location_with_parent.partOf = FHIR::Reference.new(reference: location2_example_reference_relative)
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        loc_request = stub_request(:get, location2_example_reference_absolute)
-          .to_return(status: 200, body: location2_example.to_json)
-
-        module_instance.add_location_to_hash(location_with_parent, location_hash)
-        expect(location_hash.size).to eq(2)
-        expect(location_hash[location_example_reference_relative]).to eq(location_with_parent)
-        expect(location_hash[location2_example_reference_relative]).to eq(location2_fhir)
-        expect(loc_request).to have_been_made.once
-      end
-    end
-
-    describe '#request_parent_locations' do
-      it 'returns a hash of prefetched locations' do
-        order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
-        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
-        result = module_instance.request_parent_locations
-        expect(result).to be_a(Hash)
-        expect(result[location_example_reference_relative]).to be_a(FHIR::Location)
-        expect(result[location2_example_reference_relative]).to be_a(FHIR::Location)
-      end
     end
   end
 
@@ -687,53 +406,6 @@ RSpec.describe DaVinciCRDTestKit::GatherResponseGenerationData do
       expect(p_request).to have_been_made.once
       expect(pat_request).to have_been_made.once
       expect(sr_request).to have_been_made.once
-    end
-  end
-
-  describe '#request_access_level_target' do
-    let(:target_reference) { 'Observation/123' }
-    let(:access_level_instance) do
-      Class.new do
-        include DaVinciCRDTestKit::GatherResponseGenerationData
-
-        attr_accessor :result, :request_body
-      end.new
-    end
-
-    def stub_target_input(value)
-      inputs = value.nil? ? [] : [{ 'name' => 'access_level_target_reference', 'value' => value }]
-      access_level_instance.result = double(input_json: inputs.to_json)
-      access_level_instance.request_body = { 'fhirServer' => fhir_server }
-    end
-
-    it 'does not attempt a read when no target reference was provided' do
-      stub_target_input(nil)
-      allow(access_level_instance).to receive(:fetch_reference)
-
-      access_level_instance.request_access_level_target
-
-      expect(access_level_instance).to_not have_received(:fetch_reference)
-    end
-
-    # the test finds this read by its tag, so that it is not confused with the other data gathered
-    it 'reads the target reference and tags the request' do
-      stub_target_input(target_reference)
-      allow(access_level_instance).to receive(:fetch_reference)
-
-      access_level_instance.request_access_level_target
-
-      expect(access_level_instance).to have_received(:fetch_reference)
-        .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
-    end
-
-    it 'reads a reference given as an absolute url on the request fhirServer' do
-      stub_target_input("#{fhir_server}/#{target_reference}")
-      allow(access_level_instance).to receive(:fetch_reference)
-
-      access_level_instance.request_access_level_target
-
-      expect(access_level_instance).to have_received(:fetch_reference)
-        .with(target_reference, additional_tag: DaVinciCRDTestKit::ACCESS_LEVEL_TARGET_FETCH_TAG)
     end
   end
 end

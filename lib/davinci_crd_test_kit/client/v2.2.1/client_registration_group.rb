@@ -7,12 +7,12 @@ module DaVinciCRDTestKit
       id :crd_v221_client_registration
       title 'Registration'
       description %(
-        Before hook invocations can be made, the client tested in this session
+        Before hook invocations can be made, the CRD client tested in this session
         must be registered with and trusted by Inferno's simulated CRD server
         and vice-versa. Tests in this group confirm the registration of the partner
         system on both ends.
 
-        Inferno simulates two CRD discovery endpoints for the client to connect to:
+        Inferno simulates two CRD discovery endpoints for the CRD client to connect to:
         - Discovery endpoint for services requesting the complete [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.discovery_url}`
         - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
@@ -20,9 +20,9 @@ module DaVinciCRDTestKit
 
         This group must be run before any other tests in the "Hook Invocation" group because inputs
         provided to this group will be used by Inferno for the remainder of the tests
-        to identify client requests and verify behavior. The inputs will appear as locked and
-        unchangeable on these subsequent tests. If changes to these values are needed,
-        re-run this group and provide the corrected input values.
+        to identify requests made by the CRD client and verify behavior. The inputs will
+        appear as locked and unchangeable on these subsequent tests. If changes to these
+        values are needed, re-run this group and provide the corrected input values.
       )
       run_as_group
 

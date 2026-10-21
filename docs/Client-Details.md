@@ -1,6 +1,6 @@
 # Client Suite Implementation Details
 
-The Da Vinci CRD Test Kit contains suites validating the conformance of client systems
+The Da Vinci CRD Test Kit contains suites validating the conformance of CRD clients
 to two versions of the HL7® FHIR® Da Vinci Coverage Requirements Discovery Implementation Guide:
 - [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
 - [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
@@ -14,20 +14,20 @@ requirements and may change the test validation logic.
 ## Technical Implementation
 
 For these suites, Inferno [simulates a CRD payer server](#cds-services-simulation)
-for the client system to interact with. The client will be expected to initiate
+for the CRD client to interact with. The client will be expected to initiate
 requests to the server, allow Inferno to access data using FHIR APIs, and
 demonstrate its ability to react to the returned responses. Over the course of these
 interactions, Inferno will seek to observe conformant handling of CRD requirements as
 defined in the targeted CRD version.
 
 The client suites each contain two top-level groups:
-- In the "Hook Invocation" group, client systems will register Inferno's simulated
+- In the "Hook Invocation" group, CRD clients will register Inferno's simulated
   CRD discovery endpoint(s) against payer(s) and demonstrate invocations of
   the CRD-specified hooks ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html),
   [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)) that they support.
   Support for features required across all hooks but not necessarily on each one will
   also be checked as a part of this group.
-- In the "FHIR API" group, client systems will demonstrate that they can act as
+- In the "FHIR API" group, CRD clients will demonstrate that they can act as
   a FHIR server, including general US Core read and search API requirements
   as well as the ability to support updates as a part of CRD responses such
   as the coverage-information response type ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information),
@@ -39,6 +39,13 @@ to determine whether required features and functionality are present. HL7® FHIR
 validated with the Java validator using `tx.fhir.org` as the terminology server. CDS Hooks request
 and response objects may also be checked using the validator against defined logical models
 in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)).
+
+## Must Support Tests
+
+CRD clients are required to demonstrate support for some elements which appear only
+under certain conditions. See the **[Client Must Support](Client-Must-Support)**
+section for details on what Inferno checks for and the underlying requirements
+that drive those tests.
 
 ## CRD Server Simulation
 
@@ -107,7 +114,11 @@ are not tested by Inferno.
 
 The one exception is `Coverages`, which are obtained via the same search advertized in
 [Inferno's prefetch templates](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/routes/cds-services.json).
-  
+
+These requests are made before Inferno returns the hook response. Each one fails if the server
+does not respond within 10 seconds, so that a slow or unresponsive server cannot hold the response
+indefinitely.
+
 ##### Specific elements targeted
 
 While the CRD STU2 IG does not provide precise definitions of the FHIR elements that constitute the minimum
@@ -116,8 +127,9 @@ of [minimal prefetch templates](https://build.fhir.org/ig/HL7/davinci-crd/en/Bin
 The elements indicated in those prefetch templates informed the set of elements that Inferno looks in to determine
 what references to fetch.
 
-Any literal reference, relative or absolute, Inferno will attempt to read using the provided access token.
-Non-literal references will be ignored.
+Any literal reference, relative or absolute, Inferno will attempt to read. The provided access token
+will be sent when the reference is to a resource on the `fhirServer` indicated in the hook
+request body, otherwise it will not be sent. Non-literal references will be ignored.
 
 #### CDS Hooks Responses
 
@@ -154,11 +166,28 @@ In the 2.2.1 version of the CRD IG, clients are [required to support prefetch](h
 and to be able to provide the complete minimal data set via this mechanism. Inferno therefore assumes
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
 during a hook invocation. However, clients are still required to allow servers to access data via FHIR
-APIs. During a hook invocation, Inferno will use the provided `fhirServer` and
-`fhirAuthorization.access_token` to request resources outside the standard prefetch data
-set that it needs to validate other requirements, including
+APIs. During a hook invocation, Inferno will perform FHIR read interactions to request resources outside
+the standard prefetch data set that it needs to validate other requirements, including
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.
 - Parent Location resources of those provided via prefetch via the `partOf` element.
+- Resources referenced in must support elements that don't appear within the `context` or `prefetch`
+  fields of the hook request.
+
+Inferno makes these reads before returning the hook response, so when a hook request contains
+many references to resources not included in the request or the CRD client's FHIR server responds
+slowly Inferno's response can be delayed. To bound the delay, every FHIR request Inferno makes
+during a hook invocation, including the `Coverage` search made when no Coverage is prefetched, fails
+if the server does not respond within 10 seconds. Once a server has timed out while
+Inferno is reading must support references, Inferno makes no further must support reads from that
+server for the rest of the hook request.
+
+When requesting data, Inferno will only attempt to read literal references. It will use the Bearer
+token provided in the `fhirAuthorization.access_token` field of the hook request as long as the
+reference points to a resource on the `fhirServer` indicated in the hook request, as determined
+by [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references). If the
+reference refers to a resource on another FHIR server, Inferno does not include an access token
+on the read request. Such reads do not count as evidence that Inferno can access data from the
+CRD client's FHIR server during a hook request.
 
 During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
 tester-specified resource. Whereas the other resources listed above must be accessible, Inferno
@@ -218,6 +247,7 @@ Specific general limitations across all versions include:
   decision support. Testers should consider this requirement to be verified
   through attestation and should not represent their systems as having passed
   these tests if this requirement is not met.
+- Versioned references are not supported.
 - Not all requirements are verified.
 
 ### Additional v2.0.1 Client Suite Limitations

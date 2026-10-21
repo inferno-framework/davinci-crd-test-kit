@@ -1,11 +1,12 @@
 require 'inferno'
 require 'yaml'
 require_relative 'crd_must_support_metadata_extractor'
+require_relative '../cross_suite/must_support_references'
 require_relative '../cross_suite/profile_metadata'
 
 module DaVinciCRDTestKit
   module Generator
-    # Run with `bundle exec rake crd:generate_must_support_metadata`.
+    # Run with `bundle exec rake crd:generate`.
     class MustSupportMetadataGenerator
       IG_VERSIONS = ['2.2.1'].freeze
 
@@ -17,6 +18,13 @@ module DaVinciCRDTestKit
           crd: 'davinci_crd_2.2.1.tgz',
           hrex: 'davinci_hrex_1.2.0.tgz'
         }
+      }.freeze
+
+      # Must support references can target US Core profiles, which are not in the packages above,
+      # so the US Core package the CRD IG depends on is read from the US Core test kit when writing
+      # stubs for those targets.
+      US_CORE_PACKAGES = {
+        '2.2.1' => 'us_core_700.tgz'
       }.freeze
 
       PROFILES = {
@@ -33,7 +41,9 @@ module DaVinciCRDTestKit
           { key: 'encounter', package: :crd, id: 'profile-encounter' },
           # Supporting profiles.
           { key: 'coverage', package: :crd, id: 'profile-coverage' },
+          { key: 'device', package: :crd, id: 'profile-device' },
           { key: 'location', package: :crd, id: 'profile-location' },
+          { key: 'medication', package: :crd, id: 'profile-medication' },
           { key: 'organization', package: :crd, id: 'profile-organization' },
           { key: 'patient', package: :crd, id: 'profile-patient' },
           { key: 'practitioner', package: :crd, id: 'profile-practitioner' },
@@ -44,11 +54,13 @@ module DaVinciCRDTestKit
       def run
         IG_VERSIONS.each do |ig_version|
           puts "CRD v#{ig_version}"
-          PROFILES.fetch(ig_version).each do |config|
+          generated = PROFILES.fetch(ig_version).map do |config|
             metadata = extract(ig_version, config)
             write(ig_version, config[:key], metadata)
             puts "  #{config[:key].ljust(26)} #{metadata.must_support_strings.length} must support element(s)"
+            metadata
           end
+          write_target_profile_stubs(ig_version, generated)
         end
       end
 
@@ -94,9 +106,59 @@ module DaVinciCRDTestKit
           extensions: Array(must_supports[:extensions]).sort_by { |extension| extension[:id].to_s },
           slices: slices.sort_by { |slice| slice[:slice_id].to_s },
           elements: Array(must_supports[:elements]).sort_by { |element| element[:path].to_s },
-          choices: Array(must_supports[:choices]).sort_by { |choice| choice[:paths].to_a.first.to_s },
+          choices: Array(must_supports[:choices]).sort_by do |choice|
+            [choice[:element].to_s, (choice[:paths] || choice[:slice_names]).to_a.first.to_s]
+          end,
           recursive_elements: Array(must_supports[:recursive_elements]).sort
         }
+      end
+
+      # A must support reference test looks up each target profile by URL to learn its resource
+      # type, so a target profile without generated metadata of its own gets a stub carrying just
+      # its identifying details and no must supports.
+      def write_target_profile_stubs(ig_version, generated)
+        generated_urls = generated.map(&:profile_url)
+        target_urls = generated.flat_map { |metadata| target_profile_urls(metadata) }.uniq - generated_urls
+
+        target_urls.sort.each do |url|
+          profile = target_igs_for(ig_version).flat_map(&:profiles).find { |one| one.url == url }
+          raise "Target profile #{url} not found in any package" if profile.nil?
+
+          key = stub_key(profile)
+          write(ig_version, key, stub_metadata(profile))
+          puts "  #{key.ljust(26)} stub for target profile"
+        end
+      end
+
+      # Base FHIR resource definitions are identified by their URL alone, so they need no stub.
+      def target_profile_urls(metadata)
+        metadata.must_supports[:elements]
+          .flat_map { |element| Array(element[:target_profiles]) + Array(element[:allowed_target_profiles]) }
+          .map { |target_profile| target_profile.split('|').first }
+          .reject { |url| MustSupportReferences.base_resource_type(url) }
+      end
+
+      def stub_key(profile)
+        profile.id.delete_prefix('profile-').tr('-', '_')
+      end
+
+      def stub_metadata(profile)
+        ProfileMetadata.new(
+          resource: profile.type,
+          profile_url: profile.url,
+          profile_name: profile.title&.strip,
+          profile_version: profile.version
+        )
+      end
+
+      def target_igs_for(ig_version)
+        @target_igs ||= {}
+        @target_igs[ig_version] ||= igs_for(ig_version).values + [us_core_ig(ig_version)]
+      end
+
+      def us_core_ig(ig_version)
+        directory = File.join(Gem.loaded_specs['us_core_test_kit'].full_gem_path, 'lib', 'us_core_test_kit', 'igs')
+        Inferno::Entities::IG.from_file(File.join(directory, US_CORE_PACKAGES.fetch(ig_version)))
       end
 
       def add_binding_systems(slice, profile, implementation_guide)
