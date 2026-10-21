@@ -36,6 +36,7 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Verify test generation is up to date
         run: |
+          bundle exec inferno migrate
           bundle exec rake crd:generate
           GENERATED_DIRS="lib/davinci_crd_test_kit/cross_suite/generated lib/davinci_crd_test_kit/client/v2.2.1/must_support/generated"
           if [[ -n "$(git status --porcelain $GENERATED_DIRS)" ]]; then
