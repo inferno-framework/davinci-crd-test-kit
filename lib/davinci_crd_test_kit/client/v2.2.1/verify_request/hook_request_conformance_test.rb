@@ -2,6 +2,7 @@ require_relative '../../../cross_suite/requests_logical_model_validation'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../multi_request_message_helper'
 require_relative '../client_urls'
+require_relative '../../endpoints/cds_services_discovery_handler'
 
 module DaVinciCRDTestKit
   module V221
@@ -9,6 +10,7 @@ module DaVinciCRDTestKit
       include RequestsLogicalModelValidation
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include ClientURLs
 
       id :crd_v221_hook_request_conformance
       title 'Hook requests have the correct structure and contents'
@@ -27,11 +29,6 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@found-36-A',
                             'hl7.fhir.us.davinci-crd_2.2.1@hook-20', 'hl7.fhir.us.davinci-crd_2.2.1@hook-21'
 
-      SERVICE_FILENAMES = {
-        complete: 'cds-services-v221.json',
-        subset: 'cds-services-prefetch-subset-v221.json'
-      }.freeze
-
       # the JSON values that each configuration option type defined by CRD may take
       CONFIGURATION_TYPE_CHECKS = {
         'boolean' => ->(value) { [true, false].include?(value) },
@@ -40,12 +37,10 @@ module DaVinciCRDTestKit
       }.freeze
 
       def advertised_configuration_options(request, hook)
-        target = request.url.to_s.include?(PREFETCH_SUBSET_PREFIX) ? :subset : :complete
-        @advertised_configuration_options ||= {}
-        @advertised_configuration_options[[target, hook]] ||=
-          JSON.parse(File.read(File.join(__dir__, '..', SERVICE_FILENAMES[target])))['services']
-            .find { |service| service['hook'] == hook }
-            &.dig('extension', 'davinci-crd.configuration-options')
+        services = JSON.parse(
+          CDSServicesDiscoveryHandler.cds_services('v2.2.1', prefetch_subset: prefetch_target(request) == :subset)
+        )['services']
+        services.find { |service| service['hook'] == hook }&.dig('extension', 'davinci-crd.configuration-options')
       end
 
       # The logical model checks that the configuration is an object holding primitive values, but

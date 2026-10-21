@@ -7,9 +7,7 @@ module DaVinciCRDTestKit
   # Including tests need the `complete_prefetch_service_organization_id` and
   # `subset_prefetch_service_organization_id` inputs and DaVinciCRDTestKit::MultiRequestMessageHelper.
   module PrefetchedCoveragePayerHelper
-    def prefetch_target(request)
-      request.url.to_s.include?(PREFETCH_SUBSET_PREFIX) ? :subset : :complete
-    end
+    include ClientBaseURLs
 
     def payer_org_id_for_request(request)
       if prefetch_target(request) == :subset
