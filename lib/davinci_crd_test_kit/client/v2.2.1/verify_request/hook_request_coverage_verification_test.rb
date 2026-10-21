@@ -21,7 +21,8 @@ module DaVinciCRDTestKit
         profile.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@hook-1'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26-A', 'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A',
+                            'hl7.fhir.us.davinci-crd_2.2.1@hook-1'
 
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
