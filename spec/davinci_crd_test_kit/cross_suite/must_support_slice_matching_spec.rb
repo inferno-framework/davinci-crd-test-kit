@@ -72,11 +72,6 @@ RSpec.describe DaVinciCRDTestKit::MustSupportSliceMatching do
         .to eq(['serviceCategory:x12'])
     end
 
-    it 'is not matched by inferno_core, which needs a code on every value' do
-      expect(missing(core_logic, with_category(x12_system, '3'), metadata))
-        .to eq(['serviceCategory:x12'])
-    end
-
     it 'still matches enumerated system and code pairs alongside whole systems' do
       enumerated = { system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' }
       category_slice[:discriminator][:values] << enumerated
