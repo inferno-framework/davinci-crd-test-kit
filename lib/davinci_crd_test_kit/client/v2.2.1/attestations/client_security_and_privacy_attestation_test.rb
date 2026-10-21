@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   module V221
     class SecurityAndPrivacyAttestationTest < Inferno::Test
       id :crd_v221_security_and_privacy_attestation
-      ATTESTATION_TITLE = 'Health IT module adheres to security and privacy requirements'.freeze
+      ATTESTATION_TITLE = 'CRD client adheres to security and privacy requirements'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module adheres to the security and privacy
+        During this test, the tester will confirm that the CRD client adheres to the security and privacy
         rules that CRD inherits from the specifications it builds on.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
       input :security_and_privacy_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module adheres to the security and privacy rules that CRD inherits from
+              I attest that the CRD client adheres to the security and privacy rules that CRD inherits from
               the specifications it builds on.
             ),
             type: 'radio',

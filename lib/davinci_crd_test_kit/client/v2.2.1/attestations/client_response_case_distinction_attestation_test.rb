@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   module V221
     class ResponseCaseDistinctionAttestationTest < Inferno::Test
       id :crd_v221_response_case_distinction_attestation
-      ATTESTATION_TITLE = 'Health IT module distinguishes different response cases to users'.freeze
+      ATTESTATION_TITLE = 'CRD client distinguishes different response cases to users'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module distinguishes the different CRD
+        During this test, the tester will confirm that the CRD client distinguishes the different CRD
         response cases when presenting results to users.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
       input :response_case_distinction_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module distinguishes the different CRD response cases when presenting
+              I attest that the CRD client distinguishes the different CRD response cases when presenting
               results to users.
             ),
             type: 'radio',
