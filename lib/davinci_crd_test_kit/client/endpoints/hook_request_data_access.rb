@@ -88,12 +88,13 @@ module DaVinciCRDTestKit
     end
 
     def prefetched_coverage
-      @prefetched_coverage ||=
-        if request_body.dig('prefetch', 'coverage').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
-        elsif request_body.dig('prefetch', 'cov').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'cov').to_json)
-        end
+      @prefetched_coverage ||= begin
+        prefetch = request_body['prefetch']
+        coverage = if prefetch.is_a?(Hash)
+                     prefetch.values_at('coverage', 'cov').find { |value| value.is_a?(Hash) && value.present? }
+                   end
+        FHIR.from_contents(coverage.to_json) if coverage.present?
+      end
     end
 
     def find_coverage_for_request

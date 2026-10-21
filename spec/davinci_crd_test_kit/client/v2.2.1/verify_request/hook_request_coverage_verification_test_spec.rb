@@ -147,6 +147,17 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'uses the subset service key when the complete service key does not hold an object' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    prefetch = { 'coverage' => 'Coverage/other', 'cov' => hook_request_body.dig('prefetch', 'coverage') }
+    create_hook_request(body: hook_request_body.merge('prefetch' => prefetch))
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+    expect(result_messages.map(&:message).join).to_not include('Request has no coverage')
+  end
+
   it 'uses the first Coverage in the prefetched Bundle, skipping entries of other types' do
     allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
     body = hook_request_body.deep_dup

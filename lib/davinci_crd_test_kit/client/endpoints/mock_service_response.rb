@@ -199,11 +199,9 @@ module DaVinciCRDTestKit
     end
 
     def extract_prefetched_coverage(prefetch)
-      return nil unless prefetch.present?
-      return prefetch['coverage'] if prefetch['coverage'].present?
-      return prefetch['cov'] if prefetch['cov'].present?
+      return nil unless prefetch.is_a?(Hash)
 
-      nil
+      prefetch.values_at('coverage', 'cov').find { |value| value.is_a?(Hash) && value.present? }
     end
 
     def get_context_resource(update_resource_id)
@@ -306,9 +304,9 @@ module DaVinciCRDTestKit
 
     def find_prefetched_resource(request_body, key_options)
       prefetch = request_body['prefetch']
-      return if prefetch.blank?
+      return unless prefetch.is_a?(Hash)
 
-      found_key = key_options&.find { |key| prefetch[key].present? }
+      found_key = key_options&.find { |key| prefetch[key].is_a?(Hash) && prefetch[key].present? }
       return unless found_key.present?
 
       prefetch[found_key]

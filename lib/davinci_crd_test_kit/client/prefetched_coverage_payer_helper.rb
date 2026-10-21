@@ -24,8 +24,7 @@ module DaVinciCRDTestKit
       prefetch = request_body['prefetch']
       return unless prefetch.is_a?(Hash)
 
-      value = prefetch['coverage'].presence || prefetch['cov'].presence
-      value if value.is_a?(Hash)
+      prefetch.values_at('coverage', 'cov').find { |value| value.is_a?(Hash) && value.present? }
     end
 
     # The Coverage the payer is read from while processing the hook request: either the prefetched value

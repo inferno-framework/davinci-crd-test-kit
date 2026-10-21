@@ -89,6 +89,11 @@ module DaVinciCRDTestKit
             next
           end
 
+          if prefetched_coverage(request_body).dig('payor', 0, 'reference').blank?
+            add_request_message('error', 'Coverage has no payer reference.', request_index)
+            next
+          end
+
           check_payer_organization(request_body, request_index, expected_payer_org_id)
         end
       end
@@ -113,7 +118,7 @@ module DaVinciCRDTestKit
         return 1 if coverage_value['resourceType'] == 'Coverage'
 
         Array(coverage_value['entry']).count do |entry|
-          entry.is_a?(Hash) && entry.dig('resource', 'resourceType') == 'Coverage'
+          entry.is_a?(Hash) && entry['resource'].is_a?(Hash) && entry['resource']['resourceType'] == 'Coverage'
         end
       end
 

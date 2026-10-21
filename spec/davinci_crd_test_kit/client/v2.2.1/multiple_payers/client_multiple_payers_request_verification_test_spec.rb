@@ -236,6 +236,20 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
       )
     end
 
+    it 'ignores prefetched Bundle entries whose resource is not an object' do
+      [primary_request_body, secondary_request_body].each do |body|
+        body['prefetch']['coverage']['entry'] << { 'resource' => 'Coverage/1' }
+      end
+      stub_requests([
+                      hook_request(primary_request_body, complete_service_url),
+                      hook_request(secondary_request_body, subset_service_url)
+                    ])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('pass')
+    end
+
     it 'counts a Coverage prefetched under the subset service key' do
       secondary_request_body['prefetch'] = { 'cov' => secondary_request_body['prefetch']['coverage'] }
       stub_requests([
@@ -263,6 +277,17 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
         a_string_including("(Request 2) Payer for the Coverage has the wrong id: expected 'payer-primary', " \
                            "got 'payer-secondary'")
       )
+    end
+
+    it 'fails when the prefetched Coverage has no payer reference' do
+      primary_request_body['prefetch']['coverage']['entry'][0]['resource'].delete('payor')
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(a_string_including('(Request 1) Coverage has no payer reference'))
+      expect(result_messages).to_not include(a_string_including("Inferno failed to retrieve the Coverage's payer"))
     end
 
     it 'fails when Inferno could not read the payer of the prefetched Coverage' do
