@@ -179,6 +179,86 @@ RSpec.describe DaVinciCRDTestKit::RequestsLogicalModelValidation do
         expect(module_instance.messages.none? { |m| m[:message].include?('not found') }).to be true
       end
     end
+
+    # missing or wrongly typed fields are reported by the logical model, so these checks only must not raise
+    context 'when context fields are missing or malformed' do
+      it 'adds no errors when the context is missing' do
+        order_sign_request.delete('context')
+
+        expect { module_instance.send(:check_relative_references, order_sign_request, 0) }.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'adds no errors when the context is not an object' do
+        order_sign_request['context'] = 'not-an-object'
+
+        expect { module_instance.send(:check_relative_references, order_sign_request, 0) }.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'adds no errors when userId is missing' do
+        order_sign_request['context'].delete('userId')
+
+        expect { module_instance.send(:check_relative_references, order_sign_request, 0) }.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'adds an error rather than raising when userId is not a string' do
+        order_sign_request['context']['userId'] = 42
+
+        module_instance.send(:check_relative_references, order_sign_request, 0)
+
+        expect(module_instance.messages).to contain_exactly(
+          { type: 'error', message: '(Request 1) context.userId expected a local reference, got 42.' }
+        )
+      end
+
+      it 'adds no errors when order-dispatch performer and dispatchedOrders are missing' do
+        order_dispatch_request_v211['context'].delete('performer')
+        order_dispatch_request_v211['context'].delete('dispatchedOrders')
+
+        expect do
+          module_instance.send(:check_relative_references, order_dispatch_request_v211, 0)
+        end.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'adds no errors when order-dispatch dispatchedOrders is not an array' do
+        order_dispatch_request_v211['context']['dispatchedOrders'] = 'ServiceRequest/example'
+
+        expect do
+          module_instance.send(:check_relative_references, order_dispatch_request_v211, 0)
+        end.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'adds an error rather than raising when a dispatchedOrders entry is not a string' do
+        order_dispatch_request_v211['context']['dispatchedOrders'] = [{ 'reference' => 'ServiceRequest/example' }]
+
+        module_instance.send(:check_relative_references, order_dispatch_request_v211, 0)
+
+        expect(module_instance.messages.map { |message| message[:message] }).to contain_exactly(
+          '(Request 1) context.dispatchedOrders entry 1 expected a local reference, ' \
+          'got {"reference":"ServiceRequest/example"}.'
+        )
+      end
+
+      it 'adds no errors when order-select selections is missing' do
+        order_select_request['context'].delete('selections')
+
+        expect { module_instance.send(:check_relative_references, order_select_request, 0) }.to_not raise_error
+        expect(module_instance.messages).to be_empty
+      end
+
+      it 'reports a selection as not found rather than raising when draftOrders is not an object' do
+        order_select_request['context']['draftOrders'] = 'not-a-bundle'
+
+        module_instance.send(:check_relative_references, order_select_request, 0)
+
+        expect(module_instance.messages).to_not be_empty
+        expect(module_instance.messages).to all(include(message: a_string_including('not found in the draftOrders')))
+      end
+    end
   end
 
   describe '#reject_entry_resource_issues' do
