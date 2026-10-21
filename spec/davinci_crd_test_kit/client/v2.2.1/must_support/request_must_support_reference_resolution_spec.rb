@@ -327,6 +327,27 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
   end
 
+  # A reference that is not a string is malformed, so it is counted as populated but cannot resolve,
+  # the same as a logical reference.
+  it 'counts a must support element whose reference is not a string as populated but unresolved' do
+    order = vision_prescription(prescriber: nil).merge(prescriber: { reference: { reference: 'Practitioner/pr1' } })
+    create_hook_request([order], read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('`prescriber` using profile [CRD Practitioner](')
+  end
+
+  it 'passes when a reference that is not a string sits alongside a literal one that resolves' do
+    malformed = vision_prescription(prescriber: nil).merge(prescriber: { reference: 42 })
+    create_hook_request([malformed, vision_prescription], read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('pass')
+  end
+
   it 'passes when a logical reference sits alongside a literal one that resolves' do
     logical = vision_prescription(prescriber: nil).merge(prescriber: { display: 'Dr. Smith' })
     create_hook_request([logical, vision_prescription], read: [encounter, practitioner])

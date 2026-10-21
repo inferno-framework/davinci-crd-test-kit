@@ -209,9 +209,10 @@ module DaVinciCRDTestKit
       end
 
       # The resource a reference resolved to, if any, along with the read made for it, which is
-      # attached as evidence for the result. Logical references cannot be resolved.
+      # attached as evidence for the result. Logical references, and malformed ones that are not
+      # strings, cannot be resolved.
       def resolve(reference, entry, request_data)
-        return {} if reference.reference.blank?
+        return {} unless reference.reference.is_a?(String)
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
         base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]

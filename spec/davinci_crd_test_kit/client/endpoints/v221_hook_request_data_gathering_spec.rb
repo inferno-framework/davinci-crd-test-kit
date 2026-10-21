@@ -91,6 +91,26 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(result[location2_example_reference_absolute]).to be_a(FHIR::Location)
         expect(parent_request).to have_been_made.once
       end
+
+      # The prefetched parent is identified by its urn fullUrl, so it is not the Location on the FHIR server
+      # that the child's relative reference names, even though it is in the hash first.
+      it 'reads the parent of a location with a urn fullUrl even when a parent with that id was prefetched' do
+        child_urn = 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90'
+        parent_urn = 'urn:uuid:9e3c2b7d-1a4f-4c6e-8b5d-2f7a9c1e4b60'
+        child = location_example.merge('partOf' => { 'reference' => location2_example_reference_relative })
+        order_sign_request['prefetch'] = { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+          { 'fullUrl' => parent_urn, 'resource' => location2_example },
+          { 'fullUrl' => child_urn, 'resource' => child }
+        ] } }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+        parent_request = stub_request(:get, location2_example_reference_absolute)
+          .to_return(status: 200, body: location2_example.to_json)
+
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(parent_request).to have_been_made.once
+        expect(result.keys).to contain_exactly(parent_urn, child_urn, location2_example_reference_absolute)
+      end
     end
 
     describe '#add_location_to_hash' do
@@ -310,6 +330,23 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
                                              'https://elsewhere.example/r4/Location/grandparent')
     end
 
+    it 'reads no payer when the payor reference is not a string' do
+      order_sign_request['prefetch'] = { 'coverage' => crd_coverage.merge('payor' => [{ 'reference' => 42 }]) }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      expect { module_instance.request_coverage_payer }.to_not raise_error
+      expect(module_instance).to_not have_received(:persist_query_request)
+    end
+
+    it 'reads no parent location when the partOf reference is not a string' do
+      location = location_example.merge('partOf' => { 'reference' => { 'reference' => 'Location/parent' } })
+      order_sign_request['prefetch'] = { 'locations' => location }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      expect(module_instance.request_parent_locations.keys).to contain_exactly(location_example_reference_absolute)
+      expect(module_instance).to_not have_received(:persist_query_request)
+    end
+
     it 'reads a parent location from its server without the access token' do
       external_parent = 'https://elsewhere.example/r4/Location/parent'
       location = location_example.merge('partOf' => { 'reference' => external_parent })
@@ -373,6 +410,16 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
 
       expect(practitioner_role_request).to have_been_made.once
       expect(practitioner_request).to_not have_been_made
+    end
+
+    context 'when a must support reference is not a string' do
+      let(:performer) { [{ reference: { reference: practitioner_example_reference_relative } }] }
+
+      it 'reads the other references of the request' do
+        expect { module_instance.request_must_support_references }.to_not raise_error
+        expect(practitioner_role_request).to have_been_made.once
+        expect(practitioner_request).to_not have_been_made
+      end
     end
 
     it 'tags each read as a data fetch for the hook instance' do

@@ -95,6 +95,77 @@ RSpec.describe DaVinciCRDTestKit::ProfileMetadata do
     end
   end
 
+  describe '.profile_keys' do
+    it 'lists every generated profile, including target profile stubs, in order' do
+      keys = described_class.profile_keys(ig_version)
+
+      expect(keys).to include(*profile_keys, 'us_core_patient', 'hrex_organization')
+      expect(keys).to eq(keys.sort)
+    end
+  end
+
+  describe '.for_resource_type' do
+    it 'returns the single CRD profile for the resource type untouched' do
+      expect(described_class.for_resource_type(ig_version, 'ServiceRequest'))
+        .to be(described_class.for(ig_version, 'service_request'))
+    end
+
+    it 'merges every CRD profile for the resource type' do
+      merged = described_class.for_resource_type(ig_version, 'Appointment')
+
+      expect(merged.resource).to eq('Appointment')
+      expect(merged.must_support_strings)
+        .to match_array(described_class.merged(ig_version, %w[appointment_with_order appointment_without_order])
+                          .must_support_strings)
+    end
+
+    it 'leaves out target profile stubs, which carry no must supports' do
+      expect(described_class.for(ig_version, 'us_core_patient').must_supports).to be_empty
+      expect(described_class.for(ig_version, 'hrex_organization').must_supports).to be_empty
+
+      expect(described_class.for_resource_type(ig_version, 'Patient')).to be(described_class.for(ig_version, 'patient'))
+      expect(described_class.for_resource_type(ig_version, 'Organization'))
+        .to be(described_class.for(ig_version, 'organization'))
+    end
+
+    it 'is nil for a resource type with only target profile stubs' do
+      expect(described_class.for_resource_type(ig_version, 'AllergyIntolerance')).to be_nil
+    end
+
+    it 'is nil for a resource type with no generated profile' do
+      expect(described_class.for_resource_type(ig_version, 'Observation')).to be_nil
+    end
+  end
+
+  describe '.for_profile_url' do
+    let(:service_request_url) { 'http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-servicerequest' }
+
+    it 'finds the generated profile with the given url' do
+      expect(described_class.for_profile_url(ig_version, service_request_url))
+        .to be(described_class.for(ig_version, 'service_request'))
+    end
+
+    it 'ignores a version suffix on the url' do
+      expect(described_class.for_profile_url(ig_version, "#{service_request_url}|2.2.1"))
+        .to be(described_class.for(ig_version, 'service_request'))
+      expect(described_class.for_profile_url(ig_version, "#{service_request_url}|9.9.9"))
+        .to be(described_class.for(ig_version, 'service_request'))
+    end
+
+    it 'finds a target profile stub' do
+      metadata = described_class.for_profile_url(ig_version, 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient')
+
+      expect(metadata).to be(described_class.for(ig_version, 'us_core_patient'))
+      expect(metadata.resource).to eq('Patient')
+      expect(metadata.profile_version).to eq('7.0.0')
+    end
+
+    it 'is nil for a url with no generated profile' do
+      expect(described_class.for_profile_url(ig_version, 'http://example.com/StructureDefinition/unknown')).to be_nil
+      expect(described_class.for_profile_url(ig_version, nil)).to be_nil
+    end
+  end
+
   describe '.merged' do
     it 'returns the single profile untouched when given one key' do
       merged = described_class.merged(ig_version, ['service_request'])

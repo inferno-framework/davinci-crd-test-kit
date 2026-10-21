@@ -95,8 +95,9 @@ module DaVinciCRDTestKit
 
     # The absolute form of a literal reference held by a resource on the given base server: an
     # absolute URL as given, a relative `Type/id` reference appended to the base. nil for a
-    # contained reference, or one in neither form.
+    # contained reference, one that is not a string, or one in neither form.
     def absolute_reference(reference, base)
+      return unless reference.is_a?(String)
       return if reference.blank? || reference.start_with?('#')
       return reference if absolute_url?(reference)
 

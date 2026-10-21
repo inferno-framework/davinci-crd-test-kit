@@ -247,6 +247,7 @@ Specific general limitations across all versions include:
   decision support. Testers should consider this requirement to be verified
   through attestation and should not represent their systems as having passed
   these tests if this requirement is not met.
+- Versioned references are not supported.
 - Not all requirements are verified.
 
 ### Additional v2.0.1 Client Suite Limitations

@@ -99,8 +99,8 @@ module DaVinciCRDTestKit
       coverage_resource = prefetched_coverage_resource
       return unless coverage_resource.present? && coverage_resource.payor.first&.reference.present?
 
-      fetch_reference(resolved_reference(coverage_resource.payor.first.reference, prefetched_coverage_identity),
-                      additional_tag: PAYER_ORG_FETCH_TAG)
+      payer_reference = resolved_reference(coverage_resource.payor.first.reference, prefetched_coverage_identity)
+      fetch_reference(payer_reference, additional_tag: PAYER_ORG_FETCH_TAG) if payer_reference.present?
     end
 
     # The absolute URL identifying the prefetched Coverage (see ResourceIdentity).
@@ -111,8 +111,10 @@ module DaVinciCRDTestKit
 
     # The normalized absolute form of a reference held by the resource identified by the given URL,
     # following the FHIR rules for resolving references, or the reference as given when it has no
-    # absolute form.
+    # absolute form. nil for a reference that is not a string, which cannot be read.
     def resolved_reference(reference, holder_identity)
+      return unless reference.is_a?(String)
+
       base = ResourceIdentity.base_for(holder_identity) || fhir_server_base
       ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference, base)) || reference
     end
@@ -151,9 +153,9 @@ module DaVinciCRDTestKit
       return if location_hash.key?(identity)
 
       location_hash[identity] = location
-      return unless location.partOf&.reference.present?
+      parent_reference = resolved_reference(location.partOf&.reference, identity)
+      return if parent_reference.blank?
 
-      parent_reference = resolved_reference(location.partOf.reference, identity)
       parent_location = fetch_reference(parent_reference,
                                         additional_tag: PARENT_LOCATION_FETCH_TAG,
                                         parse_as_fhir: true)
