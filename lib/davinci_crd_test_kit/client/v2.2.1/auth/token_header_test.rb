@@ -18,7 +18,8 @@ module DaVinciCRDTestKit
         - The key used to sign the token must be present in the JWKS.
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184', 'cds-hooks_3.0.0-ballot@202'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@181', 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184',
+                            'cds-hooks_3.0.0-ballot@202'
 
       # Optional so that a group whose requests were declined can pass rather than skip on inputs
       # the short circuited tests before it never produced. The run block still skips when empty.
