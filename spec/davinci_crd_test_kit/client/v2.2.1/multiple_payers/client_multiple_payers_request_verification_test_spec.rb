@@ -61,6 +61,26 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
     end
   end
 
+  let(:payer_inputs) do
+    { complete_prefetch_service_organization_id: 'payer-primary',
+      subset_prefetch_service_organization_id: 'payer-secondary' }
+  end
+  let(:fetch_result) { repo_create(:result, test_session_id: test_session.id) }
+
+  # the payer reads Inferno makes while processing each hook request
+  def create_payer_fetch(hook_instance, payer_id)
+    repo_create(:request, direction: 'outgoing', test_session_id: test_session.id, result: fetch_result,
+                          url: "https://ehr.example.org/fhir/Organization/#{payer_id}", status: 200,
+                          response_body: { resourceType: 'Organization', id: payer_id }.to_json,
+                          tags: [DaVinciCRDTestKit::PAYER_ORG_FETCH_TAG,
+                                 DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(hook_instance)])
+  end
+
+  before do
+    create_payer_fetch('hook-instance-primary', 'payer-primary')
+    create_payer_fetch('hook-instance-secondary', 'payer-secondary')
+  end
+
   def hook_request(request_body, url)
     Inferno::Entities::Request.new(url:, request_body: request_body.to_json)
   end
@@ -79,7 +99,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
   it 'fails when no hook requests were received' do
     stub_requests([])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('did not receive any hook requests')
@@ -92,7 +112,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(primary_request_body, complete_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('expected at most one for each of the two payers')
@@ -104,7 +124,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     Inferno::Entities::Request.new(url: subset_service_url, request_body: nil)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('do not contain valid JSON bodies')
@@ -113,7 +133,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
   it 'passes when a single request solicits coverage information' do
     stub_requests([hook_request(primary_request_body, complete_service_url)])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('pass')
   end
@@ -121,7 +141,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
   it 'fails when a single request disables coverage information' do
     stub_requests([hook_request(secondary_request_body, subset_service_url)])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result_messages).to include(a_string_matching(/The hook request disables coverage information/))
@@ -133,7 +153,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(secondary_request_body, subset_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('pass')
   end
@@ -144,7 +164,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(secondary_request_body, complete_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result_messages).to include(a_string_matching(/made to the same Inferno simulated CRD server/))
@@ -157,7 +177,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(secondary_request_body, subset_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result_messages).to include(a_string_matching(/Neither hook request disables coverage information/))
@@ -170,7 +190,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(secondary_request_body, subset_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result_messages).to include(a_string_matching(/Both hook requests disable coverage information/))
@@ -183,9 +203,89 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersRequestVerificationT
                     hook_request(secondary_request_body, subset_service_url)
                   ])
 
-    result = run(test)
+    result = run(test, payer_inputs)
 
     expect(result.result).to eq('fail')
     expect(result_messages).to include(a_string_matching(/differ in `context`/))
+  end
+
+  describe 'prefetched coverage' do
+    let(:secondary_coverage) { secondary_request_body.dig('prefetch', 'coverage', 'entry', 0) }
+
+    it 'fails when a request prefetches more than one Coverage' do
+      primary_request_body['prefetch']['coverage']['entry'] << secondary_coverage
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(
+        a_string_including('(Request 1) 2 Coverages were provided in the prefetched coverage data')
+      )
+    end
+
+    it 'fails when a request prefetches no Coverage' do
+      primary_request_body['prefetch']['coverage'] = { 'resourceType' => 'Bundle', 'entry' => [] }
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(
+        a_string_including('No Coverage was provided in the prefetched coverage data')
+      )
+    end
+
+    it 'counts a Coverage prefetched under the subset service key' do
+      secondary_request_body['prefetch'] = { 'cov' => secondary_request_body['prefetch']['coverage'] }
+      stub_requests([
+                      hook_request(primary_request_body, complete_service_url),
+                      hook_request(secondary_request_body, subset_service_url)
+                    ])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('pass')
+    end
+
+    it "fails when a request's Coverage is not issued by the payer of the invoked service" do
+      stub_requests([
+                      hook_request(primary_request_body, subset_service_url),
+                      hook_request(secondary_request_body, complete_service_url)
+                    ])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(
+        a_string_including("(Request 1) Payer for the Coverage has the wrong id: expected 'payer-secondary', " \
+                           "got 'payer-primary'"),
+        a_string_including("(Request 2) Payer for the Coverage has the wrong id: expected 'payer-primary', " \
+                           "got 'payer-secondary'")
+      )
+    end
+
+    it 'fails when Inferno could not read the payer of the prefetched Coverage' do
+      primary_request_body['hookInstance'] = 'hook-instance-without-payer-read'
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs)
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(
+        a_string_including("Inferno failed to retrieve the Coverage's payer during hook processing")
+      )
+    end
+
+    it 'fails when no payer Organization id is configured for the invoked service' do
+      stub_requests([hook_request(primary_request_body, complete_service_url)])
+
+      result = run(test, payer_inputs.except(:complete_prefetch_service_organization_id))
+
+      expect(result.result).to eq('fail')
+      expect(result_messages).to include(
+        a_string_including('No Inferno Payer Organization id configured for the invoked service')
+      )
+    end
   end
 end

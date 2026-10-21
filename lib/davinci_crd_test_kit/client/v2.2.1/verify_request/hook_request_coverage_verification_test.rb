@@ -2,6 +2,7 @@ require_relative '../../../cross_suite/tags'
 require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
 require_relative '../client_urls'
+require_relative '../../prefetched_coverage_payer_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -9,6 +10,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include ClientURLs
+      include DaVinciCRDTestKit::PrefetchedCoveragePayerHelper
 
       id :crd_v221_hook_request_coverage_verification
       title 'Prefetched coverages are valid'
@@ -52,53 +54,9 @@ module DaVinciCRDTestKit
             optional: true,
             locked: true
 
-      def prefetch_target(request)
-        if request.url.include?(PREFETCH_SUBSET_PREFIX)
-          :subset
-        else
-          :complete
-        end
-      end
-
-      def payer_org_id_for_request(request)
-        if prefetch_target(request) == :subset
-          subset_prefetch_service_organization_id
-        else
-          complete_prefetch_service_organization_id
-        end
-      end
-
-      def load_payer_request_for_hook_request(request_body)
-        hook_data_fetch_tag = TagMethods.hook_instance_data_fetch_tag(request_body['hookInstance'])
-        load_tagged_requests(PAYER_ORG_FETCH_TAG, hook_data_fetch_tag).first
-      end
-
       def check_payer_request(request_body, request_index, expected_payer_org_id)
-        payer_request = load_payer_request_for_hook_request(request_body)
-        unless payer_request.present? && payer_request.status.to_s.starts_with?('2')
-          add_request_message('error',
-                              "Inferno failed to retrieve the Coverage's payer during hook processing.",
-                              request_index)
-          return
-        end
-
-        payer_resource = FHIR.from_contents(payer_request.response_body)
-        unless payer_resource.present?
-          add_request_message('error', 'Request for payer resource returned invalid FHIR data.', request_index)
-          return
-        end
-
-        if payer_resource.resourceType != 'Organization'
-          add_request_message('error', 'Payer for the Coverage is not an Organization: ' \
-                                       "got '#{payer_resource.resourceType}'", request_index)
-        end
-        if payer_resource.id != expected_payer_org_id
-          add_request_message('error', 'Payer for the Coverage has the wrong id: ' \
-                                       "expected '#{expected_payer_org_id}', got '#{payer_resource.id}'.",
-                              request_index)
-        end
-
-        check_payer_resource_conformance(payer_resource, request_index)
+        payer_resource = check_payer_organization(request_body, request_index, expected_payer_org_id)
+        check_payer_resource_conformance(payer_resource, request_index) if payer_resource.present?
       end
 
       def check_payer_resource_conformance(payer_resource, request_index)
@@ -149,12 +107,6 @@ module DaVinciCRDTestKit
 
         assert_no_error_messages("#{requests_with_errors_prefix}Invalid coverage. " \
                                  'See Messages for details.')
-      end
-
-      def prefetched_coverage(request_body)
-        coverage = request_body.dig('prefetch', 'coverage', 'entry', 0, 'resource')
-        coverage = request_body.dig('prefetch', 'cov', 'entry', 0, 'resource') unless coverage.present?
-        coverage
       end
     end
   end
