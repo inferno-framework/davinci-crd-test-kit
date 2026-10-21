@@ -118,6 +118,43 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
       )
     end
 
+    it 'skips the check for a hook the invoked service does not advertise' do
+      body = JSON.parse(request_body).merge('hook' => 'patient-view',
+                                            'extension' => { 'davinci-crd.configuration' => { 'made-up' => 7 } })
+      repo_create(:request, test_session_id: test_session.id, request_body: body.to_json, result:,
+                            url: 'https://example.com/cds-services/order-sign-service', tags: [hook_name])
+      expect(run(test).result).to eq('pass')
+    end
+
+    context 'with integer and string options advertised' do
+      before do
+        allow_any_instance_of(test).to receive(:advertised_configuration_options).and_return(
+          [{ 'code' => 'max-cards', 'type' => 'integer' }, { 'code' => 'detail', 'type' => 'string' }]
+        )
+      end
+
+      it 'passes when the values have the defined types' do
+        create_request_with_configuration({ 'max-cards' => 3, 'detail' => 'full' })
+        expect(run(test).result).to eq('pass')
+      end
+
+      it 'fails when an integer option is given a non-integer number' do
+        create_request_with_configuration({ 'max-cards' => 3.5 })
+        expect(run(test).result).to eq('fail')
+        expect(results_messages.map(&:message)).to include(
+          a_string_including('property `max-cards` must be an integer, got 3.5')
+        )
+      end
+
+      it 'fails when a string option is given a non-string value' do
+        create_request_with_configuration({ 'detail' => true })
+        expect(run(test).result).to eq('fail')
+        expect(results_messages.map(&:message)).to include(
+          a_string_including('property `detail` must be a string, got true')
+        )
+      end
+    end
+
     it 'leaves a configuration that is not an object to the logical model check' do
       create_request_with_configuration('coverage-info=false')
       expect(run(test).result).to eq('pass')

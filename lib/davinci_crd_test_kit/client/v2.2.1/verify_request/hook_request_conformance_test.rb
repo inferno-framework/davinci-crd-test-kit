@@ -71,8 +71,9 @@ module DaVinciCRDTestKit
         type_check = CONFIGURATION_TYPE_CHECKS[option['type']]
         return if type_check.nil? || type_check.call(value)
 
+        article = option['type'].match?(/\A[aeiou]/i) ? 'an' : 'a'
         add_request_message('error',
-                            "`davinci-crd.configuration` property `#{code}` must be a #{option['type']}, " \
+                            "`davinci-crd.configuration` property `#{code}` must be #{article} #{option['type']}, " \
                             "got #{value.to_json}.",
                             request_index)
       end
