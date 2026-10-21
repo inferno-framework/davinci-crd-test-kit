@@ -28,8 +28,16 @@ module DaVinciCRDTestKit
       value if value.is_a?(Hash)
     end
 
+    # The Coverage the payer is read from while processing the hook request: either the prefetched value
+    # itself when given as a Coverage, or the first Coverage in a prefetched Bundle. A Coverage given
+    # outside a Bundle is reported by the prefetch completeness check, so it is still checked here.
     def prefetched_coverage(request_body)
-      prefetched_coverage_value(request_body)&.dig('entry', 0, 'resource')
+      coverage_value = prefetched_coverage_value(request_body)
+      return if coverage_value.nil?
+      return coverage_value if coverage_value['resourceType'] == 'Coverage'
+
+      Array(coverage_value['entry']).filter_map { |entry| entry['resource'] if entry.is_a?(Hash) }
+        .find { |resource| resource.is_a?(Hash) && resource['resourceType'] == 'Coverage' }
     end
 
     def load_payer_request_for_hook_request(request_body)

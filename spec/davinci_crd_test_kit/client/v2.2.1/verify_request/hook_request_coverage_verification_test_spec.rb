@@ -125,6 +125,39 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'checks the payer of a Coverage prefetched on its own rather than in a Bundle' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    create_hook_request(body: hook_request_body.merge('prefetch' => { 'coverage' => coverage_resource }))
+    create_payer_fetch_request(response_body: { 'resourceType' => 'Organization', 'id' => 'other-payer' })
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    messages = result_messages.map(&:message).join
+    expect(messages)
+      .to include("Payer for the Coverage has the wrong id: expected '#{payer_org_id}', got 'other-payer'")
+    expect(messages).to_not include('Request has no coverage')
+  end
+
+  it 'passes when a Coverage prefetched on its own has the expected payer' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    create_hook_request(body: hook_request_body.merge('prefetch' => { 'coverage' => coverage_resource }))
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+  end
+
+  it 'uses the first Coverage in the prefetched Bundle, skipping entries of other types' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    body = hook_request_body.deep_dup
+    body['prefetch']['coverage']['entry'].unshift({ 'resource' => { 'resourceType' => 'OperationOutcome' } })
+    create_hook_request(body:)
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+  end
+
   it 'fails when coverage has no payer reference' do
     no_payer_coverage = { 'resourceType' => 'Coverage' }
     body = hook_request_body.deep_merge(
