@@ -114,7 +114,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
       create_request_with_configuration({ 'coverage-info' => 1 })
       expect(run(test).result).to eq('fail')
       expect(results_messages.map(&:message)).to include(
-        a_string_including('property `coverage-info` must be a boolean, got 1')
+        a_string_including('property `coverage-info` must be a boolean, got Integer value 1.')
       )
     end
 
@@ -142,7 +142,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
         create_request_with_configuration({ 'max-cards' => 3.5 })
         expect(run(test).result).to eq('fail')
         expect(results_messages.map(&:message)).to include(
-          a_string_including('property `max-cards` must be an integer, got 3.5')
+          a_string_including('property `max-cards` must be an integer, got Float value 3.5.')
         )
       end
 
@@ -150,7 +150,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
         create_request_with_configuration({ 'detail' => true })
         expect(run(test).result).to eq('fail')
         expect(results_messages.map(&:message)).to include(
-          a_string_including('property `detail` must be a string, got true')
+          a_string_including('property `detail` must be a string, got TrueClass value true.')
         )
       end
     end

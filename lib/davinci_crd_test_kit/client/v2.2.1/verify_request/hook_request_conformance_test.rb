@@ -74,7 +74,7 @@ module DaVinciCRDTestKit
         article = option['type'].match?(/\A[aeiou]/i) ? 'an' : 'a'
         add_request_message('error',
                             "`davinci-crd.configuration` property `#{code}` must be #{article} #{option['type']}, " \
-                            "got #{value.to_json}.",
+                            "got #{value.class} value #{value.to_json}.",
                             request_index)
       end
 
