@@ -16,9 +16,7 @@ module DaVinciCRDTestKit
       title 'Hook requests have the correct structure and contents'
       description %(
         During this test, Inferno will check each request body against the structural and content
-        requirements for the invoked hook. This includes checking that each property of the
-        `davinci-crd.configuration` extension, when present, is one of the configuration options
-        advertised by the invoked Inferno service and has the type defined for that option.
+        requirements for the invoked hook.
       )
 
       output :url, :smart_auth_info
@@ -44,7 +42,7 @@ module DaVinciCRDTestKit
       end
 
       # The logical model checks that the configuration is an object holding primitive values, but
-      # not which properties the invoked service advertised or the type each one was given.
+      # not the type each advertised option was given.
       def check_configuration_extension(request, request_body, request_index)
         extension = request_body['extension']
         return unless extension.is_a?(Hash) && extension['davinci-crd.configuration'].is_a?(Hash)
@@ -59,11 +57,13 @@ module DaVinciCRDTestKit
 
       def check_configuration_option(options, code, value, request_index)
         option = options.find { |advertised| advertised['code'] == code }
+        # CRD clients may send configuration the service does not support, and the service ignores it
         if option.nil?
-          add_request_message('error',
+          add_request_message('info',
                               "`davinci-crd.configuration` property `#{code}` is not a configuration option " \
                               'advertised by the invoked service (advertised: ' \
-                              "#{options.map { |advertised| "`#{advertised['code']}`" }.join(', ')}).",
+                              "#{options.map { |advertised| "`#{advertised['code']}`" }.join(', ')}), " \
+                              'so it was ignored.',
                               request_index)
           return
         end

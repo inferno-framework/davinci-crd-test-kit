@@ -409,6 +409,25 @@ RSpec.describe DaVinciCRDTestKit::CardsIdentification do
       expect(module_instance.coverage_info_response?('cards' => cards, 'systemActions' => actions)).to be(true)
     end
 
+    it 'does not treat coverage-info as disabled when the extension or configuration is not an object' do
+      [
+        { 'extension' => [{ 'davinci-crd.configuration' => { 'coverage-info' => false } }] },
+        { 'extension' => 'davinci-crd.configuration' },
+        { 'extension' => { 'davinci-crd.configuration' => [{ 'coverage-info' => false }] } },
+        []
+      ].each do |request_body|
+        expect(module_instance.coverage_info_configuration_disabled?(request_body))
+          .to be(false), "for #{request_body.inspect}"
+      end
+    end
+
+    it 'reads a named hook request extension only when the extension is an object' do
+      expect(module_instance.request_extension({ 'extension' => { 'a' => 1 } }, 'a')).to eq(1)
+      expect(module_instance.request_extension({ 'extension' => [{ 'a' => 1 }] }, 'a')).to be_nil
+      expect(module_instance.request_extension({}, 'a')).to be_nil
+      expect(module_instance.request_extension(nil, 'a')).to be_nil
+    end
+
     it 'sets and detects the coverage-info disabled configuration option' do
       request_body = {}
 

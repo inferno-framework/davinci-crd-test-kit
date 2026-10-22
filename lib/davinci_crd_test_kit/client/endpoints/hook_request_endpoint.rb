@@ -34,7 +34,7 @@ module DaVinciCRDTestKit
     end
 
     def requested_version
-      requested = request_body.dig('extension', 'davinci-crd.requestedVersion').to_s
+      requested = request_extension(request_body, 'davinci-crd.requestedVersion').to_s
       if requested == '2.2'
         'v221'
       elsif requested == '2.0'
@@ -182,7 +182,7 @@ module DaVinciCRDTestKit
     end
 
     def coverage_info_disabled?
-      request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
+      coverage_info_configuration_disabled?(request_body)
     end
 
     def hook_instance_already_used?

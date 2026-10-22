@@ -101,12 +101,12 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestConformanceTest do
       expect(run(test).result).to eq('pass')
     end
 
-    it 'fails when a property is not an advertised option' do
+    it 'passes and notes a property that is not an advertised option' do
       create_request_with_configuration({ 'coverage-info' => false, 'made-up-option' => 7 })
-      expect(run(test).result).to eq('fail')
-      expect(results_messages.map(&:message)).to include(
-        a_string_including('property `made-up-option` is not a configuration option advertised by the ' \
-                           'invoked service (advertised: `coverage-info`)')
+      expect(run(test).result).to eq('pass')
+      expect(results_messages.map { |message| [message.type, message.message] }).to include(
+        ['info', a_string_including('property `made-up-option` is not a configuration option advertised by the ' \
+                                    'invoked service (advertised: `coverage-info`), so it was ignored.')]
       )
     end
 

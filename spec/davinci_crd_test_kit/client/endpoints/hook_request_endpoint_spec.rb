@@ -431,6 +431,27 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(cov_request).to_not have_been_made
       end
 
+      it 'responds rather than raising when the extension is an array instead of an object' do
+        allow(test).to receive(:suite).and_return(suite)
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint,
+                  order_sign_hook_request.merge('extension' => [{ 'davinci-crd.requestedVersion' => '2.2' }]))
+
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards']).to be_present
+      end
+
       it 'still returns the hook response when gathering data for later verification fails' do
         allow(test).to receive(:suite).and_return(suite)
         allow_any_instance_of(described_class).to receive(:request_coverage_payer).and_raise(NoMethodError, 'boom')
