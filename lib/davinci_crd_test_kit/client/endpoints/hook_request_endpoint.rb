@@ -15,6 +15,8 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::CardsIdentification
     include DaVinciCRDTestKit::ScenarioServiceResponse
 
+    error_response_format :operation_outcome
+
     AVAILABLE_HOOKS = [
       'appointment-book',
       'encounter-start',
