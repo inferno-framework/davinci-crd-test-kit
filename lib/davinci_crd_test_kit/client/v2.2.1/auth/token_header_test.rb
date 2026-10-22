@@ -22,6 +22,7 @@ module DaVinciCRDTestKit
 
       # Optional so that a group whose requests were declined can pass rather than skip on inputs
       # the short circuited tests before it never produced. The run block still skips when empty.
+      # The defaults only pre-fill the UI, so a missing value still arrives as nil.
       input :auth_token_headers_json, optional: true, default: '[]'
       input :crd_jwks_keys_json, optional: true, default: '[]'
       output :auth_tokens_jwk_json
@@ -29,8 +30,10 @@ module DaVinciCRDTestKit
       run do
         check_for_short_circuit
 
-        auth_token_headers = JSON.parse(auth_token_headers_json)
-        crd_jwks_keys = JSON.parse(crd_jwks_keys_json)
+        # replace any output from an earlier run so that later tests skip rather than reuse stale keys
+        output auth_tokens_jwk_json: '[]'
+        auth_token_headers = JSON.parse(auth_token_headers_json.presence || '[]')
+        crd_jwks_keys = JSON.parse(crd_jwks_keys_json.presence || '[]')
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous tests.'
         skip_if crd_jwks_keys.compact.empty?, 'No JWKS keys produced from the previous test.'
 

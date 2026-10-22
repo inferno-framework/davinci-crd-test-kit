@@ -67,6 +67,13 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       end
     end
 
+    it 'skips when no tokens or JWKs were produced' do
+      result = run(test, cds_jwt_iss: example_client_url)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to eq('No Authorization tokens produced from the previous tests.')
+    end
+
     it 'passes if it receives a valid JWT payload' do
       create_appointment_hook_request
 

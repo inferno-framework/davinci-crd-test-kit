@@ -123,6 +123,14 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(jwks_request).to have_been_made
   end
 
+  it 'skips and outputs an empty key list when no token headers were produced' do
+    result = run(test)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to eq('No Authorization tokens produced from the previous test.')
+    expect(session_output(:crd_jwks_keys_json)).to eq([])
+  end
+
   it 'skips if jku field is not set, and no jwk_set is provided' do
     token_header_no_jku = token_header.except(:jku)
 
