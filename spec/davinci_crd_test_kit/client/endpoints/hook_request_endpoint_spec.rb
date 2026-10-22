@@ -209,6 +209,72 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
     end
   end
 
+  describe 'tagging requests by jti' do
+    let(:shared_jti) { 'shared-jti' }
+
+    def build_token(jti)
+      jwt_helper.build(aud: order_sign_url, iss: example_client_url, jku: "#{example_client_url}/jwks.json",
+                       encryption_method: 'RS384', jti:)
+    end
+
+    def post_hook_request(token, body)
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, body)
+    end
+
+    def jti_tagged_requests(*tags)
+      requests_repo.tagged_requests(test_session.id, tags)
+    end
+
+    before do
+      allow(test).to receive(:suite).and_return(suite)
+      stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 200, body: patient_example.to_json)
+      stub_request(:get, practitioner_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_example.to_json)
+      stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: instructions_card_template.to_json)
+    end
+
+    it 'tags each request by its jti and marks a later request that repeats it' do
+      post_hook_request(build_token(shared_jti), order_sign_hook_request)
+      post_hook_request(build_token('other-jti'), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+      post_hook_request(build_token(shared_jti), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+
+      jti_tag = DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti)
+      expect(jti_tagged_requests(jti_tag).length).to eq(2)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag('other-jti')).length).to eq(1)
+
+      duplicates = jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG)
+      expect(duplicates.length).to eq(1)
+      expect(jti_tagged_requests(jti_tag, DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG).map(&:id))
+        .to eq(duplicates.map(&:id))
+    end
+
+    it 'keeps the usual tags on a request that repeats a jti' do
+      post_hook_request(build_token(shared_jti), order_sign_hook_request)
+      post_hook_request(build_token(shared_jti), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+
+      expect(jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG, DaVinciCRDTestKit::ORDER_SIGN_TAG).length)
+        .to eq(1)
+    end
+
+    it 'does not tag a request Inferno rejected by its jti, so resending it is not a repeat' do
+      token = build_token(shared_jti)
+      post_hook_request(token, order_sign_hook_request.merge('hook' => 'appointment-book'))
+      expect(last_response.status).to eq(400)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti))).to be_empty
+
+      post_hook_request(token, order_sign_hook_request)
+      expect(last_response).to be_ok
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti)).length).to eq(1)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG)).to be_empty
+    end
+  end
+
   describe '#apply_hook_configuration' do
     let(:endpoint) { described_class.allocate }
     let(:coverage_info_card) do

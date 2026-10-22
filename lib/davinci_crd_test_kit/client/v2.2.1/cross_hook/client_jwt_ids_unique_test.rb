@@ -1,4 +1,5 @@
 require_relative '../../tagged_request_load_helper'
+require_relative '../../../cross_suite/tags'
 
 module DaVinciCRDTestKit
   module V221
@@ -13,8 +14,8 @@ module DaVinciCRDTestKit
         use it to protect against replay attacks. A CDS Service does so by rejecting a `jti` it has
         already received, so each hook request must carry a new JWT with its own `jti`.
 
-        During this test, Inferno will check that across all hook invocations performed during these
-        tests, no `jti` value was sent on more than one request.
+        During this test, Inferno will check that no `jti` value was sent on more than one of the hook
+        requests it processed during these tests, including those made during the scenarios.
       DESCRIPTION
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@192'
@@ -30,45 +31,54 @@ module DaVinciCRDTestKit
         nil
       end
 
-      # request numbers carrying each token, grouped by the `jti` of that token
-      def request_numbers_by_jti_and_token(requests)
-        requests.each_with_index.with_object({}) do |(request, index), by_jti|
-          token = bearer_token(request)
-          next if token.blank?
-
-          jti = jwt_id(token)
-          next if jti.blank?
-
-          ((by_jti[jti] ||= {})[token] ||= []) << (index + 1)
-        end
+      def tagged_requests_exist?(tag)
+        Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [tag]).present?
       end
 
-      def request_list(request_numbers)
-        "#{'request'.pluralize(request_numbers.length)} #{request_numbers.sort.to_sentence}"
+      # The `jti` values the hook endpoint found on an earlier request when it received a later one. The
+      # duplicate requests are not loaded into the result, since each is loaded with the others sharing
+      # its `jti`.
+      def repeated_jwt_ids
+        Inferno::Repositories::Requests.new.tagged_requests(test_session_id, [DUPLICATED_JWT_ID_TAG])
+          .filter_map { |request| jwt_id(bearer_token(request)) }
+          .uniq
+      end
+
+      # identifies a request by its hook and `hookInstance`, since the requests can come from any group
+      def request_label(request)
+        body = begin
+          JSON.parse(request.request_body.to_s)
+        rescue JSON::ParserError
+          nil
+        end
+        body = {} unless body.is_a?(Hash)
+        "`#{body['hook'] || 'unknown hook'}` (hookInstance `#{body['hookInstance'] || 'none'}`)"
+      end
+
+      def request_list(hook_requests)
+        labels = hook_requests.sort_by(&:index).map { |request| request_label(request) }
+        "#{labels.length} hook requests: #{labels.to_sentence}"
       end
 
       # Says whether the JWT itself was resent or the `jti` was reused in new JWTs, since the two point
       # to different fixes in the CRD client.
-      def report_repeated_jti(jti, request_numbers_by_token)
-        request_numbers = request_list(request_numbers_by_token.values.flatten)
+      def report_repeated_jti(jti, requests_by_token)
+        sent_on = request_list(requests_by_token.values.flatten)
         repetition =
-          if request_numbers_by_token.length == 1
-            "The same JWT (`jti` #{jti.to_json}) was sent on #{request_numbers}."
+          if requests_by_token.length == 1
+            "The same JWT (`jti` #{jti.to_json}) was sent on #{sent_on}."
           else
-            "`jti` #{jti.to_json} was used by #{request_numbers_by_token.length} different JWTs, sent on " \
-              "#{request_numbers}."
+            "`jti` #{jti.to_json} was used by #{requests_by_token.length} different JWTs, sent on #{sent_on}."
           end
         add_message('error', "#{repetition} Each hook request must carry a new JWT with its own `jti`.")
       end
 
       run do
-        hook_requests = load_requests_for_cross_hook_analysis
-        skip_if hook_requests.blank?, 'No hook requests received.'
+        skip_if !tagged_requests_exist?(CROSS_HOOK_ANALYSIS_TAG), 'No hook requests received.'
 
-        request_numbers_by_jti_and_token(hook_requests).each do |jti, request_numbers_by_token|
-          next if request_numbers_by_token.values.flatten.one?
-
-          report_repeated_jti(jti, request_numbers_by_token)
+        repeated_jwt_ids.each do |jti|
+          requests_sharing_jti = load_tagged_requests(TagMethods.jwt_id_tag(jti))
+          report_repeated_jti(jti, requests_sharing_jti.group_by { |request| bearer_token(request) })
         end
 
         assert_no_error_messages('Inferno received the same `jti` value on more than one hook request. ' \
