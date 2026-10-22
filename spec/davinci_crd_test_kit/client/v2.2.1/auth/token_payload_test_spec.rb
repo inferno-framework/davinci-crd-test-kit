@@ -38,7 +38,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     }
   end
 
-  def create_appointment_hook_request
+  def create_appointment_hook_request(created_at: nil)
     repo_create(
       :request,
       name: 'appointment_book',
@@ -47,7 +47,8 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       test_session_id: test_session.id,
       result:,
       status: 200,
-      tags: ['appointment-book']
+      tags: ['appointment-book'],
+      **(created_at ? { created_at: } : {})
     )
   end
 
@@ -258,6 +259,41 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
         .first.messages.map(&:message)
       expect(messages).to include(a_string_matching(/CDS Hooks prohibits/))
       expect(messages).to include(a_string_matching(/missing required claims: `exp`/))
+    end
+
+    it 'passes when exp has since elapsed but was still valid when the request was received' do
+      create_appointment_hook_request(created_at: 5.minutes.ago)
+
+      # Expired 2 minutes ago by wall-clock time, well past the 60s clock-skew leeway on its own,
+      # but was still unexpired when the request came in 5 minutes ago.
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 2.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'fails when the token was already expired when the request was received' do
+      create_appointment_hook_request(created_at: 5.minutes.ago)
+
+      # Expired 10 minutes ago, i.e. before the request was even received 5 minutes ago, so the
+      # dynamic leeway (elapsed time since the request + 60s) should not rescue it.
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 10.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to include('Token validation error: Signature has expired')
     end
 
     it 'fails if it receives a JWT Authorization header with missing claims' do
