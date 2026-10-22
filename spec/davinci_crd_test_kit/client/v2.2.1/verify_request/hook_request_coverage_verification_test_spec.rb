@@ -108,11 +108,11 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result_message).to match(/No #{hook_name} hook requests received/)
   end
 
-  it 'passes with a warning when no coverage is present in the prefetch' do
+  it 'fails with an error when no coverage is present in the prefetch' do
     create_hook_request(body: { 'hookInstance' => hook_instance, 'hook' => hook_name })
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
-    expect(result.result).to eq('pass')
+    expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to include('Request has no coverage')
   end
 
