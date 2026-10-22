@@ -102,8 +102,8 @@ module DaVinciCRDTestKit
 
       run do
         identifier = cds_jwt_iss
-        attest_true_url = "#{resume_pass_url}?token=#{ERB::Util.url_encode(identifier)}"
-        attest_false_url = "#{resume_fail_url}?token=#{ERB::Util.url_encode(identifier)}"
+        attest_true_url = resume_pass_url_for(identifier)
+        attest_false_url = resume_fail_url_for(identifier)
         output(attest_true_url:)
         output(attest_false_url:)
         wait(

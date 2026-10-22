@@ -125,9 +125,9 @@ module DaVinciCRDTestKit
       skip_if service_id.blank?, "No service id provided or discovered for the #{invoked_hook} hook"
 
       service_endpoint = "#{discovery_url}/#{service_id}"
-      continuation_url = "#{resume_pass_url}?token=#{test_session_id}"
+      continuation_url = resume_pass_url_for(test_session_id)
       output(continuation_url:)
-      failure_url = "#{resume_fail_url}?token=#{test_session_id}"
+      failure_url = resume_fail_url_for(test_session_id)
 
       acknowledge_before_continuing = manual_continuation == 'yes'
       perform_invoke_hook_job(

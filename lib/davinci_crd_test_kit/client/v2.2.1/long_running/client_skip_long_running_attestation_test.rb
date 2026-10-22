@@ -31,8 +31,8 @@ module DaVinciCRDTestKit
                                               'no hook requests sent during the previous wait.'
 
         identifier = SecureRandom.hex(32)
-        attest_true_url = "#{resume_pass_url}?token=#{identifier}"
-        attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+        attest_true_url = resume_pass_url_for(identifier)
+        attest_false_url = resume_fail_url_for(identifier)
         output(attest_true_url:)
         output(attest_false_url:)
         wait(

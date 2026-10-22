@@ -79,6 +79,17 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
     expect(result.result).to eq('pass')
   end
 
+  it 'passes from the continuation link when the issuer contains reserved query characters' do
+    issuer = 'https://ehr.example.org/crd?client=a&env=t+1'
+    result = run(test, cds_jwt_iss: issuer)
+    expect(result.result).to eq('wait')
+
+    outputs = result.outputs.to_h { |output| [output['name'], output['value']] }
+    get(outputs['continuation_url'])
+
+    expect(results_repo.find(result.id).result).to eq('pass')
+  end
+
   it 'continues waiting after a hook request is received' do
     result = run(test, cds_jwt_iss: example_client_url)
     expect(result.result).to eq('wait')
