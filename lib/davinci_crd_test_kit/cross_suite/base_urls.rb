@@ -1,3 +1,5 @@
+require 'erb'
+
 module DaVinciCRDTestKit
   RESUME_PASS_PATH = '/resume_pass'.freeze
   RESUME_FAIL_PATH = '/resume_fail'.freeze
