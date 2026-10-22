@@ -54,9 +54,9 @@ RSpec.describe DaVinciCRDTestKit::PrefetchedCoveragePayerHelper do
     end
   end
 
-  describe '#prefetched_coverage' do
+  describe '#first_prefetched_coverage' do
     it 'returns a Coverage prefetched on its own' do
-      expect(helper.prefetched_coverage({ 'prefetch' => { 'coverage' => coverage } })).to eq(coverage)
+      expect(helper.first_prefetched_coverage({ 'prefetch' => { 'coverage' => coverage } })).to eq(coverage)
     end
 
     it 'returns the first Coverage in a prefetched Bundle, skipping malformed entries and other types' do
@@ -65,16 +65,16 @@ RSpec.describe DaVinciCRDTestKit::PrefetchedCoveragePayerHelper do
         'entry' => ['not an entry', { 'resource' => 'Coverage/1' }, { 'resource' => { 'resourceType' => 'Patient' } },
                     { 'resource' => coverage }]
       }
-      expect(helper.prefetched_coverage({ 'prefetch' => { 'coverage' => bundle } })).to eq(coverage)
+      expect(helper.first_prefetched_coverage({ 'prefetch' => { 'coverage' => bundle } })).to eq(coverage)
     end
 
     it 'returns nil when the Bundle has no Coverage' do
       bundle = { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => { 'resourceType' => 'Patient' } }] }
-      expect(helper.prefetched_coverage({ 'prefetch' => { 'coverage' => bundle } })).to be_nil
+      expect(helper.first_prefetched_coverage({ 'prefetch' => { 'coverage' => bundle } })).to be_nil
     end
 
     it 'returns nil when no coverage was prefetched' do
-      expect(helper.prefetched_coverage({ 'prefetch' => {} })).to be_nil
+      expect(helper.first_prefetched_coverage({ 'prefetch' => {} })).to be_nil
     end
   end
 end

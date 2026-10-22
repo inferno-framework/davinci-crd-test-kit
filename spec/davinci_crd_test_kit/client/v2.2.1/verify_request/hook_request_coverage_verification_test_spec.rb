@@ -169,6 +169,14 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'fails rather than raising when the request body is a JSON array' do
+    create_hook_request(body: [hook_request_body].to_json)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to include('Request body must be a JSON object, got Array')
+  end
+
   it 'fails when coverage has no payer reference' do
     no_payer_coverage = { 'resourceType' => 'Coverage' }
     body = hook_request_body.deep_merge(

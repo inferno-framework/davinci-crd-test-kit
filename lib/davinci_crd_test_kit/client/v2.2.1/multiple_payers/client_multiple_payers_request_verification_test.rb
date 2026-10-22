@@ -89,7 +89,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          if coverage_payer_reference(prefetched_coverage(request_body)).blank?
+          if coverage_payer_reference(first_prefetched_coverage(request_body)).blank?
             add_request_message('error', 'Coverage has no payer reference.', request_index)
             next
           end

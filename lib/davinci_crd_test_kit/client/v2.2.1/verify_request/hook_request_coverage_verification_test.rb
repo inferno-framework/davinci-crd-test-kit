@@ -80,6 +80,12 @@ module DaVinciCRDTestKit
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
 
+          unless request_body.is_a?(Hash)
+            add_request_message('error', "Request body must be a JSON object, got #{request_body.class}.",
+                                request_index)
+            next
+          end
+
           expected_payer_org_id = payer_org_id_for_request(request)
           if expected_payer_org_id.blank?
             add_request_message(
@@ -90,7 +96,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          coverage = prefetched_coverage(request_body)
+          coverage = first_prefetched_coverage(request_body)
           unless coverage.present?
             add_request_message('warning', 'Request has no coverage.', request_index)
             next

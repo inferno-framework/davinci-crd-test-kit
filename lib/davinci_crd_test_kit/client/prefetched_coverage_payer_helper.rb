@@ -31,7 +31,7 @@ module DaVinciCRDTestKit
     end
 
     # the Coverage the payer is read from while processing the hook request
-    def prefetched_coverage(request_body)
+    def first_prefetched_coverage(request_body)
       prefetched_coverages(request_body).first
     end
 
