@@ -20,10 +20,21 @@ module DaVinciCRDTestKit
           types in the selected US Core version (required to verify the CRD client's support
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
           hook request field).
+
+        Testers can make hook requests during this test, but Inferno will never return
+        a successful response. Typical error responses include:
+        - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
+          the request and associated it with this session, but will not return successful hook responses
+          during this test.
+        - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
+          to associate the request with this session.
       )
       attestation
       verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
+      config options: { hook_requests_unavailable: true }
+
+      input :cds_jwt_iss
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
             description: %(
@@ -71,10 +82,28 @@ module DaVinciCRDTestKit
         end.join('`, `')
       end
 
+      def service_configuration_message(discovery_url, payer_id)
+        <<~MESSAGE
+          - **Discovery Endpoint**: `#{discovery_url}`
+          - **Related Payer**: #{payer_message(payer_id)}
+          - **Access Scope**: Inferno has been granted patient- or user-level read and search access scopes for
+                all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
+        MESSAGE
+      end
+
+      def payer_message(payer_id)
+        if payer_id.present?
+          "`#{payer_id}`. These CRD services will be invoked for patients with a coverage issued by " \
+            'the payer represented by the Organization resource with that id.'
+        else
+          'Not configured.'
+        end
+      end
+
       run do
-        identifier = SecureRandom.hex(32)
-        attest_true_url = "#{resume_pass_url}?token=#{identifier}"
-        attest_false_url = "#{resume_fail_url}?token=#{identifier}"
+        identifier = cds_jwt_iss
+        attest_true_url = "#{resume_pass_url}?token=#{ERB::Util.url_encode(identifier)}"
+        attest_false_url = "#{resume_fail_url}?token=#{ERB::Util.url_encode(identifier)}"
         output(attest_true_url:)
         output(attest_false_url:)
         wait(
@@ -82,24 +111,40 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             **Registration of Inferno as a trusted CRD server**:
 
-            I attest that the following Inferno CRD servers have been registered as trusted
-            within the CRD client:
-
-            - Complete Prefetch Service Discovery Endpoint: `#{discovery_url}`
-              - Services on this CRD server will be invoked for patients with a primary coverage issued by the payer
-                represented by the Organization resource with id `#{complete_prefetch_service_organization_id}`.
-              - The CRD server has been granted patient- or user-level read and search access scopes for
-                all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
-
-            - Subset Prefetch Service Discovery Endpoint: `#{prefetch_subset_discovery_url}`
-              - Services on this CRD server will be invoked for patients with a primary coverage issued by the payer
-                represented by the Organization resource with id `#{subset_prefetch_service_organization_id}`.
-              - The CRD server has been granted patient- or user-level read and search access scopes for
-                all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
+            I attest that Inferno's CRD services have been registered as trusted
+            within the CRD client and granted the access described below.
 
             [Click here](#{attest_true_url}) if the above statement is **true**.
 
             [Click here](#{attest_false_url}) if the above statement is **false**.
+
+            #### Trusted Endpoints Configuration
+
+            *Complete Prefetch Services*:
+
+            #{service_configuration_message(discovery_url, complete_prefetch_service_organization_id)}
+
+            *Subset Prefetch Services*:
+
+            #{service_configuration_message(prefetch_subset_discovery_url, subset_prefetch_service_organization_id)}
+
+            #### Authentication and Identification
+
+            For Inferno to recognize CRD requests and associate them with this session,
+            the authentication JWT sent as a Bearer token in the Authorization header
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
+
+            #### Responses
+
+            Testers are not required to make a hook request confirming connectivity.
+            However, testers may send hook requests to confirm connectivity. Inferno
+            will always respond with an error, but the type of error indicates whether
+            connectivity was successful:
+            - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
+              the request and associated it with this session, but will not return successful hook responses
+              during this test.
+            - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
+              to associate the request with this session.
           MESSAGE
         )
       end

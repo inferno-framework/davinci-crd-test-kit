@@ -79,7 +79,28 @@ module DaVinciCRDTestKit
       tested_hook.present? && tested_hook != ANY_HOOK_TAG && requested_hook != tested_hook
     end
 
+    # the registration attestation waits on the JWT issuer so that the client can confirm that its
+    # requests are recognized, but those requests are not processed as hook invocations
+    def hook_requests_unavailable?
+      test.config.options[:hook_requests_unavailable].present?
+    end
+
     def make_response
+      return hook_requests_unavailable_response if hook_requests_unavailable?
+
+      make_hook_response
+    end
+
+    def hook_requests_unavailable_response
+      hook_error_response('Registration succeeded: this request was associated with the session registered ' \
+                          "with JWT issuer `#{iss}`. Hook requests are not processed while registration is " \
+                          'being confirmed. Complete the registration attestation and start a hook ' \
+                          'invocation test before sending additional hook requests.',
+                          code: 422,
+                          outcome_code: 'business-rule')
+    end
+
+    def make_hook_response
       if requested_hook.blank?
         hook_error_response("No hook requested - populate the 'hook' element in the request.",
                             code: 400,
@@ -181,6 +202,13 @@ module DaVinciCRDTestKit
     end
 
     def tags
+      # keep requests made during registration out of every tag-based check of hook requests
+      return [] if hook_requests_unavailable?
+
+      hook_request_tags
+    end
+
+    def hook_request_tags
       tags =
         if hook_instance_already_used?
           [DUPLICATED_HOOK_INSTANCE_TAG]
