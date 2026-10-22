@@ -1,0 +1,108 @@
+# Exercises the CRD v2.2.1 handling of validator messages in both directions with one order-sign exchange:
+# - the server session sends crafted hook requests (inputs/v221_order_sign_request_bodies.json) that the
+#   client session validates (request filters), and
+# - the client session answers with a crafted response template (inputs/v221_order_sign_response_template.json)
+#   that the server session validates (response filters).
+# Each scenario is named in the input files (card summaries, systemAction descriptions, resource ids).
+sessions:
+  - suite: crd_client_v221
+    name: client
+    preset: inferno-crd-server-suite-v221
+    suite_options:
+      us_core_version: us_core_3
+  - suite: crd_server_v221
+    name: server
+    preset: inferno-crd-client-suite-v221
+
+comparison_config:
+  normalized_strings:
+    - replacement: <INFERNO_HOST>
+      patterns:
+        - https://localhost:8443 # local ruby with TLS
+        - http://localhost:4567/inferno # local inferno core ruby
+        - http://localhost:4567 # local ruby
+        - http://localhost # local docker
+        - https://inferno.healthit.gov/suites # prod
+        - https://inferno-qa.healthit.gov/suites # qa
+    - replacement: <UUID>
+      pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+    - replacement: <RANDOM_KEY>
+      pattern: /'[a-z]{16}'/
+    - replacement: <INFERNO_URL>
+      patterns:
+        - https://inferno.healthit.gov/ # prod
+        - https://inferno-qa.healthit.gov/ # qa
+  sessions:
+    client:
+      expected_results_file: crd_v221_order_sign_validator_scenarios_with_commands_client_expected.json
+      alternate_expected_files:
+        - file: crd_v221_order_sign_validator_scenarios_with_commands_client_no_ssl_expected.json
+          when:
+            - field: inferno_base_url
+              not_matches: https
+    server:
+      expected_results_file: crd_v221_order_sign_validator_scenarios_with_commands_server_expected.json
+      alternate_expected_files:
+        - file: crd_v221_order_sign_validator_scenarios_with_commands_server_no_ssl_expected.json
+          when:
+            - field: inferno_base_url
+              not_matches: https
+
+steps:
+  - state_description: client session created
+    session: client
+    status: created
+    start_run:
+      session: client
+      runnable: 1.2.4
+      inputs:
+        order_sign_response_approach: custom
+        order_sign_custom_response_template: "@inputs/v221_order_sign_response_template.json"
+    action_description: Run Client Group 1.2.4 Hooks > order-sign with the scenario response template
+
+  - state_description: Wait at Client test 1.2.4.1.01 Requests received for order-sign hook
+    session: client
+    status: waiting
+    last_completed: 1.2.4.1.01
+    start_run:
+      session: server
+      runnable: 3.4
+      inputs:
+        order_sign_service_ids: order-sign-service
+        order_sign_request_bodies: "@inputs/v221_order_sign_request_bodies.json"
+    next_poll_session: server
+    action_description: Run Server Group 3.4 Hook Tests > order-sign with the scenario requests
+    timeout: 900 # validation of the crafted content can take several minutes
+
+  - state_description: Wait at Server test 3.4.1.01
+    session: server
+    status: waiting
+    last_completed: 3.4.1.01
+    action: WAIT
+    action_description: Wait while the requests are sent
+    timeout: 900
+
+  - state_description: Finished Server Group 3.4 Hook Tests > order-sign
+    session: server
+    status: done
+    last_completed: 3.4
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Indicate that order-sign invocations are complete
+    timeout: 900
+
+  - state_description: Wait at Client test 1.2.4.2.01 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.4.2.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 900
+
+  - state_description: Finished Client Group 1.2.4 order-sign
+    session: client
+    status: done
+    last_completed: 1.2.4
+    action: END_SCRIPT
+    action_description: Script Completed
+    timeout: 900
