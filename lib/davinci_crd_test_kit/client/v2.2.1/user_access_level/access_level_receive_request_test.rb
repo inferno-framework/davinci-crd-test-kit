@@ -49,21 +49,28 @@ module DaVinciCRDTestKit
         <<~MESSAGE
           **Invoke a hook as a #{access_level_role} user**:
 
-          Invoke any supported hook, while signed in as a **#{access_level_role}** user, on one of
-          the two Inferno simulated CRD servers discoverable at the following endpoints:
+          Invoke any supported hook while signed in as a **#{access_level_role}** user on one of
+          the two Inferno simulated CRD servers. #{same_scenario_instruction} The test will
+          automatically continue once Inferno has received a request and returned a response.
 
-          - Complete Prefetch: `#{discovery_url}`
-          - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+          While processing the hook request, Inferno will use the access token from the request
+          to read `#{access_level_target_reference}`. That read must #{'not ' if limited_access_run?}return
+          the target resource.
 
-          For Inferno to recognize these requests and associate them with this session,
+          #### Endpoints
+
+          - Complete Prefetch Discovery Endpoint: `#{discovery_url}`
+          - Subset Prefetch Discovery Endpoint: `#{prefetch_subset_discovery_url}`
+
+          #### Authentication and Identification
+
+          For Inferno to recognize CRD requests and associate them with this session,
           the authentication JWT sent as a Bearer token in the Authorization header
-          must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
-          will automatically continue once Inferno has received a request and returned
-          a response.
+          must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
-          #{same_scenario_instruction}Inferno will use the access token in the request to attempt
-          to read `#{access_level_target_reference}` and will return a mocked coverage-information
-          response.
+          #### Responses
+
+          Inferno will return a mocked coverage-information response.
         MESSAGE
       end
 

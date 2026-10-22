@@ -38,22 +38,29 @@ module DaVinciCRDTestKit
             **Unknown Response Content Test**:
 
             Invoke any supported hook on one of the two Inferno simulated
-            CRD servers discoverable at the following endpoints:
+            CRD servers and Inferno will return a response that includes some
+            random, unexpected content. The test will automatically continue once
+            Inferno has received a request and returned a response.
 
-            - Complete Prefetch: `#{discovery_url}`
-            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+            CRD clients must ignore the content they do not recognize and process
+            the coverage information as usual. Testers will be asked to attest that
+            this was demonstrated in the next test.
 
-            For Inferno to recognize these requests and associate them with this session,
+            #### Endpoints
+
+            - Complete Prefetch Discovery Endpoint: `#{discovery_url}`
+            - Subset Prefetch Discovery Endpoint: `#{prefetch_subset_discovery_url}`
+
+            #### Authentication and Identification
+
+            For Inferno to recognize CRD requests and associate them with this session,
             the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. The test
-            will automatically continue once Inferno has received a request and returned
-            a response.
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
+
+            #### Responses
 
             The response will include coverage information alongside an element and a
-            custom extension whose names are not defined by CRD or CDS Hooks. CRD clients
-            must ignore the content they do not recognize and process the coverage
-            information as usual. Testers will be asked to attest that this was
-            demonstrated in the next test.
+            custom extension whose names are not defined by CRD or CDS Hooks.
           )
         )
       end

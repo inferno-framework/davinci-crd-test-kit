@@ -45,20 +45,28 @@ module DaVinciCRDTestKit
             **Long Running Hook Request Test**:
 
             Invoke any supported hook on one of the two Inferno simulated
-            CRD servers discoverable at the following endpoints:
+            CRD servers. This test will automatically continue once Inferno
+            has received a request, paused for #{long_running_pause_time.to_i}
+            seconds, and returned a response.
 
-            - Complete Prefetch: `#{discovery_url}`
-            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+            Users must have the option to continue their workflow before Inferno's
+            response is returned. Testers will be asked to attest that this was
+            demonstrated in the next test.
 
-            For Inferno to recognize these requests and associate them with this session,
+            #### Endpoints
+
+            - Complete Prefetch Discovery Endpoint: `#{discovery_url}`
+            - Subset Prefetch Discovery Endpoint: `#{prefetch_subset_discovery_url}`
+
+            #### Authentication and Identification
+
+            For Inferno to recognize CRD requests and associate them with this session,
             the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. This test
-            will automatically continue once Inferno has received a request, paused
-            for #{long_running_pause_time.to_i} seconds, and returned a response.
+            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
-            Users must have the option to continue
-            their workflow before Inferno's response is returned. Testers will be asked to
-            attest that this was demonstrated in the next test.
+            #### Responses
+
+            Inferno will return a mocked coverage-information response.
           )
         )
       end

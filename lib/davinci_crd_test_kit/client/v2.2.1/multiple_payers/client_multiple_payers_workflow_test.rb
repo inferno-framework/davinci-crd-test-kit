@@ -77,22 +77,29 @@ module DaVinciCRDTestKit
           message: %(
             **Multiple Payers Workflow Test**:
 
-            Perform a workflow that triggers hook invocation, such as one performed during
-            previous tests, for a patient that has two active coverages associated with two
-            different payers, each the payer associated with one of the two Inferno simulated
-            CRD servers discoverable at the following endpoints:
+            Perform actions in the CRD client that trigger hook invocation(s), such as
+            one performed during previous tests, for a patient that has two active
+            coverages associated with two different payers, each associated with one
+            of the two Inferno simulated CRD service endpoints.
+
+            Once all necessary actions are complete, [click here](#{continuation_url}) to attest
+            that the CRD client triggered hook invocation(s) for a patient with active coverages
+            from two different payers and that all resulting hook requests have been sent.
+
+            #### Endpoints
 
             #{complete_prefetch_endpoint_details}
             #{subset_prefetch_endpoint_details}
 
-            For Inferno to recognize these requests and associate them with this session,
+            #### Authentication and Identification
+
+            For Inferno to recognize CRD requests and associate them with this session,
             the authentication JWT sent as a Bearer token in the Authorization header
             must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
-            By [clicking here](#{continuation_url}) I attest that a user completed a workflow
-            in the CRD client that triggered hook invocation for a patient with active
-            coverages from two different payers and that all resulting hook requests have
-            been sent.
+            #### Responses
+
+            Inferno will return a mocked coverage-information response.
           )
         )
       end

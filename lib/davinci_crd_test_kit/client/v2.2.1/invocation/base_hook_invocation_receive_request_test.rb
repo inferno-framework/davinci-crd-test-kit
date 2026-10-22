@@ -152,16 +152,22 @@ module DaVinciCRDTestKit
 
             #{invoke_intro}
 
+            [Click here](#{continuation_url}) when you have finished submitting requests.
+
+            #### Endpoints
+
             - Complete Prefetch: `#{complete_prefetch_url}`
             - Subset Prefetch: `#{subset_prefetch_url}`
 
-            For Inferno to recognize these requests and associate them with this session,
+            #### Authentication and Identification
+
+            For Inferno to recognize CRD requests and associate them with this session,
             the authentication JWT sent as a Bearer token in the Authorization header
             must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
 
-            #{configured_response_details}
+            #### Responses
 
-            [Click here](#{continuation_url}) when you have finished submitting requests.
+            #{configured_response_details}
           )
         )
       end
