@@ -12,6 +12,8 @@ module DaVinciCRDTestKit
       end
 
       def token_to_session_id(token_to_decode)
+        return if token_to_decode.blank?
+
         JSON.parse(Base64.urlsafe_decode64(token_to_decode))&.dig('session_id')
       rescue JSON::ParserError, ArgumentError
         nil

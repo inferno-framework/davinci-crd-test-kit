@@ -73,11 +73,29 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
     end
 
-    it 'returns an error when the Authorization header is missing' do
+    it 'returns 500 with an OperationOutcome when the Authorization header is missing' do
       run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                     service_request_bodies:, mock_ehr_bundle:)
       get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
-      expect(last_response.status).to be >= 400
+      expect(last_response).to be_server_error
+      expect(last_response.content_type).to start_with('application/fhir+json')
+      outcome = FHIR.from_contents(last_response.body)
+      expect(outcome).to be_a(FHIR::OperationOutcome)
+      expect(outcome.issue.first.code).to eq('not-found')
+      expect(outcome.issue.first.details.text).to include('no identifier found')
+    end
+
+    it 'returns 500 with an OperationOutcome when the token is for a different session' do
+      wait_and_auth
+      other_token = DaVinciCRDTestKit::MockEHR::FHIRRequestHandler.session_id_to_token('other-session')
+      header 'Authorization', "Bearer #{other_token}"
+      get "/custom/#{suite_id}/fhir/Patient/#{patient.id}"
+      expect(last_response).to be_server_error
+      expect(last_response.content_type).to start_with('application/fhir+json')
+      outcome = FHIR.from_contents(last_response.body)
+      expect(outcome).to be_a(FHIR::OperationOutcome)
+      expect(outcome.issue.first.code).to eq('not-found')
+      expect(outcome.issue.first.details.text).to include('is not associated with a waiting session')
     end
   end
 end
