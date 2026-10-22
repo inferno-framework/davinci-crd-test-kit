@@ -92,10 +92,10 @@ module DaVinciCRDTestKit
     end
 
     def hook_requests_unavailable_response
-      hook_error_response('Registration succeeded: this request was associated with the session registered ' \
-                          "with JWT issuer `#{iss}`. Hook requests are not processed while registration is " \
-                          'being confirmed. Complete the registration attestation and start a hook ' \
-                          'invocation test before sending additional hook requests.',
+      hook_error_response('This request was successfully associated with the session registered ' \
+                          "with JWT issuer `#{iss}`. Hook requests are not processed while connectivity is " \
+                          'being confirmed during the Registration group. Complete the registration ' \
+                          'attestation and start a hook invocation test before sending additional hook requests.',
                           code: 422,
                           outcome_code: 'business-rule')
     end

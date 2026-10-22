@@ -51,7 +51,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientServiceRegistrationAttestation,
     outcome = FHIR.from_contents(last_response.body)
     expect(outcome).to be_a(FHIR::OperationOutcome)
     expect(outcome.issue.first.code).to eq('business-rule')
-    expect(outcome.issue.first.details.text).to include('Registration succeeded')
+    expect(outcome.issue.first.details.text).to include('successfully associated')
     expect(outcome.issue.first.details.text).to include(example_client_url)
     expect(results_repo.find(result.id).result).to eq('wait')
   end

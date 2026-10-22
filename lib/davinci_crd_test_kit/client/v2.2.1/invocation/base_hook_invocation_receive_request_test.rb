@@ -122,7 +122,7 @@ module DaVinciCRDTestKit
       end
 
       def invoke_intro
-        "Invoke #{hook_slug} hook by sending requests to one or both of the two Inferno simulated CRD servers:"
+        "Invoke #{hook_slug} hook by sending requests to one or both of the two Inferno simulated CRD servers."
       end
 
       def complete_prefetch_url

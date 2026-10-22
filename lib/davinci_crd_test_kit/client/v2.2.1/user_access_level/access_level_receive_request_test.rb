@@ -50,7 +50,7 @@ module DaVinciCRDTestKit
           **Invoke a hook as a #{access_level_role} user**:
 
           Invoke any supported hook while signed in as a **#{access_level_role}** user on one of
-          the two Inferno simulated CRD servers. #{same_scenario_instruction} The test will
+          the two Inferno simulated CRD servers. #{same_scenario_instruction}The test will
           automatically continue once Inferno has received a request and returned a response.
 
           While processing the hook request, Inferno will use the access token from the request
