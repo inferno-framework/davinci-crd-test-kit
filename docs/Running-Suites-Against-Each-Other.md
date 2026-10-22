@@ -71,7 +71,7 @@ Some tests will fail, including
   fields to verify that the server ignores them.
 - Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
 
-### Additional Optional Steps for Long-running Hook Request
+### Additional Optional Steps for the Long-running Hook Request Scenario
 
 1. In the client session, run group "1.4 Long-running Hook Request" with no changes to the inputs.
 1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
@@ -87,6 +87,22 @@ Some tests will fail, including
    you had the option of cancelling Inferno's tests.
 
 All tests should pass.
+
+### Additional Optional Steps for the Unknown Response Content Scenario
+
+TODO
+
+### Additional Optional Steps for the Self-Pay Scenario
+
+TODO
+
+### Additional Optional Steps for the Multiple Payers Scenario
+
+TODO
+
+### Additional Optional Steps for the User Access Level Scoping Scenario
+
+TODO
 
 ### Additional Optional Steps for FHIR API Testing
 
