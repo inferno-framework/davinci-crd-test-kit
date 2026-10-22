@@ -98,7 +98,7 @@ module DaVinciCRDTestKit
 
           coverage = first_prefetched_coverage(request_body)
           unless coverage.present?
-            add_request_message('warning', 'Request has no coverage.', request_index)
+            add_request_message('error', 'Request has no coverage.', request_index)
             next
           end
 
