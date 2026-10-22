@@ -108,19 +108,6 @@ module DaVinciCRDTestKit
       end
     end
 
-    def create_card_response(hook_card_response)
-      if hook_card_response.nil?
-        response.headers.merge!({ 'Access-Control-Allow-Origin' => '*' })
-        response.status = 400
-        response.body = 'Invalid Request: Incorrect format for hook request body'
-      else
-        response.body = hook_card_response.to_json
-        response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-        response.status = 200
-        response.format = :json
-      end
-    end
-
     def update_specific_hook_card_info(card_response)
       return if card_response.nil?
 

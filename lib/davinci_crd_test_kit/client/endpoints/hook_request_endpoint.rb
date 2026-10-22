@@ -224,8 +224,8 @@ module DaVinciCRDTestKit
     def hook_error_response(error_message, code: 400, outcome_code: 'invalid')
       response.status = code
       response.body = error_operation_outcome(outcome_code, error_message).to_json
-      response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-      response.format = :json
+      response.headers.merge!({ 'Access-Control-Allow-Origin' => '*' })
+      response.format = 'application/fhir+json'
     end
 
     def error_operation_outcome(code, text)
