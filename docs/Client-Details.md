@@ -11,6 +11,40 @@ feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues)
 on the tests. Future versions of these tests may validate other
 requirements and may change the test validation logic.
 
+## Client Testing Paradigm
+
+To enable testing, Inferno simulates CRD Service endpoints as described
+below for CRD clients to use to initiate hook requests. However, these
+endpoints will only respond successfully when Inferno can associate the
+incoming request with an active testing session. The following are key
+considerations for testers to be aware of when testing using thes and
+tests that use this client testing paradigm:
+
+- Inferno will only recognize requests when the test session is
+  actively waiting. In the CRD client suites, these tests
+  and their parent groups are marked with a "Tester-Initiated Exchange"
+  badge. While these tests are running and active, they will display
+  a "User Action Required" dialog that explains what Inferno expects
+  to happen, how it will respond, how to continue the tests, and other
+  relevant details.
+- For CRD client tests, Inferno uses the `iss` claim in the payload
+  of the JWT provided as the bearer token to identify the session
+  that the incoming message will be associated with. Testers will
+  provide the value that the CRD client will send in this location
+  as an input when running the tests. CRD clients that cannot send
+  a JWT will not be able to uses these tests.
+- "User Action Required" dialogs are active and listening for incoming
+  requests for the session for a set period of time (typically about 5
+  minutes). The time remaining is displayed at the bottom
+  of the dialog. After the timer runs out, Inferno will stop listening
+  for requests and testers will need to click the "Cancel" button
+  and start over. Using the "Cancel" button is also an option if testers
+  are unable to complete the required steps.
+
+NOTE: these restrictions do not apply to Inferno's simulatedd discovery
+endpoint which are not session dependent. They will always return the
+same response and are always active even when there is no session waiting.
+
 ## Technical Implementation
 
 For these suites, Inferno [simulates a CRD payer server](#cds-services-simulation)
