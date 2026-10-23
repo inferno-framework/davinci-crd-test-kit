@@ -107,9 +107,9 @@ the corresponding "Response types to return from [hook name] hook requests" inpu
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
-### Cross Hook Verification
+### Cross-Invocation Requirements
 
-After running one or more hook groups, run group "1.4 Cross Hook" to check if the client
+After running one or more hook groups, run group "1.4 Cross-Invocation Requirements" to check if the client
 has met requirements that must be demonstrated across all hook requests, but aren't required for each hook invocation.
 For example, clients must have received and attested to display support of the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
 response type including all must support elements on the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
@@ -169,7 +169,7 @@ With those caveats, a passing execution of this suite would include:
 - Passing all other groups, including
   - 1.1 Registration
   - 1.3 Scenarios
-  - 1.4 Cross Hook
+  - 1.4 Cross-Invocation Requirements
   - 2 FHIR API
 
 ## Demonstration Executions

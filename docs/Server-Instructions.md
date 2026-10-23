@@ -41,10 +41,10 @@ The following groups and inputs can be used to expand the process described in t
 Additional hooks can be tested in the same manner by selecting and running the associated
 group as described in [Quick Start](#quick-start).
 
-### Cross-hook Requirements
+### Cross-Invocation Requirements
 
 Once groups associated with all supported hooks have been run, execute group
-"3.7 Required Card Response Validation" to confirm that cross-hook requirements
+"3.7 Required Card Response Validation" to confirm that cross-invocation requirements
 have been met. These tests use the requests made during other groups so they cannot be run
 before they have been run.
 

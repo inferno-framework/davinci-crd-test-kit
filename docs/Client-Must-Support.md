@@ -161,8 +161,7 @@ in the future.
 
 When looking for must support elements Inferno will consider resources in all
 requests and responses exchanged by Inferno and the CRD client during sub-groups
-of the "Hooks" group and the "Additional Hook Invocations for Cross Hook Support
-Demonstration" group. The must support element tests consider resources within the
+of the "Hooks" group and the "Additional Hook Invocations" group. The must support element tests consider resources within the
 `context` and `prefetch` fields of hook requests. The must support reference tests
 additionally consider resources obtained by FHIR read interactions that Inferno
 performed while processing those hook requests. Resources exchanged during sub-groups of the "Scenarios" group
@@ -171,7 +170,7 @@ of request content and response handling.
 
 Note that Inferno will only consider requests and responses exchanged during the most
 recent execution of each group. When any group is re-run, including the "Additional Hook
-Invocations for Cross Hook Support Demonstration" group, the requests made during the
+Invocations" group, the requests made during the
 previous run of that group will no longer be considered.
 
 ## Attestation

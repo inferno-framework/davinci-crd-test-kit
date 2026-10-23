@@ -232,7 +232,7 @@ module DaVinciCRDTestKit
               !AVAILABLE_HOOKS.include?(requested_hook)
           []
         else
-          # the `jti` tags let the cross hook check of `jti` uniqueness see the requests from every group
+          # the `jti` tags let the cross-invocation check of `jti` uniqueness see the requests from every group
           [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag, *jwt_id_tags]
         end
 

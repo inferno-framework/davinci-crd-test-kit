@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
       input :make_additional_hook_requests,
             title: 'Make additional hook requests?',
             description: %(
-              Cross hook analysis considers every hook request made during the most recent execution
+              Cross-invocation analysis considers every hook request made during the most recent execution
               of each group in this session. Select `Yes` to send more requests now so that features
               the earlier requests did not cover can be demonstrated. Otherwise select `No` to
               evaluate the requests already received, and every test in this group will pass without

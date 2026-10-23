@@ -39,7 +39,7 @@ module DaVinciCRDTestKit
         that it sends within hook requests and that it receives within hook responses.
 
         All requests made during the latest runs of each "Hooks" sub-groups and the "Additional Hook
-        Invocations for Cross Hook Support Demonstration" group above are included in this analysis.
+        Invocations" group above are included in this analysis.
         When re-running these groups, remember that requests made during the prior execution will fall
         out of scope of this analysis, so elements only demonstrated during that execution will need to
         be demonstrated again during the new test run.

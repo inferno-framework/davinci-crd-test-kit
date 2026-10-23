@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
       end
 
       # Reads the requests directly rather than going through `load_tagged_requests`, which would
-      # also associate every cross hook request with this test's own result.
+      # also associate every cross-invocation request with this test's own result.
       def tagged_requests(*tags)
         requests_repo.tagged_requests(test_session_id, tags)
       end

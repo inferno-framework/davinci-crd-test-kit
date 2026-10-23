@@ -19,10 +19,10 @@ require_relative 'client_urls'
 module DaVinciCRDTestKit
   module V221
     class ClientCrossHookInteractionGroup < Inferno::TestGroup
-      title 'Additional Hook Invocations for Cross Hook Support Demonstration'
+      title 'Additional Hook Invocations'
       id :crd_v221_client_cross_hook_interaction
       description <<~DESCRIPTION
-        Optionally send more hook requests demonstrating additional cross-hook
+        Optionally send more hook requests demonstrating additional cross-invocation
         features.
 
         Inferno's simulated hook endpoints can be discovered at:

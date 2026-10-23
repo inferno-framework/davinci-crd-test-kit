@@ -56,7 +56,7 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. When a "User Action Required" dialog appears, switch to the "complete prefetch" server session and run group "3.x <hook name>"
    1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
    1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
-1. Run client group "1.4 Cross Hook", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
+1. Run client group "1.4 Cross-Invocation Requirements", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
    1. group "2 Hook Response Demonstration" in the "complete prefetch" session (adds additional Patient and Practitioner must support elements)
    1. group "3.2 encounter-start" in the "complete prefetch" session
    1. group "3.2 encounter-start" in the "subset prefetch" session
@@ -64,7 +64,7 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. group "3.6 encounter-discharge" in the "subset prefetch" session
    1. Once all complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
    1. A series of "User Action Required" dialogs will appear asking for attestation that the CRD client does not support must support elements that were not observed. Attest with a mix of true and false answers.
-1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
+1. Run server group "3.7 Cross-Invocation Response Validation" in both server sessions.
 
 Some tests will fail, including
 - TLS tests in the client suite (1.2.x.3.08 and 1.4.1.3.08) and server suites (1.01) will fail when executed in a local system.

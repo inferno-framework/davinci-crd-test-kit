@@ -20,7 +20,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientOrderTypesSignedTest, :request do
     { resourceType: 'Bundle', entry: resources.map { |one| { resource: one } } }
   end
 
-  # Only order-sign requests carry the hook tag; every hook request carries the cross hook tag.
+  # Only order-sign requests carry the hook tag; every hook request carries the cross-invocation tag.
   def create_request(body, hook_tag: nil)
     tags = [DaVinciCRDTestKit::CROSS_HOOK_ANALYSIS_TAG, hook_tag].compact
     repo_create(:request, test_session_id: test_session.id, request_body: body.to_json,
