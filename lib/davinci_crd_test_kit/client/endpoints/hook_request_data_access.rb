@@ -1,5 +1,6 @@
 require_relative '../../cross_suite/resource_identity'
 require_relative '../../cross_suite/tags'
+require_relative '../prefetched_coverage_value'
 
 module DaVinciCRDTestKit
   # Reads data from the CRD client while a hook request is being processed, using the `fhirServer`
@@ -88,12 +89,10 @@ module DaVinciCRDTestKit
     end
 
     def prefetched_coverage
-      @prefetched_coverage ||=
-        if request_body.dig('prefetch', 'coverage').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'coverage').to_json)
-        elsif request_body.dig('prefetch', 'cov').present?
-          FHIR.from_contents(request_body.dig('prefetch', 'cov').to_json)
-        end
+      @prefetched_coverage ||= begin
+        coverage = PrefetchedCoverageValue.find(request_body['prefetch'])
+        FHIR.from_contents(coverage.to_json) if coverage.present?
+      end
     end
 
     def find_coverage_for_request

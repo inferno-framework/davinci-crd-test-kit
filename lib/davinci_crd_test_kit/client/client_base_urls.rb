@@ -21,6 +21,11 @@ module DaVinciCRDTestKit
   module ClientBaseURLs
     include BaseURLs
 
+    # which of Inferno's two simulated CRD servers received the request
+    def prefetch_target(request)
+      request.url.to_s.include?(PREFETCH_SUBSET_PREFIX) ? :subset : :complete
+    end
+
     def discovery_url
       @discovery_url ||= inferno_base_url + DISCOVERY_PATH
     end

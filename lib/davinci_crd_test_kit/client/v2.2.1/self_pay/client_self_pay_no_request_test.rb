@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
         previous test.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26-B'
 
       run do
         self_pay_requests = load_interaction_group_requests

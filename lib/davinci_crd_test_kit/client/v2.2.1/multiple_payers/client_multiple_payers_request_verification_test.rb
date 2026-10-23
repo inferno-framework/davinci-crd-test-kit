@@ -1,11 +1,15 @@
 require_relative '../../../cross_suite/cards_identification'
 require_relative '../../tagged_request_load_helper'
+require_relative '../../multi_request_message_helper'
+require_relative '../../prefetched_coverage_payer_helper'
 
 module DaVinciCRDTestKit
   module V221
     class ClientMultiplePayersRequestVerificationTest < Inferno::Test
       include CardsIdentification
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::PrefetchedCoveragePayerHelper
 
       # elements that may legitimately differ between the requests made to the two payers: unique
       # request identifiers, authorization tokens, prefetched data carrying the payer's coverage,
@@ -28,9 +32,39 @@ module DaVinciCRDTestKit
         associated with a different payer, they must be the same except for their coverage details,
         and exactly one of them must disable coverage information using the `coverage-info` key
         in the `davinci-crd.configuration` extension.
+
+        Additionally, the CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-29)
+        that only the coverage selected for the payer be included in the prefetch content of a CRD request,
+        so Inferno verifies that each request's prefetched coverage contains exactly one Coverage and that its
+        payer is the Organization associated with the invoked simulated CRD server during the "Registration" group.
       )
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-28', 'hl7.fhir.us.davinci-crd_2.2.1@dev-30'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26-A', 'hl7.fhir.us.davinci-crd_2.2.1@dev-28',
+                            'hl7.fhir.us.davinci-crd_2.2.1@dev-29-A', 'hl7.fhir.us.davinci-crd_2.2.1@dev-30',
+                            'hl7.fhir.us.davinci-crd_2.2.1@hook-1'
+
+      input :complete_prefetch_service_organization_id,
+            title: 'Complete Prefetch Service Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              complete prefetch CRD server. One of the patient's two Coverages must reference
+              this Organization as its payer.
+              Re-run the "Registration" group to provide this detail.
+            ),
+            type: 'text',
+            optional: true,
+            locked: true
+      input :subset_prefetch_service_organization_id,
+            title: 'Subset Prefetch Service Organization id',
+            description: %(
+              The FHIR Organization id associated with Inferno's simulated
+              subset prefetch CRD server. One of the patient's two Coverages must reference
+              this Organization as its payer.
+              Re-run the "Registration" group to provide this detail.
+            ),
+            type: 'text',
+            optional: true,
+            locked: true
 
       def parse_request_bodies(hook_requests)
         hook_requests.map do |request|
@@ -40,6 +74,42 @@ module DaVinciCRDTestKit
         rescue JSON::ParserError
           nil
         end
+      end
+
+      # Only the coverage selected for the invoked payer may be prefetched, and it must be issued by that payer.
+      def check_prefetched_coverages(hook_requests, request_bodies)
+        hook_requests.zip(request_bodies).each_with_index do |(request, request_body), request_index|
+          next unless single_prefetched_coverage?(request_body, request_index)
+
+          expected_payer_org_id = payer_org_id_for_request(request)
+          if expected_payer_org_id.blank?
+            add_request_message('error', 'No Inferno Payer Organization id configured for the invoked service, ' \
+                                         'so the payer of the prefetched Coverage could not be checked.',
+                                request_index)
+            next
+          end
+
+          if coverage_payer_reference(first_prefetched_coverage(request_body)).blank?
+            add_request_message('error', 'Coverage has no payer reference.', request_index)
+            next
+          end
+
+          check_payer_organization(request_body, request_index, expected_payer_org_id)
+        end
+      end
+
+      def single_prefetched_coverage?(request_body, request_index)
+        coverage_count = prefetched_coverages(request_body).size
+        return true if coverage_count == 1
+
+        message = if coverage_count.zero?
+                    'No Coverage was provided in the prefetched coverage data.'
+                  else
+                    "#{coverage_count} Coverages were provided in the prefetched coverage data. Only the " \
+                      'coverage selected for the invoked payer may be included.'
+                  end
+        add_request_message('error', message, request_index)
+        false
       end
 
       def check_solitary_request(request_body)
@@ -58,7 +128,7 @@ module DaVinciCRDTestKit
       end
 
       def check_distinct_payers(hook_requests)
-        return if hook_requests.map { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }.uniq.length == 2
+        return if hook_requests.map { |request| prefetch_target(request) }.uniq.length == 2
 
         add_message('error',
                     'Both hook requests were made to the same Inferno simulated CRD server. Each request ' \
@@ -127,13 +197,14 @@ module DaVinciCRDTestKit
         request_bodies = parse_request_bodies(hook_requests)
         assert request_bodies.all?(&:present?), 'Received hook requests do not contain valid JSON bodies.'
 
+        check_prefetched_coverages(hook_requests, request_bodies)
         if hook_requests.one?
           check_solitary_request(request_bodies.first)
         else
           check_request_pair(hook_requests, request_bodies)
         end
 
-        assert_no_error_messages('Received hook requests do not demonstrate solicitation of coverage ' \
+        assert_no_error_messages('Received hook requests do not demonstrate conformant solicitation of coverage ' \
                                  'information from a single payer. See Messages for details.')
       end
     end

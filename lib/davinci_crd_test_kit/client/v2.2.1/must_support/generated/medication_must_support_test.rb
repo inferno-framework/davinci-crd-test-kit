@@ -38,7 +38,8 @@ module DaVinciCRDTestKit
         - `code.extension:BillingOptions`
       DESCRIPTION
 
-      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-3',
+                            'hl7.fhir.us.davinci-crd_2.2.1@billopt-1'
 
       config(
         options: {

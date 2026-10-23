@@ -158,15 +158,18 @@ module DaVinciCRDTestKit
     # -----------------------------------------------------------------------
     def check_prefetch_template(prefetch_key, prefetch_request)
       @current_prefetch_key = prefetch_key
+      prior_error_count = errors.size
       instantiated_request = instantiate_template(prefetch_key, prefetch_request)
-      if demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
-        @observed_fhirpath_collection_as_comma_delimited_string = true
-      end
       unless hook_request['prefetch'].key?(prefetch_key)
         errors << "#{error_prefix} No prefetch data provided."
         return
       end
       check_provided_against_request(hook_request['prefetch'][prefetch_key], instantiated_request)
+      # the client only demonstrates the collection handling if it provided this key's data correctly
+      if errors.size == prior_error_count &&
+         demonstrates_collection_as_comma_delimited_string?(prefetch_request, instantiated_request)
+        @observed_fhirpath_collection_as_comma_delimited_string = true
+      end
     rescue FhirpathServiceError => e
       raise "#{error_prefix} FHIRPath service error while evaluating prefetch template. " \
             "This indicates an implementation problem in Inferno - please log a ticket. Details: #{e.message}"

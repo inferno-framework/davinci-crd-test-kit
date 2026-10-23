@@ -27,23 +27,28 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
     allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:long_running_group?).and_return(true)
   end
 
-  it 'fails when long_running_pause_time is less than 5 seconds' do
-    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '3')
+  it 'fails when long_running_pause_time is less than 15 seconds' do
+    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '14')
 
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('Long-running Request Pause Time')
+    expect(result.result_message).to include('at least 15 seconds')
   end
 
-  it 'enters wait state when long_running_pause_time is at least 5 seconds' do
+  it 'defaults long_running_pause_time to 15 seconds' do
+    expect(test.available_inputs[:long_running_pause_time].default).to eq('15')
+  end
+
+  it 'enters wait state when long_running_pause_time is at least 15 seconds' do
     allow_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep)
 
-    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '5')
+    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '15')
 
     expect(result.result).to eq('wait')
   end
 
   it 'passes automatically after a valid hook request and sleeps for the configured pause time' do
-    expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep).with(5)
+    expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep).with(15)
 
     token = jwt_helper.build(
       aud: appointment_book_url,
@@ -52,7 +57,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '5')
+    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '15')
     expect(result.result).to eq('wait')
 
     body['prefetch'] = { 'coverage' => crd_coverage }
@@ -65,7 +70,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
   end
 
   it 'sleeps for the duration specified by long_running_pause_time input' do
-    expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep).with(10)
+    expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep).with(20)
 
     token = jwt_helper.build(
       aud: appointment_book_url,
@@ -74,7 +79,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
       encryption_method: 'RS384'
     )
 
-    run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '10')
+    run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '20')
 
     body['prefetch'] = { 'coverage' => crd_coverage }
     header('Authorization', "Bearer #{token}")
@@ -91,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
       encryption_method: 'RS384'
     )
 
-    result = run(test, cds_jwt_iss: 'different.example.com', long_running_pause_time: '5')
+    result = run(test, cds_jwt_iss: 'different.example.com', long_running_pause_time: '15')
     expect(result.result).to eq('wait')
 
     body['prefetch'] = { 'coverage' => crd_coverage }

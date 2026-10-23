@@ -4,13 +4,13 @@ module DaVinciCRDTestKit
   module V221
     class CoverageBasedInvocationAttestationTest < Inferno::Test
       id :crd_v221_coverage_based_invocation_attestation
-      ATTESTATION_TITLE = 'Health IT module invokes hooks on multiple payers in parallel'.freeze
+      ATTESTATION_TITLE = 'CRD client invokes hooks on multiple payers in parallel'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module invokes hooks on multiple payer
-        services in parallel if more than one invocation is needed based on the patient's active coverages.
-        To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
-        test.
+        During this test, the tester will confirm that the CRD client invokes hooks on multiple payer
+        services in parallel and displays the results simultaneously if more than one invocation is needed
+        based on the patient's active coverages. To see the specifics of the attested requirements, click
+        the "View Specification Requirements" link for this test.
       )
       attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
@@ -19,8 +19,9 @@ module DaVinciCRDTestKit
       input :coverage_based_invocation_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module invokes hooks on multiple payer services in
-              parallel if more than one invocation is needed based on the patient's active coverages.
+              I attest that the CRD client invokes hooks on multiple payer services in
+              parallel and displays the results simultaneously if more than one invocation
+              is needed based on the patient's active coverages.
             ),
             type: 'radio',
             default: 'false',

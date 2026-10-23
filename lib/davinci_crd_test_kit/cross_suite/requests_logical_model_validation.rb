@@ -125,36 +125,46 @@ module DaVinciCRDTestKit
 
     # verify that context fields required to contain local references (resourceType/id)
     # do contain them and that the resourceType is in the list of expected types.
+    #
+    # Fields that are absent, or lists that are not arrays, are skipped: the logical model reports them.
     def check_relative_references(request_body, request_index)
       # unless order-dispatch, check userId
       # if order-dispatch, check performer and dispatchedOrders list
       # if order-select, check selections
+      context = request_body['context']
+      return unless context.is_a?(Hash)
 
       if request_body['hook'] == 'order-dispatch'
-        local_reference?(request_body['context']['performer'],
-                         "(Request #{request_index + 1}) context.performer",
-                         allowed_resource_types: PERFORMER_ALLOWED_RESOURCE_TYPES)
-        request_body['context']['dispatchedOrders'].each_with_index do |order_reference, index|
+        check_context_reference(context, 'performer', request_index, PERFORMER_ALLOWED_RESOURCE_TYPES)
+        context_reference_list(context, 'dispatchedOrders').each_with_index do |order_reference, index|
           local_reference?(order_reference,
                            "(Request #{request_index + 1}) context.dispatchedOrders entry #{index + 1}",
                            allowed_resource_types: ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES)
         end
       else
-        local_reference?(request_body['context']['userId'],
-                         "(Request #{request_index + 1}) context.userId",
-                         allowed_resource_types: USER_ID_ALLOWED_RESOURCE_TYPES)
+        check_context_reference(context, 'userId', request_index, USER_ID_ALLOWED_RESOURCE_TYPES)
         if request_body['hook'] == 'order-select'
-          request_body['context']['selections'].each_with_index do |order_reference, index|
+          context_reference_list(context, 'selections').each_with_index do |order_reference, index|
             error_prefix = "(Request #{request_index + 1}) context.selections entry #{index + 1}"
             next unless local_reference?(order_reference,
                                          error_prefix,
                                          allowed_resource_types: ProfilesAndResourceTypes::ORDER_RESOURCE_TYPES)
 
-            referenced_resource_present_in_bundle?(request_body['context']['draftOrders'], order_reference,
+            referenced_resource_present_in_bundle?(context['draftOrders'], order_reference,
                                                    error_prefix, 'draftOrders')
           end
         end
       end
+    end
+
+    def check_context_reference(context, field, request_index, allowed_resource_types)
+      return if context[field].nil?
+
+      local_reference?(context[field], "(Request #{request_index + 1}) context.#{field}", allowed_resource_types:)
+    end
+
+    def context_reference_list(context, field)
+      context[field].is_a?(Array) ? context[field] : []
     end
 
     # -------------------------------------------------------------------------

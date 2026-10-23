@@ -30,8 +30,7 @@ module DaVinciCRDTestKit
       id :crd_v221_inferno_response_validation
       simulation_verification
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@3', 'cds-hooks_3.0.0-ballot@222', 'cds-hooks_3.0.0-ballot@223',
-                            'cds-hooks_3.0.0-ballot@224', 'hl7.fhir.us.davinci-crd_2.2.1@conf-10'
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-10'
 
       input :custom_response_template, optional: true
 

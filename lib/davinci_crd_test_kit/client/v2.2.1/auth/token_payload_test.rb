@@ -1,11 +1,13 @@
 require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
+require_relative '../../jwt_claim_types'
 
 module DaVinciCRDTestKit
   module V221
     class TokenPayloadTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include DaVinciCRDTestKit::JwtClaimTypes
       include ClientURLs
 
       id :crd_v221_token_payload
@@ -19,9 +21,10 @@ module DaVinciCRDTestKit
         - `aud` must match the URL of the CDS Service endpoint being invoked.
         - `exp` must represent a time in the future.
         - `jti` must be a non-blank string that uniquely identifies this authentication JWT.
+        - `iss` must be a string, `aud` a string or an array of strings, and `exp` and `iat` numbers.
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@180', 'cds-hooks_3.0.0-ballot@181', 'cds-hooks_3.0.0-ballot@187',
+      verifies_requirements 'cds-hooks_3.0.0-ballot@180', 'cds-hooks_3.0.0-ballot@187',
                             'cds-hooks_3.0.0-ballot@189', 'cds-hooks_3.0.0-ballot@190', 'cds-hooks_3.0.0-ballot@191',
                             'cds-hooks_3.0.0-ballot@192', 'cds-hooks_3.0.0-ballot@196', 'cds-hooks_3.0.0-ballot@203'
 
@@ -95,6 +98,8 @@ module DaVinciCRDTestKit
           rescue StandardError => e
             add_request_message('error', "Token validation error: #{e.message}", index)
           end
+
+          jwt_claim_type_errors(unverified_payload).each { |message| add_request_message('error', message, index) }
 
           missing_claims = required_claims - unverified_payload.keys
           next if missing_claims.empty?

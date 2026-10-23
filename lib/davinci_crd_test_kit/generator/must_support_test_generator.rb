@@ -12,29 +12,32 @@ module DaVinciCRDTestKit
     class MustSupportTestGenerator
       CONF_3 = 'hl7.fhir.us.davinci-crd_2.2.1@conf-3'.freeze
       HOOK_3 = 'hl7.fhir.us.davinci-crd_2.2.1@hook-3'.freeze
+      # billing-options is must support on the profiles that can carry billing codes, so their must
+      # support tests show whether the CRD client conveys them
+      BILLOPT_1 = 'hl7.fhir.us.davinci-crd_2.2.1@billopt-1'.freeze
 
       # One test per request type, plus one for each profile that is referenced from within a
       # request rather than being a request itself. Order here is the order in the UI, which is
       # alphabetical by resource type.
       TEST_DEFINITIONS = [
-        { id: :crd_v221_appointment_must_support, requirements: [CONF_3],
+        { id: :crd_v221_appointment_must_support, requirements: [CONF_3, BILLOPT_1],
           profiles: [{ resource_type: 'Appointment', title: 'CRD Appointment', supporting_profile: true,
                        profile_keys: %w[appointment_with_order appointment_without_order] }] },
-        { id: :crd_v221_communication_request_must_support, requirements: [CONF_3, HOOK_3],
+        { id: :crd_v221_communication_request_must_support, requirements: [CONF_3, HOOK_3, BILLOPT_1],
           profiles: [{ resource_type: 'CommunicationRequest', profile_keys: ['communication_request'] }] },
         { id: :crd_v221_coverage_must_support, requirements: [CONF_3],
           profiles: [{ resource_type: 'Coverage', supporting_profile: true, profile_keys: ['coverage'] }] },
-        { id: :crd_v221_device_must_support, requirements: [CONF_3],
+        { id: :crd_v221_device_must_support, requirements: [CONF_3, BILLOPT_1],
           profiles: [{ resource_type: 'Device', supporting_profile: true, profile_keys: ['device'] }] },
-        { id: :crd_v221_device_request_must_support, requirements: [CONF_3, HOOK_3],
+        { id: :crd_v221_device_request_must_support, requirements: [CONF_3, HOOK_3, BILLOPT_1],
           profiles: [{ resource_type: 'DeviceRequest', profile_keys: ['device_request'] }] },
-        { id: :crd_v221_encounter_must_support, requirements: [CONF_3],
+        { id: :crd_v221_encounter_must_support, requirements: [CONF_3, BILLOPT_1],
           profiles: [{ resource_type: 'Encounter', supporting_profile: true, profile_keys: ['encounter'] }] },
         { id: :crd_v221_location_must_support, requirements: [CONF_3],
           profiles: [{ resource_type: 'Location', supporting_profile: true, profile_keys: ['location'] }] },
-        { id: :crd_v221_medication_must_support, requirements: [CONF_3],
+        { id: :crd_v221_medication_must_support, requirements: [CONF_3, BILLOPT_1],
           profiles: [{ resource_type: 'Medication', supporting_profile: true, profile_keys: ['medication'] }] },
-        { id: :crd_v221_medication_request_must_support, requirements: [CONF_3, HOOK_3],
+        { id: :crd_v221_medication_request_must_support, requirements: [CONF_3, HOOK_3, BILLOPT_1],
           profiles: [{ resource_type: 'MedicationRequest', profile_keys: ['medication_request'] }] },
         { id: :crd_v221_nutrition_order_must_support, requirements: [CONF_3, HOOK_3],
           profiles: [{ resource_type: 'NutritionOrder', profile_keys: ['nutrition_order'] }] },
@@ -47,9 +50,9 @@ module DaVinciCRDTestKit
         { id: :crd_v221_practitioner_role_must_support, requirements: [CONF_3],
           profiles: [{ resource_type: 'PractitionerRole', supporting_profile: true,
                        profile_keys: ['practitioner_role'] }] },
-        { id: :crd_v221_service_request_must_support, requirements: [CONF_3, HOOK_3],
+        { id: :crd_v221_service_request_must_support, requirements: [CONF_3, HOOK_3, BILLOPT_1],
           profiles: [{ resource_type: 'ServiceRequest', profile_keys: ['service_request'] }] },
-        { id: :crd_v221_vision_prescription_must_support, requirements: [CONF_3, HOOK_3],
+        { id: :crd_v221_vision_prescription_must_support, requirements: [CONF_3, HOOK_3, BILLOPT_1],
           profiles: [{ resource_type: 'VisionPrescription', profile_keys: ['vision_prescription'] }] }
       ].freeze
 

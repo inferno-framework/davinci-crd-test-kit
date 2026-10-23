@@ -68,7 +68,7 @@ module DaVinciCRDTestKit
               prefetch, so this scenario could not directly demonstrate that prefetch data is
               scoped by user access.
 
-              I attest that the Health IT module limits the data made available via prefetch to
+              I attest that the CRD client limits the data made available via prefetch to
               what the current user is authorized to access.
 
               [Click here](#{attest_true_url}) if the above statement is **true**.

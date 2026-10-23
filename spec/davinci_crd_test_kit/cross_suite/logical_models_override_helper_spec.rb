@@ -137,6 +137,24 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
     end
   end
 
+  describe '#local_reference? with a value that is not a string' do
+    it 'returns false and adds an error for a number' do
+      result = module_instance.send(:local_reference?, 42, 'prefix')
+
+      expect(result).to be false
+      expect(module_instance.messages).to contain_exactly(
+        { type: 'error', message: 'prefix expected a local reference, got 42.' }
+      )
+    end
+
+    it 'returns false and adds an error for nil' do
+      result = module_instance.send(:local_reference?, nil, 'prefix')
+
+      expect(result).to be false
+      expect(module_instance.messages.first[:message]).to eq('prefix expected a local reference, got null.')
+    end
+  end
+
   describe '#referenced_resource_present_in_bundle?' do
     let(:bundle) do
       {
@@ -176,6 +194,25 @@ RSpec.describe DaVinciCRDTestKit::LogicalModelsOverrideHelper do
       expect(module_instance.messages.length).to eq(1)
       expect(module_instance.messages.first[:type]).to eq('error')
       expect(module_instance.messages.first[:message]).to include("'ServiceRequest/sr-1'")
+    end
+
+    it 'returns false and adds an error when the bundle is not an object' do
+      result = module_instance.send(:referenced_resource_present_in_bundle?, 'entry', 'ServiceRequest/sr-1',
+                                    'prefix', 'draftOrders')
+
+      expect(result).to be false
+      expect(module_instance.messages.length).to eq(1)
+      expect(module_instance.messages.first[:message]).to include("'ServiceRequest/sr-1'")
+    end
+
+    it 'skips entries that are not objects or have no resource object' do
+      bundle['entry'].unshift('not-an-entry', { 'resource' => 'not-a-resource' })
+
+      result = module_instance.send(:referenced_resource_present_in_bundle?, bundle, 'ServiceRequest/sr-1',
+                                    'prefix', 'draftOrders')
+
+      expect(result).to be true
+      expect(module_instance.messages).to be_empty
     end
 
     it 'returns false and adds an error when the bundle has no entries' do

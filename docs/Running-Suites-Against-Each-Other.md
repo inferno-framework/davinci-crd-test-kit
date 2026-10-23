@@ -72,7 +72,6 @@ Some tests will fail, including
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
 - Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription (skip).
-- Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
 
 ### Additional Optional Steps for Long-running Hook Request
 
@@ -80,10 +79,10 @@ Some tests will fail, including
 1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
    changes to the inputs.
 1. Note that a "User Action Required" dialog will appear in the server session with no option to
-   continue other than to cancel. This is expected because it is waiting for the client session's
-   simulated CRD server to respond. That simulated CRD server is pausing for 5 seconds before
-   responding.
-1. After 5 seconds, the "User Action Required" dialog in the server session will disappear and the
+   continue other than to cancel. Do not cancel the tests as this is expected. The server suite
+   is waiting for the client session's simulated CRD server to respond and during the long-running
+   test the simulated CRD server pauses for at least 15 seconds before responding.
+1. After 15 seconds, the "User Action Required" dialog in the server session will disappear and the
    tests will complete.
 1. Return to the client session and a new "User Action Required" asking for an attestation that
    the user's workflow could continue during the long-running request. Attest "true" because

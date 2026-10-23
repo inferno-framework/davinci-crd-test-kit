@@ -1,3 +1,5 @@
+require 'digest'
+
 module DaVinciCRDTestKit
   APPOINTMENT_BOOK_TAG = 'appointment-book'.freeze
   ENCOUNTER_START_TAG = 'encounter-start'.freeze
@@ -21,6 +23,8 @@ module DaVinciCRDTestKit
   ACCESS_LEVEL_LIMITED_GROUP_TAG = 'access_level_limited_request'.freeze
   ACCESS_LEVEL_TARGET_FETCH_TAG = 'access_level_target'.freeze
   DUPLICATED_HOOK_INSTANCE_TAG = 'duplicate_hook_instance'.freeze
+  JWT_ID_TAG_PREFIX = 'jti_'.freeze
+  DUPLICATED_JWT_ID_TAG = 'duplicate_jti'.freeze
   COVERAGE_INFO_DISABLED_TAG = 'coverage-info-disabled'.freeze
   TECHNICAL_ISSUES_TAG = 'technical-issues'.freeze
   NO_MEMBER_FOUND_TAG = 'no-member-found'.freeze
@@ -48,6 +52,12 @@ module DaVinciCRDTestKit
       "#{HOOK_INSTANCE_DATA_FETCH_TAG_PREFIX}#{hook_instance}"
     end
 
-    module_function :hook_instance_tag, :hook_instance_data_fetch_tag
+    # A `jti` can be any value of any length, so the tag holds a digest of it to fit the tag name column.
+    # The JSON form keeps a number and the string of its digits apart.
+    def jwt_id_tag(jti)
+      "#{JWT_ID_TAG_PREFIX}#{Digest::SHA256.hexdigest(jti.to_json)}"
+    end
+
+    module_function :hook_instance_tag, :hook_instance_data_fetch_tag, :jwt_id_tag
   end
 end

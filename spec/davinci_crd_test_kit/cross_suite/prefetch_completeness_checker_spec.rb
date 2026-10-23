@@ -537,6 +537,47 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       checker.check_prefetched_data
       expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
     end
+
+    it 'remains false when the provided data for the multi-id template is missing an expected entry' do
+      # e.g., the client only evaluated the first branch of the union
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = { 'patients' => crd_patient_example_bundle }
+      checker = make_checker(order_sign_request,
+                             { 'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
+      errors = checker.check_prefetched_data
+      expect(errors).to include(a_string_including('missing expected entries'))
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when the multi-id template key is absent from the prefetch' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = {}
+      checker = make_checker(order_sign_request,
+                             { 'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'becomes true when the multi-id template is satisfied even though another template has errors' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = {
+        'patient' => crd_patient_example.merge('id' => 'wrong'),
+        'patients' => {
+          'resourceType' => 'Bundle',
+          'entry' => [
+            { 'resource' => crd_patient_example },
+            { 'resource' => crd_patient_example.merge('id' => 'other') }
+          ]
+        }
+      }
+      checker = make_checker(order_sign_request, {
+                               'patient' => 'Patient/{{context.patientId}}',
+                               'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}'
+                             })
+      errors = checker.check_prefetched_data
+      expect(errors).to include(a_string_including('unexpected id'))
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
+    end
   end
 
   describe 'prefetch resource extraction' do
