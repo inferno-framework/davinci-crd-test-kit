@@ -20,7 +20,7 @@ dedicated hostname.
       hook invocation.
    1. In the server session, run the corresponding group "3.x <hook name>" leaving the inputs
       as is.
-   1. Once the server test are complete, return to the client tests and click the link
+   1. Once the server tests are complete, return to the client tests and click the link
       in the "User Action Required" dialog indicating requests are complete to continue the
       tests.
    1. A second "User Action Required" dialog will appear asking you to attest that the returned
@@ -32,7 +32,7 @@ dedicated hostname.
 Notes:
 - The server preset contains requests for all hooks, so any can be tested.
 - The execution uses the mocked CRD cards created by Inferno.
-- While the server tests do not include a simlulated FHIR API, the client present includes
+- While the server tests do not include a simulated FHIR API, the client preset includes
   inputs for testing the FHIR API group against the public Inferno reference server. However,
   these tests will largely fail since the public reference server is read-only meaning that
   the update tests will fail.
@@ -68,7 +68,7 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
 
 Some tests will fail, including
 - TLS tests in the client suite (1.2.x.3.08 and 1.4.1.3.08) and server suites (1.01) will fail when executed in a local system.
-- Client tests 1.2.x.3.01 and 1.4.1.3.01 validating that the hook requests structure and content will fail with errors
+- Client tests 1.2.x.3.01 and 1.4.1.3.01 validating the hook request structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
 - Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription (skip).
@@ -84,7 +84,7 @@ Some tests will fail, including
    test the simulated CRD server pauses for at least 15 seconds before responding.
 1. After 15 seconds, the "User Action Required" dialog in the server session will disappear and the
    tests will complete.
-1. Return to the client session and a new "User Action Required" asking for an attestation that
+1. Return to the client session and a new "User Action Required" dialog will appear asking for an attestation that
    the user's workflow could continue during the long-running request. Attest "true" because
    you had the option of cancelling Inferno's tests.
 

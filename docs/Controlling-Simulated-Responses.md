@@ -1,7 +1,7 @@
 # Controlling Responses from Inferno's Simulated CRD Server
 
 During the CRD client tests, provider systems are asked to demonstrate
-that they can handle conformant cards and system actions retured by CRD server
+that they can handle conformant cards and system actions returned by a CRD server
 and allow users to see and take actions based on these returned details.
 However, provider systems are not expected to be able to handle all conformant
 responses because details within them, such as specific orders or terminologies
@@ -18,7 +18,7 @@ that goes beyond what is specified by the CRD standard so as to show that the
 client can interact with a system meeting only the base CRD standard. Inferno
 enforces this requirement by failing when a custom extension not defined within
 CRD is found within a response returned by Inferno. While client requests are typically
-allowed to have custom extensions, portions of the request that are echoed back in
+allowed to have custom extensions, if portions of the request containing them are echoed back in
 Inferno responses (e.g., mocked coverage-information systemActions, or templates using
 the `com.inferno.resourceSelectionCriteria` extension), they will cause failures
 on the responses. This may be relaxed in the future and testers are welcome to
@@ -34,9 +34,9 @@ card type selected in the "Response types to return..." input. In addition to th
 below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
 
 - **[External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)**: 
-  Inferno's [static external reference card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/external_reference.json)
+  Inferno's [static external reference card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/external_reference.json)
   provides a link to the CRD IG's [External Reference definition](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference).
-- **[Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)**: Inferno's [static instructions card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/instructions.json)
+- **[Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)**: Inferno's [static instructions card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/instructions.json)
   provides generic instructions. It is always included in a mocked response if no other cards or system
   actions would be returned.
 - **[Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)**:
@@ -52,15 +52,15 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   indicated. No other sub-extensions of the [`coverage-information` extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html) will be populated. The target
   order resources for each hook include:
   - *appointment-book*: each Appointment in `context.appointments`.
-  - *encounter-start* and *encounter-discharge*: the Encounter refered to by `context.encounterId` 
+  - *encounter-start* and *encounter-discharge*: the Encounter referred to by `context.encounterId` 
     which must either be provided as a prefetched resource or found via a read for the indicated
     Encounter at the time of the invocation using the FHIR server access details found in the hook request.
   - *order-sign* and *order-select*: each entry in `context.draftOrders`.
-  - *order-dispatch*: the resource refered to by `context.order` which must either be provided as a
+  - *order-dispatch*: the resource referred to by `context.order` which must either be provided as a
     prefetched resource or found via a read for the indicated resource at the time of the invocation
     using the FHIR server access details found in the hook request.
 - **[Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)**:
-  Inferno's [propose alternate request card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/propose_alternate_request.json)
+  Inferno's [propose alternate request card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/propose_alternate_request.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks. It provides a
   suggestion for the system to delete one of the indicated orders and recreate it. The selected order
   will either be the first order in `context.draftOrders` for the `order-sign`, `order-select` hooks
@@ -68,37 +68,37 @@ below, all returned cards get a unique `uuid` and their summary is prefixed with
   must either be provided as a prefetched resource or found via a read for the indicated resource
   at the time of the invocation using the FHIR server access details found in the hook request.
 - **[Identify Companion/Prerequisite Orders](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)**:
-  Inferno's [companion/prerequisite card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/propose_alternate_request.json)
+  Inferno's [companion/prerequisite card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/companions_prerequisites.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks.
   It provides a suggestion for the system to create a ServiceRequest for a monthly physical assessment
   for the next three months. The ServiceRequest will be updated to reference the hook request's patient
   (`context.patientId`), the hook request's user (`context.userId`) as the `requester`, and an `authoredOn`
   date of the current date.
 - **[Request Form Completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion)**:
-  Inferno's [request form completion card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/request_form_completion.json)
+  Inferno's [request form completion card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/request_form_completion.json)
   provides suggestions for the system to create a cancer Questionnaire resource and
   an associated Task resource to track its completion. The Task resource in the template will be
   updated to be [`for`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#diff_Task.for)
   the patient referenced in the hook invocation (`context.patientId`) and have the current date
   for `authoredOn`.
 - **[Create or Update Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)**:
-  Inferno's [create or update card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/create_update_coverage_information.json)
+  Inferno's [create or update card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/create_update_coverage_information.json)
   provides suggestions for the system to either update the existing coverage if one was found (provided via prefetch or retrieved via query) or create one otherwise. If updating the existing coverage, it will
   change the [`period`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage-definitions.html#diff_Coverage.period)
   to run from the current date to 1 month in the future. If creating a new coverage, it will create
   a draft self-pay coverage for the patient indicated in the hook request (`context.patientId`).
 - **[Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application)**:
-  Inferno's [static launch SMART application card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/card_responses/launch_smart_app.json)
-  points to the launch url for the CRD client test suite. 
+  Inferno's [static launch SMART application card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/launch_smart_app.json)
+  points to the launch URL for the CRD client test suite. 
 
 ## Tester-directed Custom Responses
 
-To better support the demonstration and testing of the full range CRD client capabilities,
+To better support the demonstration and testing of the full range of CRD client capabilities,
 Inferno provides a mechanism for testers to specify how Inferno will respond to hook
 invocations made by their system. Inferno will use the hook request to select and complete
 cards and actions from a template hook response provided by the tester. 
 
-At a high level testers will provide a CDS Hook response with a partially specified set of cards
+At a high level, testers will provide a CDS Hook response with a partially specified set of cards
 and system actions. Those cards and actions can include
 - Within cards and actions, an extension containing a FHIRPath expression that selects requests
   for which the card should be returned.
@@ -131,7 +131,7 @@ available to control which cards are returned for a given request and their cont
 #### Actions
 
 Actions can be found both within the top-level `systemActions` field and nested within `suggestions`
-found on cards. The same field requirements, configuration options, instantiation logic
+found on cards. The same field requirements, configuration options, and instantiation logic
 apply in both cases.
 
 Testers must populate the [required](https://cds-hooks.hl7.org/2.0/#action) `type`
@@ -166,10 +166,10 @@ string `default`. Specifics for each type of value:
   [conversion of collections to singletons](https://hl7.org/fhirpath/N1/index.html#singleton-evaluation-of-collections)
   for details on what will constitute a `true` result). Otherwise, the entity is not included in the
   response.
-- *`default`*: The specifics depend of whether the entity is a card or action:
+- *`default`*: The specifics depend on whether the entity is a card or action:
   - **Card**: If no other cards are (yet) included in the response, then this card will be included.
   - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
-    and no other actions are (yet) included in the response, then this card will be included.
+    and no other actions are (yet) included in the response, then this action will be included.
     If there is a [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension),
     then the action will be instantiated against any selected resource for which no action has yet been
     instantiated.
@@ -247,7 +247,7 @@ Notes:
 
 When defined on an action, this extension controls how many copies of the action will be included
 in the response and the target resource for each. The extension value will be a FHIRPath expression.
-For each resource returned in the collection when the expression is evluated against the hook request,
+For each resource returned in the collection when the expression is evaluated against the hook request,
 a copy of the action will be included in the response. How the target resource is used in
 instantiating the action depends on the `type`:
 - `delete`: the target resource will be used as the reference in the action's `resourceId` field
@@ -257,7 +257,7 @@ instantiating the action depends on the `type`:
   those elements will be merged into the target resource. When performing the merge,
   - All `resource.extension` entries defined in the action template will be added to the target
     resource's `extension` list.
-  - All other top-level elements defined directly under `resource` the action template will be be
+  - All other top-level elements defined directly under `resource` in the action template will be
     added at the top-level to the target resource, completely replacing any existing content
     in that element in the target resource.
 
@@ -296,12 +296,12 @@ Notes:
 - If the evaluation of the expression in a `com.inferno.resourceSelectionCriteria` extension
   returns no resource, then no copies of the action will be included, even if the
   expression in the `com.inferno.inclusionCriteria` extension directs the action to be included.
-- the `com.inferno.resourceSelectionCriteria` can be used with or without the 
+- The `com.inferno.resourceSelectionCriteria` extension can be used with or without the 
   `com.inferno.inclusionCriteria` extension and vice versa. Here are some example use
-  case for each combination:
+  cases for each combination:
   - *`com.inferno.inclusionCriteria` extension only*: Include a suggestion with a `create` action for
     a static resource when a ServiceRequest with a specific code is included in the hook request.
-  - *`com.inferno.resourceSelectionCriteria` extension only*: always add a coverage-information
+  - *`com.inferno.resourceSelectionCriteria` extension only*: Always add a coverage-information
     extension to each draftOrder.
   - *Both `com.inferno.inclusionCriteria` and `com.inferno.resourceSelectionCriteria` extensions*:
     For a specific patient only (inclusion criteria), add a suggestion to modify all MedicationRequest
@@ -311,12 +311,12 @@ Notes:
 
 #### Expression Tokens
 
-Expression tokens for dynamic content indicated by a FHIRPath expression surrounded by double curly braces
-(`{{<FHIRPath expression}}`) within fields and sub-fields of the action. The indicated FHIRPath
+Expression tokens indicate dynamic content using a FHIRPath expression surrounded by double curly braces
+(`{{<FHIRPath expression>}}`) within fields and sub-fields of the action. The indicated FHIRPath
 expression will be evaluated against the hook request and the result used to replace the token.
 
 These can be used, for example, to make sure that resources in the returned response reference
-the patient the hook was invoked for using `{{context.patientId}})`.
+the patient the hook was invoked for using `{{context.patientId}}`.
 
 Notes:
 - Entries within the returned collection that are not data types (lists or objects) will be ignored.
@@ -334,18 +334,18 @@ Notes:
 #### `coverage-information` Defaulting
 
 System actions that add the `coverage-information` extension to resources are a response type
-for which the CRD IG requires client support. To help testers specify this card type, Inferno will
+for which the CRD IG requires client support. To help testers specify this response type, Inferno will
 populate the following `coverage-information` sub-extensions when not found in
 `coverage-information` extensions within the response template:
 - `coverage` sub-extension: Inferno will add a reference to the target Patient's coverage, as
   identified as the first coverage made available via prefetch or returned in response to
   a query for active coverages.
-- `date` sub-extension: Inferno will add the current date (UTC)
+- `date` sub-extension: Inferno will add the current date (UTC).
 - `coverage-assertion-id` sub-extension: Inferno will add a random 32-bit hex value.
 
 Notes:
 - Inferno will not override a value provided for a sub-extension that would be defaulted. Thus,
-  Expression tokens can be included to provide a specific request-dependent value that is
+  expression tokens can be included to provide a specific request-dependent value that is
   different from Inferno's default.
 
 ### FHIRPath Evaluation Limitations
@@ -356,11 +356,11 @@ engine. Inferno currently uses the FHIRPath engine built into the official HL7 F
 to evaluate FHIRPath expressions on FHIR resources. For CDS Hook request fields, Inferno implements
 a small subset of FHIRPath to bridge to the point in those requests that contain FHIR resources.
 
-Inferno's FHIRPath evaluation for CDS Hook requests provides the most limitations. These include
+Inferno's FHIRPath evaluation for CDS Hook requests has the most limitations. These include:
 - The [FHIRPath expression](https://hl7.org/fhirpath/N1/index.html#expressions) must be
   a path with function calls. The use of literals and operators (e.g. the union operator
   `<exp 1> | <exp 2>`) is not currently supported.
-- The first segment of the path must be a field of the CDS Hook request. The expression cannot start with a `%` context variable or a resource type, or a function.
+- The first segment of the path must be a field of the CDS Hook request. The expression cannot start with a `%` context variable, a resource type, or a function.
 - The only function allowed on non-FHIR paths is `where(<field> = <value>)`, where `<field>`
   must be a single label without any concatenation (`.` characters).
 
@@ -370,9 +370,9 @@ Note that once the path reaches a FHIR resource, then other features are support
 
 Inferno's use of the HL7 FHIR Validator's FHIRPath engine comes with some restrictions as well.
 - The engine is not configured to resolve profiles or value sets. It has the base FHIR R4
-  definions loaded, so functions like `ofType` will work, but types defined in IGs or elsewhere
+  definitions loaded, so functions like `ofType` will work, but types defined in IGs or elsewhere
   cannot be used.
-- The FHIRPath engine may not implement the entire [FHIRPath specication](https://hl7.org/fhirpath/N1/index.html),
+- The FHIRPath engine may not implement the entire [FHIRPath specification](https://hl7.org/fhirpath/N1/index.html),
   for example the `resolve()` function is not supported.
 
 The Inferno team is open to adding support for additional FHIRPath functions. Please submit a
@@ -381,15 +381,15 @@ of your use case and the additional features that you believe are necessary.
 
 ### Complete Example
 
-The following example illustrates the type of scenarios that can be setup using the custom response
+The following example illustrates the type of scenarios that can be set up using the custom response
 templates. The details below include the template as well as sample requests and their responses.
 
 #### Payer Business Logic Description
 
 This scenario considers two patients, with ids `pat015` and `888`, each with different coverages
 at the simulated payer. Both patients require prior authorization for an MRI with additional
-information requested via DTR. Patient A has a limited formulary such that a request for
-prescription-strength Advil will be denied and a [card proposing](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request) an equivalent generic medication.
+information requested via DTR. Patient `pat015` has a limited formulary such that a request for
+prescription-strength Advil will be denied and a [card proposing](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request) an equivalent generic medication returned.
 
 #### Template
 
@@ -683,9 +683,9 @@ Includes orders for
 ##### Custom Response
 
 The response contains:
-- a [propose alternative card](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)
+- a [propose alternate request card](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)
   to replace the order for Advil with one for generic Ibuprofen (type, code, patient matched the inclusion criteria) using delete (existing Advil order selected and its id populated in the `resourceId` field) and create (static, always included) actions.
-- 3 system responses indicating whether each of the three orders is covered:
+- 3 system actions indicating whether each of the three orders is covered:
   - a hospital bed device: covered (from the default `systemAction` entry)
   - Prescription-strength Advil: not covered (type, code, patient matched the inclusion criteria)
   - an MRI: prior auth required (type and code matched the inclusion criteria)
@@ -1076,7 +1076,7 @@ Includes orders for
 ##### Custom Response
 
 The response contains:
-- 3 system responses indicating whether each of the three orders is covered:
+- 3 system actions indicating whether each of the three orders is covered:
   - a hospital bed device: covered (from the default `systemAction` entry)
   - Prescription-strength Advil: covered (from the default `systemAction` entry)
   - an MRI: prior auth required (type and code matched the inclusion criteria)

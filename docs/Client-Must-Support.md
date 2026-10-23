@@ -67,7 +67,7 @@ For each of these profiles, Inferno performs two checks as described below.
 Inferno looks across all resources provided within the hook request bodies (`context`
 or `prefetch`) and confirms that it sees examples of each element flagged as must support.
 Per the [CRD must support requirement](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-3)
-on CRD clients when acting as data sources a CRD client needs to support an element
+on CRD clients when acting as data sources, a CRD client needs to support an element
 only when it "maintains a mustSupport data element and surfaces it to users". Thus
 Inferno allows testers to indicate that the CRD client does not support a must
 support element through an attestation (see the [Attestation](#attestation) section
@@ -97,7 +97,7 @@ target profiles:
 
 There are two exclusions that Inferno makes when performing these checks. In both cases
 the check is considered to have passed:
-- When checking an element, if the target element is never populated, the Inferno will
+- When checking an element, if the target element is never populated, Inferno will
   consider the requirement to be met vacuously. Because the Reference element is must
   support, the [Must Support Element Presence](#must-support-element-presence)
   test will confirm whether support for this element needs to be demonstrated. If it
@@ -143,7 +143,7 @@ Reference element to not represent an example of a reference that resolves to a 
 
 Currently, Inferno only checks that CRD clients can receive the full scope of must support
 elements for [coverage information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
-which is the only response type the CRD clients are required to support.
+which is the only response type CRD clients are required to support.
 The relevant must support elements are the must support sub-extensions within the
 [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html).
 All other information within the coverage information system action represents
@@ -218,7 +218,7 @@ requirement [hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-
 
 Ancillary information such as specific medications or provider details are included
 within supporting resource types. If the CRD client does not support representing
-information using one of the supporting resource types, then they can certify
+information using one of the supporting resource types, then testers can certify
 this by unchecking one of the boxes in the "Supporting resource types populated
 by the CRD client" input. Those that remain selected will be expected to appear
 within at least one invocation of a hook. The supporting types include:

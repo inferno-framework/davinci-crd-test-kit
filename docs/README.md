@@ -22,7 +22,7 @@ to this test kit.
 *   **Client Testing Instructions**: Step-by-step guide for testing CRD clients, including demonstration executions for both
     the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
     and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
-*   **[Controlling Simulated CRD server Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
+*   **[Controlling Simulated CRD Server Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
 *   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what CRD clients must demonstrate to pass.
 
 ### Using the Da Vinci CRD Server Test Suites 
@@ -50,7 +50,7 @@ to this test kit.
     [CDS Hooks background section](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/background.html#cds-hooks)
     references "CDS Hooks 2.0", the IG declares and links to CDS Hooks 3.0.0-ballot;
     this test kit treats CDS Hooks 3.0.0-ballot as the applicable reference for CRD v2.2.1.
-*   **[CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)**: Spreadsheet detailing the interpretation of hook definnition requirements for this test kit.
+*   **[CDS Hooks Library Requirements Spreadsheet](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/requirements/cds-hooks-library_1.0.1_requirements.xlsx)**: Spreadsheet detailing the interpretation of hook definition requirements for this test kit.
 
 ## Support
 

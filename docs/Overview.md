@@ -17,7 +17,7 @@ an exchange partner for the system under test (when testing a CRD client Inferno
 a CRD server and vice-versa) and verifying that each exchange is conformant and that
 all exchanges in aggregate demonstrate the required capabilities.
 
-This test kit is [open source](#license) and freely available for use or
+This test kit is [open source](https://github.com/inferno-framework/davinci-crd-test-kit/?tab=readme-ov-file#license) and freely available for use or
 adoption by the health IT community including EHR vendors, payer systems, health app
 developers, and testing labs. It is built using the [Inferno
 Framework](https://inferno-framework.github.io/). The Inferno Framework is
@@ -32,7 +32,7 @@ The CRD Test Kit contains test suites to test the two actors defined by the CRD 
   needed to provide that decision support. This role is played by provider systems
   in which orders are placed, such as EHRs. See the [Client Details](Client-Details.md) page
   for more information.
-- CRD servers: Servers are responsible for responding to CDS Hooks calls and responding with appropriate
+- CRD servers: Servers are responsible for receiving CDS Hooks calls and responding with appropriate
   decision support, which may involve using FHIR requests to gather more data from
   the client. See the [Server Details](Server-Details.md) page for more information.
 
@@ -71,9 +71,9 @@ While these tests cover core aspects of the CRD IG, there are known limitations:
   of requests or responses will elicit specific behavior. It also does not want to
   dictate to the systems being tested the specifics of its data, configuration, or
   business rules. For these reasons, testers need to provide Inferno with
-  details the requests to make or responses to use.
+  details of the requests to make or responses to use.
 
-For a details on specific specific limitations, detailed requirements, and known
+For details on specific limitations, detailed requirements, and known
 issues, please consult the following resources: 
 - [Client Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#testing-limitations)
 - [Server Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details#testing-limitations)

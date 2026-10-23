@@ -30,10 +30,10 @@ contains four:
    a single hook invocation and return conformant cards and actions.
 1. The v2.0.1 "Hook Tests" group and the v2.2.1 "Hooks" group make
    one or more CDS Hooks calls for each hook type
-   that the tester provides request bodies for. It then validates that the responses
+   that the tester provides request bodies for. They then validate that the responses
    are conformant and cover the response behavior required by the hook type.
 1. The v2.2.1 suite also contains a "Specific Coverage Responses" group, which
-   tests the abliity of a CRD server to provide specific types of coverage
+   tests the ability of a CRD server to provide specific types of coverage
    information responses under particular conditions.
 
 All requests and responses are checked for conformance to the targeted CRD IG and

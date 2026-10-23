@@ -11,9 +11,10 @@ Inferno needs to know 4 basic pieces of information to invoke a hook on a CRD se
 - **Discovery Authentication**: whether the discovery endpoint requires authentication.
 - **Signature Algorithm**: which supported signing algorithm to use - `ES384` or `RS384`.
 - **Hook Request Body**: the request contents to use when making the hook invocation.
+
 Once those details are available, test execution can start.
 
-To execute a simple set of tests targeting a single hook follow these steps:
+To execute a simple set of tests targeting a single hook, follow these steps:
 
 1. Create a "Da Vinci CRD Server v2.0.1 Test Suite" session.
 1. Select group "1 Discovery" from the list at the left and click the "RUN TESTS" button
@@ -44,7 +45,7 @@ group as described in [Quick Start](#quick-start).
 
 Once groups associated with all supported hooks have been run, execute group
 "3.7 Required Card Response Validation" to confirm that cross-hook requirements
-have been met. These tests use the requests made during other groups so cannot be run
+have been met. These tests use the requests made during other groups so they cannot be run
 before they have been run.
 
 ## Demonstration Execution
@@ -56,8 +57,8 @@ you can do so using the following steps:
 1. Create a "Da Vinci CRD Server v2.0.1 Test Suite" session.
 1. Select the *CRD Server Reference Implementation* option from the Preset dropdown in the upper left.
 1. Click the "RUN ALL TESTS" button in the upper right and click "SUBMIT"
-1. Inferno will perform several hook invocations and complete the test run. Note that all
-   tests may not pass.
+1. Inferno will perform several hook invocations and complete the test run. Note that not all
+   tests may pass.
 
 ## Inferno Client vs Server Execution
 
