@@ -32,6 +32,7 @@ module DaVinciCRDTestKit
             ),
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       run do
         identifier = cds_jwt_iss
