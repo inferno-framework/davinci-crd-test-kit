@@ -20,7 +20,7 @@ module DaVinciCRDTestKit
         included in the CDS section of the previous response did not prevent the CRD client from
         processing the returned coverage information and making it available to the user.
       )
-      attestation
+      flag_as_attestation
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-33'
 
