@@ -1,0 +1,18 @@
+{
+  "cards": [
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0c0001",
+      "summary": "Scenario: instructions card for the appointment-book scenarios",
+      "detail": "An instructions card returned for each appointment-book scenario request.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+# Exercises the CRD v2.0.1 handling of validator messages with one appointment-book exchange:
+# - the server session sends crafted hook requests (inputs/v201_appointment_book_request_bodies.json) that the
+#   client session validates (the unresolvable meta.source produces a "No definition could be found for URL value"
+#   message that must stay filtered; the v2.0.1 client filter for the older "URL value ... does not resolve" wording
+#   no longer matches anything, so inferno_core's built-in filter is what removes it), and
+# - the client session answers with a crafted response template (inputs/v201_appointment_book_response_template.json)
+#   that the server session validates (suite-level ext-coverage-information on Appointment filter).
+# Each scenario is named in the input files (systemAction descriptions, resource ids).
+sessions:
+  - suite: crd_client
+    name: client
+    preset: inferno-crd-server-suite
+    suite_options:
+      smart_app_launch_version: smart_app_launch_2
+  - suite: crd_server
+    name: server
+    preset: inferno-crd-client-suite
+
+comparison_config:
+  normalized_strings:
+    - replacement: <INFERNO_HOST>
+      patterns:
+        - https://localhost:8443 # local ruby with TLS
+        - http://localhost:4567/inferno # local inferno core ruby
+        - http://localhost:4567 # local ruby
+        - http://localhost # local docker
+        - https://inferno.healthit.gov/suites # prod
+        - https://inferno-qa.healthit.gov/suites # qa
+    - replacement: <UUID>
+      pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+    - replacement: <RANDOM_KEY>
+      pattern: /'[a-z]{16}'/
+    - replacement: <INFERNO_URL>
+      patterns:
+        - https://inferno.healthit.gov/ # prod
+        - https://inferno-qa.healthit.gov/ # qa
+  sessions:
+    client:
+      expected_results_file: crd_v201_appointment_book_validator_scenarios_with_commands_client_expected.json
+      alternate_expected_files:
+        - file: crd_v201_appointment_book_validator_scenarios_with_commands_client_no_ssl_expected.json
+          when:
+            - field: inferno_base_url
+              not_matches: https
+    server:
+      expected_results_file: crd_v201_appointment_book_validator_scenarios_with_commands_server_expected.json
+      alternate_expected_files:
+        - file: crd_v201_appointment_book_validator_scenarios_with_commands_server_no_ssl_expected.json
+          when:
+            - field: inferno_base_url
+              not_matches: https
+
+steps:
+  - state_description: client session created
+    session: client
+    status: created
+    start_run:
+      session: client
+      runnable: 1.2.1
+      inputs:
+        appointment_book_response_approach: custom
+        appointment_book_custom_response_template: "@inputs/v201_appointment_book_response_template.json"
+    action_description: Run Client Group 1.2.1 Hooks > appointment-book with the scenario response template
+
+  - state_description: Wait at Client test 1.2.1.1.01 Requests received for appointment-book hook
+    session: client
+    status: waiting
+    last_completed: 1.2.1.1.01
+    start_run:
+      session: server
+      runnable: 3.1
+      inputs:
+        appointment_book_service_ids: appointment-book-service
+        appointment_book_request_bodies: "@inputs/v201_appointment_book_request_bodies.json"
+        mock_ehr_bundle: "@inputs/v201_mock_ehr_bundle.json"
+        manual_continuation: "yes"
+    next_poll_session: server
+    action_description: Run Server Group 3.1 Hook Tests > appointment-book with the scenario requests
+    timeout: 900 # validation of the crafted content can take several minutes
+
+  # The server keeps its FHIR endpoints available until it is told to continue (at most 900 seconds), so the
+  # client can read context resources while its request tests run. Neither session reports when the server has
+  # finished sending the scenario request and its three follow-up requests (they take well under a second), so
+  # pause before continuing the client. The 30 seconds is a guess: if the requests arrive late (for example with
+  # a slow Sidekiq), client 1.2.1.x results change, so when they don't match, check this pause first.
+  - state_description: Wait at Server test 3.1.1.01 (requests are being sent)
+    session: server
+    status: waiting
+    last_completed: 3.1.1.01
+    command: "sleep 30 && curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    next_poll_session: client
+    action_description: Give the server time to send all requests, then indicate that invocations are complete
+    timeout: 900
+
+  - state_description: Wait at Client test 1.2.1.2.02 Client displays returned decision support details to the user
+    session: client
+    status: waiting
+    last_completed: 1.2.1.2.02
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the cards have been displayed
+    timeout: 900
+
+  - state_description: Finished Client Group 1.2.1 appointment-book
+    session: client
+    status: done
+    last_completed: 1.2.1
+    command: "curl -o /dev/null -s '{server.wait_outputs.continuation_url}'"
+    next_poll_session: server
+    action_description: Let the server continue to its request and response tests
+    timeout: 900
+
+  - state_description: Finished Server Group 3.1 Hook Tests > appointment-book
+    session: server
+    status: done
+    last_completed: 3.1
+    action: END_SCRIPT
+    action_description: Script Completed
+    timeout: 900

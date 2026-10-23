@@ -1,0 +1,593 @@
+{
+  "cards": [
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0001",
+      "summary": "Scenario R1: launchSMART card without suggestions",
+      "detail": "Checks that a launchSMART card without suggestions is accepted.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "links": [
+        {
+          "label": "Inferno SMART App",
+          "url": "https://inferno.healthit.gov/smart-app",
+          "type": "smart"
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0002",
+      "summary": "Scenario R2: launchSMART card with a suggestion",
+      "detail": "Checks that a launchSMART card with a suggestion is reported as an error.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "links": [
+        {
+          "label": "Inferno SMART App",
+          "url": "https://inferno.healthit.gov/smart-app",
+          "type": "smart"
+        }
+      ],
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Remove the order",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0001",
+          "actions": [
+            {
+              "type": "delete",
+              "description": "Remove the current order",
+              "resourceId": "DeviceRequest/crd221-demo-devicerequest-different-orderer-vs-performer"
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0003",
+      "summary": "Scenario R3: form completion card with a Questionnaire that has an id",
+      "detail": "Checks that a form completion card whose Questionnaire has an id is accepted.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Add completion of the XYZ form to the task list",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0003",
+          "actions": [
+            {
+              "type": "create",
+              "description": "Add version 2 of the XYZ form if it doesn't already exist",
+              "resource": {
+                "resourceType": "Questionnaire",
+                "id": "XYZ",
+                "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ",
+                "title": "Questionnaire XYZ",
+                "version": "2",
+                "status": "active",
+                "subjectType": [
+                  "Patient"
+                ],
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Has the patient tried physical therapy?",
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "extension": {
+                "davinci-crd.if-none-exist": "url=http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ&version=2"
+              }
+            },
+            {
+              "type": "create",
+              "description": "Add 'Complete XYZ form' to the task list",
+              "resource": {
+                "resourceType": "Task",
+                "id": "scenario-r3-task",
+                "status": "ready",
+                "intent": "order",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                      "code": "complete-questionnaire"
+                    }
+                  ]
+                },
+                "description": "Complete XYZ form for local retention",
+                "for": {
+                  "reference": "Patient/{{context.patientId}}"
+                },
+                "authoredOn": "{{today()}}",
+                "requester": {
+                  "reference": "Organization/crd221-demo-payer-complete-prefetch"
+                },
+                "input": [
+                  {
+                    "type": {
+                      "text": "questionnaire",
+                      "coding": [
+                        {
+                          "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                          "code": "questionnaire"
+                        }
+                      ]
+                    },
+                    "valueCanonical": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/XYZ"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0004",
+      "summary": "Scenario R4: form completion card with a Questionnaire that has no id",
+      "detail": "Checks that a form completion card whose Questionnaire has no id is reported as an error.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Add completion of the ABC form to the task list",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0004",
+          "actions": [
+            {
+              "type": "create",
+              "description": "Add version 1 of the ABC form if it doesn't already exist",
+              "resource": {
+                "resourceType": "Questionnaire",
+                "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/ABC",
+                "title": "Questionnaire ABC",
+                "version": "1",
+                "status": "active",
+                "subjectType": [
+                  "Patient"
+                ],
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Has the patient tried physical therapy?",
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "extension": {
+                "davinci-crd.if-none-exist": "url=http://inferno.healthit.gov/davinci-crd-test-kit/forms/ABC&version=1"
+              }
+            },
+            {
+              "type": "create",
+              "description": "Add 'Complete ABC form' to the task list",
+              "resource": {
+                "resourceType": "Task",
+                "id": "scenario-r4-task",
+                "status": "ready",
+                "intent": "order",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                      "code": "complete-questionnaire"
+                    }
+                  ]
+                },
+                "description": "Complete ABC form for local retention",
+                "for": {
+                  "reference": "Patient/{{context.patientId}}"
+                },
+                "authoredOn": "{{today()}}",
+                "requester": {
+                  "reference": "Organization/crd221-demo-payer-complete-prefetch"
+                },
+                "input": [
+                  {
+                    "type": {
+                      "text": "questionnaire",
+                      "coding": [
+                        {
+                          "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                          "code": "questionnaire"
+                        }
+                      ]
+                    },
+                    "valueCanonical": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/ABC"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0005",
+      "summary": "Scenario R5: propose alternate request card with an update action",
+      "detail": "Checks that an update action on a propose alternate request card is accepted.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Change the order to a rental",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0005",
+          "actions": [
+            {
+              "type": "update",
+              "description": "Update the order",
+              "resource": {
+                "note": [
+                  {
+                    "text": "Changed to a rental per payer guidance"
+                  }
+                ]
+              },
+              "extension": {
+                "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0006",
+      "summary": "Scenario R6: propose alternate request card with an extra create action",
+      "detail": "Checks that a delete action followed by two create actions is reported as a crd-respar-1 warning.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Replace the order and add a follow-up order",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0006",
+          "actions": [
+            {
+              "type": "delete",
+              "description": "Remove the current order",
+              "resourceId": "DeviceRequest/crd221-demo-devicerequest-different-orderer-vs-performer"
+            },
+            {
+              "type": "create",
+              "description": "Order the alternative",
+              "resource": {
+                "note": [
+                  {
+                    "text": "Alternative order"
+                  }
+                ]
+              },
+              "extension": {
+                "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+              }
+            },
+            {
+              "type": "create",
+              "description": "Order a follow-up",
+              "resource": {
+                "note": [
+                  {
+                    "text": "Follow-up order"
+                  }
+                ]
+              },
+              "extension": {
+                "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0007",
+      "summary": "Scenario R7: propose alternate request card whose updated order is invalid",
+      "detail": "Checks that an invalid status on the updated order is reported as an error.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Change the order status",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0007",
+          "actions": [
+            {
+              "type": "update",
+              "description": "Update the order",
+              "resource": {
+                "status": "not-a-status"
+              },
+              "extension": {
+                "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0008",
+      "summary": "Scenario R8: additional orders card whose new order has no subject",
+      "detail": "Checks that a new order without a subject is reported once as an error.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "selectionBehavior": "any",
+      "suggestions": [
+        {
+          "label": "Add a physical assessment order",
+          "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0a0008",
+          "actions": [
+            {
+              "type": "create",
+              "description": "Add order for physical assessment",
+              "resource": {
+                "resourceType": "ServiceRequest",
+                "id": "scenario-r8-servicerequest",
+                "status": "draft",
+                "intent": "order",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "http://snomed.info/sct",
+                      "code": "225885004",
+                      "display": "Health assessment (procedure)"
+                    }
+                  ]
+                },
+                "authoredOn": "{{today()}}",
+                "requester": {
+                  "reference": "{{context.userId}}"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0009",
+      "summary": "Scenario R9: instructions card with a CDS Hooks extension",
+      "detail": "Checks that a CDS Hooks extension on a card is accepted.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)",
+        "org.example.scenario-note": "extensions are allowed on cards"
+      }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0010",
+      "summary": "Scenario R10: instructions card with an unknown element",
+      "detail": "Checks that an unknown element on a card is reported as an error.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "scenarioUnknownElement": "not part of the CDS Hooks card",
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    }
+  ],
+  "systemActions": [
+    {
+      "type": "update",
+      "description": "Scenario S2: update the Coverage with the if-none-exist extension",
+      "resource": {
+        "resourceType": "Coverage",
+        "id": "crd221-demo-coverage-complete-prefetch",
+        "subscriberId": "10A3D58WH456",
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+              "code": "self"
+            }
+          ]
+        },
+        "beneficiary": {
+          "reference": "Patient/crd221-demo-patient"
+        },
+        "status": "active",
+        "class": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
+                  "code": "plan"
+                }
+              ]
+            },
+            "value": "Medicare Part A"
+          }
+        ],
+        "payor": [
+          {
+            "reference": "Organization/crd221-demo-payer-complete-prefetch"
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)",
+        "davinci-crd.if-none-exist": "identifier=crd221-demo-coverage-complete-prefetch"
+      }
+    },
+    {
+      "type": "update",
+      "description": "Scenario S3: update the Coverage with an if-none-exist extension that is not a string",
+      "resource": {
+        "resourceType": "Coverage",
+        "id": "crd221-demo-coverage-complete-prefetch",
+        "subscriberId": "10A3D58WH456",
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/subscriber-relationship",
+              "code": "self"
+            }
+          ]
+        },
+        "beneficiary": {
+          "reference": "Patient/crd221-demo-patient"
+        },
+        "status": "active",
+        "class": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/coverage-class",
+                  "code": "plan"
+                }
+              ]
+            },
+            "value": "Medicare Part A"
+          }
+        ],
+        "payor": [
+          {
+            "reference": "Organization/crd221-demo-payer-complete-prefetch"
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)",
+        "davinci-crd.if-none-exist": 42
+      }
+    },
+    {
+      "type": "create",
+      "description": "Scenario S4: create a Questionnaire without an id",
+      "resource": {
+        "resourceType": "Questionnaire",
+        "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S4",
+        "status": "active",
+        "item": [
+          {
+            "linkId": "1",
+            "text": "Has the patient tried physical therapy?",
+            "type": "boolean"
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "type": "create",
+      "description": "Scenario S5: create a Questionnaire without an id and with an invalid status",
+      "resource": {
+        "resourceType": "Questionnaire",
+        "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S5",
+        "status": "not-a-status",
+        "item": [
+          {
+            "linkId": "1",
+            "text": "Has the patient tried physical therapy?",
+            "type": "boolean"
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    }
+  ]
+}
