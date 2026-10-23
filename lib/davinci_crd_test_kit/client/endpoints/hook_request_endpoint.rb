@@ -48,6 +48,10 @@ module DaVinciCRDTestKit
       iss
     end
 
+    def test_run_identifier_location_description
+      'the `iss` (issuer) claim in the payload of the JWT sent as a Bearer token in the HTTP Authorization header'
+    end
+
     def iss
       @iss ||=
         begin

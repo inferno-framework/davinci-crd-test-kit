@@ -943,6 +943,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome).to be_a(FHIR::OperationOutcome)
       expect(outcome.issue.first.code).to eq('not-found')
       expect(outcome.issue.first.details.text).to include('no identifier found')
+      expect(outcome.issue.first.details.text).to include('Inferno-issued Bearer token sent in the HTTP Authorization')
     end
   end
 end
