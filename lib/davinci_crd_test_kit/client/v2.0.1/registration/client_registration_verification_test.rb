@@ -80,7 +80,7 @@ module DaVinciCRDTestKit
             begin
               JWT::JWK.new(key_hash)
             rescue JWT::JWKError => e
-              id = key_hash['kid'] | index
+              id = key_hash['kid'] || index
               warning_messages << "Key #{id} invalid: #{e}"
               nil
             end

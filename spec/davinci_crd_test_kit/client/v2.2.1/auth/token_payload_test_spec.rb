@@ -282,5 +282,72 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to include('JWT payload missing required claims: `exp`')
     end
+
+    describe 'claim types' do
+      # JWT.encode refuses non-numeric `exp` and `iat`, so tokens with them are signed as given
+      def sign_as_given(payload)
+        header = Base64.urlsafe_encode64(token_header.merge(alg: 'RS384').to_json, padding: false)
+        body = Base64.urlsafe_encode64(payload.to_json, padding: false)
+        signature = rsa_key.sign(OpenSSL::Digest.new('SHA384'), "#{header}.#{body}")
+        "#{header}.#{body}.#{Base64.urlsafe_encode64(signature, padding: false)}"
+      end
+
+      def run_with_payload(payload)
+        create_appointment_hook_request
+        rsa_jwk_hash['alg'] = 'RS384'
+        run(test,
+            auth_tokens: [sign_as_given(payload)],
+            auth_tokens_jwk_json: [rsa_jwk_hash.to_json],
+            cds_jwt_iss: example_client_url)
+      end
+
+      def messages
+        results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+          .first.messages.map(&:message)
+      end
+
+      it 'passes when every claim has the required type, including an array `aud`' do
+        result = run_with_payload(token_payload.merge(aud: [appointment_book_url]))
+
+        expect(result.result).to eq('pass')
+      end
+
+      it 'fails when `exp` is a numeric string, which JWT.decode accepts' do
+        result = run_with_payload(token_payload.merge(exp: 5.minutes.from_now.to_i.to_s))
+
+        expect(result.result).to eq('fail')
+        expect(messages).to include(a_string_including('claim `exp` must be a number, got "'))
+      end
+
+      it 'fails when `iat` is not a number' do
+        result = run_with_payload(token_payload.merge(iat: 'yesterday'))
+
+        expect(result.result).to eq('fail')
+        expect(messages).to include(a_string_including('claim `iat` must be a number, got "yesterday"'))
+      end
+
+      it 'fails when `jti` is not a string' do
+        result = run_with_payload(token_payload.merge(jti: 12_345))
+
+        expect(result.result).to eq('fail')
+        expect(messages).to include(a_string_including('claim `jti` must be a string, got 12345'))
+      end
+
+      it 'fails when `aud` is an array containing a non-string' do
+        result = run_with_payload(token_payload.merge(aud: [appointment_book_url, 7]))
+
+        expect(result.result).to eq('fail')
+        expect(messages).to include(
+          a_string_including('claim `aud` must be a string or an array of strings')
+        )
+      end
+
+      it 'reports every wrongly typed claim' do
+        result = run_with_payload(token_payload.merge(iat: 'yesterday', jti: 12_345))
+
+        expect(result.result).to eq('fail')
+        expect(messages).to include(a_string_including('claim `iat`'), a_string_including('claim `jti`'))
+      end
+    end
   end
 end

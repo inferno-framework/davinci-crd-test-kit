@@ -21,5 +21,9 @@ RSpec.describe DaVinciCRDTestKit::MockEHR::FHIRRequestHandler do
       token = Base64.urlsafe_encode64('not json', padding: false)
       expect(handler.token_to_session_id(token)).to be_nil
     end
+
+    it 'returns nil when no token is provided' do
+      expect(handler.token_to_session_id(nil)).to be_nil
+    end
   end
 end

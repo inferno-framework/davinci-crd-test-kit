@@ -932,12 +932,18 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   # Authorization
   # =========================================================================
   describe 'authorization' do
-    it 'returns an error when the Authorization header is missing' do
+    it 'returns 500 with an OperationOutcome when the Authorization header is missing' do
       result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                              service_request_bodies:, mock_ehr_bundle: bundle)
       expect(result.result).to eq('wait')
       get patient_endpoint
-      expect(last_response.status).to be >= 400
+      expect(last_response).to be_server_error
+      expect(last_response.content_type).to start_with('application/fhir+json')
+      outcome = FHIR.from_contents(last_response.body)
+      expect(outcome).to be_a(FHIR::OperationOutcome)
+      expect(outcome.issue.first.code).to eq('not-found')
+      expect(outcome.issue.first.details.text).to include('no identifier found')
+      expect(outcome.issue.first.details.text).to include('Bearer token (encoding the target Inferno session ID)')
     end
   end
 end

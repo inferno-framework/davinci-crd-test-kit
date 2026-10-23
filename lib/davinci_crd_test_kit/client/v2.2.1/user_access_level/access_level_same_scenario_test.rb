@@ -8,6 +8,7 @@ module DaVinciCRDTestKit
   module V221
     class AccessLevelSameScenarioTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include DaVinciCRDTestKit::ClientBaseURLs
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_same_scenario
@@ -18,9 +19,14 @@ module DaVinciCRDTestKit
         Inferno simulated CRD server, with the same content. See
         [Matching Requests in the User Access Level Scoping Scenario](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#matching-requests-in-the-user-access-level-scoping-scenario)
         for what is compared for each hook, and where those details are taken from.
+        This check is necessary to ensure that any changes in access observed by Inferno happen
+        due to the difference in the user and not another mechanism.
 
         This test does not check any other aspect of the requests for conformance.
       )
+
+      verifies_requirements 'cds-hooks_3.0.0-ballot@63', 'cds-hooks_3.0.0-ballot@64',
+                            'cds-hooks_3.0.0-ballot@173'
 
       ORDER_CONTENT_FIELDS = ['code', 'medicationCodeableConcept', 'medicationReference',
                               'codeCodeableConcept', 'codeReference'].freeze
@@ -226,16 +232,12 @@ module DaVinciCRDTestKit
       # the two services request different prefetch data sets, so invoking one of each would
       # produce prefetch differences that have nothing to do with the user's access level
       def check_same_service(full_request, limited_request)
-        return if subset_prefetch_service?(full_request) == subset_prefetch_service?(limited_request)
+        return if prefetch_target(full_request) == prefetch_target(limited_request)
 
         add_message('error',
                     'The full-access and limited-access requests were made to different Inferno ' \
                     'simulated CRD servers, one requesting the complete prefetch data set and the ' \
                     'other a subset. Both runs must invoke the same service.')
-      end
-
-      def subset_prefetch_service?(request)
-        request.url.to_s.include?(PREFETCH_SUBSET_PREFIX)
       end
 
       def check_same_patient(full_body, limited_body)

@@ -15,6 +15,8 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::CardsIdentification
     include DaVinciCRDTestKit::ScenarioServiceResponse
 
+    error_response_format :operation_outcome
+
     AVAILABLE_HOOKS = [
       'appointment-book',
       'encounter-start',
@@ -34,7 +36,7 @@ module DaVinciCRDTestKit
     end
 
     def requested_version
-      requested = request_body.dig('extension', 'davinci-crd.requestedVersion').to_s
+      requested = request_extension(request_body, 'davinci-crd.requestedVersion').to_s
       if requested == '2.2'
         'v221'
       elsif requested == '2.0'
@@ -46,13 +48,26 @@ module DaVinciCRDTestKit
       iss
     end
 
+    def test_run_identifier_location_description
+      'the iss (issuer) claim in the payload of the JWT sent as a Bearer token in the HTTP Authorization header'
+    end
+
     def iss
-      @iss ||=
+      @iss ||= token_payload['iss']
+    end
+
+    def jwt_id
+      @jwt_id ||= token_payload['jti']
+    end
+
+    # the payload of the authentication JWT, decoded without verifying it, or an empty Hash
+    def token_payload
+      @token_payload ||=
         begin
           payload, = JWT.decode(token, nil, false)
-          payload['iss']
+          payload.is_a?(Hash) ? payload : {}
         rescue JWT::DecodeError
-          nil
+          {}
         end
     end
 
@@ -194,7 +209,7 @@ module DaVinciCRDTestKit
     end
 
     def coverage_info_disabled?
-      request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
+      coverage_info_configuration_disabled?(request_body)
     end
 
     def hook_instance_already_used?
@@ -217,7 +232,8 @@ module DaVinciCRDTestKit
               !AVAILABLE_HOOKS.include?(requested_hook)
           []
         else
-          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag]
+          # the `jti` tags let the cross hook check of `jti` uniqueness see the requests from every group
+          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag, *jwt_id_tags]
         end
 
       # the self-pay scenario checks for the absence of requests and the multiple payers scenario checks
@@ -225,6 +241,14 @@ module DaVinciCRDTestKit
       tags << interaction_group_tag if self_pay_group? || multiple_payers_group?
 
       tags.uniq.compact
+    end
+
+    def jwt_id_tags
+      return [] if jwt_id.blank?
+
+      jwt_id_tag = TagMethods.jwt_id_tag(jwt_id)
+      jwt_id_already_used = requests_repo.tagged_requests(test_run.test_session_id, [jwt_id_tag]).present?
+      [jwt_id_tag, (DUPLICATED_JWT_ID_TAG if jwt_id_already_used)]
     end
 
     def hook_instance_tag
@@ -250,8 +274,8 @@ module DaVinciCRDTestKit
     def hook_error_response(error_message, code: 400, outcome_code: 'invalid')
       response.status = code
       response.body = error_operation_outcome(outcome_code, error_message).to_json
-      response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-      response.format = :json
+      response.headers.merge!({ 'Access-Control-Allow-Origin' => '*' })
+      response.format = 'application/fhir+json'
     end
 
     def error_operation_outcome(code, text)

@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   module V221
     class ResourceIdentifiersAttestationTest < Inferno::Test
       id :crd_v221_resource_identifiers_attestation
-      ATTESTATION_TITLE = 'Health IT module does not use business identifiers in resource identifiers'.freeze
+      ATTESTATION_TITLE = 'CRD client does not use business identifiers in resource identifiers'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module does not expose resource identifiers
+        During this test, the tester will confirm that the CRD client does not expose resource identifiers
         that have a determinable relationship with business identifiers.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
       input :resource_identifiers_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module does not expose resource identifiers that have a determinable
+              I attest that the CRD client does not expose resource identifiers that have a determinable
               relationship with business identifiers.
             ),
             type: 'radio',

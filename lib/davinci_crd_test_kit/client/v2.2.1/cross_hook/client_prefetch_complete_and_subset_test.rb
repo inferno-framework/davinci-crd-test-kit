@@ -7,6 +7,7 @@ module DaVinciCRDTestKit
     class ClientPrefetchCompleteAndSubsetTest < Inferno::Test
       include TaggedRequestLoadHelper
       include CrossHookHelper
+      include ClientURLs
 
       title 'CRD client can provide both the complete standard prefetch data set and a subset'
       id :crd_v221_client_prefetch_complete_and_subset
@@ -52,7 +53,7 @@ module DaVinciCRDTestKit
 
       run do
         subset_prefetch_requests, complete_prefetch_requests =
-          load_requests_for_cross_hook_analysis.partition { |request| request.url.include?(PREFETCH_SUBSET_PREFIX) }
+          load_requests_for_cross_hook_analysis.partition { |request| prefetch_target(request) == :subset }
         completeness_tests = find_completeness_tests
         check_for_demonstration(subset_prefetch_requests, completeness_tests, :subset)
         check_for_demonstration(complete_prefetch_requests, completeness_tests, :complete)

@@ -74,6 +74,41 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result.result).to eq('pass')
   end
 
+  describe 'invalid keys in the JWKS' do
+    let(:invalid_key_with_kid) { { 'kty' => 'unknown', 'kid' => 'bad-key' } }
+    let(:invalid_key_without_kid) { { 'kty' => 'unknown' } }
+
+    def jwks_with(*extra_keys)
+      { 'keys' => jwks_hash['keys'] + extra_keys }.to_json
+    end
+
+    it 'warns about an invalid key, naming it by its kid, and still passes with the valid keys' do
+      result = run_with_defaults(cds_jwk_set: jwks_with(invalid_key_with_kid))
+
+      expect(result.result).to eq('pass')
+      warning = result_messages.find { |message| message.message.start_with?('Key bad-key invalid:') }
+      expect(warning).to be_present
+      expect(warning.type).to eq('warning')
+    end
+
+    it 'warns about an invalid key without a kid, naming it by its position in the key set' do
+      result = run_with_defaults(cds_jwk_set: jwks_with(invalid_key_without_kid))
+
+      expect(result.result).to eq('pass')
+      expect(result_messages.map(&:message))
+        .to include(start_with("Key #{jwks_hash['keys'].length} invalid:"))
+    end
+
+    it 'fails when every key in the JWKS is invalid' do
+      result = run_with_defaults(cds_jwk_set: { 'keys' => [invalid_key_with_kid] }.to_json)
+
+      expect(result.result).to eq('fail')
+      messages = result_messages.map(&:message)
+      expect(messages).to include(start_with('Key bad-key invalid:'))
+      expect(messages).to include(include('does not include any valid keys'))
+    end
+  end
+
   it 'fails for both missing JWKS and duplicate organization ids simultaneously' do
     result = run_with_defaults(
       cds_jwk_set: nil,

@@ -108,11 +108,11 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result_message).to match(/No #{hook_name} hook requests received/)
   end
 
-  it 'passes with a warning when no coverage is present in the prefetch' do
+  it 'fails with an error when no coverage is present in the prefetch' do
     create_hook_request(body: { 'hookInstance' => hook_instance, 'hook' => hook_name })
     result = run(test, complete_prefetch_service_organization_id: payer_org_id,
                        subset_prefetch_service_organization_id: payer_org_id)
-    expect(result.result).to eq('pass')
+    expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to include('Request has no coverage')
   end
 
@@ -125,6 +125,58 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
     expect(result.result).to eq('pass')
   end
 
+  it 'checks the payer of a Coverage prefetched on its own rather than in a Bundle' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    create_hook_request(body: hook_request_body.merge('prefetch' => { 'coverage' => coverage_resource }))
+    create_payer_fetch_request(response_body: { 'resourceType' => 'Organization', 'id' => 'other-payer' })
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    messages = result_messages.map(&:message).join
+    expect(messages)
+      .to include("Payer for the Coverage has the wrong id: expected '#{payer_org_id}', got 'other-payer'")
+    expect(messages).to_not include('Request has no coverage')
+  end
+
+  it 'passes when a Coverage prefetched on its own has the expected payer' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    create_hook_request(body: hook_request_body.merge('prefetch' => { 'coverage' => coverage_resource }))
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+  end
+
+  it 'uses the subset service key when the complete service key does not hold an object' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    prefetch = { 'coverage' => 'Coverage/other', 'cov' => hook_request_body.dig('prefetch', 'coverage') }
+    create_hook_request(body: hook_request_body.merge('prefetch' => prefetch))
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+    expect(result_messages.map(&:message).join).to_not include('Request has no coverage')
+  end
+
+  it 'uses the first Coverage in the prefetched Bundle, skipping entries of other types' do
+    allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    body = hook_request_body.deep_dup
+    body['prefetch']['coverage']['entry'].unshift({ 'resource' => { 'resourceType' => 'OperationOutcome' } })
+    create_hook_request(body:)
+    create_payer_fetch_request
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('pass')
+  end
+
+  it 'fails rather than raising when the request body is a JSON array' do
+    create_hook_request(body: [hook_request_body].to_json)
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).join).to include('Request body must be a JSON object, got Array')
+  end
+
   it 'fails when coverage has no payer reference' do
     no_payer_coverage = { 'resourceType' => 'Coverage' }
     body = hook_request_body.deep_merge(
@@ -135,6 +187,19 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestCoverageVerificationTest do
                        subset_prefetch_service_organization_id: payer_org_id)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message).join).to include('Coverage has no payer reference')
+  end
+
+  it 'fails rather than raising when the payer is not given as a reference object' do
+    [['Organization/inferno-payer-org'], 'Organization/inferno-payer-org', [{ 'reference' => 7 }]].each do |payor|
+      body = hook_request_body.deep_merge(
+        'prefetch' => { 'coverage' => { 'entry' => [{ 'resource' => coverage_resource.merge('payor' => payor) }] } }
+      )
+      create_hook_request(body:)
+    end
+    result = run(test, complete_prefetch_service_organization_id: payer_org_id,
+                       subset_prefetch_service_organization_id: payer_org_id)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message).grep(/Coverage has no payer reference/).size).to eq(3)
   end
 
   it 'fails when Inferno did not successfully retrieve the payer during hook processing' do

@@ -327,6 +327,33 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(system_actions.first['resource'].resourceType).to eq('Encounter')
     end
 
+    it 'uses the subset service keys when the complete service keys do not hold objects' do
+      request = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures',
+                                               'encounter_start_hook_request.json')))
+        .merge({
+                 'prefetch' => {
+                   'coverage' => 'Coverage/other',
+                   'cov' =>
+                    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures',
+                                                   'crd_coverage_example.json'))),
+                   'encounter' => 'Encounter/other',
+                   'enc' =>
+                    JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures',
+                                                   'crd_encounter_example.json')))
+                 }
+               })
+      creator = make_v221_creator(
+        types: ['coverage_information'],
+        hook: DaVinciCRDTestKit::ENCOUNTER_START_TAG,
+        body: request
+      )
+      response = creator.build_mock_hook_response
+      system_actions = response['systemActions']
+      expect(system_actions).to be_present
+      expect(system_actions.size).to eq(1)
+      expect(system_actions.first['resource'].resourceType).to eq('Encounter')
+    end
+
     it 'instructions card returned as fallback when no cards or system actions would otherwise be produced' do
       request = JSON.parse(
         File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'encounter_discharge_hook_request.json'))

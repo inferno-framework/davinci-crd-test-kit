@@ -45,6 +45,22 @@ RSpec.describe DaVinciCRDTestKit::HookRequestDataAccess do
       expect(cov_request).to_not have_been_made
     end
 
+    it 'uses the subset service key when the complete service key does not hold an object' do
+      cov_request = stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+
+      crd_coverage_bundle.entry.first.resource.id = 'prefetch_coverage'
+      order_sign_request['prefetch'] = {
+        'coverage' => 'Coverage/other',
+        'cov' => JSON.parse(crd_coverage_bundle.to_json)
+      }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      coverage = module_instance.request_coverage
+      expect(coverage.id).to eq('prefetch_coverage')
+      expect(cov_request).to_not have_been_made
+    end
+
     it 'finds no coverage if the prefetch data is bad' do
       cov_request = stub_request(:get, coverage_search_url)
         .to_return(status: 200, body: crd_coverage_bundle.to_json)

@@ -10,11 +10,12 @@ module DaVinciCRDTestKit
       description %(
         Verify that the JWT header contains the header fields required by the
         [CDS hooks spec](https://cds-hooks.hl7.org/2.0#trusting-cds-clients).
-        The `alg`, `kid`, and `typ` fields are required. This test also verifies that the `typ` field is set to
-        `JWT` and that the key used to sign the token can be identified in the JWKS.
+        The `alg`, `kid`, and `typ` fields are required, and `alg` and `kid` must be strings. This test
+        also verifies that the `typ` field is set to `JWT` and that the key used to sign the token can be
+        identified in the JWKS.
       )
 
-      verifies_requirements 'cds-hooks_2.0@182', 'cds-hooks_2.0@184', 'cds-hooks_2.0@202'
+      verifies_requirements 'cds-hooks_2.0@181', 'cds-hooks_2.0@182', 'cds-hooks_2.0@184', 'cds-hooks_2.0@202'
 
       input :auth_token_headers_json, :crd_jwks_keys_json
       output :auth_tokens_jwk_json
@@ -32,7 +33,11 @@ module DaVinciCRDTestKit
           header = JSON.parse(token_header)
           algorithm = header['alg']
 
-          add_message('error', "#{request_number}Token header must have the `alg` field") if algorithm.blank?
+          if algorithm.blank?
+            add_message('error', "#{request_number}Token header must have the `alg` field")
+          elsif !algorithm.is_a?(String)
+            add_message('error', "#{request_number}Token header `alg` field must be a string, got #{algorithm.to_json}")
+          end
 
           add_message('error', "#{request_number}Token header `alg` field cannot be set to none") if algorithm == 'none'
 
@@ -50,6 +55,11 @@ module DaVinciCRDTestKit
           end
 
           kid = header['kid']
+          unless kid.is_a?(String)
+            add_message('error', "#{request_number}Token header `kid` field must be a string, got #{kid.to_json}")
+            next
+          end
+
           keys = JSON.parse(crd_jwks_keys[index])
 
           jwk = keys.find { |key| key['kid'] == kid }

@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   module V221
     class PrefetchKeyOmissionAttestationTest < Inferno::Test
       id :crd_v221_prefetch_key_omission_attestation
-      ATTESTATION_TITLE = 'Health IT module omits prefetch keys when data not available'.freeze
+      ATTESTATION_TITLE = 'CRD client omits prefetch keys when data not available'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module omits prefetch keys when the relevant
+        During this test, the tester will confirm that the CRD client omits prefetch keys when the relevant
         data cannot be provided.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
       input :prefetch_key_omission_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module omits prefetch keys when the relevant data cannot be provided.
+              I attest that the CRD client omits prefetch keys when the relevant data cannot be provided.
             ),
             type: 'radio',
             default: 'false',

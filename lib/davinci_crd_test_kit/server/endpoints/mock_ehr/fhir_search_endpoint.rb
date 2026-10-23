@@ -7,6 +7,8 @@ module DaVinciCRDTestKit
       include Inferno::DSL::FHIRResourceNavigation
       include FHIRRequestHandler
 
+      error_response_format :operation_outcome
+
       def make_response
         prepare_response
         return unless mock_ehr_bundle_present?

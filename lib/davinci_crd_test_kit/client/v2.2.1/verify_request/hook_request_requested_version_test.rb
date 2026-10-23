@@ -17,8 +17,7 @@ module DaVinciCRDTestKit
         the `davinci-crd.requestedVersion` extension with the correct value: "2.2".
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@214', 'hl7.fhir.us.davinci-crd_2.2.1@dev-3-A',
-                            'hl7.fhir.us.davinci-crd_2.2.1@dev-12'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@214', 'hl7.fhir.us.davinci-crd_2.2.1@dev-3-A'
 
       run do
         hook_requests = load_interaction_group_requests
@@ -28,6 +27,19 @@ module DaVinciCRDTestKit
         hook_requests.each_with_index do |request, request_index|
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless request_body.present?
+
+          unless request_body.is_a?(Hash)
+            add_request_message('error', "Request body must be a JSON object, got #{request_body.class}.",
+                                request_index)
+            next
+          end
+
+          if request_body.key?('extension') && !request_body['extension'].is_a?(Hash)
+            add_request_message('error',
+                                "`extension` must be a JSON object, got #{request_body['extension'].class}.",
+                                request_index)
+            next
+          end
 
           requested_version = request_body.dig('extension', 'davinci-crd.requestedVersion')
           if requested_version.blank?

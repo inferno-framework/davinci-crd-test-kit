@@ -7,16 +7,21 @@ module DaVinciCRDTestKit
       include ClientURLs
       include DaVinciCRDTestKit::ClientWaitMessages
 
+      # CRD expects responses within a 5 or 10 second window depending on the hook. The minimum pause
+      # exceeds the longer window with enough margin for the CRD client to recognize the response as late.
+      MINIMUM_PAUSE_SECONDS = 15
+
       id :crd_v221_client_long_running_receive_request
       title 'CRD client invokes any hook'
       description %(
         During this test, Inferno will wait while the CRD client makes a single hook requests of any type.
         Inferno will return a [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-        but only after pausing for a configured amount of time, which must be 5 seconds or longer. The details
-        of the request and its response do not matter for the purposes of this test and they will not be
-        evaluated, checked for conformance, or included in cross-hook evaluations. The test will automatically
-        continue after Inferno receives a hook request, the configured pause time has elapsed,
-        and a response has been returned.
+        but only after pausing for a configured amount of time, which must be #{MINIMUM_PAUSE_SECONDS} seconds or
+        longer so that it exceeds the [5 or 10 second response window](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-3)
+        CRD defines for each hook. The details of the request and its response do not matter for the purposes
+        of this test and they will not be evaluated, checked for conformance, or included in cross-hook
+        evaluations. The test will automatically continue after Inferno receives a hook request, the
+        configured pause time has elapsed, and a response has been returned.
       )
       config options: { accepts_multiple_requests: true }
 
@@ -24,10 +29,11 @@ module DaVinciCRDTestKit
             title: 'Long-running Request Pause Time',
             description: %(
               Time in seconds to wait before returning a response to a hook invocation
-              made when testing a long-running request. Must be at least 5 seconds,
-              which is the minimum threshold for a long-running response as defined by CRD.
+              made when testing a long-running request. Must be at least #{MINIMUM_PAUSE_SECONDS} seconds,
+              which exceeds the 5 or 10 second response window CRD defines for each hook with enough
+              margin for the CRD client to recognize that the response is taking too long.
             ),
-            default: '5'
+            default: MINIMUM_PAUSE_SECONDS.to_s
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
@@ -37,6 +43,7 @@ module DaVinciCRDTestKit
             ),
             locked: true
       payer_organization_id_inputs
+            
 
       run do
         verify_long_running_pause_time_input
@@ -72,8 +79,8 @@ module DaVinciCRDTestKit
       end
 
       def verify_long_running_pause_time_input
-        assert long_running_pause_time.to_i >= 5,
-               'The **Long-running Request Pause Time** input must be at least 5 seconds.'
+        assert long_running_pause_time.to_i >= MINIMUM_PAUSE_SECONDS,
+               "The **Long-running Request Pause Time** input must be at least #{MINIMUM_PAUSE_SECONDS} seconds."
       end
     end
   end
