@@ -48,7 +48,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
   end
 
   it 'lists the payer organization ids in the wait dialog when provided' do
-    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '5',
+    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '15',
                        complete_prefetch_service_organization_id: 'org-complete',
                        subset_prefetch_service_organization_id: 'org-subset')
 

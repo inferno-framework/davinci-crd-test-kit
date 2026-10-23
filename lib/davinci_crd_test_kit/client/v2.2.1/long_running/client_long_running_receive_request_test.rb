@@ -43,7 +43,6 @@ module DaVinciCRDTestKit
             ),
             locked: true
       payer_organization_id_inputs
-            
 
       run do
         verify_long_running_pause_time_input
