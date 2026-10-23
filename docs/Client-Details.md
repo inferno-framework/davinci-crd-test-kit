@@ -11,7 +11,9 @@ feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues)
 on the tests. Future versions of these tests may validate other
 requirements and may change the test validation logic.
 
-## Client Testing Paradigm
+## Understanding CRD Client Testing in Inferno
+
+### Client Testing Paradigm
 
 To enable testing, Inferno simulates CRD service endpoints as described
 below for CRD clients to use to initiate hook requests. However, these
@@ -25,7 +27,7 @@ other tests that use this client testing paradigm:
   and their parent groups are marked with a "Tester-Initiated Exchange"
   badge. While these tests are running and active, they will display
   a "User Action Required" dialog that explains what Inferno expects
-  to happen, how it will respond, how to continue the tests, and other
+  to happen, how Inferno will respond, how to continue the tests, and other
   relevant details.
 - For CRD client tests, Inferno uses the `iss` claim in the payload
   of the JWT provided as the Bearer token to identify the session
@@ -33,17 +35,42 @@ other tests that use this client testing paradigm:
   provide the value that the CRD client will send in this location
   as an input when running the Registration tests. CRD clients that
   cannot send a JWT will not be able to use these tests.
-- "User Action Required" dialogs are active and listening for incoming
+- "User Action Required" dialogs are active and waiting for incoming
   requests for the session for a set period of time (typically about 5
   minutes). The time remaining is displayed at the bottom
-  of the dialog. After the timer runs out, Inferno will stop listening
+  of the dialog. After the timer runs out, Inferno will stop waiting
   for requests and testers will need to click the "Cancel" button
-  and start over. Using the "Cancel" button is also an option if testers
-  are unable to complete the required steps.
+  and start over. Using the "Cancel" button is always an option if testers
+  are unable or do not want to complete the required steps.
 
 NOTE: these restrictions do not apply to Inferno's simulated discovery
-endpoint which are not session dependent. They will always return the
-same response and are always active even when there is no session waiting.
+endpoints which are not session-dependent. They will always return the
+same response and are always active even when there is no active session.
+
+### Tester-provided Responses
+
+When simulating a CRD server responding to a hook request, Inferno must
+return CRD responses that follow a complex structure and can include
+rich data in the form of FHIR resources. However, Inferno is not a payer
+and does not have the data, knowledge, or business rules that would typically
+be used to create a complete response to a hook request. For its simulation,
+therefore, Inferno must either respond to a small number of well-defined ways
+using simple and predictable logic that covers all required scenarios or
+allow testers to bring their own responses. These test kits pursue both
+approaches by:
+
+- Supporting the generation of generic mocked responses that cover only
+  basic cases.
+- Allowing testers to specify more complex and specific responses for Inferno
+  to use to support complete scenario coverage.
+
+On the one hand, this reduces configuration burden within the CRD client
+because Inferno will work with whatever orders and (conformant) patients
+are already present there. On the other hand, it requires that testers
+understand the response structure and can provide technical (conformant)
+response details for Inferno to use. See the [Controlling Responses from Inferno's Simulated CRD Server](Controlling-Simulated-Responses)
+page of this wiki for details on both the [mocked responses](Controlling-Simulated-Responses#mocked-responses) that Inferno
+can generate and how Inferno [builds responses from tester-provided templates](Controlling-Simulated-Responses#tester-directed-custom-responses).
 
 ## Technical Implementation
 
@@ -167,7 +194,7 @@ request body, otherwise it will not be sent. Non-literal references will be igno
 
 #### CDS Hooks Responses
 
-THe CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+The CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
 that meet each of the [CRD Card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
 However, these simple cards may not support the target client in demonstrating the full CRD
 capabilities of its system. The CRD client test suite also allows testers to 

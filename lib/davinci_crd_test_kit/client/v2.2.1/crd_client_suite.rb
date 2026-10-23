@@ -29,10 +29,13 @@ module DaVinciCRDTestKit
         [provide feedback](https://github.com/inferno-framework/davinci-crd-test-kit/issues) on the tests.
         Future versions of these tests may validate other requirements and may change how these are tested.
 
-        Detailed information about this test suite can be found in the
+        Before running these tests, testers should be familiar with
+        - [Inferno's client testing paradigm as used in this CRD client suite.](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#client-testing-paradigm)
+        - [Inferno's approach to simulating CRD hook responses.](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#tester-provided-responses)
+
+        Additional information about this test suite can be found in the
         [client section](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details) of the
         [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki), including:
-        - [Important details about client testing in Inferno](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#client-testing-paradigm)
         - [What testers need to successfully execute these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#pre-execution-setup-and-required-information),
         - [Minimal](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#quick-start)
           and [complete](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1#additional-testing-options)

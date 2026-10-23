@@ -22,7 +22,7 @@ allowed to have custom extensions, portions of the request that are echoed back 
 Inferno responses (e.g., mocked coverage-information systemActions, or templates using
 the `com.inferno.resourceSelectionCriteria` extension), they will cause failures
 on the responses. This may be relaxed in the future and testers are welcome to
-provide feedback on the current behavior via github issues.
+provide feedback on the current behavior via [GitHub issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
 
 ## Mocked Responses
 
