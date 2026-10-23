@@ -78,10 +78,11 @@ steps:
     action_description: Run Server Group 3.1 Hook Tests > appointment-book with the scenario requests
     timeout: 900 # validation of the crafted content can take several minutes
 
-  # The server keeps its FHIR endpoints available until it is told to continue, so the client can read
-  # context resources while its request tests run. Neither session reports when the server has finished
-  # sending the scenario request and its three follow-up requests (they take well under a second), so
-  # pause before continuing the client.
+  # The server keeps its FHIR endpoints available until it is told to continue (at most 900 seconds), so the
+  # client can read context resources while its request tests run. Neither session reports when the server has
+  # finished sending the scenario request and its three follow-up requests (they take well under a second), so
+  # pause before continuing the client. The 30 seconds is a guess: if the requests arrive late (for example with
+  # a slow Sidekiq), client 1.2.1.x results change, so when they don't match, check this pause first.
   - state_description: Wait at Server test 3.1.1.01 (requests are being sent)
     session: server
     status: waiting
