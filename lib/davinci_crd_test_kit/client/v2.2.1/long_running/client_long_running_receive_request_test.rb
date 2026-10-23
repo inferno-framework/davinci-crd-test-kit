@@ -20,14 +20,6 @@ module DaVinciCRDTestKit
       )
       config options: { accepts_multiple_requests: true }
 
-      input :cds_jwt_iss,
-            title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
-            locked: true
       input :long_running_pause_time,
             title: 'Long-running Request Pause Time',
             description: %(
@@ -36,6 +28,15 @@ module DaVinciCRDTestKit
               which is the minimum threshold for a long-running response as defined by CRD.
             ),
             default: '5'
+      input :cds_jwt_iss,
+            title: 'CRD JWT Issuer',
+            description: %(
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              Run or re-run the "Registration" group to set or change this value.
+            ),
+            locked: true
+      payer_organization_id_inputs
 
       run do
         verify_long_running_pause_time_input

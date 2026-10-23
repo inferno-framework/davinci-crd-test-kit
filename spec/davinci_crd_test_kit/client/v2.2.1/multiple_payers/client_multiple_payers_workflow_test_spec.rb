@@ -65,8 +65,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientMultiplePayersWorkflowTest, :reque
                        subset_prefetch_service_organization_id: 'org-subset')
 
     expect(result.result).to eq('wait')
-    expect(result.result_message).to include('payer Organization id: `org-complete`')
-    expect(result.result_message).to include('payer Organization id: `org-subset`')
+    expect(result.result_message).to include('associated with payer `Organization/org-complete`')
+    expect(result.result_message).to include('associated with payer `Organization/org-subset`')
   end
 
   it 'passes when the tester clicks the continuation link' do

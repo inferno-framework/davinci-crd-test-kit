@@ -88,7 +88,7 @@ module DaVinciCRDTestKit
       def service_configuration_message(discovery_url, payer_id)
         <<~MESSAGE
           - **Discovery Endpoint**: `#{discovery_url}`
-          - **Related Payer**: #{payer_message(payer_id)}
+          - **Associated Payer**: #{payer_message(payer_id)}
           - **Access Scope**: Inferno has been granted patient- or user-level read and search access scopes for
                 all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
         MESSAGE
@@ -96,8 +96,8 @@ module DaVinciCRDTestKit
 
       def payer_message(payer_id)
         if payer_id.present?
-          "`#{payer_id}`. These CRD services will be invoked for patients with a coverage issued by " \
-            'the payer represented by the Organization resource with that id.'
+          'The CRD client will invoke these CRD services for patients with a coverage issued by ' \
+            "the payer represented by `Organization/#{payer_id}`."
         else
           'Not configured.'
         end

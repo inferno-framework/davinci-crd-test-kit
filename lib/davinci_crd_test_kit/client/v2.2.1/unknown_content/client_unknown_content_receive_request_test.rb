@@ -31,6 +31,7 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      payer_organization_id_inputs
 
       run do
         identifier = cds_jwt_iss

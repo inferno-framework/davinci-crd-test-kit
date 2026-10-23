@@ -56,6 +56,7 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      payer_organization_id_inputs
       output :continuation_url
 
       def hook_key
@@ -144,8 +145,8 @@ module DaVinciCRDTestKit
         <<~ENDPOINTS
           #### `#{hook_slug}` Service Endpoints
 
-          - Complete Prefetch `#{hook_slug}` Service: `#{complete_prefetch_url}`
-          - Subset Prefetch `#{hook_slug}` Service: `#{subset_prefetch_url}`
+          - Complete Prefetch `#{hook_slug}` Service#{complete_prefetch_payer_note}: `#{complete_prefetch_url}`
+          - Subset Prefetch `#{hook_slug}` Service#{subset_prefetch_payer_note}: `#{subset_prefetch_url}`
         ENDPOINTS
       end
 

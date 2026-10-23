@@ -12,13 +12,13 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSkipLongRunningAttestationTest, :r
     allow(SecureRandom).to receive(:hex).and_return(known_token)
   end
 
-  it 'skips when no long-running requests were sent during the previous wait' do
+  it 'skips when no long-running requests were sent during the previous test' do
     allow_any_instance_of(test).to receive(:load_interaction_group_requests).and_return([])
 
     result = run(test)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to include('no hook requests sent during the previous wait')
+    expect(result.result_message).to include('no hook requests sent during the previous test')
   end
 
   it 'enters wait state when long-running requests exist' do

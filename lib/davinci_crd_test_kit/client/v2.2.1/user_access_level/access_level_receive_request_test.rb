@@ -17,9 +17,6 @@ module DaVinciCRDTestKit
       id :crd_v221_access_level_receive_request
       title 'CRD client invokes a hook as an EHR user'
 
-      input :cds_jwt_iss,
-            title: 'CRD JWT Issuer',
-            locked: true
       input :access_level_target_reference,
             title: 'Target Resource Reference',
             description: %(
@@ -28,6 +25,10 @@ module DaVinciCRDTestKit
               full-access user and denied to the limited-access user. If possible, it should be
               within the set of prefetched data requested by Inferno.
             )
+      input :cds_jwt_iss,
+            title: 'CRD JWT Issuer',
+            locked: true
+      payer_organization_id_inputs
 
       def limited_access_run?
         crd_interaction_group == ACCESS_LEVEL_LIMITED_GROUP_TAG

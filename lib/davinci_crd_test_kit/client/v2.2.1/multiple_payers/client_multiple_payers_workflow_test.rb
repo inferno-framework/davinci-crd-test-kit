@@ -30,35 +30,8 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
-      input :complete_prefetch_service_organization_id,
-            title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. One of the patient's two Coverages must reference
-              this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
-            ),
-            type: 'text',
-            optional: true,
-            locked: true
-      input :subset_prefetch_service_organization_id,
-            title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. One of the patient's two Coverages must reference
-              this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
-            ),
-            type: 'text',
-            optional: true,
-            locked: true
+      payer_organization_id_inputs
       output :continuation_url
-
-      def payer_organization_note(organization_id)
-        return '' if organization_id.blank?
-
-        " (payer Organization id: `#{organization_id}`)"
-      end
 
       run do
         identifier = cds_jwt_iss
