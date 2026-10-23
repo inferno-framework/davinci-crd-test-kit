@@ -13,12 +13,12 @@ requirements and may change the test validation logic.
 
 ## Client Testing Paradigm
 
-To enable testing, Inferno simulates CRD Service endpoints as described
+To enable testing, Inferno simulates CRD service endpoints as described
 below for CRD clients to use to initiate hook requests. However, these
 endpoints will only respond successfully when Inferno can associate the
 incoming request with an active testing session. The following are key
-considerations for testers to be aware of when testing using thes and
-tests that use this client testing paradigm:
+considerations for testers to be aware of when testing with these and
+other tests that use this client testing paradigm:
 
 - Inferno will only recognize requests when the test session is
   actively waiting. In the CRD client suites, these tests
@@ -28,11 +28,11 @@ tests that use this client testing paradigm:
   to happen, how it will respond, how to continue the tests, and other
   relevant details.
 - For CRD client tests, Inferno uses the `iss` claim in the payload
-  of the JWT provided as the bearer token to identify the session
+  of the JWT provided as the Bearer token to identify the session
   that the incoming message will be associated with. Testers will
   provide the value that the CRD client will send in this location
-  as an input when running the tests. CRD clients that cannot send
-  a JWT will not be able to uses these tests.
+  as an input when running the Registration tests. CRD clients that
+  cannot send a JWT will not be able to use these tests.
 - "User Action Required" dialogs are active and listening for incoming
   requests for the session for a set period of time (typically about 5
   minutes). The time remaining is displayed at the bottom
@@ -41,7 +41,7 @@ tests that use this client testing paradigm:
   and start over. Using the "Cancel" button is also an option if testers
   are unable to complete the required steps.
 
-NOTE: these restrictions do not apply to Inferno's simulatedd discovery
+NOTE: these restrictions do not apply to Inferno's simulated discovery
 endpoint which are not session dependent. They will always return the
 same response and are always active even when there is no session waiting.
 
