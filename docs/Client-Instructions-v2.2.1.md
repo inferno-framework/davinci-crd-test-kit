@@ -121,7 +121,7 @@ demonstrated.
 
 ### Long-running Hook Requests
 
-Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue their workflow during long-running
+Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue working during long-running
 responses. Inferno will pause for a specified number of seconds (at least 5) before responding to a hook
 invocation made during this test to allow testers to verify and demonstrate this capability in the tested
 CRD client.

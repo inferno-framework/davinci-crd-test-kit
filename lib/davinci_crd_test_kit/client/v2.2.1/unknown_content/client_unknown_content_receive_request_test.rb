@@ -1,9 +1,11 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
     class ClientUnknownContentReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
 
       id :crd_v221_client_unknown_content_receive_request
       title 'CRD client invokes any hook'
@@ -32,37 +34,34 @@ module DaVinciCRDTestKit
 
       run do
         identifier = cds_jwt_iss
-        wait(
-          identifier:,
-          message: %(
-            **Unknown Response Content Test**:
+        wait(identifier:, message: wait_message)
+      end
 
-            Invoke any supported hook on one of the two Inferno simulated
-            CRD servers and Inferno will return a response that includes some
-            random, unexpected content. The test will automatically continue once
-            Inferno has received a request and returned a response.
+      # wait messages are rendered as given, so keep every line flush to avoid markdown reading
+      # the indentation as a code block
+      def wait_message
+        <<~MESSAGE
+          #### Unknown Response Content Test
 
-            CRD clients must ignore the content they do not recognize and process
-            the coverage information as usual. Testers will be asked to attest that
-            this was demonstrated in the next test.
+          Invoke any supported hook on one of the two Inferno simulated
+          CRD servers and Inferno will return a response that includes some
+          random, unexpected content. The test will automatically continue once
+          Inferno has received a request and returned a response.
 
-            #### Endpoints
+          CRD clients must ignore the content they do not recognize and process
+          the coverage information as usual. Testers will be asked to certify that
+          this was demonstrated in the next test.
 
-            - Complete Prefetch Discovery Endpoint: `#{discovery_url}`
-            - Subset Prefetch Discovery Endpoint: `#{prefetch_subset_discovery_url}`
+          #{service_discovery_endpoints_section}
+          #### Authentication and Identification
 
-            #### Authentication and Identification
+          #{session_identification_message}
 
-            For Inferno to recognize CRD requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
+          #### Responses
 
-            #### Responses
-
-            The response will include coverage information alongside an element and a
-            custom extension whose names are not defined by CRD or CDS Hooks.
-          )
-        )
+          The response will include coverage information alongside an element and a
+          custom extension whose names are not defined by CRD or CDS Hooks.
+        MESSAGE
       end
     end
   end

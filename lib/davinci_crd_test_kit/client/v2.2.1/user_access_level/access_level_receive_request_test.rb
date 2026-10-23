@@ -1,3 +1,4 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../../cross_suite/tags'
@@ -9,6 +10,7 @@ module DaVinciCRDTestKit
     # distinct `crd_interaction_group` tag (full vs limited) via `config`.
     class AccessLevelReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include AccessLevelTargetReference
 
@@ -47,7 +49,7 @@ module DaVinciCRDTestKit
       # the indentation as a code block
       def wait_message
         <<~MESSAGE
-          **Invoke a hook as a #{access_level_role} user**:
+          #### Invoke a Hook as a #{access_level_role.capitalize} User
 
           Invoke any supported hook while signed in as a **#{access_level_role}** user on one of
           the two Inferno simulated CRD servers. #{same_scenario_instruction}The test will
@@ -57,16 +59,10 @@ module DaVinciCRDTestKit
           to read `#{access_level_target_reference}`. That read must #{'not ' if limited_access_run?}return
           the target resource.
 
-          #### Endpoints
-
-          - Complete Prefetch Discovery Endpoint: `#{discovery_url}`
-          - Subset Prefetch Discovery Endpoint: `#{prefetch_subset_discovery_url}`
-
+          #{service_discovery_endpoints_section}
           #### Authentication and Identification
 
-          For Inferno to recognize CRD requests and associate them with this session,
-          the authentication JWT sent as a Bearer token in the Authorization header
-          must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
+          #{session_identification_message}
 
           #### Responses
 

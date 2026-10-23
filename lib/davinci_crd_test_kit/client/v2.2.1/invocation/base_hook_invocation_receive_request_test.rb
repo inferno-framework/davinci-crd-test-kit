@@ -1,3 +1,4 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 require_relative '../../../cross_suite/cards_identification'
 
@@ -5,6 +6,7 @@ module DaVinciCRDTestKit
   module V221
     class BaseHookInvocationReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
 
       RESPONSE_TYPE_OPTIONS = [
         {
@@ -84,8 +86,8 @@ module DaVinciCRDTestKit
             'against the incoming request to create a response.'
         else
           'When responding, Inferno will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
-            'the following response types using the incoming request: ' \
-            "\n            - #{selected_response_types_string}"
+            'the following response types using the incoming request:' \
+            "\n\n- #{selected_response_types_string}"
           # rubocop:enable Layout/LineLength
         end
       end
@@ -114,15 +116,15 @@ module DaVinciCRDTestKit
             DaVinciCRDTestKit::CardsIdentification.humanize_response_type(response_type)
               .sub('Card', '(card)')
               .sub('Action', '(systemAction)')
-          end.join("\n            - ")
+          end.join("\n- ")
       end
 
       def invoke_heading
-        "Invoke the `#{hook_slug}` hook"
+        "Invoke the `#{hook_slug}` Hook"
       end
 
       def invoke_intro
-        "Invoke #{hook_slug} hook by sending requests to one or both of the two Inferno simulated CRD servers."
+        "Invoke the `#{hook_slug}` hook by sending requests to one or both of the two Inferno simulated CRD servers."
       end
 
       def complete_prefetch_url
@@ -138,6 +140,34 @@ module DaVinciCRDTestKit
         false
       end
 
+      def wait_message_endpoints_section
+        <<~ENDPOINTS
+          #### `#{hook_slug}` Service Endpoints
+
+          - Complete Prefetch `#{hook_slug}` Service: `#{complete_prefetch_url}`
+          - Subset Prefetch `#{hook_slug}` Service: `#{subset_prefetch_url}`
+        ENDPOINTS
+      end
+
+      def message
+        <<~MESSAGE
+          #### #{invoke_heading}
+
+          #{invoke_intro}
+
+          [Click here](#{continuation_url}) when you have finished submitting requests.
+
+          #{wait_message_endpoints_section}
+          #### Authentication and Identification
+
+          #{session_identification_message}
+
+          #### Responses
+
+          #{configured_response_details}
+        MESSAGE
+      end
+
       run do
         next if skip_waiting_for_requests?
 
@@ -147,28 +177,7 @@ module DaVinciCRDTestKit
 
         wait(
           identifier:,
-          message: %(
-            **#{invoke_heading}**:
-
-            #{invoke_intro}
-
-            [Click here](#{continuation_url}) when you have finished submitting requests.
-
-            #### Endpoints
-
-            - Complete Prefetch: `#{complete_prefetch_url}`
-            - Subset Prefetch: `#{subset_prefetch_url}`
-
-            #### Authentication and Identification
-
-            For Inferno to recognize CRD requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
-
-            #### Responses
-
-            #{configured_response_details}
-          )
+          message:
         )
       end
     end

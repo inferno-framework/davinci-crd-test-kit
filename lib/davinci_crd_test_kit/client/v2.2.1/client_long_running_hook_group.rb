@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       id :crd_v221_client_long_running_hook
       description <<~DESCRIPTION
         When a hook invocation runs long, the CRD IG requires systems to provide
-        users with a way to bypass the hook and continue their workflow.
+        users with a way to bypass the hook and continue working.
 
         Hook requests made during these tests will not be checked for conformance
         or included in the cross-hook analyses around must support and other coverage requirements.

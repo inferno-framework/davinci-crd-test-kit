@@ -34,7 +34,7 @@ module DaVinciCRDTestKit
         wait(
           identifier:,
           message: %(
-            **Self-Pay Workflow Test**:
+            #### Self-Pay Scenario Test
 
             Perform actions in the CRD client that would normally trigger a hook request, such as one
             performed during previous tests, but for a service or product where the patient
