@@ -28,7 +28,7 @@ module DaVinciCRDTestKit
         section of the [CRD Test Kit Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
       )
       id :crd_v221_inferno_response_validation
-      simulation_verification
+      flag_as_simulation_verification
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-10'
 
