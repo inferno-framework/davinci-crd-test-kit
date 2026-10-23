@@ -1,9 +1,11 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
     class ClientMultiplePayersWorkflowTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
 
       id :crd_v221_client_multiple_payers_workflow
       title 'CRD client performs a workflow for a patient with multiple payer coverages'
@@ -28,73 +30,42 @@ module DaVinciCRDTestKit
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
-      input :complete_prefetch_service_organization_id,
-            title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. One of the patient's two Coverages must reference
-              this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
-            ),
-            type: 'text',
-            optional: true,
-            locked: true
-      input :subset_prefetch_service_organization_id,
-            title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. One of the patient's two Coverages must reference
-              this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
-            ),
-            type: 'text',
-            optional: true,
-            locked: true
+      payer_organization_id_inputs
       output :continuation_url
-
-      def payer_organization_note(organization_id)
-        return '' if organization_id.blank?
-
-        " (payer Organization id: `#{organization_id}`)"
-      end
-
-      def complete_prefetch_endpoint_details
-        "- Complete Prefetch: `#{discovery_url}`#{payer_organization_note(complete_prefetch_service_organization_id)}"
-      end
-
-      def subset_prefetch_endpoint_details
-        "- Subset Prefetch: `#{prefetch_subset_discovery_url}`" \
-          "#{payer_organization_note(subset_prefetch_service_organization_id)}"
-      end
 
       run do
         identifier = cds_jwt_iss
-        continuation_url = "#{resume_pass_url}?token=#{identifier}"
+        continuation_url = resume_pass_url_for(identifier)
         output(continuation_url:)
 
         wait(
           identifier:,
-          message: %(
-            **Multiple Payers Workflow Test**:
-
-            Perform a workflow that triggers hook invocation, such as one performed during
-            previous tests, for a patient that has two active coverages associated with two
-            different payers, each the payer associated with one of the two Inferno simulated
-            CRD servers discoverable at the following endpoints:
-
-            #{complete_prefetch_endpoint_details}
-            #{subset_prefetch_endpoint_details}
-
-            For Inferno to recognize these requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
-
-            By [clicking here](#{continuation_url}) I attest that a user completed a workflow
-            in the CRD client that triggered hook invocation for a patient with active
-            coverages from two different payers and that all resulting hook requests have
-            been sent.
-          )
+          message: wait_message
         )
+      end
+
+      def wait_message
+        <<~MESSAGE
+          #### Multiple Payers Scenario Test
+
+          Perform actions in the CRD client that trigger hook invocation(s), such as
+          one performed during previous tests, for a patient that has two active
+          coverages associated with two different payers, each associated with one
+          of the two Inferno simulated CRD service endpoints.
+
+          Once all necessary actions are complete, [click here](#{continuation_url}) to attest
+          that the CRD client triggered hook invocation(s) for a patient with active coverages
+          from two different payers and that all resulting hook requests have been sent.
+
+          #{service_discovery_endpoints_section}
+          #### Authentication and Identification
+
+          #{session_identification_message}
+
+          #### Responses
+
+          Inferno will return a mocked coverage-information response.
+        MESSAGE
       end
     end
   end

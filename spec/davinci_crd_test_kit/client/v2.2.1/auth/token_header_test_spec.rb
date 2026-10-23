@@ -26,6 +26,15 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenHeaderTest do
       .first
   end
 
+  it 'skips and outputs an empty JWK list when no token headers or keys were produced' do
+    result = run(test)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to eq('No Authorization tokens produced from the previous tests.')
+    outputs = result.outputs.to_h { |output| [output['name'], output['value']] }
+    expect(outputs['auth_tokens_jwk_json']).to eq('[]')
+  end
+
   it 'passes if it receives a valid JWT Authorization header' do
     result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('pass')

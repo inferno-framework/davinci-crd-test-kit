@@ -1,9 +1,11 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 
 module DaVinciCRDTestKit
   module V221
     class ClientLongRunningReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
 
       # CRD expects responses within a 5 or 10 second window depending on the hook. The minimum pause
       # exceeds the longer window with enough margin for the CRD client to recognize the response as late.
@@ -23,14 +25,6 @@ module DaVinciCRDTestKit
       )
       config options: { accepts_multiple_requests: true }
 
-      input :cds_jwt_iss,
-            title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
-            locked: true
       input :long_running_pause_time,
             title: 'Long-running Request Pause Time',
             description: %(
@@ -40,33 +34,47 @@ module DaVinciCRDTestKit
               margin for the CRD client to recognize that the response is taking too long.
             ),
             default: MINIMUM_PAUSE_SECONDS.to_s
+      input :cds_jwt_iss,
+            title: 'CRD JWT Issuer',
+            description: %(
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
+              request sent as the Bearer token in the `Authorization` header.
+              Run or re-run the "Registration" group to set or change this value.
+            ),
+            locked: true
+      payer_organization_id_inputs
 
       run do
         verify_long_running_pause_time_input
 
         identifier = cds_jwt_iss
-        wait(
-          identifier:,
-          message: %(
-            **Long Running Hook Request Test**:
+        wait(identifier:, message: wait_message)
+      end
 
-            Invoke any supported hook on one of the two Inferno simulated
-            CRD servers discoverable at the following endpoints:
+      # wait messages are rendered as given, so keep every line flush to avoid markdown reading
+      # the indentation as a code block
+      def wait_message
+        <<~MESSAGE
+          #### Long Running Hook Request Test
 
-            - Complete Prefetch: `#{discovery_url}`
-            - Subset Prefetch: `#{prefetch_subset_discovery_url}`
+          Invoke any supported hook on one of the two Inferno simulated
+          CRD servers. This test will automatically continue once Inferno
+          has received a request, paused for #{long_running_pause_time.to_i}
+          seconds, and returned a response.
 
-            For Inferno to recognize these requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload. This test
-            will automatically continue once Inferno has received a request, paused
-            for #{long_running_pause_time.to_i} seconds, and returned a response.
+          Users must have the option to continue working while waiting for Inferno's
+          response to be returned. Testers will be asked to certify that this was
+          demonstrated in the next test.
 
-            Users must have the option to continue
-            their workflow before Inferno's response is returned. Testers will be asked to
-            attest that this was demonstrated in the next test.
-          )
-        )
+          #{service_discovery_endpoints_section}
+          #### Authentication and Identification
+
+          #{session_identification_message}
+
+          #### Responses
+
+          Inferno will return a mocked coverage-information response.
+        MESSAGE
       end
 
       def verify_long_running_pause_time_input

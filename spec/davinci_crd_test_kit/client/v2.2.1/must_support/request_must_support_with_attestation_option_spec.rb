@@ -11,7 +11,9 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportWithAttestationOption,
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client_v221" }
   let(:known_token) { 'abc123' }
   let(:attest_true_url) { "#{base_url}/resume_pass?token=#{known_token}" }
-  let(:decline_message) { CGI.escape('Not all must support elements demonstrated. See messages for details.') }
+  let(:decline_message) do
+    ERB::Util.url_encode('Not all must support elements demonstrated. See messages for details.')
+  end
   let(:attest_false_url) { "#{base_url}/resume_fail?token=#{known_token}&message=#{decline_message}" }
   let(:receiving_result) { repo_create(:result, test_session_id: test_session.id) }
   let(:complete_service_request) { DaVinciCRDTestKit::CompleteResources::SERVICE_REQUEST }

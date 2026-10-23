@@ -108,21 +108,15 @@ module DaVinciCRDTestKit
       end
 
       def invoke_heading
-        'Invoke any hook'
+        'Invoke Any Hook'
       end
 
       def invoke_intro
-        "Invoke any hook by sending requests to\n            " \
-          "one or both of the two Inferno simulated CRD servers\n            " \
-          'discoverable at the following endpoints:'
+        'Invoke any hook by sending requests to one or both of the two Inferno simulated CRD servers.'
       end
 
-      def complete_prefetch_url
-        discovery_url
-      end
-
-      def subset_prefetch_url
-        prefetch_subset_discovery_url
+      def wait_message_endpoints_section
+        service_discovery_endpoints_section
       end
     end
   end

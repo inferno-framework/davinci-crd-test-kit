@@ -61,6 +61,19 @@ RSpec.describe DaVinciCRDTestKit::V221::DecodeAuthTokenTest do
       end
     end
 
+    it 'skips and replaces outputs from an earlier run with empty lists when there are no requests' do
+      %w[auth_tokens auth_token_payloads_json auth_token_headers_json].each do |name|
+        session_data_repo.save(test_session_id: test_session.id, name:, value: '["stale"]', type: 'text')
+      end
+
+      result = run(test)
+
+      expect(result.result).to eq('skip')
+      expect(session_output(:auth_tokens)).to eq([])
+      expect(session_output(:auth_token_payloads_json)).to eq([])
+      expect(session_output(:auth_token_headers_json)).to eq([])
+    end
+
     it 'passes if valid authorization header included in request' do
       token = jwt_helper.build(
         aud: appointment_book_url,

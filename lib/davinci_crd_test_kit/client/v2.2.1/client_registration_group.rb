@@ -8,11 +8,11 @@ module DaVinciCRDTestKit
       title 'Registration'
       description %(
         Before hook invocations can be made, the CRD client tested in this session
-        must be registered with and trusted by Inferno's simulated CRD server
+        must be registered with and trusted by Inferno's simulated CRD servers
         and vice-versa. Tests in this group confirm the registration of the partner
         system on both ends.
 
-        Inferno simulates two CRD discovery endpoints for the CRD client to connect to:
+        Inferno simulates two CRD servers with discovery endpoints for the CRD client to connect to:
         - Discovery endpoint for services requesting the complete [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.discovery_url}`
         - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):

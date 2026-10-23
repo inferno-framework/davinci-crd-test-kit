@@ -28,22 +28,22 @@ module DaVinciCRDTestKit
 
       run do
         identifier = cds_jwt_iss
-        continuation_url = "#{resume_pass_url}?token=#{identifier}"
+        continuation_url = resume_pass_url_for(identifier)
         output(continuation_url:)
 
         wait(
           identifier:,
           message: %(
-            **Self-Pay Workflow Test**:
+            #### Self-Pay Scenario Test
 
-            Perform a workflow that would normally trigger a hook request, such as one
+            Perform actions in the CRD client that would normally trigger a hook request, such as one
             performed during previous tests, but for a service or product where the patient
             record contains an indication that the patient intends to self-pay. The CRD client must
             not send any hook requests to Inferno during the workflow.
 
-            By [clicking here](#{continuation_url}) I attest that a user completed a workflow
-            in the CRD client that would normally trigger a hook request for a service that
-            has been marked as self-pay.
+            Once all necessary actions are complete, [click here](#{continuation_url}) to attest that
+            the steps that would normally trigger a hook request have been completed for a service
+            marked as self-pay.
 
             If Inferno receives a hook request, this test will automatically continue
             and the next test will fail.

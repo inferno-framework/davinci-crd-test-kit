@@ -20,6 +20,8 @@ module DaVinciCRDTestKit
         same CRD requirements when performing these scenarios.
       DESCRIPTION
 
+      input_order :long_running_pause_time, :access_level_target_reference
+
       group from: :crd_v221_client_long_running_hook
       group from: :crd_v221_client_unknown_content_hook
       group from: :crd_v221_client_self_pay_hook

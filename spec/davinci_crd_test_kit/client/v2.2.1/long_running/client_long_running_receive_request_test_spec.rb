@@ -47,6 +47,16 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLongRunningReceiveRequestTest, :re
     expect(result.result).to eq('wait')
   end
 
+  it 'lists the payer organization ids in the wait dialog when provided' do
+    result = run(test, cds_jwt_iss: example_client_url, long_running_pause_time: '15',
+                       complete_prefetch_service_organization_id: 'org-complete',
+                       subset_prefetch_service_organization_id: 'org-subset')
+
+    expect(result.result).to eq('wait')
+    expect(result.result_message).to include('associated with payer `Organization/org-complete`')
+    expect(result.result_message).to include('associated with payer `Organization/org-subset`')
+  end
+
   it 'passes automatically after a valid hook request and sleeps for the configured pause time' do
     expect_any_instance_of(DaVinciCRDTestKit::HookRequestEndpoint).to receive(:sleep).with(15)
 
