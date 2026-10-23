@@ -79,13 +79,16 @@ module DaVinciCRDTestKit
     end
     private_class_method :build_metadata_endpoint
 
+    # error_response_format is stored per class and not inherited, so subclasses must set it again
     def self.build_search_endpoint(metadata_dir: nil, metadata_files_proc: nil)
       if metadata_files_proc
         Class.new(MockEHR::FHIRSearchEndpoint) do
+          error_response_format :operation_outcome
           define_singleton_method(:metadata_files) { metadata_files_proc.call }
         end
       else
         Class.new(MockEHR::FHIRSearchEndpoint) do
+          error_response_format :operation_outcome
           define_method(:metadata_directory) { metadata_dir }
         end
       end

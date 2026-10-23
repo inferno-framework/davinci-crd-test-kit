@@ -133,6 +133,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
@@ -157,6 +158,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*not_a_hook/)
@@ -180,6 +182,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
@@ -203,6 +206,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json('/custom/crd_client/cds-services/appointment-book-service', appointment_book_request)
 
       expect(last_response.status).to eq(422)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/appointment-book.*order-sign/)
@@ -649,6 +653,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         post_json(server_endpoint, order_sign_hook_request)
 
         expect(last_response.status).to eq(400)
+        expect(last_response.content_type).to start_with('application/fhir+json')
         parsed_body = JSON.parse(last_response.body)
         expect(parsed_body['resourceType']).to eq('OperationOutcome')
         expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
