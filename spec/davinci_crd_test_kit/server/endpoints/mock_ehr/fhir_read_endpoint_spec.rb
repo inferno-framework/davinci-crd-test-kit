@@ -83,7 +83,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome).to be_a(FHIR::OperationOutcome)
       expect(outcome.issue.first.code).to eq('not-found')
       expect(outcome.issue.first.details.text).to include('no identifier found')
-      expect(outcome.issue.first.details.text).to include('Inferno-issued Bearer token sent in the HTTP Authorization')
+      expect(outcome.issue.first.details.text).to include('Bearer token (encoding the target Inferno session ID)')
     end
 
     it 'returns 500 with an OperationOutcome when the token is for a different session' do
@@ -97,7 +97,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(outcome).to be_a(FHIR::OperationOutcome)
       expect(outcome.issue.first.code).to eq('not-found')
       expect(outcome.issue.first.details.text).to include('is not associated with a waiting session')
-      expect(outcome.issue.first.details.text).to include('Inferno-issued Bearer token sent in the HTTP Authorization')
+      expect(outcome.issue.first.details.text).to include('Bearer token (encoding the target Inferno session ID)')
     end
   end
 end

@@ -168,7 +168,7 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderSelectReceiveRequestTest, :request 
     expect(outcome).to be_a(FHIR::OperationOutcome)
     expect(outcome.issue.first.code).to eq('not-found')
     expect(outcome.issue.first.details.text).to include('is not associated with a waiting session')
-    expect(outcome.issue.first.details.text).to include('the `iss` (issuer) claim in the payload of the JWT')
+    expect(outcome.issue.first.details.text).to include('the iss (issuer) claim in the payload of the JWT')
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end
@@ -199,7 +199,7 @@ RSpec.describe DaVinciCRDTestKit::V201::OrderSelectReceiveRequestTest, :request 
     expect(outcome).to be_a(FHIR::OperationOutcome)
     expect(outcome.issue.first.code).to eq('not-found')
     expect(outcome.issue.first.details.text).to include('is not associated with a waiting session')
-    expect(outcome.issue.first.details.text).to include('the `iss` (issuer) claim in the payload of the JWT')
+    expect(outcome.issue.first.details.text).to include('the iss (issuer) claim in the payload of the JWT')
     result = results_repo.find(result.id)
     expect(result.result).to eq('wait')
   end

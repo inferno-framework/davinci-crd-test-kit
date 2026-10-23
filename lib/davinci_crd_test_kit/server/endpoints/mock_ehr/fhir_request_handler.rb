@@ -12,8 +12,7 @@ module DaVinciCRDTestKit
       end
 
       def test_run_identifier_location_description
-        'the encoded Inferno-issued Bearer token sent in the HTTP Authorization header ' \
-          'and representing the target Inferno session id'
+        'the Inferno-issued Bearer token (encoding the target Inferno session ID) in the HTTP Authorization header'
       end
 
       def token_to_session_id(token_to_decode)
