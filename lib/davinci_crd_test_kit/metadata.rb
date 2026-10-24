@@ -34,8 +34,8 @@ module DaVinciCRDTestKit
     tags ['Da Vinci', 'CRD']
     last_updated LAST_UPDATED
     version VERSION
-    maturity 'Low'
-    authors ['Stephen MacVicar', 'Vanessa Fotso', 'Emily Michaud']
+    maturity 'Medium'
+    authors ['Inferno Team']
     repo 'https://github.com/inferno-framework/davinci-crd-test-kit'
   end
 end
