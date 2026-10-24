@@ -16,48 +16,55 @@ requirements and may change the test validation logic.
 ### Client Testing Paradigm
 
 To enable testing, Inferno simulates CRD service endpoints as described
-below for CRD clients to use to initiate hook requests. However, these
-endpoints will only respond successfully when Inferno can associate the
-incoming request with an active testing session. The following are key
-considerations for testers to be aware of when testing with these and
-other tests that use this client testing paradigm:
+below for CRD clients to initiate hook requests against (for the
+[client v2.2.1 suite](#simulated-crd-server-in-the-crd-client-v221-suite) and
+the [client v2.0.1 suite](#simulated-crd-server-in-the-crd-client-v201-suite)).
+However, these endpoints will only respond successfully when Inferno can
+associate the incoming request with an active testing session. The following
+are key considerations for testers to be aware of when running these tests and
+others that use this client testing paradigm:
 
 - Inferno will only recognize requests when the test session is
   actively waiting. In the CRD client suites, these tests
   and their parent groups are marked with a "Tester-Initiated Exchange"
-  badge. While these tests are running and active, they will display
+  badge. When these tests are running and active, they will display
   a "User Action Required" dialog that explains what Inferno expects
   to happen, how Inferno will respond, how to continue the tests, and other
-  relevant details.
+  relevant details. If a "User Action Required" dialog is not displayed
+  in your session, Inferno will not recognize any hook requests you make.
+- "User Action Required" dialogs are active and waiting for incoming
+  requests for the session for a set period of time (typically about 5
+  minutes). The active time remaining is displayed at the bottom
+  of the dialog. After the timer runs out, Inferno will stop waiting
+  for requests and testers will need to click the "Cancel" button
+  and restart the test run that timed out. Using the "Cancel"
+  button is always an option if testers are unable to or do not
+  want to complete the remaining steps for the current test.
 - For CRD client tests, Inferno uses the `iss` claim in the payload
   of the JWT provided as the Bearer token to identify the session
   that the incoming message will be associated with. Testers will
   provide the value that the CRD client will send in this location
   as an input when running the Registration tests. CRD clients that
-  cannot send a JWT will not be able to use these tests.
-- "User Action Required" dialogs are active and waiting for incoming
-  requests for the session for a set period of time (typically about 5
-  minutes). The time remaining is displayed at the bottom
-  of the dialog. After the timer runs out, Inferno will stop waiting
-  for requests and testers will need to click the "Cancel" button
-  and start over. Using the "Cancel" button is always an option if testers
-  are unable or do not want to complete the required steps.
+  cannot [send a JWT for authentication](https://cds-hooks.hl7.org/#trusting-cds-clients)
+  will not be able to use these tests.
 
-NOTE: these restrictions do not apply to Inferno's simulated discovery
-endpoints which are not session-dependent. They will always return the
-same response and are always active even when there is no active session.
+NOTE: because Inferno's simulated discovery endpoints are not session-dependent,
+these restrictions do not apply to them. Discovery requests will always return the
+same response and the endpoints are always active even when there is no waiting session.
 
-#### Debugging Connectivity Issues 
+#### Debugging Connectivity Issues
 
 Until hook requests from the CRD client reach Inferno's CRD service endpoints
 and get associated with an active session, they will not be visible within
-the Inferno UI. Compare the response to the following cases for help
-in determining what might be going wrong:
+the Inferno UI. If you are receiving error responses when sending requests
+to Inferno or are otherwise unsure whether your requests are reaching Inferno,
+compare the response you received to the following cases for help in
+determining what might be happening:
 - Non-FHIR, non-CDS response: Inferno's CRD endpoints will always
-  return FHIR OperationOutcomes as errors and CDS response on success.
-  If something else was returned, then double check the endpoint the
+  return FHIR OperationOutcomes for errors and CDS responses on success.
+  If something else was returned, double check the endpoint the
   request was sent to as it will not be an Inferno CRD endpoint.
-  If you think it is and Inferno CRD endpoint that returned this
+  If you think it is an Inferno CRD endpoint that returned this
   anomalous response, [submit a GitHub issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues)
   providing the specific request, the URL it was sent to, and the
   response.
@@ -69,7 +76,7 @@ in determining what might be going wrong:
     URL at which Inferno received the request, including the host
     and suite. If those details do not look right, the CRD client's
     configuration may need to be updated to point to the correct
-    location
+    target Inferno host and suite.
   - "no identifier found": Indicates that the JWT Inferno expects to
     find as the Bearer token in the Authorization header was either
     not present or malformed in some way. Update the CRD client to
@@ -80,26 +87,27 @@ in determining what might be going wrong:
     Inferno found an `iss` in the JWT in the Bearer token, but no
     matching session was waiting. This could mean that the session
     was not waiting with an active "User Action Required" dialog
-    that indicated it would respond to CRD requests, or that the
-    "User Action Required" dialog had expired. If neither of those
-    cases are true, double check the target URL to make sure the
+    that indicated it would respond to CRD requests or that the
+    "User Action Required" dialog had expired. If neither fits
+    your case, double check the target URL to make sure the
     request went to the Inferno host where your session is running.
   - "error encountered while determining the test run identifier":
     Your request is malformed in some way that Inferno does not
-    handle well. [Report as a GitHub issue in this repository](https://github.com/inferno-framework/davinci-crd-test-kit/issues),
+    handle well. Check your request and [submit a GitHub issue
+    in this repository](https://github.com/inferno-framework/davinci-crd-test-kit/issues),
     providing the specific request, the URL it was sent to, and the
     response.
 - Another OperationOutcome or CDS response: This could be an Inferno
   response to a request that was correctly associated with a session.
-  You could confirm by using the technique described in the
+  You can confirm by using the technique described in the
   [Debugging Other Unexpected Responses](#debugging-other-unexpected-responses)
-  to see if the request got associated with the waiting test.
+  section to see if the request got associated with the waiting test.
   If not, double check the target URL.
 
 #### Debugging Other Unexpected Responses
 
 Inferno's CRD service simulation attempts to be permissive and return
-responses whenever possible even if the requests or the responses
+successful responses whenever possible even if the requests or the responses
 are not themselves conformant and won't pass the tests. If you see
 unexpected results and responses even when you think that requests
 are correctly reaching Inferno and matching up with your session, you
@@ -107,40 +115,57 @@ can always see all requests that Inferno received and responded to
 while waiting at a "User Action Required" dialog.
 
 To see the requests received by Inferno and associated with the session
-while a "User Action Required" dialog was active, if the run is not
-already finished, first either cancel the test run or continue and complete
-it using the instructions, links, or buttons in the "User Action Required"
-dialog. Then, select the specific test with the blue "Tester-Initiated Exchange"
-badge (containing groups will have it, too) and open the Requests
-tab. All requests that Inferno received and associated with the session
-while that "User Action Required" dialog was active will be here with
-details of the request received and Inferno's response. If you completed
-the test run instead of canceling it, other tests may have requests
-associated with them, but some, e.g., error responses, will not be
-listed on those other tests.
+while a "User Action Required" dialog was active, select the test and
+view the Requests tab. To do so, if the run is not already finished,
+first either cancel the test run or continue and complete it using the
+instructions, links, or buttons in the "User Action Required"
+dialog. If you aren't sure which test to select, look for the test with
+the blue "Tester-Initiated Exchange" badge within the executed group.
+Containing groups will have it, too, and can be used to guide you to the
+right test, but they will not have requests associated with them. Once
+you've found the right test, all requests that Inferno received and
+associated with the session while that "User Action Required" dialog
+was active will be listed on the test's Requests tab with details of
+the request received and Inferno's response. If you completed the test
+run instead of canceling it, other tests may have requests associated
+with them, but some, e.g., error responses, will not be listed on those
+other tests.
 
-### Tester-provided Responses
+### Tester-Provided Responses
 
 When simulating a CRD server responding to a hook request, Inferno must
 return CRD responses that follow a complex structure and can include
 rich data in the form of FHIR resources. However, Inferno is not a payer
 and does not have the data, knowledge, or business rules that would typically
-be used to create a complete response to a hook request. For its simulation,
-therefore, Inferno must either respond in a small number of well-defined ways
-using simple and predictable logic that covers all required scenarios or
-allow testers to bring their own responses. These test kits pursue both
-approaches by:
+be used to create a complete response to a hook request. This provides a
+challenge for Inferno as it needs to be able to respond conformantly to
+any conformant system that tests against it and do so with the full range of
+CRD responses required by the specification to confirm complete conformance
+and coverage.
 
-- Supporting the generation of generic mocked responses that cover only
-  basic cases.
-- Allowing testers to specify more complex and specific responses for Inferno
-  to use to support complete scenario coverage.
+The Inferno team considered two potential approaches to address this challenge:
+1. Inferno-driven: Define tightly controlled scenarios that CRD clients would need to set
+   up and use to demonstrate conformance.
+2. Tester-driven: Ask testers to provide the responses that Inferno will use
+   and have Inferno verify that they are conformant and complete.
 
-On the one hand, this reduces configuration burden within the CRD client
-because Inferno will work with whatever orders and (conformant) patients
-are already present there. On the other hand, it requires that testers
-understand the response structure and can provide technical (conformant)
-response details for Inferno to use. See the [Controlling Responses from Inferno's Simulated CRD Server](Controlling-Simulated-Responses)
+The second option was chosen due to the risk in the first option of placing
+unintended requirements upon CRD clients testing with Inferno and
+the high cost to testers to set up very specific scenarios. The trade-off
+is that testers now need to specify the response details for Inferno
+in at least some cases to pass the tests.
+
+Specifically, when responding to CRD hook invocations Inferno can either:
+
+- Generate generic mocked responses that cover only basic cases, or
+- Respond with tester-provided content, including more complex responses
+  that may be tailored to specific details of the CRD client or the data or
+  configuration that it holds.
+
+Currently, tester must use tester-provided responses to satisfy
+Coverage-Information extension must support requirements.
+
+See the [Controlling Responses from Inferno's Simulated CRD Server](Controlling-Simulated-Responses)
 page of this wiki for details on both the [mocked responses](Controlling-Simulated-Responses#mocked-responses) that Inferno
 can generate and how Inferno [builds responses from tester-provided templates](Controlling-Simulated-Responses#tester-directed-custom-responses).
 
@@ -199,7 +224,7 @@ behavior when invoked by tested clients.
 
 The CRD IG requires that clients make data beyond the details provided in the hook request body available
 to servers so that payers can use it as a part of coverage determination. The IG lists the [minimum that
-payers need to make available](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#additional-data-retrieval):
+CRD clients need to make available](https://hl7.org/fhir/us/davinci-crd/STU2/foundation.html#additional-data-retrieval):
 
 - Patient
 - Relevant Coverage
@@ -242,7 +267,7 @@ available to the CRD servers on which they invoke hooks. Therefore,
 
 Inferno performs individual reads for each resource identified. While this involves additional requests, support
 for these read interactions is required by the CRD Client CapabilityStatement and the US Core Server CapabilityStatement
-that it builds on. In practice clients may support and payers may use more efficient queries that
+that it builds on. In practice, clients may support and payers may use more efficient queries that
 are not tested by Inferno.
 
 The one exception is `Coverages`, which are obtained via the same search advertised in
@@ -260,36 +285,36 @@ of [minimal prefetch templates](https://build.fhir.org/ig/HL7/davinci-crd/en/Bin
 The elements indicated in those prefetch templates informed the set of elements that Inferno looks in to determine
 what references to fetch.
 
-Any literal reference, relative or absolute, Inferno will attempt to read. The provided access token
+Inferno will attempt to read any literal reference, relative or absolute. The provided access token
 will be sent when the reference is to a resource on the `fhirServer` indicated in the hook
-request body, otherwise it will not be sent. Non-literal references will be ignored.
+request body; otherwise it will not be sent. Non-literal references will be ignored.
 
 #### CDS Hooks Responses
 
 The CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
 that meet each of the [CRD Card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
 However, these simple cards may not support the target client in demonstrating the full CRD
-capabilities of its system. The CRD client test suite also allows testers to 
+capabilities of its system. The CRD client test suite also allows testers to
 [provide a template for the responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
 for Inferno to provide back, including directives that determine details of the actual responses
 based on the request. This way, testers can configure the responses to match the patients, orders,
-and other relevant details of their system allowing a complete demonstration. See the
+and other relevant details of their system, allowing a complete demonstration. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details.
 
 In either case, Inferno will check that the responses it generates to send back to the client are
-conformant and systems will not pass the tests if they are not.
+conformant and systems will not pass the tests if issues are identified.
 
 #### SMART Authentication for FHIR API Access
 
 In order to access the client's FHIR API, Inferno will need to be a
 [trusted service](https://cds-hooks.hl7.org/STU2/#trusting-cds-services)
-registered as a client using details provided within the suite at time of execution.
+registered as a client using details provided within the suite at the time of execution.
 
 ### Simulated CRD Server in the CRD Client v2.2.1 Suite
 
 The Da Vinci CRD Client v2.2.1 Test Suite provides basic CDS services for
-[the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/hooks.html).
+[the six hooks contained in the implementation guide](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html).
 While it mostly follows the same approach as [the simulation in the v2.0.1 suite](#simulated-crd-server-in-the-crd-client-v201-suite),
 there are several key differences described here.
 
@@ -300,7 +325,7 @@ and to be able to provide the complete minimal data set via this mechanism. Infe
 that the requisite data is included and does not attempt to retrieve any data in the minimal data set
 during a hook invocation. However, clients are still required to allow servers to access data via FHIR
 APIs. During a hook invocation, Inferno will perform FHIR read interactions to request resources outside
-the standard prefetch data set that it needs to validate other requirements, including
+the standard prefetch data set that it needs to validate other requirements, including:
 - The Organization resource that represents the payer associated with the prefetched Coverage via its `payor` element.
 - Parent Location resources of those provided via prefetch through the `partOf` element.
 - Resources referenced in must support elements that don't appear within the `context` or `prefetch`
@@ -322,7 +347,7 @@ reference refers to a resource on another FHIR server, Inferno does not include 
 on the read request. Such reads do not count as evidence that Inferno can access data from the
 CRD client's FHIR server during a hook request.
 
-During the "User Access Level Scoping" scenario Inferno will attempt to read an additional
+During the "User Access Level Scoping" scenario, Inferno will attempt to read an additional
 tester-specified resource. Whereas the other resources listed above must be accessible, Inferno
 will expect this resource to be available only during the hook request made by the full-access user.
 
@@ -330,9 +355,9 @@ will expect this resource to be available only during the hook request made by t
 
 The v2.2.1 suite defines two sets of services rooted at the following discovery endpoints:
 - `custom/crd_client_v221/cds-services`: requests the complete [standard prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch)
-  dataset. The discovery response returned can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json).
+  data set. The discovery response returned can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json).
 - `custom/crd_client_v221/prefetch-subset/cds-services`: requests a subset of the [standard prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch)
-  dataset using non-standard prefetch keys to allow clients to demonstrate their ability to react to the
+  data set using non-standard prefetch keys to allow clients to demonstrate their ability to react to the
   service definitions provided by payers. The discovery response returned can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
 
 #### Hook Configuration Options
@@ -342,7 +367,7 @@ hook configuration options specified in hook requests, including:
 - requested version via the `davinci-crd.requestedVersion` extension: clients can request [v2.0.1 simulation](#simulated-crd-server-in-the-crd-client-v201-suite)
   behavior. Note that the requests are still evaluated by the tests against v2.2.1 requirements.
 - coverage-info response filter via the `coverage-info` key in the `davinci-crd.configuration`
-  extension: if set to `false` Inferno's simulation will not return any cards related to coverages,
+  extension: if set to `false`, Inferno's simulation will not return any cards related to coverages,
   including cards with a `coverage-info` source type or topic, and coverage information and
   form completion responses in the `systemActions` list.
 
@@ -371,7 +396,7 @@ types to support. These tests try to provide testers with an opportunity to
 exercise as much of their systems as they wish and validate that the exercised
 behaviors are correct. However, not all areas of the IG are exercised.
 
-Specific general limitations across all versions include:
+Limitations across all versions include:
 - This suite does not implement any payer business logic, so testers must either
   use [Inferno's simple hard-coded responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
   or [tell Inferno how to return responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
