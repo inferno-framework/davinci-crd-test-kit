@@ -47,6 +47,78 @@ NOTE: these restrictions do not apply to Inferno's simulated discovery
 endpoints which are not session-dependent. They will always return the
 same response and are always active even when there is no active session.
 
+#### Debugging Connectivity Issues 
+
+Until hook requests from the CRD client reach Inferno's CRD service endpoints
+and get associated with an active session, they will not be visible within
+the Inferno UI. Compare the response to the following cases for help
+in determining what might be going wrong:
+- Non-FHIR, non-CDS response: Inferno's CRD endpoints will always
+  return FHIR OperationOutcomes as errors and CDS response on success.
+  If something else was returned, then double check the endpoint the
+  request was sent to as it will not be an Inferno CRD endpoint.
+  If you think it is and Inferno CRD endpoint that returned this
+  anomalous response, [submit a GitHub issue](https://github.com/inferno-framework/davinci-crd-test-kit/issues)
+  providing the specific request, the URL it was sent to, and the
+  response.
+- OperationOutcome response indicating that "Inferno could not find an
+  active test run" in `issue.details.text`: Inferno received the
+  request, but failed to associate it with the session. The details
+  of the error message will help you determine what went wrong:
+  - Unexpected target URL: The error message will contain the
+    URL at which Inferno received the request, including the host
+    and suite. If those details do not look right, the CRD client's
+    configuration may need to be updated to point to the correct
+    location
+  - "no identifier found": Indicates that the JWT Inferno expects to
+    find as the Bearer token in the Authorization header was either
+    not present or malformed in some way. Update the CRD client to
+    send a JWT with the `iss` claim equal to the value configured
+    in your Inferno session. If this is not possible, you will not
+    be able to use these Inferno tests.
+  - "identifier 'X' ... is not associated with a waiting session":
+    Inferno found an `iss` in the JWT in the Bearer token, but no
+    matching session was waiting. This could mean that the session
+    was not waiting with an active "User Action Required" dialog
+    that indicated it would respond to CRD requests, or that the
+    "User Action Required" dialog had expired. If neither of those
+    cases are true, double check the target URL to make sure the
+    request went to the Inferno host where your session is running.
+  - "error encountered while determining the test run identifier":
+    Your request is malformed in some way that Inferno does not
+    handle well. [Report as a GitHub issue in this repository](https://github.com/inferno-framework/davinci-crd-test-kit/issues),
+    providing the specific request, the URL it was sent to, and the
+    response.
+- Another OperationOutcome or CDS response: This could be an Inferno
+  response to a request that was correctly associated with a session.
+  You could confirm by using the technique described in the
+  [Debugging Other Unexpected Responses](#debugging-other-unexpected-responses)
+  to see if the request got associated with the waiting test.
+  If not, double check the target URL.
+
+#### Debugging Other Unexpected Responses
+
+Inferno's CRD service simulation attempts to be permissive and return
+responses whenever possible even if the requests or the responses
+are not themselves conformant and won't pass the tests. If you see
+unexpected results and responses even when you think that requests
+are correctly reaching Inferno and matching up with your session, you
+can always see all requests that Inferno received and responded to
+while waiting at a "User Action Required" dialog.
+
+To see the requests received by Inferno and associated with the session
+while a "User Action Required" dialog was active, if the run is not
+already finished, first either cancel the test run or continue and complete
+it using the instructions, links, or buttons in the "User Action Required"
+dialog. Then, select the specific test with the blue "Tester-Initiated Exchange"
+badge (containing groups will have it, too) and open the Requests
+tab. All requests that Inferno received and associated with the session
+while that "User Action Required" dialog was active will be here with
+details of the request received and Inferno's response. If you completed
+the test run instead of canceling it, other tests may have requests
+associated with them, but some, e.g., error responses, will not be
+listed on those other tests.
+
 ### Tester-provided Responses
 
 When simulating a CRD server responding to a hook request, Inferno must
