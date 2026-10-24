@@ -25,14 +25,16 @@ module DaVinciCRDTestKit
           hook request field).
 
         Testers can make hook requests during this test, but Inferno will never return
-        a successful response. Typical error responses include:
+        a successful response while waiting here as hook requests are tested during other steps.
+        Typical error responses include:
         - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
           the request and associated it with this session, but will not return successful hook responses
           during this test.
         - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
           to associate the request with this session.
       )
-      attestation
+      flag_as_attestation
+      flag_as_tester_initiated_exchange
       verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
       config options: { hook_requests_unavailable: true }
@@ -146,12 +148,12 @@ module DaVinciCRDTestKit
 
             *Responses*
 
-            During this test, Inferno will always respond with an error, but the details of the error will
-            indicate whether connectivity was successful:
-            - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
-              the request and associated it with this session.
-            - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
-              to associate the request with this session.
+            During this test, Inferno will always respond with an error to hook requests
+            but the details of the error will indicate whether connectivity was successful:
+            - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded:
+              Inferno recognized the request and associated it with this session.
+            - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed:
+              Inferno was not able to associate the request with this session.
           MESSAGE
         )
       end

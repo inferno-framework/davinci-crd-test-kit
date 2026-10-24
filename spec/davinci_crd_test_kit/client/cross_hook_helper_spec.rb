@@ -78,7 +78,7 @@ RSpec.describe DaVinciCRDTestKit::CrossHookHelper do
   before { test_class.parent = additional_capabilities_group }
 
   describe '#find_completeness_tests' do
-    it 'finds the prefetch-complete test for every hook group and for the cross-hooks interaction group' do
+    it 'finds the prefetch-complete test for every hook group and for the cross-invocation interaction group' do
       result = instance.find_completeness_tests
 
       expect(result).to contain_exactly(
@@ -104,7 +104,7 @@ RSpec.describe DaVinciCRDTestKit::CrossHookHelper do
       expect(result).to contain_exactly(order_sign_prefetch_complete_test, cross_hooks_prefetch_complete_test)
     end
 
-    it 'compacts out the cross-hooks completeness test when none is found' do
+    it 'compacts out the cross-invocation completeness test when none is found' do
       cross_hooks_requests_subgroup.tests = []
 
       result = instance.find_completeness_tests
@@ -119,7 +119,7 @@ RSpec.describe DaVinciCRDTestKit::CrossHookHelper do
       expect { instance.find_completeness_tests }.to raise_error(NoMethodError)
     end
 
-    it 'raises if the cross-hooks interaction group cannot be found under the grandparent group' do
+    it 'raises if the cross-invocation interaction group cannot be found under the grandparent group' do
       cross_hook_group.groups = []
 
       expect { instance.find_completeness_tests }.to raise_error(NoMethodError)

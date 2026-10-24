@@ -29,6 +29,7 @@ module DaVinciCRDTestKit
             title: 'CRD JWT Issuer',
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       def limited_access_run?
         crd_interaction_group == ACCESS_LEVEL_LIMITED_GROUP_TAG

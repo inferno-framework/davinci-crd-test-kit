@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         but only after pausing for a configured amount of time, which must be #{MINIMUM_PAUSE_SECONDS} seconds or
         longer so that it exceeds the [5 or 10 second response window](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-3)
         CRD defines for each hook. The details of the request and its response do not matter for the purposes
-        of this test and they will not be evaluated, checked for conformance, or included in cross-hook
+        of this test and they will not be evaluated, checked for conformance, or included in cross-invocation
         evaluations. The test will automatically continue after Inferno receives a hook request, the
         configured pause time has elapsed, and a response has been returned.
       )
@@ -43,6 +43,7 @@ module DaVinciCRDTestKit
             ),
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       run do
         verify_long_running_pause_time_input

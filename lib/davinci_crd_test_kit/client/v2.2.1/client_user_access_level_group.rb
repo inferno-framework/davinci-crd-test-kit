@@ -24,7 +24,7 @@ module DaVinciCRDTestKit
 
         Hook requests made during these tests will not be checked for conformance beyond scenario
         requirements for confirming that both hook requests contain consistent content. The requests
-        will not be included in the cross-hook analyses around must support and other coverage
+        will not be included in the cross-invocation analyses around must support and other coverage
         requirements.
       DESCRIPTION
 

@@ -58,6 +58,7 @@ module DaVinciCRDTestKit
             locked: true
       payer_organization_id_inputs
       output :continuation_url
+      flag_as_tester_initiated_exchange
 
       def hook_key
         raise NotImplementedError, "#{self.class} must implement #hook_key"

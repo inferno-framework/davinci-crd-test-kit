@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
         level rather than within the FHIR resources carried in the response, and testers cannot change
         the response that is returned. The details of the request and its response do not matter for
         the purposes of this test and they will not be evaluated, checked for conformance, or included
-        in cross-hook evaluations. The test will automatically continue after Inferno receives a hook
+        in cross-invocation evaluations. The test will automatically continue after Inferno receives a hook
         request and returns a response.
       )
       config options: { accepts_multiple_requests: true }
@@ -32,6 +32,7 @@ module DaVinciCRDTestKit
             ),
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       run do
         identifier = cds_jwt_iss

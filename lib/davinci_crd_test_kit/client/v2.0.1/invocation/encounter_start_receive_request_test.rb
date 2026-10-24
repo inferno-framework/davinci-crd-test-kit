@@ -99,6 +99,7 @@ module DaVinciCRDTestKit
             optional: true,
             enable_when: { input_name: 'encounter_start_response_approach', value: 'custom' }
       output :continuation_url
+      flag_as_tester_initiated_exchange
 
       run do
         identifier = cds_jwt_iss

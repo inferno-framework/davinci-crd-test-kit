@@ -8,7 +8,7 @@ require_relative 'verify_request/service_request_no_custom_extensions_test'
 module DaVinciCRDTestKit
   module V221
     class ServerRequiredCardResponseValidationGroup < Inferno::TestGroup
-      title 'Cross-Hook Response Validation'
+      title 'Cross-Invocation Response Validation'
       description %(
         This group contains tests to verify the behavior of the server responses
         across all hooks.
