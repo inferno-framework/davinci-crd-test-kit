@@ -26,7 +26,7 @@ module DaVinciCRDTestKit
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
             description: %(
-              The CRD client's JWK Set containing it's public key. May be either
+              The CRD client's JWK Set containing its public key. May be either
               a publicly accessible url containing the JWKS, or the raw JWKS.
               The client suite may be run without this input, but it is required
               for the tests to pass.

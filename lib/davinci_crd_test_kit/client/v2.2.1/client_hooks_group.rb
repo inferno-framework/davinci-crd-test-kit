@@ -40,7 +40,7 @@ module DaVinciCRDTestKit
           * `order-sign` service id: `order-sign-service`
           * `order-dispatch` service id: `order-dispatch-service`
           * `encounter-discharge` service id: `encounter-discharge-service`
-        - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
+        - Discovery endpoint for services requesting a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.prefetch_subset_discovery_url}`
           * `appointment-book` service id: `appointment-book-subset`
           * `encounter-start` service id: `encounter-start-subset`

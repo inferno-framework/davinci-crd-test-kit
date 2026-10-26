@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
       input :order_select_response_approach,
             title: 'Response generation approach for order-select',
             description: %(
-              Determines how Inferno will generate response for order-select
+              Determines how Inferno will generate responses for order-select
               hook invocations.
             ),
             type: 'radio',

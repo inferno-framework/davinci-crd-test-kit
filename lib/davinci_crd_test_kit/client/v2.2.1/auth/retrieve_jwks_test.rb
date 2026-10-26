@@ -29,7 +29,7 @@ module DaVinciCRDTestKit
             type: 'textarea',
             description: %(
             The CRD client's registered JWK Set, provided during the "Registration" group, containing
-            it's public key. Used only when a request was received with a JWT without the `jku`
+            its public key. Used only when a request was received with a JWT without the `jku`
             header. May be either a publicly accessible url containing the JWKS, or the raw JWKS
             JSON. Run or re-run the "Registration" group to set or change this value.
           ),

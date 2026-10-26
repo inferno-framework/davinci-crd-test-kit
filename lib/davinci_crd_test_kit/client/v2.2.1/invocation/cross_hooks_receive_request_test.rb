@@ -29,7 +29,7 @@ module DaVinciCRDTestKit
               the earlier requests did not cover can be demonstrated. Otherwise select `No` to
               evaluate the requests already received, and every test in this group will pass without
               further requests. NOTE: if re-running this test, requests made during its previous
-              execution run will no longer be considered, even if `No` is selected.
+              execution runs will no longer be considered, even if `No` is selected.
             ),
             type: 'radio',
             default: 'false',
@@ -42,7 +42,7 @@ module DaVinciCRDTestKit
       input :cross_hooks_response_approach,
             title: 'Response generation approach for all hooks',
             description: %(
-              Determines how Inferno will generate response for all
+              Determines how Inferno will generate responses for all
               hook invocations.
             ),
             type: 'radio',

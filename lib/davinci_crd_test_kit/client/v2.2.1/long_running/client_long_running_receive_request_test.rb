@@ -14,7 +14,7 @@ module DaVinciCRDTestKit
       id :crd_v221_client_long_running_receive_request
       title 'CRD client invokes any hook'
       description %(
-        During this test, Inferno will wait while the CRD client makes a single hook requests of any type.
+        During this test, Inferno will wait while the CRD client makes a single hook request of any type.
         Inferno will return a [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
         but only after pausing for a configured amount of time, which must be #{MINIMUM_PAUSE_SECONDS} seconds or
         longer so that it exceeds the [5 or 10 second response window](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-3)

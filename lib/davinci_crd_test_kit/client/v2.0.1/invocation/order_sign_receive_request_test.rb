@@ -35,7 +35,7 @@ module DaVinciCRDTestKit
       input :order_sign_response_approach,
             title: 'Response generation approach for order-sign',
             description: %(
-              Determines how Inferno will generate response for order-sign
+              Determines how Inferno will generate responses for order-sign
               hook invocations.
             ),
             type: 'radio',

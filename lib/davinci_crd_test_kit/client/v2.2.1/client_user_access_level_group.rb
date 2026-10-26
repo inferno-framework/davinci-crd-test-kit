@@ -10,7 +10,7 @@ module DaVinciCRDTestKit
       title 'User Access Level Scoping'
       id :crd_v221_client_user_access_level
       description <<~DESCRIPTION
-        This group verifies that during a CDS Service hook invocation access to data on
+        This group verifies that during a CDS Service hook invocation, access to data on
         the CRD client's FHIR server is scoped to the authorized access level of the EHR
         user when the hook is invoked. Testers will invoke a hook twice, each time with consistent
         content (e.g., an order for the same service): once as an EHR user with full access, and

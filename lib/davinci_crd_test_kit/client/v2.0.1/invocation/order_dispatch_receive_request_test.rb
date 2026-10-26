@@ -36,7 +36,7 @@ module DaVinciCRDTestKit
       input :order_dispatch_response_approach,
             title: 'Response generation approach for order-dispatch',
             description: %(
-              Determines how Inferno will generate response for order-dispatch
+              Determines how Inferno will generate responses for order-dispatch
               hook invocations.
             ),
             type: 'radio',

@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
       input :encounter_discharge_response_approach,
             title: 'Response generation approach for encounter-discharge',
             description: %(
-              Determines how Inferno will generate response for encounter-discharge
+              Determines how Inferno will generate responses for encounter-discharge
               hook invocations.
             ),
             type: 'radio',

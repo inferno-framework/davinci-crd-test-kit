@@ -56,7 +56,7 @@ module DaVinciCRDTestKit
             title: 'Subset Prefetch Service Organization id',
             description: %(
               The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. This Organization must be referenced
+              subset prefetch CRD server. This Organization must be referenced as the
               payer on Coverages in hook requests made to services described by the
               `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
               The client suite may be run without this input, but it is required

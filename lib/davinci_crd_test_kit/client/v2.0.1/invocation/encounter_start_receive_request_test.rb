@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
       input :encounter_start_response_approach,
             title: 'Response generation approach for encounter-start',
             description: %(
-              Determines how Inferno will generate response for encounter-start
+              Determines how Inferno will generate responses for encounter-start
               hook invocations.
             ),
             type: 'radio',

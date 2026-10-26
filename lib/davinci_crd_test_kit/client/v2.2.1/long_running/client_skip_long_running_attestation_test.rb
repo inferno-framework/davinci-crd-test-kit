@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         During this test, the tester will confirm that the CRD client allows users to continue
         working in the system when a hook request is long-running. This could be accomplished,
         for example, by providing a bypass/continue mechanism when a CRD server is taking too long
-        to respond, or by always running hooks requests in the background and notifying users when they
+        to respond, or by always running hook requests in the background and notifying users when they
         return pertinent information.
       )
       flag_as_attestation

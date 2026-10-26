@@ -8,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
 
       id :crd_v221_hook_request_requested_version
-      title 'Hook requests contains the CRD version extension'
+      title 'Hook requests contain the CRD version extension'
       description %(
         Inferno's CRD service supports multiple versions of CRD, so [CRD clients are required](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformancedetails.html#ci-c-dev-3)
         to specify the requested version using the `davinci-crd.requestedVersion` extension on each request.
