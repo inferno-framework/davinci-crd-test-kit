@@ -15,8 +15,9 @@ requirements and may change the test validation logic.
 
 ### Client Testing Paradigm
 
-To enable testing, Inferno simulates CRD service endpoints as described
-below for CRD clients to initiate hook requests against (for the
+To enable testing of CRD clients that [initiate requests](https://inferno-framework.github.io/docs/getting-started/paradigms#client-initiator-testing),
+Inferno [simulates CRD service endpoints](#crd-server-simulation)
+for CRD clients to initiate hook requests against (for the
 [client v2.2.1 suite](#simulated-crd-server-in-the-crd-client-v221-suite) and
 the [client v2.0.1 suite](#simulated-crd-server-in-the-crd-client-v201-suite)).
 However, these endpoints will only respond successfully when Inferno can
