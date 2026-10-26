@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_registration_verification
-      title 'CRD client registers with Inferno'
+      title 'CRD client registration details are complete and valid'
       description %(
         In order to register with and be able to make hook requests against Inferno's
         simulated CRD servers, the tester must provide the `iss` (issuer) claim in
@@ -29,8 +29,8 @@ module DaVinciCRDTestKit
           These are used to verify that the prefetched coverage is linked to the correct payer for the invoked
           service.
 
-        During this test, registration information provided will be checked for conformance
-        with these requirements.
+        During this test, Inferno will verify that the provided registration information is
+        complete and valid.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@199'
@@ -49,7 +49,7 @@ module DaVinciCRDTestKit
             type: 'textarea',
             description: %(
               The CRD client's JWK Set containing its public key. May be either
-              a publicly accessible url containing the JWKS, or the raw JWKS.
+              a publicly accessible URL containing the JWKS, or the raw JWKS.
               The client suite may be run without this input, but it is required
               for the tests to pass.
             ),
@@ -133,7 +133,7 @@ module DaVinciCRDTestKit
             begin
               JSON.parse(retrieved.body)
             rescue JSON::ParserError
-              warning_messages << "Failed to fetch valid json from jwks uri #{jku}."
+              warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
               nil
             end
         else

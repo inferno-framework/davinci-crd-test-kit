@@ -30,7 +30,7 @@ The CRD Test Kit contains test suites to test the two actors defined by the CRD 
 - CRD clients: Clients are responsible for initiating CDS Hooks calls and consuming
   received decision support. They are also responsible for returning data requested by the CRD server
   needed to provide that decision support. This role is played by provider systems
-  in which orders are placed, such as EHRs. See the [Client Details](Client-Details.md) page
+  in which orders are placed, such as EHRs. See the [Client Details](Client-Details) page
   for more information.
 - CRD servers: Servers are responsible for receiving CDS Hooks calls and responding with appropriate
   decision support, which may involve using FHIR requests to gather more data from

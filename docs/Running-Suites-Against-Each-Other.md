@@ -73,9 +73,9 @@ Some tests will fail, including
   fields to verify that the server ignores them.
 - Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription (skip).
 
-### Additional Optional Steps for Long-running Hook Request
+### Additional Optional Steps for Long-Running Hook Request
 
-1. In the client session, run group "1.3.1 Long-running Hook Request" with no changes to the inputs.
+1. In the client session, run group "1.3.1 Long-Running Hook Request" with no changes to the inputs.
 1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
    changes to the inputs.
 1. Note that a "User Action Required" dialog will appear in the server session with no option to
@@ -97,7 +97,7 @@ All tests should pass.
    - Update the **Mock EHR Data** input with the contents of the [stress-test-Bundle.json](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/endpoints/mock_ehr/stress-test-Bundle.json)
      file. This contains a complete set of US Core data. NOTE: its size introduces a small amount of lag into the Inferno UI
      when the input dialog is open.
-   - Update the "Require acknowledgement of completed hook requests?" input to have the "Continue on user acknowledgement"
+   - Update the **Require acknowledgement of completed hook requests?** input to have the "Continue on user acknowledgement"
      option selected.
 2. Once a "User Action Required" dialog appears, run client group "2 FHIR API". This will run for a while.
 3. Once complete, return to the server session and click the link to complete the tests.

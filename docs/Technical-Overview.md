@@ -184,41 +184,56 @@ When making changes to the test kit itself, it's important to ensure the changes
 
 Consistency in naming and documentation helps to make the test kit and its suites clear
 and understandable to users. The maintainers of this repository strongly recommend following
-the naming and style guidelines in this section. See the "Da Vinci CRD Client v2.2.1 Test Suite"
-for an example of a suite that follows these guidelines. Other suites in this test kit may not
-currently follow these guidelines.
+the naming and style guidelines in this section, which apply to suite, group, test, and input
+definitions, wait dialog messages, and the pages in the `docs/` folder. See the "Da Vinci CRD
+Client v2.2.1 Test Suite" for an example of a suite that follows these guidelines. Other suites
+in this test kit may not currently follow these guidelines.
+
+### Terminology
+
+- Refer to the tested system by its actor name: "CRD client" or "CRD server", rather than
+  "client", "server", or "system under test".
+- Hook names (e.g., `order-sign`) are never capitalized. Put them in backticks in descriptions,
+  messages, and documentation, but not in titles.
 
 ### Suite, Group, and Test Titles
 
 - **Capitalization scheme**
-  - *Suites* and *Groups*: Capitalize each word of the title of suites and groups.
-  - *Tests*: Capitalize only the first word of test titles.
-  - *Exceptions*: Formal entities from the specifications with specific capitalization schemes,
-    e.g., hook names like `appointment-book` are never capitalized and formal response types
-    defined in the CRD guide like "Coverage Information" are always capitalized.
-- Naming scheme
+  - *Suites* and *Groups*: Use title case. Capitalize each word except articles, conjunctions,
+    and short prepositions (e.g., "a", "and", "of", "to") that are not the first word. Capitalize
+    each part of a hyphenated word, e.g., "Long-Running", "Self-Pay", and "Cross-Invocation".
+  - *Tests*: Use sentence case. Capitalize only the first word of test titles.
+  - *Exceptions*: Names with their own capitalization are always written as defined, e.g.,
+    hook names like `appointment-book` are never capitalized, and formal response types
+    ("Coverage Information"), profile names ("CRD Medication Request"), and acronyms
+    (JWT, JWKS, FHIR, TLS) keep their capitalization.
+- **Naming scheme**
   - *Suites*: For suite titles, use the form "<IG> <Actor> <Version> Test Suite",
     e.g., "Da Vinci CRD Client v2.2.1 Test Suite".
   - *Groups*: For group titles, use a short noun or noun phrase representing what
     is being checked within the group, e.g., "Registration", "order-sign", or
     "Response Handling".
   - *Tests*: The form of test titles depends on the type of test
-    - Verification tests (most): For tests that verify behavior, use the form 
-      "<Subject> <criteria checked>", e.g., "Client made additional FHIR data available
+    - Verification tests (most): For tests that verify behavior, use the form
+      "<Subject> <criteria checked>", e.g., "CRD client made additional FHIR data available
       during hook request processing" and "Prefetched resources conform to the required
       CRD profiles".
-    - Interaction tests: For tests where the primary activity is an interaction, use the
-      form "<Subject> <action>", e.g., "Client invokes the order-sign hook".
+    - Interaction and workflow tests: For tests where the primary activity is an interaction
+      or a tester-performed workflow, use the form "<Subject> <action>", e.g., "CRD client
+      invokes the order-sign hook".
+    - Attestation tests: Use the attested statement, e.g., "CRD client retains logs of all
+      CRD-related hook invocations".
 
 ### References to Inferno Entities
 
-- *Suites*, *Groups*, and *Tests*: When referencing an Inferno suite, group, or test,
-  put the name in double quotes. Optionally include the short ID as a prefix. For example,
-  the following phrases are both acceptable:
+- *Suites*, *Groups*, *Tests*, and *Presets*: When referencing an Inferno suite, group, test,
+  or preset, put the name in double quotes, not backticks or bold. Optionally include the
+  short ID as a prefix. For example, the following phrases are both acceptable:
   - group "1.1 Registration"
   - the "Registration" group
-- *Presets*: When referencing a preset, put the name in double quotes.
-- *Inputs*: When referencing an input, **bold** the name.
+- *Inputs*: When referencing an input, **bold** its title, e.g., the **CRD JWT Issuer** input.
+- *Other systems*: Put the names of UI elements in the tested system or other tools in double
+  quotes, e.g., the "CDS Services URL" field.
 
 ### Suite, Group, and Test Descriptions
 
@@ -233,11 +248,23 @@ highlighted as available on a linked page:
 - *Groups*: Groups don't necessarily need descriptions. When present, group descriptions
   can provide context, explain how the contained groups/tests are run, and/or
   explain what a passing run looks like.
-- *Tests*: Tests must have a description. Test descriptions can provide additional
-  context to explain the test and how it works. They must provide a paragraph
-  explaining what the test checks (or does, for interaction tests), starting
-  with “During this test, Inferno will verify …” for verification tests and
-  “During this test, Inferno will wait for …” for interaction tests.
+- *Tests*: Tests must have a description. Test descriptions can start with additional
+  context, such as the requirement being tested, and can explain how the test works. They
+  must include a paragraph explaining what the test checks (or does, for interaction and
+  workflow tests), starting with:
+  - "During this test, Inferno will verify ..." for verification tests,
+  - "During this test, Inferno will wait while ..." for interaction tests, and
+  - "During this test, the tester will confirm ..." or "During this test, the tester will
+    perform ..." for attestation and tester-performed workflow tests.
+
+### Wait Dialog Messages
+
+- Interaction dialogs start with a `####` heading naming the action, e.g.,
+  "#### Invoke the `order-sign` Hook", and use `####` headings for supporting sections.
+- Attestation dialogs start with a bold title ending in "Attestation" followed by a colon,
+  e.g., "**Card Display Attestation**:", state the attested statement, and end with the
+  **true** and **false** links.
+- Keep message lines flush left in heredocs so that Markdown does not render them as code blocks.
 
 ## Contribution Guidelines
 

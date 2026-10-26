@@ -38,7 +38,7 @@ module DaVinciCRDTestKit
         wait(
           identifier:,
           message: <<~MESSAGE
-            **Long Running Request Attestation**:
+            **Long-Running Request Attestation**:
 
             I attest that the user was able to continue working in the system
             while waiting for the long-running hook request to return a response:

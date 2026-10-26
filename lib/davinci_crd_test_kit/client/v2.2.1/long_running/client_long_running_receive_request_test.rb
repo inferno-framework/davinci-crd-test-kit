@@ -56,7 +56,7 @@ module DaVinciCRDTestKit
       # the indentation as a code block
       def wait_message
         <<~MESSAGE
-          #### Long Running Hook Request Test
+          #### Long-Running Hook Request Test
 
           Invoke any supported hook on one of the two Inferno simulated
           CRD servers. This test will automatically continue once Inferno

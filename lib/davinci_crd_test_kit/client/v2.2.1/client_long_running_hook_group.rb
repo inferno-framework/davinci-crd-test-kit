@@ -4,7 +4,7 @@ require_relative 'long_running/client_skip_long_running_attestation_test'
 module DaVinciCRDTestKit
   module V221
     class ClientLongRunningHookGroup < Inferno::TestGroup
-      title 'Long-running Hook Request'
+      title 'Long-Running Hook Request'
       id :crd_v221_client_long_running_hook
       description <<~DESCRIPTION
         When a hook invocation runs long, the CRD IG requires systems to provide

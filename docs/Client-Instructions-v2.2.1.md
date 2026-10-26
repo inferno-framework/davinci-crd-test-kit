@@ -2,7 +2,7 @@
 
 This document provides a step-by-step guide for using the Da Vinci CRD Client v2.2.1 Test Suite to test
 a **CRD client**, including instructions for a [demonstration execution](#demonstration-executions)
-against the public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
+against the public [Da Vinci BR Provider reference implementation](https://br-provider.davinci.hl7.org/).
 
 ## Pre-execution Setup and Required Information
 
@@ -25,7 +25,7 @@ In order to pass all tests in the suite, a CRD client implementation must
 - Associate each of these endpoints with a FHIR Organization id representing the payer
   that provides the insurance coverage and is responsible for determining coverage requirements.
   Inferno will use this information to verify that Hook calls are made against the
-  [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformancedetails.html#ci-c-dev-26).
+  [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-26).
 - Sign JWTs sent as a part of hook request authentication and provide the JSON Web Key Set (JWKS)
   containing the key used for the signature, either as a URL where it is publicly hosted or the
   raw JWKS as JSON.
@@ -130,9 +130,9 @@ Re-run these tests to re-evaluate after making additional requests with adjusted
 (see [Customizing Responses](#customizing-responses)) so that the requisite support is
 demonstrated.
 
-### Long-running Hook Requests
+### Long-Running Hook Requests
 
-Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue working during long-running
+Run the "Long-Running Hook Request" group under "1.3 Scenarios" to test that users can continue working during long-running
 responses. Inferno will pause for a specified number of seconds (at least 15) before responding to a hook
 invocation made during this test to allow testers to verify and demonstrate this capability in the tested
 CRD client.
@@ -164,7 +164,7 @@ potentially only remaining active during the hook invocation itself. Since the F
 outside of a hook invocation and are long-running due to their comprehensive nature, the token provided
 in the hook request may not be usable for these tests. If the token is not usable, testers
 may override the token and provide an appropriate token (and other details such as a refresh token and corresponding
-endpoints) in the "OAuth Credentials" input of the FHIR API tests. Note that the token
+endpoints) in the **OAuth Credentials** input of the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
 
 ## Interpreting Results
@@ -214,7 +214,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    1. Clicking the gear icon in the upper right to open the settings dialog.
    1. Select the "Payor" tab
    1. Use the "Server" dropdown to select the "Custom" option.
-   1. In the "CDS Services URL" input, put `https://inferno.healthit.gov/suites/custom/crd_client_v221/cds-services`.
+   1. In the "CDS Services URL" field, put `https://inferno.healthit.gov/suites/custom/crd_client_v221/cds-services`.
    1. Click the "Bypass payor-handled check" box.
    1. Click the "Save" button and close the dialog to complete the setup.
 1. Select a patient (any) to open their chart.

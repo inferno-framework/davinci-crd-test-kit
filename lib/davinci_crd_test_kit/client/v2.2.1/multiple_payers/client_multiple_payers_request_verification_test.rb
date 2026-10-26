@@ -25,7 +25,9 @@ module DaVinciCRDTestKit
         solicit coverage information for that one payer. If CRD clients invoke CRD on other payers, the
         CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-30)
         that response types that return coverage information are disabled for those 'likely
-        secondary' payers. During this test, Inferno verifies that the CRD client made one or two hook
+        secondary' payers.
+
+        During this test, Inferno will verify that the CRD client made one or two hook
         requests when the tester performed a workflow for a patient with two payer coverages during
         the previous test. If a single request was received, it must not disable coverage
         information responses. If two requests were received, each must have been made to a service

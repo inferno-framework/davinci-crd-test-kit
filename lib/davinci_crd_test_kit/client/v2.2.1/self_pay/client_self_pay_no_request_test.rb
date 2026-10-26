@@ -12,7 +12,9 @@ module DaVinciCRDTestKit
         that CRD clients only invoke hooks on payer services where the patient record indicates
         active coverage with the payer associated with the service and where there is no recorded
         indication the patient intends to bypass insurance coverage, i.e., the service or product
-        is not flagged as 'self-pay'. During this test, Inferno verifies that the CRD client did not
+        is not flagged as 'self-pay'.
+
+        During this test, Inferno will verify that the CRD client did not
         make any hook requests when the tester performed a self-pay workflow during the
         previous test.
       )

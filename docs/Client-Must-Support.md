@@ -201,7 +201,7 @@ supporting types respectively.
 #### Order types
 
 For order types, testers will select all types of orders that the system supports
-placing in the "Order types supported by the CRD client" input. Those selected will
+placing in the **Order types supported by the CRD client** input. Those selected will
 be expected to appear within at least one invocation of a hook. Note that any
 supported order type also must appear within an `order-sign` hook invocation due to
 requirement [hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-3). The CRD order types include:
@@ -218,8 +218,8 @@ requirement [hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-
 Ancillary information such as specific medications or provider details are included
 within supporting resource types. If the CRD client does not support representing
 information using one of the supporting resource types, then testers can certify
-this by unchecking one of the boxes in the "Supporting resource types populated
-by the CRD client" input. Those that remain selected will be expected to appear
+this by unchecking one of the boxes in the **Supporting resource types populated
+by the CRD client** input. Those that remain selected will be expected to appear
 within at least one invocation of a hook. The supporting types include:
 
 - [CRD Appointment with Order](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-appointment-with-order.html)

@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::PrefetchedCoveragePayerHelper
 
       id :crd_v221_hook_request_coverage_verification
-      title 'Prefetched coverages are valid'
+      title 'Prefetched coverages are issued by the payer associated with the invoked service'
       description %(
         During this test, Inferno will verify that the issuing payer Organization id from the `payor` element
         of each hook request's prefetched coverage matches the Organization id associated with the

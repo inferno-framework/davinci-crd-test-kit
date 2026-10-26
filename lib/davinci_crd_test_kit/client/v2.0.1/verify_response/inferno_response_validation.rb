@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
         the documentation for details on how Inferno builds a response from the provided
         custom template.
 
-        If this test fails when Inferno mocked the response based on selected card types, please
+        If this test fails when Inferno mocked the response based on selected response types, please
         report this failure to the Inferno team via github issues.
       )
       id :crd_v201_inferno_response_validation

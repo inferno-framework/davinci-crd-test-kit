@@ -48,9 +48,9 @@ group as described in [Quick Start](#quick-start).
 
 ### Customizing Responses
 
-The "Custom response template for [hook name] hook requests" input can be used to customize the hook
+The **Custom response template for [hook name] hook requests** input can be used to customize the hook
 responses to better fit the configuration of the tested CRD client. When this input is populated,
-the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
+the corresponding **Response types to return from [hook name] hook requests** input is ignored. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
@@ -109,8 +109,8 @@ you can do so using the following steps:
    which will not be used.
 1. Select the *CRD Request Generator Reference Implementation* option from the Preset dropdown in the upper left.
 1. Select the "1.2.4 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
-1. Select the response types Inferno should respond with under the "Response types to return
-   from order-sign hook requests" input and click the "SUBMIT" button.
+1. Select the response types Inferno should respond with under the **Response types to return
+   from order-sign hook requests** input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be
    made against Inferno's simulated CRD server.
 1. Open the [reference client](https://crd-request-generator.davinci.hl7.org/) in another tab/browser.
