@@ -175,7 +175,6 @@ When making changes to the test kit itself, it's important to ensure the changes
     *   Manually execute the test suites/groups affected by your changes against:
         *   The public reference implementations (if applicable).
         *   Any local test servers or client simulators you have.
-        *   The provided Postman collection for client tests.
     *   This helps catch issues that RSpec tests might miss, especially those related to UI interactions or workflow logic as experienced by a user.
 5.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details,
     update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's

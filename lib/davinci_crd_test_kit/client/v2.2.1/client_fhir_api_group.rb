@@ -19,7 +19,8 @@ module DaVinciCRDTestKit
       INPUT_INSTRUCTIONS = %(
         The location of and an access token for the CRD client's FHIR server are expected to come in
         the CDS Hooks request. The following information will be auto-populated from
-        the body of the latest hook invocation made during this session:
+        the body of the latest hook invocation made during this session
+        in one of the "Hooks" sub-groups or the "Additional Hook Invocations" group:
         - The URL of the CRD client FHIR server from the `fhirServer` field.
         - The OAuth Access Token from the `fhirAuthorization.access_token` field.
 

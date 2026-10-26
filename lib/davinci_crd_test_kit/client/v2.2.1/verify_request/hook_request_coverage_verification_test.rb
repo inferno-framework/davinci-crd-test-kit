@@ -90,7 +90,8 @@ module DaVinciCRDTestKit
           if expected_payer_org_id.blank?
             add_request_message(
               'error',
-              'No Inferno Payer Organization id configured for this endpoint; skipping required coverage check.',
+              'No Inferno Payer Organization id configured for the invoked service, so the payer of the ' \
+              'prefetched Coverage could not be checked. Re-run the "Registration" group to provide it.',
               request_index
             )
             next
