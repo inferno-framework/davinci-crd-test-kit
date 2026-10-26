@@ -41,10 +41,15 @@ In addition to the logic described below, all returned cards get a unique `uuid`
   provides a link to the CRD IG's [External Reference definition](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference).
 - **[Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)**: Inferno's [static instructions card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/instructions.json)
   provides generic instructions. It is always included in a mocked response if no other cards or system
-  actions would be returned.
+  actions would be returned, with one exception: when Inferno would only return Coverage Information
+  (see below) but cannot find a coverage for the patient, the Instructions card is not added
+  automatically and the response will contain no cards or system actions.
 - **[Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)**:
   Inferno will build a system action to add a [`coverage-information` extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
-  to each order associated with the hook invocation. The target coverage must either be provided
+  to each order associated with the hook invocation. On the `appointment-book`, `order-sign`, and
+  `order-dispatch` hooks, for which CRD clients must support this response type, Inferno always
+  attempts to return it, even if it is not selected in the **Response types to return from [hook name] hook requests**
+  input. On other hooks, it is returned only when selected. The target coverage must either be provided
   as a prefetched resource or found via a query for active coverages for the patient at the time of
   the invocation using the FHIR server access details found in the hook request. If no coverage can
   be found, then this response type will not be included in Inferno's response. If returned, the

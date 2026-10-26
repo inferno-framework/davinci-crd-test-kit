@@ -95,21 +95,19 @@ module DaVinciCRDTestKit
       end
 
       def selected_response_types_string
-        response_types =
-          if selected_response_types.present?
-            selected_response_types
-          else
-            # matches the hook's default response type
-            primary_hook? ? [DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE] : [DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE]
-          end.map do |response_type|
-            if response_type == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
-              "#{response_type}_action"
-            else
-              "#{response_type}_card"
-            end
-          end
+        response_types = selected_response_types.presence || []
+        # mocked responses on primary hooks always include Coverage Information, whether or not it was selected
+        response_types |= [DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE] if primary_hook?
+        # an Instructions card is returned when nothing else would be
+        response_types = [DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE] if response_types.empty?
 
-        format_responded_response_types(response_types)
+        format_responded_response_types(response_types.map do |response_type|
+          if response_type == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
+            "#{response_type}_action"
+          else
+            "#{response_type}_card"
+          end
+        end)
       end
 
       def format_responded_response_types(response_types)

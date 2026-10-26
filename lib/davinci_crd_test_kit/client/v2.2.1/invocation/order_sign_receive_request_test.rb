@@ -42,9 +42,10 @@ module DaVinciCRDTestKit
             title: 'Response types to return from order-sign hook requests',
             description: %(
               Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. If no types are selected, Inferno will mock and return
-              a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
-              response for this primary hook.
+              when responding to hook invocations. Because CRD clients must support the
+              [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+              response type on this primary hook, Inferno will always include a Coverage Information
+              response, even if it is not selected.
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],

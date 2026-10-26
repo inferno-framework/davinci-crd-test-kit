@@ -64,9 +64,12 @@ module DaVinciCRDTestKit
             title: 'Response types to return from all hook requests',
             description: %(
               Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. If no types are selected, Inferno will mock and return
-              a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
-              response.
+              when responding to hook invocations. On the `appointment-book`, `order-sign`, and `order-dispatch`
+              hooks, for which CRD clients must support the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+              response type, Inferno will always include a Coverage Information response even if it
+              is not selected. If no types are selected, Inferno will mock and return an
+              [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
+              response on the other hooks.
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -103,8 +106,23 @@ module DaVinciCRDTestKit
         'all'
       end
 
+      # Coverage Information is added based on the hook each request invokes, so it is described
+      # separately in the dialog rather than being treated as always present.
       def primary_hook?
-        true
+        false
+      end
+
+      def selected_response_types_string
+        coverage_information_note = 'Coverage Information (systemAction) on `appointment-book`, `order-sign`, ' \
+                                    'and `order-dispatch` requests'
+        if selected_response_types.blank?
+          return "#{coverage_information_note}\n- Instructions (card) on other hook requests"
+        end
+        if selected_response_types.include?(DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE)
+          return super
+        end
+
+        "#{super}\n- #{coverage_information_note}"
       end
 
       def invoke_heading
