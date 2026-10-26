@@ -13,15 +13,19 @@ module DaVinciCRDTestKit
       id :crd_v221_token_payload
       title 'Authorization token payloads have required claims and valid signatures'
       description %(
-        During this test, Inferno will verify that for each request the JWT payload is conformant to the
-        requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
+        During this test, Inferno will verify that for each request the JWT is signed and its payload is
+        conformant to the requirements in the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
         including the following:
+        - The JWT signature must be valid when verified using the key from the CRD client's JWKS
+          identified by the `kid` header in the previous test.
+        - The signing algorithm, taken from the key's `alg` or, if absent, the JWT header's `alg`, must not
+          be `none` or a symmetric (HMAC) algorithm such as `HS256`.
         - The `iss`, `aud`, `exp`, `iat`, and `jti` claims are required.
-        - `iss` must match the `issuer` from the **CRD JWT Issuer** input.
+        - `iss` must equal the value of the **CRD JWT Issuer** input.
         - `aud` must match the URL of the CDS Service endpoint being invoked.
-        - `exp` must represent a time in the future.
-        - `jti` must be a non-blank string that uniquely identifies this authentication JWT.
-        - `iss` must be a string, `aud` a string or an array of strings, and `exp` and `iat` numbers.
+        - `exp` must represent a time in the future (allowing 60 seconds of clock skew).
+        - `jti` must be a non-blank string.
+        - `iss` and `jti` must be strings, `aud` a string or an array of strings, and `exp` and `iat` numbers.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@180', 'cds-hooks_3.0.0-ballot@187',

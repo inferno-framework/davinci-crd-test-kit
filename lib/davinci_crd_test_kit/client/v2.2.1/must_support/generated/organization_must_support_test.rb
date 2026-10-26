@@ -17,7 +17,7 @@ module DaVinciCRDTestKit
 
         If any must support elements are not demonstrated, the tester will have the option to attest
         that these elements are not supported by the CRD client or surfaced to its users. Testers
-        must setup scenarios in which the "data exists and privacy constraints permit" Inferno to view
+        must set up scenarios in which the "data exists and privacy constraints permit" Inferno to view
         the must support information.
 
         Inferno will consider resources present within the `context` and `prefetch` elements of all hook

@@ -163,7 +163,7 @@ Specifically, when responding to CRD hook invocations Inferno can either:
   that may be tailored to specific details of the CRD client or the data or
   configuration that it holds.
 
-Currently, tester must use tester-provided responses to satisfy
+Currently, testers must use tester-provided responses to satisfy
 Coverage-Information extension must support requirements.
 
 See the [Controlling Responses from Inferno's Simulated CRD Server](Controlling-Simulated-Responses)

@@ -21,7 +21,7 @@ module DaVinciCRDTestKit
       input :appointment_book_response_approach,
             title: 'Response generation approach for appointment-book',
             description: %(
-              Determines how Inferno will generate responses for appoontment-book
+              Determines how Inferno will generate responses for appointment-book
               hook invocations.
             ),
             type: 'radio',

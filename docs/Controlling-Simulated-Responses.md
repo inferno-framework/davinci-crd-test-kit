@@ -28,7 +28,7 @@ provide feedback on the current behavior via [GitHub issues](https://github.com/
 
 Inferno can generate (mostly) static versions of each of the cards and system actions specified
 by the CRD IG ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
-[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/cards.html)). Inferno will mock an example of each
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html)). Inferno will mock an example of each
 response type selected in the **Response types to return from [hook name] hook requests** input when:
 - v2.2.1: the **Response generation approach for [hook name]** input is set to "Create simple
   mocks based on selected response types" (the default).
@@ -36,16 +36,16 @@ response type selected in the **Response types to return from [hook name] hook r
 
 In addition to the logic described below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
 
-- **[External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)**: 
+- **External Reference** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#external-reference-response-type)):
   Inferno's [static external reference card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/external_reference.json)
-  provides a link to the CRD IG's [External Reference definition](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference).
-- **[Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)**: Inferno's [static instructions card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/instructions.json)
+  provides a link to the External Reference section of the [current build of the CRD IG](https://build.fhir.org/ig/HL7/davinci-crd/cards.html).
+- **Instructions** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)): Inferno's [static instructions card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/instructions.json)
   provides generic instructions. It is always included in a mocked response if no other cards or system
   actions would be returned, with one exception: when Inferno would only return Coverage Information
   (see below) but cannot find a coverage for the patient, the Instructions card is not added
   automatically and the response will contain no cards or system actions.
-- **[Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)**:
-  Inferno will build a system action to add a [`coverage-information` extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html)
+- **Coverage Information** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)):
+  Inferno will build a system action to add a `coverage-information` extension ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html))
   to each order associated with the hook invocation. On the `appointment-book`, `order-sign`, and
   `order-dispatch` hooks, for which CRD clients must support this response type, Inferno always
   attempts to return it, even if it is not selected in the **Response types to return from [hook name] hook requests**
@@ -53,11 +53,11 @@ In addition to the logic described below, all returned cards get a unique `uuid`
   as a prefetched resource or found via a query for active coverages for the patient at the time of
   the invocation using the FHIR server access details found in the hook request. If no coverage can
   be found, then this response type will not be included in Inferno's response. If returned, the
-  extension will indicate that the order is "covered" (in [`covered`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:covered)),
-  that no prior auth is necessary ("no-auth" in [`pa-needed`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:pa-needed))
-  with the current [`date`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:date)
-  and a random [`coverage-assertion-id`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:coverage-assertion-id)
-  indicated. No other sub-extensions of the [`coverage-information` extension](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information.html) will be populated. The target
+  extension will indicate that the order is "covered" (in `covered` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:covered), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:covered))),
+  that no prior auth is necessary ("no-auth" in `pa-needed` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:pa-needed), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:pa-needed)))
+  with the current `date` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:date), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:date))
+  and a random `coverage-assertion-id` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:coverage-assertion-id), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information-definitions.html#diff_Extension.extension:coverage-assertion-id))
+  indicated. No other sub-extensions of the `coverage-information` extension will be populated. The target
   order resources for each hook include:
   - *appointment-book*: each Appointment in `context.appointments`.
   - *encounter-start* and *encounter-discharge*: the Encounter referred to by `context.encounterId` 
@@ -72,7 +72,7 @@ In addition to the logic described below, all returned cards get a unique `uuid`
     - v2.0.1: the resource referred to by `context.order`, which must either be provided as a
       prefetched resource under the `order` prefetch key or found via a read for the indicated
       resource at the time of the invocation using the FHIR server access details found in the hook request.
-- **[Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)**:
+- **Propose Alternate Request** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#propose-alternate-request-response-type)):
   Inferno's [propose alternate request card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/propose_alternate_request.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks. It provides a
   suggestion for the system to delete one of the indicated orders and recreate it. The selected order
@@ -85,7 +85,7 @@ In addition to the logic described below, all returned cards get a unique `uuid`
     at the time of the invocation using the FHIR server access details found in the hook request.
 
   If no order can be found, the card is not included in the response.
-- **[Identify Companion/Prerequisite Orders](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)**:
+- **Identify Companion/Prerequisite Orders** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#identify-additional-orders-response-type)):
   Inferno's [companion/prerequisite card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/companions_prerequisites.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks.
   It provides a suggestion for the system to create a ServiceRequest for a monthly physical assessment
@@ -93,22 +93,22 @@ In addition to the logic described below, all returned cards get a unique `uuid`
   (`context.patientId`), a `requester`, and an `authoredOn` date of the current date. The `requester`
   is the hook request's user (`context.userId`), except on v2.2.1 `order-dispatch` requests,
   which use the performer the orders are being dispatched to (`context.performer`).
-- **[Request Form Completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion)**:
+- **Request Form Completion** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#request-form-completion-response-type)):
   Inferno's [request form completion card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/request_form_completion.json)
   provides suggestions for the system to create a cancer Questionnaire resource and
   an associated Task resource to track its completion. The Task resource in the template will be
-  updated to be [`for`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#diff_Task.for)
+  updated to be `for` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-taskquestionnaire-definitions.html#diff_Task.for), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-taskquestionnaire-definitions.html#diff_Task.for))
   the patient referenced in the hook invocation (`context.patientId`) and have the current date
   for `authoredOn`.
-- **[Create or Update Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information)**:
+- **Create or Update Coverage Information** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#create-or-update-coverage-information), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#update-coverage-records-response-type)):
   Inferno's [create or update card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/create_update_coverage_information.json)
   provides suggestions for the system to either update the existing coverage if one was found (provided via prefetch or retrieved via query) or create one otherwise. If updating the existing coverage, it will
-  change the [`period`](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage-definitions.html#diff_Coverage.period)
+  change the `period` ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/StructureDefinition-profile-coverage-definitions.html#diff_Coverage.period), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-coverage-definitions.html#Coverage.period))
   to run from the current date to 1 month in the future. If creating a new coverage, it will create
   a draft self-pay coverage for the patient indicated in the hook request (`context.patientId`).
-- **[Launch SMART Application](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application)**:
+- **Launch SMART Application** ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#launch-smart-application), [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#launch-smart-application-response-type)):
   Inferno's [static launch SMART application card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/launch_smart_app.json)
-  points to the launch URL for the CRD client test suite. 
+  points to an Inferno launch URL. 
 
 ## Tester-directed Custom Responses
 
@@ -344,7 +344,8 @@ These can be used, for example, to make sure that resources in the returned resp
 the patient the hook was invoked for using `{{context.patientId}}`.
 
 Notes:
-- Entries within the returned collection that are not data types (lists or objects) will be ignored.
+- Entries within the returned collection that are lists or objects will be ignored. Only
+  entries that are primitive data types will be kept.
 - If multiple entries (not including ignored and nil entries) are returned, then the results will
   be turned into a comma-delimited list for use in replacing the token.
 - Inferno supports the raw `today()` function alone as well as with addition
@@ -366,7 +367,7 @@ populate the following `coverage-information` sub-extensions when not found in
   identified as the first coverage made available via prefetch or returned in response to
   a query for active coverages.
 - `date` sub-extension: Inferno will add the current date (UTC).
-- `coverage-assertion-id` sub-extension: Inferno will add a random 32-bit hex value.
+- `coverage-assertion-id` sub-extension: Inferno will add a random 64-bit hex value.
 
 Notes:
 - Inferno will not override a value provided for a sub-extension that would be defaulted. Thus,

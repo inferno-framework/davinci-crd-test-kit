@@ -116,7 +116,7 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             #### Register Inferno's CRD Servers
 
-            Setup the CRD client to connect to and trust Inferno's CRD servers
+            Set up the CRD client to connect to and trust Inferno's CRD servers
             and their services using the information below. Test connectivity
             if desired and then respond to the following statement as appropriate:
 
