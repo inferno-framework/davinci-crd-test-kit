@@ -100,8 +100,8 @@ module DaVinciCRDTestKit
               related to requests sent as a part of CRD. Inferno will expect those resource types to be
               demonstrated within hook requests. By unchecking a resource type, the tester attests
               that the CRD client does not support the information represented by the resource type
-              or does not surface it to users. `Patient` and `Coverage` resource types are not
-              listed but are always included in the checks because CRD clients are required to support them.
+              or does not surface it to users. `Patient` and `Coverage` resource types are not listed
+              but must be demonstrated because CRD clients are required to support them.
             ),
             type: 'checkbox',
             default: SUPPORTING_TYPE_OPTIONS.map { |option| option[:value] },
