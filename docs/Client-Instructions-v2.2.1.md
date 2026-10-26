@@ -72,8 +72,10 @@ Once you have that information, follow these steps:
    tests fail, e.g., because no JWKS was provided.
 1. Select the sub-group under "1.2 Hooks" that corresponds to a hook implemented by the
    tested client and click the "RUN TESTS" button in the upper right.
-1. Select the response types Inferno should respond with under the **Response types to return
-   from [hook name] hook requests** input (the options depend on which hook was chosen).
+1. Leave the **Response generation approach for [hook name]** input set to "Create simple mocks
+   based on selected response types" and select the response types Inferno should respond with
+   under the **Response types to return from [hook name] hook requests** input (the options
+   depend on which hook was chosen).
 1. Click the "SUBMIT" button and a "User Action Required" dialog will appear asking for
    hook invocations to be made against Inferno's simulated service endpoint.
 1. Make one or more hook invocations of the target hook against Inferno's simulated service
@@ -101,9 +103,18 @@ group as described in [Quick Start](#quick-start).
 
 ### Customizing Responses
 
-The "Custom response template for [hook name] hook requests" input can be used to customize the hook
-responses to better fit the configuration of the tested CRD client. When this input is populated,
-the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
+Each hook group, as well as the "Additional Hook Invocations" group under "1.4 Cross-Invocation
+Requirements", has a **Response generation approach for [hook name]** input that determines how
+Inferno builds its responses:
+- "Create simple mocks based on selected response types" (default): Inferno
+  [mocks](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+  each response type selected in the **Response types to return from [hook name] hook requests** input.
+- "Generate responses based on a tester-provided template": Inferno builds responses from the
+  [template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  provided in the **Custom response template for [hook name] hook requests** input, which can be
+  tailored to better fit the configuration of the tested CRD client.
+
+Only the input for the selected approach is displayed and used. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 

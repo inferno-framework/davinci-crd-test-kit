@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
           client_access_token: { name: :appointment_book_client_access_token },
           client_fhir_server: { name: :appointment_book_client_fhir_server },
           crd_jwks_keys_json: { name: :appointment_book_crd_jwks_keys_json },
-          custom_response_template: { name: :appointment_book_custom_response_template },
+          response_approach: { name: :appointment_book_response_approach },
           selected_response_types: { name: :appointment_book_selected_response_types }
         },
         outputs: {

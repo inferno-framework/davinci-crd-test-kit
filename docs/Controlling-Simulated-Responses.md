@@ -28,10 +28,13 @@ provide feedback on the current behavior via [GitHub issues](https://github.com/
 
 Inferno can generate (mostly) static versions of each of the cards and system actions specified
 by the CRD IG ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html),
-[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/cards.html)). When no custom response
-template is provided in the test inputs for a hook group, Inferno will mock an example of each
-card type selected in the "Response types to return..." input. In addition to the logic described
-below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/cards.html)). Inferno will mock an example of each
+response type selected in the **Response types to return from [hook name] hook requests** input when:
+- v2.2.1: the **Response generation approach for [hook name]** input is set to "Create simple
+  mocks based on selected response types" (the default).
+- v2.0.1: no custom response template is provided in the test inputs for the hook group.
+
+In addition to the logic described below, all returned cards get a unique `uuid` and their summary is prefixed with the invoked hook.
 
 - **[External Reference](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#external-reference)**: 
   Inferno's [static external reference card](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/external_reference.json)
@@ -97,6 +100,12 @@ To better support the demonstration and testing of the full range of CRD client 
 Inferno provides a mechanism for testers to specify how Inferno will respond to hook
 invocations made by their system. Inferno will use the hook request to select and complete
 cards and actions from a template hook response provided by the tester. 
+
+Testers provide the template in the **Custom response template for [hook name] hook requests**
+input. In the v2.2.1 suite, this input is only
+enabled and displayed when the **Response generation approach for [hook name]**
+input is set to "Generate responses based on a tester-provided template".
+In the v2.0.1 suite, providing the template is sufficient.
 
 At a high level, testers will provide a CDS Hook response with a partially specified set of cards
 and system actions. Those cards and actions can include

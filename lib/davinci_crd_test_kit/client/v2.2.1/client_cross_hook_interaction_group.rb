@@ -44,7 +44,7 @@ module DaVinciCRDTestKit
           client_access_token: { name: :cross_hooks_client_access_token },
           client_fhir_server: { name: :cross_hooks_client_fhir_server },
           crd_jwks_keys_json: { name: :cross_hooks_crd_jwks_keys_json },
-          custom_response_template: { name: :cross_hooks_custom_response_template },
+          response_approach: { name: :cross_hooks_response_approach },
           selected_response_types: { name: :cross_hooks_selected_response_types }
         },
         outputs: {

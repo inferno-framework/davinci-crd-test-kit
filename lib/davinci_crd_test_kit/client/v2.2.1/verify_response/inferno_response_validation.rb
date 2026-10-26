@@ -17,10 +17,10 @@ module DaVinciCRDTestKit
         To prevent the injection of non-standard information into Inferno responses, these validations will
         strictly check that all extensions are allowed at the locations they appear by the CRD specification.
 
-        If this test fails when the tester provided a custom response template, adjust the
+        If this test fails when responses were generated from a tester-provided template, adjust the
         provided template and the submitted requests so that the response built by Inferno
         is conformant. If this test fails when Inferno mocked the response based on selected
-        card types, first ensure that the CRD client's request is conformant. If the request is conformant
+        response types, first ensure that the CRD client's request is conformant. If the request is conformant
         but Inferno's response(s) are still not conformant, please report this failure to the
         Inferno team via [GitHub Issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
         For more details on how Inferno builds responses, see the
@@ -32,10 +32,10 @@ module DaVinciCRDTestKit
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-10'
 
-      input :custom_response_template, optional: true
+      input :response_approach, optional: true
 
       def response_label(index = nil)
-        response_type = (custom_response_template.present? ? 'Custom built' : 'Mocked')
+        response_type = (response_approach == 'custom' ? 'Custom built' : 'Mocked')
         "#{response_type} response#{" #{index}" if index.present?}"
       end
 
