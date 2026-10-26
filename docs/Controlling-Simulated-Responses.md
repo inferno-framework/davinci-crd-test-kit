@@ -64,24 +64,35 @@ In addition to the logic described below, all returned cards get a unique `uuid`
     which must either be provided as a prefetched resource or found via a read for the indicated
     Encounter at the time of the invocation using the FHIR server access details found in the hook request.
   - *order-sign* and *order-select*: each entry in `context.draftOrders`.
-  - *order-dispatch*: the resource referred to by `context.order` which must either be provided as a
-    prefetched resource or found via a read for the indicated resource at the time of the invocation
-    using the FHIR server access details found in the hook request.
+  - *order-dispatch*:
+    - v2.2.1: each order referenced in `context.dispatchedOrders`. Each order must either be
+      provided as an entry in a prefetched Bundle (matched on resource type and id) or found via a
+      read for the referenced resource at the time of the invocation using the FHIR server access
+      details found in the hook request.
+    - v2.0.1: the resource referred to by `context.order`, which must either be provided as a
+      prefetched resource under the `order` prefetch key or found via a read for the indicated
+      resource at the time of the invocation using the FHIR server access details found in the hook request.
 - **[Propose Alternate Request](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#propose-alternate-request)**:
   Inferno's [propose alternate request card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/propose_alternate_request.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks. It provides a
   suggestion for the system to delete one of the indicated orders and recreate it. The selected order
-  will either be the first order in `context.draftOrders` for the `order-sign`, `order-select` hooks
-  or the order referenced by `context.order` for the `order-dispatch` hook, in which case it
-  must either be provided as a prefetched resource or found via a read for the indicated resource
-  at the time of the invocation using the FHIR server access details found in the hook request.
+  will be the first order in `context.draftOrders` for the `order-sign` and `order-select` hooks.
+  For the `order-dispatch` hook, it will be:
+  - v2.2.1: the first order referenced in `context.dispatchedOrders` that Inferno can find, either
+    as an entry in a prefetched Bundle or via a read for the referenced resource at the time of the
+    invocation using the FHIR server access details found in the hook request.
+  - v2.0.1: the order referenced by `context.order`, found via a read for the indicated resource
+    at the time of the invocation using the FHIR server access details found in the hook request.
+
+  If no order can be found, the card is not included in the response.
 - **[Identify Companion/Prerequisite Orders](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#identify-additional-orders-as-companionsprerequisites-for-current-order)**:
   Inferno's [companion/prerequisite card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/companions_prerequisites.json)
   is only available on the `order-sign`, `order-select`, and `order-dispatch` hooks.
   It provides a suggestion for the system to create a ServiceRequest for a monthly physical assessment
   for the next three months. The ServiceRequest will be updated to reference the hook request's patient
-  (`context.patientId`), the hook request's user (`context.userId`) as the `requester`, and an `authoredOn`
-  date of the current date.
+  (`context.patientId`), a `requester`, and an `authoredOn` date of the current date. The `requester`
+  is the hook request's user (`context.userId`), except on v2.2.1 `order-dispatch` requests,
+  which use the performer the orders are being dispatched to (`context.performer`).
 - **[Request Form Completion](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#request-form-completion)**:
   Inferno's [request form completion card template](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses/request_form_completion.json)
   provides suggestions for the system to create a cancer Questionnaire resource and
