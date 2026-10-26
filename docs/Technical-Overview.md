@@ -108,7 +108,7 @@ directory includes:
   - **[`cards_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/cards_validation.rb)**
   - **[`hook_request_field_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/hook_request_field_validation.rb)**
   - **[`suggestion_actions_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/suggestion_actions_validation.rb)**
-* **Logical Model-based Verification Logic**: Logical models describing CRD requests and responses are new as of the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models).
+* **Logical Model-based Verification Logic**: Logical models describing CRD requests and responses are new as of the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4).
   Shared modules for performing validation against these models that attempt to correct for gaps and bugs in them are available:
   - **[`response_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/response_logical_model_validation.rb)**:
     Card logical models in the 2.2.1 version require some response mangling to get them to work, which is handled by this module.

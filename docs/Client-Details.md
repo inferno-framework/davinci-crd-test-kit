@@ -179,7 +179,7 @@ demonstrate its ability to react to the returned responses. Over the course of t
 interactions, Inferno will seek to observe conformant handling of CRD requirements as
 defined in the targeted CRD version.
 
-The client suites each contain two top-level groups:
+The client suites each contain three top-level groups:
 - In the "Hook Invocation" group, CRD clients will register Inferno's simulated
   CRD discovery endpoint(s) against payer(s) and demonstrate invocations of
   the CRD-specified hooks ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html),
@@ -191,13 +191,16 @@ The client suites each contain two top-level groups:
   as well as the ability to support updates as a part of CRD responses such
   as the coverage-information response type ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information),
   [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)).
+- In the "Visual Inspection and Attestation" group, testers will confirm through
+  attestation that the CRD client supports requirements that Inferno is not able
+  to verify.
 
 All FHIR resources present in requests and responses, both FHIR and CDS Hooks, will be checked
 for conformance to the CRD IG and CDS Hooks requirements individually and used in aggregate
 to determine whether required features and functionality are present. HL7® FHIR® resources are
 validated with the Java validator using `tx.fhir.org` as the terminology server. CDS Hooks request
 and response objects may also be checked using the validator against defined logical models
-in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)).
+in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4)).
 
 ## Must Support Tests
 
@@ -415,7 +418,7 @@ Limitations across all versions include:
 
 ### Additional v2.2.1 Client Suite Limitations
 
-- The [logical models defined in the v2.2.1 CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models)
+- The [logical models defined in the v2.2.1 CRD IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4)
   contain some bugs and inconsistencies. Known issues have been reported
   and workarounds have been added to the test kit. If you identify an error
   reported by Inferno that you believe is inaccurate, please report it

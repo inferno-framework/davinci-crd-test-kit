@@ -42,7 +42,7 @@ required features and functionality are present. HL7® FHIR® resources are vali
 with the Java validator using `tx.fhir.org` as the terminology server. CDS Hooks
 request and response objects may also be checked using the validator against defined
 logical models in versions that support them, such as
-[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models).
+[v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4).
 
 ### Trusting Inferno's CDS Client
 
