@@ -367,7 +367,7 @@ populate the following `coverage-information` sub-extensions when not found in
   identified as the first coverage made available via prefetch or returned in response to
   a query for active coverages.
 - `date` sub-extension: Inferno will add the current date (UTC).
-- `coverage-assertion-id` sub-extension: Inferno will add a random 64-bit hex value.
+- `coverage-assertion-id` sub-extension: Inferno will add a random 64-character hex value.
 
 Notes:
 - Inferno will not override a value provided for a sub-extension that would be defaulted. Thus,

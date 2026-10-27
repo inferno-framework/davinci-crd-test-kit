@@ -158,7 +158,8 @@ be run after the hook tests.
 
 A primary requirement for running the FHIR API tests is an access token for Inferno to send in the
 `Authorization` header that will grant the access needed to verify API support. The token provided
-in the most recent CDS Hooks invocation will be used by default. However, these should be short-lived
+in the most recent CDS Hooks invocation made in one of the "Hooks" sub-groups or the "Additional
+Hook Invocations" group will be used by default. However, these should be short-lived
 per the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#passing-the-access-token-to-the-cds-service),
 potentially only remaining active during the hook invocation itself. Since the FHIR API tests are performed
 outside of a hook invocation and are long-running due to their comprehensive nature, the token provided

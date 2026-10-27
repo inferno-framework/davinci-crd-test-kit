@@ -203,7 +203,7 @@ supporting types respectively.
 For order types, testers will select all types of orders that the system supports
 placing in the **Order types supported by the CRD client** input. Those selected will
 be expected to appear within at least one invocation of a hook. Note that any
-supported order type also must appear within an `order-sign` hook invocation due to
+observed order type also must appear within an `order-sign` hook invocation due to
 requirement [hook-3](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-3). The CRD order types include:
 
 - [CRD Communication Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-profile-communicationrequest.html)

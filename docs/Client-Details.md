@@ -179,21 +179,22 @@ demonstrate its ability to react to the returned responses. Over the course of t
 interactions, Inferno will seek to observe conformant handling of CRD requirements as
 defined in the targeted CRD version.
 
-The client suites each contain three top-level groups:
+The client suites contain two or three top-level groups:
 - In the "Hook Invocation" group, CRD clients will register Inferno's simulated
   CRD discovery endpoint(s) against payer(s) and demonstrate invocations of
   the CRD-specified hooks ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html),
   [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)) that they support.
   Support for features required across all hooks but not necessarily on each one will
-  also be checked as a part of this group.
+  also be checked as a part of this group. In the client v2.2.1 suite, specific
+  scenarios, such as long-running hook requests will be checked as well.
 - In the "FHIR API" group, CRD clients will demonstrate that they can act as
   a FHIR server, including general US Core read and search API requirements
   as well as the ability to support updates as a part of CRD responses such
   as the coverage-information response type ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information),
   [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)).
-- In the "Visual Inspection and Attestation" group, testers will confirm through
-  attestation that the CRD client supports requirements that Inferno is not able
-  to verify.
+- In the "Visual Inspection and Attestation" group (v2.2.1 only), testers will
+  confirm through attestation that the CRD client supports requirements that
+  Inferno is not able to verify.
 
 All FHIR resources present in requests and responses, both FHIR and CDS Hooks, will be checked
 for conformance to the CRD IG and CDS Hooks requirements individually and used in aggregate

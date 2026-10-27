@@ -34,7 +34,7 @@ The CRD Test Kit contains test suites to test the two actors defined by the CRD 
   for more information.
 - CRD servers: Servers are responsible for receiving CDS Hooks calls and responding with appropriate
   decision support, which may involve using FHIR requests to gather more data from
-  the client. See the [Server Details](Server-Details.md) page for more information.
+  the client. See the [Server Details](Server-Details) page for more information.
 
 In each case, content provided by the system under test will be checked individually
 for conformance and in aggregate to determine that the full set of features 
@@ -102,7 +102,7 @@ solely constitute full CRD IG conformance. Systems should also meet requirements
 attestation or other means.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client v2.0.1 Suite Testing Instructions](Client-Instructions.md)
-* [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1.md)
-* [Server v2.0.1 Suite Testing Instructions](Server-Instructions.md)
-* [Server v2.2.1 Suite Testing Instructions](Server-Instructions-v2.2.1.md)
+* [Client v2.0.1 Suite Testing Instructions](Client-Instructions)
+* [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1)
+* [Server v2.0.1 Suite Testing Instructions](Server-Instructions)
+* [Server v2.2.1 Suite Testing Instructions](Server-Instructions-v2.2.1)
