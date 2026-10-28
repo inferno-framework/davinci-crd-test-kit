@@ -75,10 +75,6 @@ module DaVinciCRDTestKit
         validation_context do
           snomedCT '731000124108' # explicit snomedCT expansion parameter
         end
-
-        exclude_message do |message|
-          message.message.match?(/\A\S+: \S+: URL value '.*' does not resolve/)
-        end
       end
 
       suite_option :smart_app_launch_version,
