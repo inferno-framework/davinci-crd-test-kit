@@ -11,10 +11,10 @@ module DaVinciCRDTestKit
       id :crd_v221_client_user_access_level
       description <<~DESCRIPTION
         This group verifies that during a CDS Service hook invocation, access to data on
-        the CRD client's FHIR server is scoped to the authorized access level of the EHR
-        user when the hook is invoked. Testers will invoke a hook twice, each time with consistent
-        content (e.g., an order for the same service): once as an EHR user with full access, and
-        again as an EHR user with limited access. Testers will provide a reference to a resource
+        the CRD client's FHIR server is scoped to the authorized access level of the user
+        when the hook is invoked. Testers will invoke a hook twice, each time with consistent
+        content (e.g., an order for the same service): once as a user with full access, and
+        again as a user with limited access. Testers will provide a reference to a resource
         that the full-access user is expected to be able to access while the limited-access user
         cannot. If possible, the resource should be in the set of prefetched data that Inferno
         requests. Inferno will use the access token supplied in each hook request to read that

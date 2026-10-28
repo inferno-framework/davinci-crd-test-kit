@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_receive_request
-      title 'CRD client invokes a hook as an EHR user'
+      title 'CRD client invokes a hook as a user' # updated when used to specify the kind of user
 
       input :access_level_target_reference,
             title: 'Target Resource Reference',

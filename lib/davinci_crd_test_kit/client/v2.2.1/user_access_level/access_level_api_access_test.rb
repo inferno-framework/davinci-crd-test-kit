@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_api_access
-      title 'FHIR API access to the target resource is scoped to the EHR user'
+      title 'FHIR API access to the target resource is scoped to the user'
       description %(
         During this test, Inferno will verify that the FHIR reads it made during hook processing of
         the resource referenced in the **Target Resource Reference** input, using the access token
@@ -117,7 +117,7 @@ module DaVinciCRDTestKit
         end
 
         assert_no_error_messages("Access to `#{access_level_target_reference}` was not correctly scoped to " \
-                                 'the EHR user. See Messages for details.')
+                                 'the user. See Messages for details.')
       end
     end
   end

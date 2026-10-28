@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_prefetch_scope
-      title 'Prefetched data access is scoped to the EHR user'
+      title 'Prefetched data access is scoped to the user'
       description %(
         During this test, Inferno will verify that the prefetch data included with the full-access
         and limited-access hook requests is scoped to the user. If the resource referenced in the
