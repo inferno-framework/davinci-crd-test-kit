@@ -268,6 +268,29 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
       expect(messages).to include(a_string_matching(/missing required claims: `exp`/))
     end
 
+    it 'reports an expired token even when its signature is also invalid' do
+      create_appointment_hook_request(created_at: 5.minutes.ago)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 10.minutes.ago.to_i
+      )
+      payload, header = JWT.decode(token, nil, false)
+      token_invalid_key = JWT.encode payload, OpenSSL::PKey::RSA.new(2048), 'RS384', header
+
+      result = run(test, auth_tokens: [token_invalid_key], auth_tokens_jwk_json: [jwk.to_json],
+                         cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+
+      messages = results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+        .first.messages.map(&:message)
+      expect(messages).to include(a_string_including('Token validation error: Signature verification failed'))
+      expect(messages).to include(a_string_including('Token had expired when the request was received'))
+    end
+
     it 'passes when exp has since elapsed but was still valid when the request was received' do
       create_appointment_hook_request(created_at: 5.minutes.ago)
 
@@ -288,8 +311,7 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
     it 'fails when the token was already expired when the request was received' do
       create_appointment_hook_request(created_at: 5.minutes.ago)
 
-      # Expired 10 minutes ago, i.e. before the request was even received 5 minutes ago, so the
-      # dynamic leeway (elapsed time since the request + 60s) should not rescue it.
+      # Expired 10 minutes ago, i.e. before the request was even received 5 minutes ago.
       token = jwt_helper.build(
         aud: appointment_book_url,
         iss: example_client_url,
@@ -300,7 +322,30 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenPayloadTest do
 
       result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to include('Token validation error: Signature has expired')
+      expect(entity_result_message.message).to include('Token had expired when the request was received')
+    end
+
+    it 'judges each token against when its own request was received' do
+      create_appointment_hook_request(created_at: 10.minutes.ago)
+      create_appointment_hook_request(created_at: 2.minutes.ago)
+
+      # Valid when the first request came in 10 minutes ago, but expired before the second one 2 minutes ago.
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 5.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token, token], auth_tokens_jwk_json: [jwk.to_json, jwk.to_json],
+                         cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+
+      messages = results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+        .first.messages.map(&:message)
+      expect(messages.length).to eq(1)
+      expect(messages.first).to start_with('(Request 2) Token had expired when the request was received')
     end
 
     it 'fails if it receives a JWT Authorization header with missing claims' do
