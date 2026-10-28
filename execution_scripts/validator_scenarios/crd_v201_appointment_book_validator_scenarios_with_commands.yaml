@@ -1,10 +1,11 @@
 # Exercises the CRD v2.0.1 handling of validator messages with one appointment-book exchange:
 # - the server session sends crafted hook requests (inputs/v201_appointment_book_request_bodies.json) that the
 #   client session validates (the unresolvable meta.source produces a "No definition could be found for URL value"
-#   message that must stay filtered; the v2.0.1 client filter for the older "URL value ... does not resolve" wording
-#   no longer matches anything, so inferno_core's built-in filter is what removes it), and
+#   message that inferno_core's built-in filter removes), and
 # - the client session answers with a crafted response template (inputs/v201_appointment_book_response_template.json)
 #   that the server session validates (suite-level ext-coverage-information on Appointment filter).
+# The server does not wait for the client to finish its tests, so the client's reads of context resources at test
+# time fail and its results record those failures.
 # Each scenario is named in the input files (systemAction descriptions, resource ids).
 sessions:
   - suite: crd_client
@@ -72,24 +73,25 @@ steps:
       inputs:
         appointment_book_service_ids: appointment-book-service
         appointment_book_request_bodies: "@inputs/v201_appointment_book_request_bodies.json"
-        mock_ehr_bundle: "@inputs/v201_mock_ehr_bundle.json"
-        manual_continuation: "yes"
     next_poll_session: server
     action_description: Run Server Group 3.1 Hook Tests > appointment-book with the scenario requests
     timeout: 900 # validation of the crafted content can take several minutes
 
-  # The server keeps its FHIR endpoints available until it is told to continue (at most 900 seconds), so the
-  # client can read context resources while its request tests run. Neither session reports when the server has
-  # finished sending the scenario request and its three follow-up requests (they take well under a second), so
-  # pause before continuing the client. The 30 seconds is a guess: if the requests arrive late (for example with
-  # a slow Sidekiq), client 1.2.1.x results change, so when they don't match, check this pause first.
-  - state_description: Wait at Server test 3.1.1.01 (requests are being sent)
+  - state_description: Wait at Server test 3.1.1.01
     session: server
     status: waiting
     last_completed: 3.1.1.01
-    command: "sleep 30 && curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
+    action: WAIT
+    action_description: Wait while the requests are sent
+    timeout: 900
+
+  - state_description: Finished Server Group 3.1 Hook Tests > appointment-book
+    session: server
+    status: done
+    last_completed: 3.1
+    command: "curl -o /dev/null -s '{client.wait_outputs.continuation_url}'"
     next_poll_session: client
-    action_description: Give the server time to send all requests, then indicate that invocations are complete
+    action_description: Indicate that appointment-book invocations are complete
     timeout: 900
 
   - state_description: Wait at Client test 1.2.1.2.02 Client displays returned decision support details to the user
@@ -104,15 +106,6 @@ steps:
     session: client
     status: done
     last_completed: 1.2.1
-    command: "curl -o /dev/null -s '{server.wait_outputs.continuation_url}'"
-    next_poll_session: server
-    action_description: Let the server continue to its request and response tests
-    timeout: 900
-
-  - state_description: Finished Server Group 3.1 Hook Tests > appointment-book
-    session: server
-    status: done
-    last_completed: 3.1
     action: END_SCRIPT
     action_description: Script Completed
     timeout: 900

@@ -14,5 +14,31 @@
         }
       }
     }
+  ],
+  "systemActions": [
+    {
+      "type": "update",
+      "description": "Scenario A4: coverage information on each Appointment",
+      "resource": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+            "extension": [
+              {
+                "url": "covered",
+                "valueCode": "covered"
+              },
+              {
+                "url": "pa-needed",
+                "valueCode": "no-auth"
+              }
+            ]
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.resourceSelectionCriteria": "context.appointments.entry.resource.ofType(Appointment)"
+      }
+    }
   ]
 }

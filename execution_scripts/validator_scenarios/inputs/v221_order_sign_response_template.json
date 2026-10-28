@@ -462,6 +462,26 @@
       "extension": {
         "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
       }
+    },
+    {
+      "uuid": "c5a3f0de-0d51-4a9b-9f0e-6f1d1b0b0011",
+      "summary": "Scenario R11: instructions card with a request-only CRD extension",
+      "detail": "Checks that a CRD extension used outside its context of use is still reported.",
+      "indicator": "info",
+      "source": {
+        "label": "Inferno",
+        "topic": {
+          "system": "http://terminology.hl7.org/CodeSystem/cdshooks-card-type",
+          "code": "guideline",
+          "display": "Guideline"
+        }
+      },
+      "extension": {
+        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)",
+        "davinci-crd.configuration": {
+          "coverage-info": true
+        }
+      }
     }
   ],
   "systemActions": [
@@ -553,16 +573,39 @@
     },
     {
       "type": "create",
-      "description": "Scenario S4: create a Questionnaire without an id",
+      "description": "Scenario S4: request form completion Task without an id",
       "resource": {
-        "resourceType": "Questionnaire",
-        "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S4",
-        "status": "active",
-        "item": [
+        "resourceType": "Task",
+        "status": "ready",
+        "intent": "order",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+              "code": "complete-questionnaire"
+            }
+          ]
+        },
+        "description": "Complete form S4",
+        "for": {
+          "reference": "Patient/crd221-demo-patient"
+        },
+        "authoredOn": "2026-10-01",
+        "requester": {
+          "reference": "Organization/crd221-demo-payer-complete-prefetch"
+        },
+        "input": [
           {
-            "linkId": "1",
-            "text": "Has the patient tried physical therapy?",
-            "type": "boolean"
+            "type": {
+              "text": "questionnaire",
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                  "code": "questionnaire"
+                }
+              ]
+            },
+            "valueCanonical": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S4"
           }
         ]
       },
@@ -572,21 +615,92 @@
     },
     {
       "type": "create",
-      "description": "Scenario S5: create a Questionnaire without an id and with an invalid status",
+      "description": "Scenario S5: request form completion Task without an id and with an invalid status",
       "resource": {
-        "resourceType": "Questionnaire",
-        "url": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S5",
+        "resourceType": "Task",
         "status": "not-a-status",
-        "item": [
+        "intent": "order",
+        "code": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+              "code": "complete-questionnaire"
+            }
+          ]
+        },
+        "description": "Complete form S5",
+        "for": {
+          "reference": "Patient/crd221-demo-patient"
+        },
+        "authoredOn": "2026-10-01",
+        "requester": {
+          "reference": "Organization/crd221-demo-payer-complete-prefetch"
+        },
+        "input": [
           {
-            "linkId": "1",
-            "text": "Has the patient tried physical therapy?",
-            "type": "boolean"
+            "type": {
+              "text": "questionnaire",
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/temp",
+                  "code": "questionnaire"
+                }
+              ]
+            },
+            "valueCanonical": "http://inferno.healthit.gov/davinci-crd-test-kit/forms/S5"
           }
         ]
       },
       "extension": {
         "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "type": "update",
+      "description": "Scenario S6: coverage information on the DeviceRequest",
+      "resource": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+            "extension": [
+              {
+                "url": "covered",
+                "valueCode": "covered"
+              },
+              {
+                "url": "pa-needed",
+                "valueCode": "no-auth"
+              }
+            ]
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(DeviceRequest)"
+      }
+    },
+    {
+      "type": "update",
+      "description": "Scenario S7: coverage information with an invalid covered code on the ServiceRequest",
+      "resource": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-coverage-information",
+            "extension": [
+              {
+                "url": "covered",
+                "valueCode": "not-a-code"
+              },
+              {
+                "url": "pa-needed",
+                "valueCode": "no-auth"
+              }
+            ]
+          }
+        ]
+      },
+      "extension": {
+        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(ServiceRequest)"
       }
     }
   ]
