@@ -79,6 +79,9 @@
                   }
                 ]
               },
+              "subject": {
+                "reference": "Patient/crd221-demo-patient"
+              },
               "authoredOn": "2023-01-01T00:00:00Z",
               "requester": {
                 "reference": "Practitioner/crd221-demo-practitioner-orderer"
@@ -90,7 +93,7 @@
     },
     "extension": {
       "davinci-crd.configuration": {
-        "alt-drug": true
+        "coverage-info": true
       },
       "davinci-crd.requestedVersion": "2.2",
       "org.example.scenario-note": "extensions are allowed on hook requests"

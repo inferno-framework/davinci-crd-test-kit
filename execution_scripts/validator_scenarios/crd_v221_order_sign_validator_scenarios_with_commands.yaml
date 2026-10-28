@@ -2,7 +2,8 @@
 # - the server session sends crafted hook requests (inputs/v221_order_sign_request_bodies.json) that the
 #   client session validates (request filters), and
 # - the client session answers with a crafted response template (inputs/v221_order_sign_response_template.json)
-#   that the server session validates (response filters).
+#   that the server session validates (response filters), including coverage information and request form
+#   completion system actions.
 # Each scenario is named in the input files (card summaries, systemAction descriptions, resource ids).
 sessions:
   - suite: crd_client_v221
@@ -27,7 +28,9 @@ comparison_config:
     - replacement: <UUID>
       pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
     - replacement: <RANDOM_KEY>
-      pattern: /'[a-z]{16}'/
+      patterns:
+        - /'[a-z]{16}'/
+        - /`[a-z]{16}`/ # unadvertised configuration option in the unknown configuration request
     - replacement: <INFERNO_URL>
       patterns:
         - https://inferno.healthit.gov/ # prod

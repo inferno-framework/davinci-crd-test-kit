@@ -1,11 +1,12 @@
 # Exercises the CRD v2.2.1 handling of validator messages for Appointments with one appointment-book exchange:
 # - the server session sends crafted hook requests (inputs/v221_appointment_book_request_bodies.json) whose
-#   context.appointments the client session validates (Appointment participant slices, Bundle entry issues), and
+#   context.appointments the client session validates (Appointment participant slices, Bundle entry issues),
 # - the server session also validates the Appointments in its own requests (suite-level Appointment participant
-#   slice filter). The client session answers with a plain instructions card
-#   (inputs/v221_appointment_book_response_template.json): a coverage information response would make the server
-#   session send a varying number of extra requests.
-# Each scenario is named in the Appointment ids and descriptions in the input file.
+#   slice filter), and
+# - the client session answers (inputs/v221_appointment_book_response_template.json) with an instructions card and
+#   a coverage information system action on each Appointment, which the server session validates (Appointment
+#   filters applied to response resources).
+# Each scenario is named in the Appointment ids and descriptions in the input files.
 sessions:
   - suite: crd_client_v221
     name: client
@@ -29,7 +30,9 @@ comparison_config:
     - replacement: <UUID>
       pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
     - replacement: <RANDOM_KEY>
-      pattern: /'[a-z]{16}'/
+      patterns:
+        - /'[a-z]{16}'/
+        - /`[a-z]{16}`/ # unadvertised configuration option in the unknown configuration request
     - replacement: <INFERNO_URL>
       patterns:
         - https://inferno.healthit.gov/ # prod

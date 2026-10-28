@@ -17,6 +17,7 @@
       "appointments": {
         "resourceType": "Bundle",
         "type": "collection",
+        "total": 4,
         "entry": [
           {
             "resource": {
@@ -269,8 +270,7 @@
               ]
             }
           }
-        ],
-        "timestamp": "not-a-timestamp"
+        ]
       }
     },
     "prefetch": {
@@ -617,8 +617,7 @@
     },
     "extension": {
       "davinci-crd.configuration": {
-        "coverage": true,
-        "max-cards": 10
+        "coverage-info": true
       },
       "davinci-crd.requestedVersion": "2.2"
     }
