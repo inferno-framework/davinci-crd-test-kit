@@ -31,7 +31,8 @@ module DaVinciCRDTestKit
       DESCRIPTION
       run_as_group
 
-      input_order :cross_hooks_response_approach,
+      input_order :make_additional_hook_requests,
+                  :cross_hooks_response_approach,
                   :cross_hooks_selected_response_types,
                   :cross_hooks_custom_response_template
 
@@ -64,11 +65,14 @@ module DaVinciCRDTestKit
 
       group do
         title 'Interaction'
+        id :crd_v221_cross_hook_interaction
+
         test from: :crd_v221_cross_hooks_request
       end
 
       group do
         title 'Response Handling'
+        id :crd_v221_cross_hook_responses
 
         test from: :crd_v221_card_display_attest_test
         test from: :crd_v221_inferno_response_validation
@@ -76,6 +80,8 @@ module DaVinciCRDTestKit
 
       group do
         title 'Requests'
+        id :crd_v221_cross_hook_requests
+
         test from: :crd_v221_hook_request_conformance
         test from: :crd_v221_hook_request_requested_version
         test from: :crd_v221_hook_request_prefetch_profiles
@@ -88,6 +94,8 @@ module DaVinciCRDTestKit
 
       group do
         title 'Authorization'
+        id :crd_v221_cross_hook_auth
+
         test from: :crd_v221_decode_auth_token
         test from: :crd_v221_retrieve_jwks
         test from: :crd_v221_token_header

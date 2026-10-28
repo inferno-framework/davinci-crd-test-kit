@@ -1,10 +1,10 @@
-require_relative '../../resource_extractor'
 require_relative '../../server_hook_helper'
+require_relative '../../../cross_suite/hook_request_resource_extraction'
 
 module DaVinciCRDTestKit
   module V221
     class ServiceRequestNoCustomExtensionsTest < Inferno::Test
-      include DaVinciCRDTestKit::ResourceExtractor
+      include DaVinciCRDTestKit::HookRequestResourceExtraction
       include DaVinciCRDTestKit::ServerHookHelper
 
       US_CORE_EXTENSION_URLS = [

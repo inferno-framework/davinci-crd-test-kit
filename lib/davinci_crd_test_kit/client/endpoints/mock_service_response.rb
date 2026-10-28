@@ -1,3 +1,5 @@
+require_relative '../prefetched_coverage_value'
+
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
@@ -108,19 +110,6 @@ module DaVinciCRDTestKit
       end
     end
 
-    def create_card_response(hook_card_response)
-      if hook_card_response.nil?
-        response.headers.merge!({ 'Access-Control-Allow-Origin' => '*' })
-        response.status = 400
-        response.body = 'Invalid Request: Incorrect format for hook request body'
-      else
-        response.body = hook_card_response.to_json
-        response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-        response.status = 200
-        response.format = :json
-      end
-    end
-
     def update_specific_hook_card_info(card_response)
       return if card_response.nil?
 
@@ -180,7 +169,7 @@ module DaVinciCRDTestKit
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
-      prefetched_coverage =  extract_prefetched_coverage(request_body['prefetch'])
+      prefetched_coverage = PrefetchedCoverageValue.find(request_body['prefetch'])
       if prefetched_coverage.present?
         coverage_or_bundle = FHIR.from_contents(prefetched_coverage.to_json)
         coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
@@ -196,14 +185,6 @@ module DaVinciCRDTestKit
           )
         end
       end
-    end
-
-    def extract_prefetched_coverage(prefetch)
-      return nil unless prefetch.present?
-      return prefetch['coverage'] if prefetch['coverage'].present?
-      return prefetch['cov'] if prefetch['cov'].present?
-
-      nil
     end
 
     def get_context_resource(update_resource_id)
@@ -306,9 +287,9 @@ module DaVinciCRDTestKit
 
     def find_prefetched_resource(request_body, key_options)
       prefetch = request_body['prefetch']
-      return if prefetch.blank?
+      return unless prefetch.is_a?(Hash)
 
-      found_key = key_options&.find { |key| prefetch[key].present? }
+      found_key = key_options&.find { |key| prefetch[key].is_a?(Hash) && prefetch[key].present? }
       return unless found_key.present?
 
       prefetch[found_key]

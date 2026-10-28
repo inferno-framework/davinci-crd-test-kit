@@ -1,7 +1,8 @@
-require_relative 'cross_hook/client_card_must_support_coverage_information_test'
+require_relative 'must_support/generated/client_cross_hook_must_support_group'
 require_relative 'cross_hook/client_location_address_propagation_test'
 require_relative 'cross_hook/client_fhirpath_collection_as_comma_delimited_string_test'
 require_relative 'cross_hook/client_hook_instances_unique_test'
+require_relative 'cross_hook/client_jwt_ids_unique_test'
 require_relative 'cross_hook/client_prefetch_complete_and_subset_test'
 require_relative 'client_cross_hook_interaction_group'
 
@@ -15,29 +16,31 @@ module DaVinciCRDTestKit
         and hook requests rather than specific ones.
 
         These tests must be run after the tests in the "Hooks" group are run.
-        Clients may, but are not required to, make additional hook requests
+        The CRD client may, but is not required to, make additional hook requests
         during these tests to show additional features not demonstrated during
         previous hook requests. Note that only the requests made during the
         most recent execution of a given group will be included in the analysis.
       DESCRIPTION
 
-      run_as_group
+      input_order :make_additional_hook_requests,
+                  :cross_hooks_response_approach,
+                  :cross_hooks_selected_response_types,
+                  :cross_hooks_custom_response_template,
+                  :order_types_supported,
+                  :supporting_types_supported
 
       group from: :crd_v221_client_cross_hook_interaction
-      group do
-        id :crd_v221_client_cross_hook_must_support
-        title 'Must Support'
-
-        test from: :crd_v221_client_card_must_support_coverage_information
-      end
+      group from: :crd_v221_client_cross_hook_must_support
       group do
         id :crd_v221_client_cross_hook_additional_capabilities
         title 'Additional Capabilities'
+        run_as_group
 
         test from: :crd_v221_client_location_address_propagation
         test from: :crd_v221_client_fhir_path_collection_as_comma_delimited_string
         test from: :crd_v221_client_hook_instances_unique
         test from: :crd_v221_client_prefetch_complete_and_subset
+        test from: :crd_v221_client_jwt_ids_unique
       end
     end
   end

@@ -1,0 +1,6 @@
+---
+:resource: DiagnosticReport
+:profile_url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab
+:profile_name: US Core DiagnosticReport Profile for Laboratory Results Reporting
+:profile_version: 7.0.0
+:must_supports: {}

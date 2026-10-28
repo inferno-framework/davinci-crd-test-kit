@@ -34,7 +34,9 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
     )
   end
 
-  def create_data_fetch_request(response_body:, status: 200, instance: hook_instance)
+  def create_data_fetch_request(response_body:, status: 200, instance: hook_instance, with_token: true)
+    tags = [DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance)]
+    tags << DaVinciCRDTestKit::DATA_FETCH_TAG if with_token
     repo_create(
       :request,
       direction: 'outgoing',
@@ -44,7 +46,7 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
       response_body: response_body.is_a?(Hash) ? response_body.to_json : response_body,
       status:,
       headers: [],
-      tags: [DaVinciCRDTestKit::TagMethods.hook_instance_data_fetch_tag(instance), DaVinciCRDTestKit::DATA_FETCH_TAG]
+      tags:
     )
   end
 
@@ -72,6 +74,14 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestDataFetchVerificationTest do
 
   it 'fails when no additional data requests were made for any hook request' do
     create_hook_request
+    result = run(test)
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('never able to successfully obtain additional FHIR data')
+  end
+
+  it 'fails when the only successful additional data request was made without the access token' do
+    create_hook_request
+    create_data_fetch_request(response_body: organization_resource, with_token: false)
     result = run(test)
     expect(result.result).to eq('fail')
     expect(result.result_message).to include('never able to successfully obtain additional FHIR data')

@@ -1,3 +1,4 @@
+require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 require_relative '../../../cross_suite/cards_identification'
 
@@ -5,6 +6,7 @@ module DaVinciCRDTestKit
   module V221
     class BaseHookInvocationReceiveRequestTest < Inferno::Test
       include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
 
       RESPONSE_TYPE_OPTIONS = [
         {
@@ -49,11 +51,12 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
             description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the client's hook
+              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
               request sent as the Bearer token in the `Authorization` header.
               Run or re-run the "Registration" group to set or change this value.
             ),
             locked: true
+      payer_organization_id_inputs
       output :continuation_url
 
       def hook_key
@@ -84,8 +87,8 @@ module DaVinciCRDTestKit
             'against the incoming request to create a response.'
         else
           'When responding, Inferno will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses) ' \
-            'the following response types using the incoming request: ' \
-            "\n            - #{selected_response_types_string}"
+            'the following response types using the incoming request:' \
+            "\n\n- #{selected_response_types_string}"
           # rubocop:enable Layout/LineLength
         end
       end
@@ -114,15 +117,15 @@ module DaVinciCRDTestKit
             DaVinciCRDTestKit::CardsIdentification.humanize_response_type(response_type)
               .sub('Card', '(card)')
               .sub('Action', '(systemAction)')
-          end.join("\n            - ")
+          end.join("\n- ")
       end
 
       def invoke_heading
-        "Invoke the `#{hook_slug}` hook"
+        "Invoke the `#{hook_slug}` Hook"
       end
 
       def invoke_intro
-        "Invoke #{hook_slug} hook by sending requests to one or both of the two Inferno simulated CRD servers:"
+        "Invoke the `#{hook_slug}` hook by sending requests to one or both of the two Inferno simulated CRD servers."
       end
 
       def complete_prefetch_url
@@ -133,29 +136,49 @@ module DaVinciCRDTestKit
         send(:"#{hook_key}_prefetch_subset_url")
       end
 
+      # Overridden by a group whose additional requests are optional, so it can pass without waiting.
+      def skip_waiting_for_requests?
+        false
+      end
+
+      def wait_message_endpoints_section
+        <<~ENDPOINTS
+          #### `#{hook_slug}` Service Endpoints
+
+          - Complete Prefetch `#{hook_slug}` Service#{complete_prefetch_payer_note}: `#{complete_prefetch_url}`
+          - Subset Prefetch `#{hook_slug}` Service#{subset_prefetch_payer_note}: `#{subset_prefetch_url}`
+        ENDPOINTS
+      end
+
+      def message
+        <<~MESSAGE
+          #### #{invoke_heading}
+
+          #{invoke_intro}
+
+          [Click here](#{continuation_url}) when you have finished submitting requests.
+
+          #{wait_message_endpoints_section}
+          #### Authentication and Identification
+
+          #{session_identification_message}
+
+          #### Responses
+
+          #{configured_response_details}
+        MESSAGE
+      end
+
       run do
+        next if skip_waiting_for_requests?
+
         identifier = cds_jwt_iss
-        continuation_url = "#{resume_pass_url}?token=#{identifier}"
+        continuation_url = resume_pass_url_for(identifier)
         output(continuation_url:)
 
         wait(
           identifier:,
-          message: %(
-            **#{invoke_heading}**:
-
-            #{invoke_intro}
-
-            - Complete Prefetch: `#{complete_prefetch_url}`
-            - Subset Prefetch: `#{subset_prefetch_url}`
-
-            For Inferno to recognize these requests and associate them with this session,
-            the authentication JWT sent as a Bearer token in the Authorization header
-            must have `#{cds_jwt_iss}` as the `iss` claim in the JWT payload.
-
-            #{configured_response_details}
-
-            [Click here](#{continuation_url}) when you have finished submitting requests.
-          )
+          message:
         )
       end
     end

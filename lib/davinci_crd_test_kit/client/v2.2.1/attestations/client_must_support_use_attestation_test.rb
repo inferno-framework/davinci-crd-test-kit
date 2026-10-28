@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   module V221
     class MustSupportUseAttestationTest < Inferno::Test
       id :crd_v221_must_support_use_attestation
-      ATTESTATION_TITLE = 'Health IT module uses received must support data'.freeze
+      ATTESTATION_TITLE = 'CRD client uses received must support data'.freeze
       title ATTESTATION_TITLE
       description %(
-        During this test, the tester will confirm that the Health IT module uses the mustSupport data it receives.
+        During this test, the tester will confirm that the CRD client uses the mustSupport data it receives.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
       )
@@ -18,7 +18,7 @@ module DaVinciCRDTestKit
       input :must_support_use_attestation,
             title: ATTESTATION_TITLE,
             description: %(
-              I attest that the Health IT module uses the mustSupport data it receives.
+              I attest that the CRD client uses the mustSupport data it receives.
             ),
             type: 'radio',
             default: 'false',

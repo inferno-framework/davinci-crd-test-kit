@@ -94,11 +94,17 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
       expect(last_response.headers['Access-Control-Allow-Origin']).to eq('*')
     end
 
-    it 'returns an error when the Authorization header is missing' do
+    it 'returns 500 with an OperationOutcome when the Authorization header is missing' do
       run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
                     service_request_bodies:, mock_ehr_bundle:)
       post "/custom/#{suite_id}/fhir/Patient", new_patient.to_json
-      expect(last_response.status).to be >= 400
+      expect(last_response).to be_server_error
+      expect(last_response.content_type).to start_with('application/fhir+json')
+      outcome = FHIR.from_contents(last_response.body)
+      expect(outcome).to be_a(FHIR::OperationOutcome)
+      expect(outcome.issue.first.code).to eq('not-found')
+      expect(outcome.issue.first.details.text).to include('no identifier found')
+      expect(outcome.issue.first.details.text).to include('Bearer token (encoding the target Inferno session ID)')
     end
 
     it 'created resource can be read back via GET' do

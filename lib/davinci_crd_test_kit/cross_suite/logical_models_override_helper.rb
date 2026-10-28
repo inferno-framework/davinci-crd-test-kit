@@ -173,6 +173,11 @@ module DaVinciCRDTestKit
     # -------------------------------------------------------------------------
 
     def local_reference?(value, error_prefix, allowed_resource_types: nil)
+      unless value.is_a?(String)
+        add_message('error', "#{error_prefix} expected a local reference, got #{value.to_json}.")
+        return false
+      end
+
       is_local_reference = true
       local_reference_match = value.match(%r{^([A-Za-z]+)/(.+)$})
       if local_reference_match.present?
@@ -215,16 +220,9 @@ module DaVinciCRDTestKit
     end
 
     def referenced_resource_present_in_bundle?(bundle, local_reference, error_prefix, bundle_location)
-      unless bundle.present? && bundle['entry'].present?
-        add_message('error',
-                    "#{error_prefix} referenced resource '#{local_reference}' " \
-                    "not found in the #{bundle_location} Bundle.")
-        return false
-      end
-
       target_resource_type, target_id = local_reference.split('/')
-      found = bundle['entry'].any? do |entry|
-        entry.dig('resource', 'resourceType') == target_resource_type && entry.dig('resource', 'id') == target_id
+      found = json_bundle_entry_resources(bundle).any? do |resource|
+        resource['resourceType'] == target_resource_type && resource['id'] == target_id
       end
       return true if found
 
@@ -232,6 +230,16 @@ module DaVinciCRDTestKit
                   "#{error_prefix} referenced resource '#{local_reference}' " \
                   "not found in the #{bundle_location} Bundle.")
       false
+    end
+
+    # the resource objects in the entries of a Bundle given as JSON, skipping anything malformed
+    def json_bundle_entry_resources(bundle)
+      return [] unless bundle.is_a?(Hash) && bundle['entry'].is_a?(Array)
+
+      bundle['entry'].filter_map do |entry|
+        resource = entry['resource'] if entry.is_a?(Hash)
+        resource if resource.is_a?(Hash)
+      end
     end
   end
 end

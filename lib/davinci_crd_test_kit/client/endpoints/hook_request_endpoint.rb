@@ -1,4 +1,5 @@
-require_relative 'gather_response_generation_data'
+require_relative 'v201_hook_request_data_gathering'
+require_relative 'v221_hook_request_data_gathering'
 require_relative 'mock_service_response'
 require_relative 'custom_service_response'
 require_relative 'scenario_service_response'
@@ -8,10 +9,13 @@ require_relative '../../cross_suite/tags'
 module DaVinciCRDTestKit
   class HookRequestEndpoint < Inferno::DSL::SuiteEndpoint
     include DaVinciCRDTestKit::MockServiceResponse
-    include DaVinciCRDTestKit::GatherResponseGenerationData
+    include DaVinciCRDTestKit::V201HookRequestDataGathering
+    include DaVinciCRDTestKit::V221HookRequestDataGathering
     include DaVinciCRDTestKit::CustomServiceResponse
     include DaVinciCRDTestKit::CardsIdentification
     include DaVinciCRDTestKit::ScenarioServiceResponse
+
+    error_response_format :operation_outcome
 
     AVAILABLE_HOOKS = [
       'appointment-book',
@@ -32,7 +36,7 @@ module DaVinciCRDTestKit
     end
 
     def requested_version
-      requested = request_body.dig('extension', 'davinci-crd.requestedVersion').to_s
+      requested = request_extension(request_body, 'davinci-crd.requestedVersion').to_s
       if requested == '2.2'
         'v221'
       elsif requested == '2.0'
@@ -44,13 +48,26 @@ module DaVinciCRDTestKit
       iss
     end
 
+    def test_run_identifier_location_description
+      'the iss (issuer) claim in the payload of the JWT sent as a Bearer token in the HTTP Authorization header'
+    end
+
     def iss
-      @iss ||=
+      @iss ||= token_payload['iss']
+    end
+
+    def jwt_id
+      @jwt_id ||= token_payload['jti']
+    end
+
+    # the payload of the authentication JWT, decoded without verifying it, or an empty Hash
+    def token_payload
+      @token_payload ||=
         begin
           payload, = JWT.decode(token, nil, false)
-          payload['iss']
+          payload.is_a?(Hash) ? payload : {}
         rescue JWT::DecodeError
-          nil
+          {}
         end
     end
 
@@ -77,13 +94,34 @@ module DaVinciCRDTestKit
       tested_hook.present? && tested_hook != ANY_HOOK_TAG && requested_hook != tested_hook
     end
 
+    # the registration attestation waits on the JWT issuer so that the client can confirm that its
+    # requests are recognized, but those requests are not processed as hook invocations
+    def hook_requests_unavailable?
+      test.config.options[:hook_requests_unavailable].present?
+    end
+
     def make_response
+      return hook_requests_unavailable_response if hook_requests_unavailable?
+
+      make_hook_response
+    end
+
+    def hook_requests_unavailable_response
+      hook_error_response('This request was successfully associated with the session registered ' \
+                          "with JWT issuer `#{iss}`. Hook requests are not processed while connectivity is " \
+                          'being confirmed during the Registration group. Complete the registration ' \
+                          'attestation and start a hook invocation test before sending additional hook requests.',
+                          code: 422,
+                          outcome_code: 'business-rule')
+    end
+
+    def make_hook_response
       if requested_hook.blank?
         hook_error_response("No hook requested - populate the 'hook' element in the request.",
                             code: 400,
                             outcome_code: 'value')
       elsif invoked_hook != requested_hook
-        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the client " \
+        hook_error_response("#{request.env['PATH_INFO']} serves the #{invoked_hook}, but the CRD client " \
                             "requested the #{requested_hook} hook.",
                             code: 400,
                             outcome_code: 'value')
@@ -114,6 +152,9 @@ module DaVinciCRDTestKit
         send(:"gather_#{requested_hook&.gsub('-', '_')}_data")
         request_coverage
       elsif ig_version == 'v221'
+        if user_access_level_group?
+          continue_after_failure('reading the access level target') { request_access_level_target }
+        end
         request_additional_fhir_data
       end
       response_body = apply_hook_configuration(hook_response)
@@ -134,7 +175,7 @@ module DaVinciCRDTestKit
     def hook_response
       if unknown_content_group?
         build_unknown_content_hook_response
-      elsif self_pay_group? || long_running_group?
+      elsif fixed_coverage_information_group?
         build_coverage_information_hook_response
       elsif response_approach == 'custom'
         build_custom_hook_response
@@ -146,24 +187,29 @@ module DaVinciCRDTestKit
       nil
     end
 
-    def apply_hook_configuration(response_body) # rubocop:disable Metrics/CyclomaticComplexity
-      return response_body unless response_body.present? && coverage_info_disabled?
+    def apply_hook_configuration(response_body)
+      return response_body unless response_body.present?
 
-      cards = response_body['cards']
-      response_body['cards'] = cards.reject { |card| coverage_info_card_type?(card) } if cards.is_a?(Array)
+      remove_coverage_information(response_body) if coverage_info_disabled?
 
-      system_actions = response_body['systemActions']
-      if system_actions.is_a?(Array)
-        response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
-      end
-
+      # CDS Hooks requires systemActions, if present, to be non-empty
       response_body.delete 'systemActions' if response_body['systemActions'].blank?
 
       response_body
     end
 
+    def remove_coverage_information(response_body)
+      cards = response_body['cards']
+      response_body['cards'] = cards.reject { |card| coverage_info_card_type?(card) } if cards.is_a?(Array)
+
+      system_actions = response_body['systemActions']
+      return unless system_actions.is_a?(Array)
+
+      response_body['systemActions'] = system_actions.reject { |action| coverage_info_system_action_type?(action) }
+    end
+
     def coverage_info_disabled?
-      request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
+      coverage_info_configuration_disabled?(request_body)
     end
 
     def hook_instance_already_used?
@@ -171,6 +217,13 @@ module DaVinciCRDTestKit
     end
 
     def tags
+      # keep requests made during registration out of every tag-based check of hook requests
+      return [] if hook_requests_unavailable?
+
+      hook_request_tags
+    end
+
+    def hook_request_tags
       tags =
         if hook_instance_already_used?
           [DUPLICATED_HOOK_INSTANCE_TAG]
@@ -179,13 +232,23 @@ module DaVinciCRDTestKit
               !AVAILABLE_HOOKS.include?(requested_hook)
           []
         else
-          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag]
+          # the `jti` tags let the cross hook check of `jti` uniqueness see the requests from every group
+          [hook_instance_tag, hook_tag, interaction_group_tag, cross_hook_tag, *jwt_id_tags]
         end
 
-      # the self-pay scenario checks for the absence of requests, so even invalid requests must carry the group tag
-      tags << interaction_group_tag if self_pay_group?
+      # the self-pay scenario checks for the absence of requests and the multiple payers scenario checks
+      # all requests made, so even invalid requests must carry the group tag
+      tags << interaction_group_tag if self_pay_group? || multiple_payers_group?
 
       tags.uniq.compact
+    end
+
+    def jwt_id_tags
+      return [] if jwt_id.blank?
+
+      jwt_id_tag = TagMethods.jwt_id_tag(jwt_id)
+      jwt_id_already_used = requests_repo.tagged_requests(test_run.test_session_id, [jwt_id_tag]).present?
+      [jwt_id_tag, (DUPLICATED_JWT_ID_TAG if jwt_id_already_used)]
     end
 
     def hook_instance_tag
@@ -201,14 +264,18 @@ module DaVinciCRDTestKit
     end
 
     def cross_hook_tag
-      CROSS_HOOK_ANALYSIS_TAG if test.config.options[:include_in_cross_hook_analysis]
+      CROSS_HOOK_ANALYSIS_TAG if include_in_cross_hook_analysis?
+    end
+
+    def include_in_cross_hook_analysis?
+      test.config.options[:include_in_cross_hook_analysis].present?
     end
 
     def hook_error_response(error_message, code: 400, outcome_code: 'invalid')
       response.status = code
       response.body = error_operation_outcome(outcome_code, error_message).to_json
-      response.headers.merge!({ 'Content-Type' => 'application/json', 'Access-Control-Allow-Origin' => '*' })
-      response.format = :json
+      response.headers.merge!({ 'Access-Control-Allow-Origin' => '*' })
+      response.format = 'application/fhir+json'
     end
 
     def error_operation_outcome(code, text)
@@ -246,6 +313,19 @@ module DaVinciCRDTestKit
       test.config.options[:crd_interaction_group] == SELF_PAY_GROUP_TAG
     end
 
+    def multiple_payers_group?
+      test.config.options[:crd_interaction_group] == MULTIPLE_PAYERS_GROUP_TAG
+    end
+
+    def user_access_level_group?
+      [ACCESS_LEVEL_FULL_GROUP_TAG, ACCESS_LEVEL_LIMITED_GROUP_TAG].include?(interaction_group_tag)
+    end
+
+    # scenarios that ignore the tester's response configuration and always return coverage information
+    def fixed_coverage_information_group?
+      self_pay_group? || long_running_group? || multiple_payers_group? || user_access_level_group?
+    end
+
     def long_running_pause_time
       JSON.parse(result.input_json)
         .find { |input| input['name'].include?('long_running_pause_time') }
@@ -255,10 +335,16 @@ module DaVinciCRDTestKit
     # end the wait immediately after the scenario request returns
     # pause for long-running requests here because update_result runs before response generation
     def update_result
-      return unless long_running_group? || unknown_content_group? || self_pay_group?
+      return unless continue_after_one_hook_request?
 
       sleep long_running_pause_time if long_running_group?
       results_repo.update(result.id, result: 'pass', result_message: '')
+    end
+
+    # the multiple payers scenario is excluded so that the wait continues until the tester
+    # acknowledges that all requests have been sent, since more than one request may be made
+    def continue_after_one_hook_request?
+      long_running_group? || unknown_content_group? || self_pay_group? || user_access_level_group?
     end
   end
 end

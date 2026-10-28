@@ -7,7 +7,7 @@ module DaVinciCRDTestKit
       title 'Self-Pay'
       id :crd_v221_client_self_pay_hook
       description <<~DESCRIPTION
-        The CRD IG requires clients to invoke hooks on payer services only when the patient
+        The CRD IG requires that CRD clients invoke hooks on payer services only when the patient
         record indicates active coverage with the payer associated with the service and there
         is no recorded indication that the patient intends to bypass insurance coverage, i.e.,
         the service or product is not flagged as 'self-pay'. During this scenario the tester

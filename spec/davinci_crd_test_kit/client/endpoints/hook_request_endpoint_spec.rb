@@ -133,6 +133,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text'])
@@ -157,6 +158,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*not_a_hook/)
@@ -180,6 +182,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json(server_endpoint, order_sign_hook_request)
 
       expect(last_response.status).to eq(400)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
@@ -203,9 +206,76 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       post_json('/custom/crd_client/cds-services/appointment-book-service', appointment_book_request)
 
       expect(last_response.status).to eq(422)
+      expect(last_response.content_type).to start_with('application/fhir+json')
       parsed_body = JSON.parse(last_response.body)
       expect(parsed_body['resourceType']).to eq('OperationOutcome')
       expect(parsed_body['issue'].first['details']['text']).to match(/appointment-book.*order-sign/)
+    end
+  end
+
+  describe 'tagging requests by jti' do
+    let(:shared_jti) { 'shared-jti' }
+
+    def build_token(jti)
+      jwt_helper.build(aud: order_sign_url, iss: example_client_url, jku: "#{example_client_url}/jwks.json",
+                       encryption_method: 'RS384', jti:)
+    end
+
+    def post_hook_request(token, body)
+      header('Authorization', "Bearer #{token}")
+      post_json(server_endpoint, body)
+    end
+
+    def jti_tagged_requests(*tags)
+      requests_repo.tagged_requests(test_session.id, tags)
+    end
+
+    before do
+      allow(test).to receive(:suite).and_return(suite)
+      stub_request(:get, patient_example_reference_absolute)
+        .to_return(status: 200, body: patient_example.to_json)
+      stub_request(:get, practitioner_example_reference_absolute)
+        .to_return(status: 200, body: practitioner_example.to_json)
+      stub_request(:get, coverage_search_url)
+        .to_return(status: 200, body: crd_coverage_bundle.to_json)
+      run(test, cds_jwt_iss: example_client_url,
+                order_sign_response_approach: 'custom',
+                order_sign_custom_response_template: instructions_card_template.to_json)
+    end
+
+    it 'tags each request by its jti and marks a later request that repeats it' do
+      post_hook_request(build_token(shared_jti), order_sign_hook_request)
+      post_hook_request(build_token('other-jti'), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+      post_hook_request(build_token(shared_jti), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+
+      jti_tag = DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti)
+      expect(jti_tagged_requests(jti_tag).length).to eq(2)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag('other-jti')).length).to eq(1)
+
+      duplicates = jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG)
+      expect(duplicates.length).to eq(1)
+      expect(jti_tagged_requests(jti_tag, DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG).map(&:id))
+        .to eq(duplicates.map(&:id))
+    end
+
+    it 'keeps the usual tags on a request that repeats a jti' do
+      post_hook_request(build_token(shared_jti), order_sign_hook_request)
+      post_hook_request(build_token(shared_jti), order_sign_hook_request.merge('hookInstance' => SecureRandom.uuid))
+
+      expect(jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG, DaVinciCRDTestKit::ORDER_SIGN_TAG).length)
+        .to eq(1)
+    end
+
+    it 'does not tag a request Inferno rejected by its jti, so resending it is not a repeat' do
+      token = build_token(shared_jti)
+      post_hook_request(token, order_sign_hook_request.merge('hook' => 'appointment-book'))
+      expect(last_response.status).to eq(400)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti))).to be_empty
+
+      post_hook_request(token, order_sign_hook_request)
+      expect(last_response).to be_ok
+      expect(jti_tagged_requests(DaVinciCRDTestKit::TagMethods.jwt_id_tag(shared_jti)).length).to eq(1)
+      expect(jti_tagged_requests(DaVinciCRDTestKit::DUPLICATED_JWT_ID_TAG)).to be_empty
     end
   end
 
@@ -259,6 +329,32 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
       expect(filtered_response['cards']).to eq([guideline_card])
       expect(filtered_response['systemActions']).to eq([other_action])
+    end
+
+    it 'removes systemActions when filtering coverage-info leaves it empty' do
+      allow(endpoint).to receive(:request_body).and_return(
+        'extension' => { 'davinci-crd.configuration' => { 'coverage-info' => false } }
+      )
+
+      response_body = { 'cards' => [], 'systemActions' => [coverage_info_action] }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to eq({ 'cards' => [] })
+    end
+
+    it 'removes an empty systemActions array when no configuration is provided' do
+      allow(endpoint).to receive(:request_body).and_return({})
+
+      response_body = {
+        'cards' => [guideline_card.merge('suggestions' => [{ 'label' => 'none', 'actions' => [] }])],
+        'systemActions' => []
+      }
+
+      filtered_response = endpoint.apply_hook_configuration(response_body)
+
+      expect(filtered_response).to_not have_key('systemActions')
+      expect(filtered_response['cards'].first['suggestions'].first['actions']).to eq([])
     end
   end
 
@@ -337,6 +433,56 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         expect(pat_request).to_not have_been_made
         expect(p_request).to_not have_been_made
         expect(cov_request).to_not have_been_made
+      end
+
+      it 'responds rather than raising when the extension is an array instead of an object' do
+        allow(test).to receive(:suite).and_return(suite)
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        run(test, cds_jwt_iss: example_client_url,
+                  order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint,
+                  order_sign_hook_request.merge('extension' => [{ 'davinci-crd.requestedVersion' => '2.2' }]))
+
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards']).to be_present
+      end
+
+      it 'still returns the hook response when gathering data for later verification fails' do
+        allow(test).to receive(:suite).and_return(suite)
+        allow_any_instance_of(described_class).to receive(:request_coverage_payer).and_raise(NoMethodError, 'boom')
+
+        token = jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+
+        waiting_result = run(test, cds_jwt_iss: example_client_url,
+                                   order_sign_response_approach: 'custom',
+                                   order_sign_custom_response_template: { cards: [instructions_card_template] }.to_json)
+
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, order_sign_hook_request)
+
+        expect(last_response).to be_ok
+        expect(JSON.parse(last_response.body)['cards']).to be_present
+
+        messages = Inferno::Repositories::Messages.new.messages_for_result(waiting_result.id)
+        hook_instance = order_sign_hook_request['hookInstance']
+        expect(messages.map(&:type)).to include('warning')
+        expect(messages.map(&:message).join)
+          .to include("internal error while reading the Coverage payer for hook request `#{hook_instance}`")
+          .and include('NoMethodError: boom')
       end
 
       it 'fetches the coverage payer when coverage with a payer reference is in the prefetch' do
@@ -507,6 +653,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
         post_json(server_endpoint, order_sign_hook_request)
 
         expect(last_response.status).to eq(400)
+        expect(last_response.content_type).to start_with('application/fhir+json')
         parsed_body = JSON.parse(last_response.body)
         expect(parsed_body['resourceType']).to eq('OperationOutcome')
         expect(parsed_body['issue'].first['details']['text']).to match(/order-sign.*appointment-book/)
@@ -538,12 +685,14 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
       end
     end
 
-    it 'does not make FHIR data-fetch requests when requestedVersion extension specifies 2.2' do
+    it 'does not make the v2.0.1 response generation data fetches when requestedVersion extension specifies 2.2' do
       allow(test).to receive(:suite).and_return(suite)
+      # v2.2.1 reads must support references instead, such as the draft order's orderer, which this
+      # example does not look at. Stubs declared later take precedence, so the ones below still record
+      # their own requests.
+      stub_request(:get, %r{\A#{fhir_server}/}).to_return(status: 404)
       pat_request = stub_request(:get, patient_example_reference_absolute)
         .to_return(status: 200, body: patient_example.to_json)
-      p_request = stub_request(:get, practitioner_example_reference_absolute)
-        .to_return(status: 200, body: practitioner_example.to_json)
       cov_request = stub_request(:get, coverage_search_url)
         .to_return(status: 200, body: crd_coverage_bundle.to_json)
 
@@ -566,8 +715,55 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
 
       expect(last_response).to be_ok
       expect(pat_request).to_not have_been_made
-      expect(p_request).to_not have_been_made
       expect(cov_request).to_not have_been_made
+    end
+  end
+
+  describe 'scenario group handling' do
+    def endpoint_for(interaction_group)
+      endpoint = described_class.new
+      allow(endpoint).to receive(:test)
+        .and_return(double(config: double(options: { crd_interaction_group: interaction_group })))
+      endpoint
+    end
+
+    it 'recognizes both user access level groups' do
+      [DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:user_access_level_group?)).to be(true)
+      end
+    end
+
+    it 'does not treat another scenario group as a user access level group' do
+      expect(endpoint_for(DaVinciCRDTestKit::SELF_PAY_GROUP_TAG).send(:user_access_level_group?)).to be(false)
+      expect(endpoint_for(nil).send(:user_access_level_group?)).to be(false)
+    end
+
+    # these scenarios each expect exactly one request, so the wait ends as soon as it arrives
+    it 'continues after one request for the scenarios that expect only one' do
+      [DaVinciCRDTestKit::LONG_RUNNING_GROUP_TAG,
+       DaVinciCRDTestKit::UNKNOWN_CONTENT_GROUP_TAG,
+       DaVinciCRDTestKit::SELF_PAY_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:continue_after_one_hook_request?)).to be(true)
+      end
+    end
+
+    # the tester says when they are done, since more than one request may be made
+    it 'does not continue after one request for the multiple payers scenario' do
+      endpoint = endpoint_for(DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG)
+
+      expect(endpoint.send(:continue_after_one_hook_request?)).to be(false)
+    end
+
+    it 'returns a fixed coverage information response for the scenarios that do not let the tester choose' do
+      [DaVinciCRDTestKit::SELF_PAY_GROUP_TAG,
+       DaVinciCRDTestKit::LONG_RUNNING_GROUP_TAG,
+       DaVinciCRDTestKit::MULTIPLE_PAYERS_GROUP_TAG,
+       DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG].each do |tag|
+        expect(endpoint_for(tag).send(:fixed_coverage_information_group?)).to be(true)
+      end
     end
   end
 end

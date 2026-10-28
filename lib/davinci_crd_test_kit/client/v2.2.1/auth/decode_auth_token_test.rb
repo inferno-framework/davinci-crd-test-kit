@@ -22,6 +22,8 @@ module DaVinciCRDTestKit
 
       run do
         load_interaction_group_requests
+        # replace any outputs from an earlier run so that later tests skip rather than reuse stale tokens
+        output auth_tokens: '[]', auth_token_payloads_json: '[]', auth_token_headers_json: '[]'
         skip_if requests.empty?, "No #{hook_name} requests were made in a previous test as expected."
         auth_tokens = []
         auth_token_payloads_json = []

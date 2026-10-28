@@ -1,5 +1,6 @@
 require 'date'
 require 'uri'
+require_relative 'resource_identity'
 
 module DaVinciCRDTestKit
   class FhirpathServiceError < StandardError; end
@@ -142,14 +143,7 @@ module DaVinciCRDTestKit
     end
 
     def base_fhir_server_for_identity(current_resource_identity)
-      return nil unless current_resource_identity.present?
-
-      parsed_identity = URI.parse(current_resource_identity)
-      return nil unless ['http', 'https'].include?(parsed_identity.scheme)
-
-      current_resource_identity.split('/')[0..-3].join('/')
-    rescue URI::InvalidURIError
-      nil
+      ResourceIdentity.base_for(current_resource_identity)
     end
 
     # -------------------------------------------------------------------------

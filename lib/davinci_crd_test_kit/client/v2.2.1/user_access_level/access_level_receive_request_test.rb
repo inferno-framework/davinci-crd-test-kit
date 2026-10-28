@@ -1,0 +1,89 @@
+require_relative '../../client_wait_messages'
+require_relative '../client_urls'
+require_relative '../../tagged_request_load_helper'
+require_relative '../../../cross_suite/tags'
+require_relative 'access_level_target_reference'
+
+module DaVinciCRDTestKit
+  module V221
+    # Used for both the full-access and limited-access interaction tests; each usage configures a
+    # distinct `crd_interaction_group` tag (full vs limited) via `config`.
+    class AccessLevelReceiveRequestTest < Inferno::Test
+      include ClientURLs
+      include DaVinciCRDTestKit::ClientWaitMessages
+      include DaVinciCRDTestKit::TaggedRequestLoadHelper
+      include AccessLevelTargetReference
+
+      id :crd_v221_access_level_receive_request
+      title 'CRD client invokes a hook as an EHR user'
+
+      input :access_level_target_reference,
+            title: 'Target Resource Reference',
+            description: %(
+              Relative reference (e.g. `Observation/123`) that Inferno will read using the access
+              token supplied in the hook request. This resource is expected to be accessible by the
+              full-access user and denied to the limited-access user. If possible, it should be
+              within the set of prefetched data requested by Inferno.
+            )
+      input :cds_jwt_iss,
+            title: 'CRD JWT Issuer',
+            locked: true
+      payer_organization_id_inputs
+
+      def limited_access_run?
+        crd_interaction_group == ACCESS_LEVEL_LIMITED_GROUP_TAG
+      end
+
+      def access_level_role
+        crd_interaction_group == ACCESS_LEVEL_FULL_GROUP_TAG ? 'full-access' : 'limited-access'
+      end
+
+      # only the second run has an earlier one whose content it has to match
+      def same_scenario_instruction
+        return '' unless limited_access_run?
+
+        'Invoke the hook for the same order(s), appointment(s), or encounter used for the full-access ' \
+          'user in this scenario. '
+      end
+
+      # wait messages are rendered as given, so keep every line flush to avoid markdown reading
+      # the indentation as a code block
+      def wait_message
+        <<~MESSAGE
+          #### Invoke a Hook as a #{access_level_role.capitalize} User
+
+          Invoke any supported hook while signed in as a **#{access_level_role}** user on one of
+          the two Inferno simulated CRD servers. #{same_scenario_instruction}The test will
+          automatically continue once Inferno has received a request and returned a response.
+
+          While processing the hook request, Inferno will use the access token from the request
+          to read `#{access_level_target_reference}`. That read must #{'not ' if limited_access_run?}return
+          the target resource.
+
+          #{service_discovery_endpoints_section}
+          #### Authentication and Identification
+
+          #{session_identification_message}
+
+          #### Responses
+
+          Inferno will return a mocked coverage-information response.
+        MESSAGE
+      end
+
+      run do
+        assert_target_reference_valid
+
+        # the limited-access run is only meaningful alongside a successful full-access one, so don't
+        # make the tester stage a second workflow that cannot be evaluated
+        if limited_access_run?
+          skip_if load_tagged_requests(ACCESS_LEVEL_FULL_GROUP_TAG).blank?,
+                  'Full-access hook request was not successful. Check the response for details and re-try.'
+        end
+
+        identifier = cds_jwt_iss
+        wait(identifier:, message: wait_message)
+      end
+    end
+  end
+end

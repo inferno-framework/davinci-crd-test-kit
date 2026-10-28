@@ -8,6 +8,7 @@ module DaVinciCRDTestKit
     class HookRequestPrefetchCompleteTest < Inferno::Test
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include ClientURLs
 
       id :crd_v221_hook_request_prefetch_complete
       title 'Hook requests include the requested prefetch data'
@@ -19,7 +20,7 @@ module DaVinciCRDTestKit
         See the [Prefetch Template](https://cds-hooks.hl7.org/2026Jan/en/#prefetch-template)
         section for more information about the format of `prefetch` templates.
 
-        [The CRD IG requires client support for prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
+        [The CRD IG requires that CRD clients support prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#prefetch)
         including the ability to provide all data in and subsets of the [standard prefetch templates](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch),
         when they are requested by the invoked CRD server. Inferno simulates two CRD servers,
         one at `#{ClientURLs.discovery_url}` requiring the [complete set of standard prefetches](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json)
@@ -97,13 +98,8 @@ module DaVinciCRDTestKit
           hook_request = parse_json_request_entity(request.request_body, 'Request body', request_index)
           next unless hook_request.present?
 
-          prefetch_target = if request.url.include?(PREFETCH_SUBSET_PREFIX)
-                              :subset
-                            else
-                              :complete
-                            end
-
-          services_path = service_path_for_target(prefetch_target)
+          target = prefetch_target(request)
+          services_path = service_path_for_target(target)
           checker = PrefetchCompletenessChecker.new(hook_request, request_index, services_path)
           completeness_errors = checker.check_prefetched_data
           completeness_errors.each do |error|
@@ -114,10 +110,10 @@ module DaVinciCRDTestKit
           end
           if completeness_errors.blank? &&
              checker.data_set_different_with_alternate_service?(
-               service_path_for_opposite(prefetch_target),
-               key_comparison_map_for_target(prefetch_target)
+               service_path_for_opposite(target),
+               key_comparison_map_for_target(target)
              )
-            if prefetch_target == :subset
+            if target == :subset
               output demonstrates_prefetch_subset_distinct_from_complete: true
             else
               output demonstrates_prefetch_complete_distinct_from_subset: true

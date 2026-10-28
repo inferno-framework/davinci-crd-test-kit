@@ -26,6 +26,15 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenHeaderTest do
       .first
   end
 
+  it 'skips and outputs an empty JWK list when no token headers or keys were produced' do
+    result = run(test)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to eq('No Authorization tokens produced from the previous tests.')
+    outputs = result.outputs.to_h { |output| [output['name'], output['value']] }
+    expect(outputs['auth_tokens_jwk_json']).to eq('[]')
+  end
+
   it 'passes if it receives a valid JWT Authorization header' do
     result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('pass')
@@ -108,5 +117,21 @@ RSpec.describe DaVinciCRDTestKit::V221::TokenHeaderTest do
     result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
     expect(result.result).to eq('fail')
     expect(entity_result_message.message).to include('JWKS did not contain a public key with an id of `12345`')
+  end
+
+  it 'fails if it receives a JWT header with an `alg` field that is not a string' do
+    token_header[:alg] = ['RS384']
+
+    result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to include('Token header `alg` field must be a string, got ["RS384"]')
+  end
+
+  it 'fails if it receives a JWT header with a `kid` field that is not a string' do
+    token_header[:kid] = 12_345
+
+    result = run(test, auth_token_headers_json: [token_header.to_json], crd_jwks_keys_json: [jwks_hash_keys.to_json])
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message).to include('Token header `kid` field must be a string, got 12345')
   end
 end

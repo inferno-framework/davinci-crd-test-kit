@@ -111,9 +111,16 @@ module DaVinciCRDTestKit
       cards.present? || actions.present?
     end
 
+    # the value of the named hook request extension, or nil when the request or its `extension` is not
+    # an object
+    def request_extension(request_body, name)
+      extension = request_body['extension'] if request_body.is_a?(Hash)
+      extension[name] if extension.is_a?(Hash)
+    end
+
     def coverage_info_configuration_disabled?(request_body)
-      request_body.is_a?(Hash) &&
-        request_body.dig('extension', 'davinci-crd.configuration', COVERAGE_INFO_CONFIGURATION_CODE) == false
+      configuration = request_extension(request_body, 'davinci-crd.configuration')
+      configuration.is_a?(Hash) && configuration[COVERAGE_INFO_CONFIGURATION_CODE] == false
     end
 
     def disable_coverage_info_configuration!(request_body)

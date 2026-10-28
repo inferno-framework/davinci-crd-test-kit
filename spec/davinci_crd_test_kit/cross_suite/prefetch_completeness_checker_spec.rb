@@ -537,6 +537,47 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       checker.check_prefetched_data
       expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
     end
+
+    it 'remains false when the provided data for the multi-id template is missing an expected entry' do
+      # e.g., the client only evaluated the first branch of the union
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = { 'patients' => crd_patient_example_bundle }
+      checker = make_checker(order_sign_request,
+                             { 'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
+      errors = checker.check_prefetched_data
+      expect(errors).to include(a_string_including('missing expected entries'))
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'remains false when the multi-id template key is absent from the prefetch' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = {}
+      checker = make_checker(order_sign_request,
+                             { 'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}' })
+      checker.check_prefetched_data
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(false)
+    end
+
+    it 'becomes true when the multi-id template is satisfied even though another template has errors' do
+      order_sign_request['context']['secondPatientId'] = 'other'
+      order_sign_request['prefetch'] = {
+        'patient' => crd_patient_example.merge('id' => 'wrong'),
+        'patients' => {
+          'resourceType' => 'Bundle',
+          'entry' => [
+            { 'resource' => crd_patient_example },
+            { 'resource' => crd_patient_example.merge('id' => 'other') }
+          ]
+        }
+      }
+      checker = make_checker(order_sign_request, {
+                               'patient' => 'Patient/{{context.patientId}}',
+                               'patients' => 'Patient?_id={{context.patientId|context.secondPatientId}}'
+                             })
+      errors = checker.check_prefetched_data
+      expect(errors).to include(a_string_including('unexpected id'))
+      expect(checker.observed_fhirpath_collection_as_comma_delimited_string).to be(true)
+    end
   end
 
   describe 'prefetch resource extraction' do
@@ -631,6 +672,64 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
         expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
       end
+    end
+  end
+
+  describe 'prefetched resource index' do
+    let(:service_request) { { 'resourceType' => 'ServiceRequest', 'id' => 'sr-1' } }
+
+    def indexed(prefetch)
+      order_sign_request['prefetch'] = prefetch
+      make_checker(order_sign_request, {}).send(:prefetched_resources)
+    end
+
+    it 'indexes each resource in an array value under a prefetch key' do
+      index = indexed({ 'orders' => [service_request, crd_patient_example] })
+
+      expect(index.keys).to contain_exactly("#{base_fhir_url}/ServiceRequest/sr-1", "#{base_fhir_url}/Patient/example")
+      expect(index["#{base_fhir_url}/ServiceRequest/sr-1"]).to be(service_request)
+    end
+
+    it 'indexes the entries of a Bundle nested in a prefetch Bundle entry, but not the nested Bundle itself' do
+      inner_bundle = { 'resourceType' => 'Bundle', 'id' => 'inner', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      outer_bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Bundle/inner', 'resource' => inner_bundle }
+      ] }
+      index = indexed({ 'bundles' => outer_bundle })
+
+      expect(index.keys).to contain_exactly('https://elsewhere.example/r4/Patient/example')
+      expect(index['https://elsewhere.example/r4/Patient/example']).to be(crd_patient_example)
+    end
+
+    it 'indexes an entry without a fullUrl by fhirServer and Type/id, and one with a fullUrl by that fullUrl' do
+      bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'resource' => service_request },
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      index = indexed({ 'mixed' => bundle })
+
+      expect(index.keys).to contain_exactly("#{base_fhir_url}/ServiceRequest/sr-1",
+                                            'https://elsewhere.example/r4/Patient/example')
+    end
+
+    it 'keeps the first resource indexed under an identity' do
+      later = crd_patient_example.merge('gender' => 'unknown')
+      index = indexed({ 'patient' => crd_patient_example, 'patients' => [later] })
+
+      expect(index["#{base_fhir_url}/Patient/example"]).to be(crd_patient_example)
+    end
+
+    it 'finds a resource from a nested Bundle by its type and id' do
+      inner_bundle = { 'resourceType' => 'Bundle', 'entry' => [
+        { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
+      ] }
+      order_sign_request['prefetch'] = { 'bundles' => { 'resourceType' => 'Bundle',
+                                                        'entry' => [{ 'resource' => inner_bundle }] } }
+      checker = make_checker(order_sign_request, {})
+
+      expect(checker.prefetched_resource('Patient/example')).to be(crd_patient_example)
     end
   end
 
@@ -841,6 +940,75 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                                          'practitioners' => crd_practitioner_example_bundle }
       errors = errors_for(order_sign_request, templates)
       expect(errors).to be_empty
+    end
+  end
+
+  describe '#prefetched_resource' do
+    let(:observation) { { 'resourceType' => 'Observation', 'id' => '123' } }
+    let(:bundle_with_foreign_full_url) do
+      { 'resourceType' => 'Bundle',
+        'entry' => [{ 'fullUrl' => 'https://elsewhere.example.org/fhir/Observation/123',
+                      'resource' => observation }] }
+    end
+
+    def checker_for(prefetch, fhir_server: base_fhir_url)
+      request = { 'prefetch' => prefetch }
+      request['fhirServer'] = fhir_server if fhir_server
+      described_class.new(request, nil, nil)
+    end
+
+    it 'finds a resource prefetched on its own' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'finds a resource in a Bundle entry with no fullUrl' do
+      bundle = { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => observation }] }
+
+      expect(checker_for({ 'obs' => bundle }).prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    # prefetch templates that are searches return Bundles whose fullUrls the server chooses
+    it 'finds a Bundle entry whose fullUrl is rooted elsewhere than the fhirServer' do
+      checker = checker_for({ 'obs' => bundle_with_foreign_full_url })
+
+      expect(checker.prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'finds a resource when the request provides no fhirServer' do
+      checker = checker_for({ 'obs' => bundle_with_foreign_full_url }, fhir_server: nil)
+
+      expect(checker.prefetched_resource('Observation/123')).to eq(observation)
+    end
+
+    it 'returns nil for a resource that was not prefetched' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation/456')).to be_nil
+    end
+
+    it 'returns nil for a reference that is not a relative reference' do
+      expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation')).to be_nil
+    end
+
+    it 'returns nil rather than raising when prefetch is not an object' do
+      expect(checker_for('none').prefetched_resource('Observation/123')).to be_nil
+    end
+
+    it 'does not raise when fhirServer is not a string' do
+      checker = checker_for({ 'obs' => observation }, fhir_server: 42)
+
+      expect { checker.prefetched_resource('Observation/123') }.to_not raise_error
+    end
+  end
+
+  describe '#prefetched_resource_present?' do
+    let(:observation) { { 'resourceType' => 'Observation', 'id' => '123' } }
+
+    it 'is true when the resource was prefetched and false when it was not' do
+      checker = described_class.new(
+        { 'fhirServer' => base_fhir_url, 'prefetch' => { 'obs' => observation } }, nil, nil
+      )
+
+      expect(checker.prefetched_resource_present?('Observation/123')).to be(true)
+      expect(checker.prefetched_resource_present?('Observation/456')).to be(false)
     end
   end
 end

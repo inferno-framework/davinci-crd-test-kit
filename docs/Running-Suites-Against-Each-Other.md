@@ -26,7 +26,7 @@ dedicated hostname.
    1. A second "User Action Required" dialog will appear asking you to attest that the returned
       responses were displayed. Choose your response based on the results of the response
       evaluation in the server tests.
-1. Run client group "1.3 Card Must Support" and Server group "3.7 Required Card Response
+1. Run client group "1.4.2 Must Support" and Server group "3.7 Required Card Response
    Validation" to complete the server tests.
 
 Notes:
@@ -56,12 +56,14 @@ of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-c
    1. When a "User Action Required" dialog appears, switch to the "complete prefetch" server session and run group "3.x <hook name>"
    1. Once complete, switch to the "subset prefetch" server session and run group "3.x <hook name>"
    1. Once complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
-1. Run client group "1.3 Cross Hook", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
+1. Run client group "1.4 Cross Hook", which will pause to receive additional hook requests. Re-run the following groups in the two server sessions:
+   1. group "2 Hook Response Demonstration" in the "complete prefetch" session (adds additional Patient and Practitioner must support elements)
    1. group "3.2 encounter-start" in the "complete prefetch" session
    1. group "3.2 encounter-start" in the "subset prefetch" session
    1. group "3.6 encounter-discharge" in the "complete prefetch" session
    1. group "3.6 encounter-discharge" in the "subset prefetch" session
    1. Once all complete, return to the client session and click the link in the "User Action Required" dialog to continue. Attest to the display of cards when the next "User Action Required" dialog appears.
+   1. A series of "User Action Required" dialogs will appear asking for attestation that the CRD client does not support must support elements that were not observed. Attest with a mix of true and false answers.
 1. Run server group "3.7 Cross-Hook Response Validation" in both server sessions.
 
 Some tests will fail, including
@@ -69,18 +71,18 @@ Some tests will fail, including
 - Client tests 1.2.x.3.01 and 1.4.1.3.01 validating that the hook requests structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
-- Server tests in Group 4. The Client tests do not return the specific codes needed for these tests to pass.
+- Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription (skip).
 
 ### Additional Optional Steps for the Long-running Hook Request Scenario
 
-1. In the client session, run group "1.4 Long-running Hook Request" with no changes to the inputs.
+1. In the client session, run group "1.3.1 Long-running Hook Request" with no changes to the inputs.
 1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
    changes to the inputs.
 1. Note that a "User Action Required" dialog will appear in the server session with no option to
-   continue other than to cancel. This is expected because it is waiting for the client session's
-   simulated CRD server to respond. That simulated CRD server is pausing for 5 seconds before
-   responding.
-1. After 5 seconds, the "User Action Required" dialog in the server session will disappear and the
+   continue other than to cancel. Do not cancel the tests as this is expected. The server suite
+   is waiting for the client session's simulated CRD server to respond and during the long-running
+   test the simulated CRD server pauses for at least 15 seconds before responding.
+1. After 15 seconds, the "User Action Required" dialog in the server session will disappear and the
    tests will complete.
 1. Return to the client session and a new "User Action Required" asking for an attestation that
    the user's workflow could continue during the long-running request. Attest "true" because

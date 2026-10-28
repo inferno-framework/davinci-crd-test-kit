@@ -329,6 +329,11 @@ RSpec.describe DaVinciCRDTestKit::FhirpathOnCDSRequest do
       expect(base_fhir_server('NutritionOrder/1')).to be_nil
     end
 
+    it 'returns nil for an http URL that is not a RESTful URL to a resource' do
+      expect(base_fhir_server('https://ehr.example/locations/loc1')).to be_nil
+      expect(base_fhir_server('http://host/x')).to be_nil
+    end
+
     it 'returns nil for a urn scheme' do
       expect(base_fhir_server('urn:uuid:some-uuid')).to be_nil
     end

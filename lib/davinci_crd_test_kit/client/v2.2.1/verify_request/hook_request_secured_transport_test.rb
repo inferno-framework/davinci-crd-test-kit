@@ -11,7 +11,7 @@ module DaVinciCRDTestKit
       title 'Hook request interactions use TLS'
       description %(
         During this test, Inferno will verify that
-        requests made by both the client and Inferno's simulated CRD servers are made against
+        requests made by both the CRD client and Inferno's simulated CRD servers are made against
         TLS-secured endpoints using the `https` protocol.
       )
       verifies_requirements 'cds-hooks_3.0.0-ballot@2', 'cds-hooks_3.0.0-ballot@168', 'cds-hooks_3.0.0-ballot@172',

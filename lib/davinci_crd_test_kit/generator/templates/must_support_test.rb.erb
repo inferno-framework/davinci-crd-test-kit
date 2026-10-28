@@ -1,0 +1,22 @@
+require_relative '../request_must_support_with_attestation_option'
+
+module DaVinciCRDTestKit
+  module <%= module_name %>
+    class <%= class_name %> < RequestMustSupportWithAttestationOption
+      id :<%= test_id %>
+      title '<%= title.gsub("'", "\\\\'") %>'
+      description <<~DESCRIPTION
+<%= indented_description %>
+      DESCRIPTION
+
+      verifies_requirements <%= requirements.map { |requirement| "'#{requirement}'" }.join(",\n                            ") %>
+
+      config(
+        options: {
+          ig_version: '<%= ig_version %>',
+          profiles: <%= profiles_literal %>
+        }
+      )
+    end
+  end
+end

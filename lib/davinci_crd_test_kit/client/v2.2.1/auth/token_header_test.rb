@@ -1,9 +1,11 @@
 require_relative '../../multi_request_message_helper'
+require_relative '../../../cross_suite/short_circuit_interaction'
 
 module DaVinciCRDTestKit
   module V221
     class TokenHeaderTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
+      include DaVinciCRDTestKit::ShortCircuitInteraction
 
       id :crd_v221_token_header
       title 'Authorization token headers contain required information'
@@ -12,18 +14,28 @@ module DaVinciCRDTestKit
         requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
         including the following:
         - The `alg`, `kid`, and `typ` fields are required.
+        - The `alg` and `kid` fields must be strings.
         - The `typ` field must be "JWT".
         - The key used to sign the token must be present in the JWKS.
       )
 
-      verifies_requirements 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184', 'cds-hooks_3.0.0-ballot@202'
+      verifies_requirements 'cds-hooks_3.0.0-ballot@181', 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184',
+                            'cds-hooks_3.0.0-ballot@202'
 
-      input :auth_token_headers_json, :crd_jwks_keys_json
+      # Optional so that a group whose requests were declined can pass rather than skip on inputs
+      # the short circuited tests before it never produced. The run block still skips when empty.
+      # The defaults only pre-fill the UI, so a missing value still arrives as nil.
+      input :auth_token_headers_json, optional: true, default: '[]'
+      input :crd_jwks_keys_json, optional: true, default: '[]'
       output :auth_tokens_jwk_json
 
       run do
-        auth_token_headers = JSON.parse(auth_token_headers_json)
-        crd_jwks_keys = JSON.parse(crd_jwks_keys_json)
+        check_for_short_circuit
+
+        # replace any output from an earlier run so that later tests skip rather than reuse stale keys
+        output auth_tokens_jwk_json: '[]'
+        auth_token_headers = JSON.parse(auth_token_headers_json.presence || '[]')
+        crd_jwks_keys = JSON.parse(crd_jwks_keys_json.presence || '[]')
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous tests.'
         skip_if crd_jwks_keys.compact.empty?, 'No JWKS keys produced from the previous test.'
 
@@ -39,6 +51,12 @@ module DaVinciCRDTestKit
 
           if algorithm.blank?
             add_request_message('error', 'Token header must have the `alg` field', index)
+            auth_tokens_jwk_json << nil
+            next
+          end
+
+          unless algorithm.is_a?(String)
+            add_request_message('error', "Token header `alg` field must be a string, got #{algorithm.to_json}", index)
             auth_tokens_jwk_json << nil
             next
           end
@@ -64,6 +82,12 @@ module DaVinciCRDTestKit
           end
 
           kid = header['kid']
+          unless kid.is_a?(String)
+            add_request_message('error', "Token header `kid` field must be a string, got #{kid.to_json}", index)
+            auth_tokens_jwk_json << nil
+            next
+          end
+
           if crd_jwks_keys[index].nil?
             add_request_message('error', 'No JWKS keys available for this request', index)
             auth_tokens_jwk_json << nil

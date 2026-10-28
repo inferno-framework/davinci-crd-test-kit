@@ -1,13 +1,13 @@
 require_relative '../../cross_suite/fhirpath_on_cds_request'
 require_relative '../../cross_suite/replace_tokens'
-require_relative 'gather_response_generation_data'
+require_relative 'hook_request_data_access'
 
 module DaVinciCRDTestKit
   # Build responses using tester-provided template
   module CustomServiceResponse
     include DaVinciCRDTestKit::FhirpathOnCDSRequest
     include DaVinciCRDTestKit::ReplaceTokens
-    include DaVinciCRDTestKit::GatherResponseGenerationData
+    include DaVinciCRDTestKit::HookRequestDataAccess
 
     def custom_response_template
       @custom_response_template ||=

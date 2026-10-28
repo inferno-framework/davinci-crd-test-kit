@@ -11,7 +11,13 @@ module DaVinciCRDTestKit
         token_to_session_id(request.headers['authorization']&.delete_prefix('Bearer '))
       end
 
+      def test_run_identifier_location_description
+        'the Inferno-issued Bearer token (encoding the target Inferno session ID) in the HTTP Authorization header'
+      end
+
       def token_to_session_id(token_to_decode)
+        return if token_to_decode.blank?
+
         JSON.parse(Base64.urlsafe_decode64(token_to_decode))&.dig('session_id')
       rescue JSON::ParserError, ArgumentError
         nil

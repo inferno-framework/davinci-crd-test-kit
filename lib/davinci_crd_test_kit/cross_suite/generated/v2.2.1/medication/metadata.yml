@@ -1,0 +1,17 @@
+---
+:resource: Medication
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-medication
+:profile_name: CRD Medication
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Medication.code.extension:BillingOptions
+    :slice_name: BillingOptions
+    :path: code.extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
+    :modifier_extension: false
+  :slices: []
+  :elements:
+  - :path: code
+  :choices: []
+  :recursive_elements: []

@@ -13,8 +13,8 @@ requirements and may change the test validation logic.
 
 ## Technical Implementation
 
-In these suites, Inferno simulates a CRD client system and makes CDS Hooks invocations
-against the tested CRD server system. Over the course of these requests, Inferno seeks
+In these suites, Inferno simulates a CRD client and makes CDS Hooks invocations
+against the tested CRD server. Over the course of these requests, Inferno seeks
 to observe conformant handling of invocations for supported CRD hooks
 ([v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2/hooks.html),
 [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html)) and the

@@ -1,0 +1,22 @@
+---
+:resource: Device
+:profile_url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-device
+:profile_name: CRD Device
+:profile_version: 2.2.1
+:must_supports:
+  :extensions:
+  - :id: Device.extension:BillingOptions
+    :slice_name: BillingOptions
+    :path: extension
+    :url: http://hl7.org/fhir/us/davinci-crd/StructureDefinition/ext-billing-options
+    :modifier_extension: false
+  :slices: []
+  :elements:
+  - :path: property
+  - :path: property.type
+  - :path: property.valueCode
+  - :path: property.valueQuantity
+  - :path: udiCarrier
+  - :path: udiCarrier.deviceIdentifier
+  :choices: []
+  :recursive_elements: []

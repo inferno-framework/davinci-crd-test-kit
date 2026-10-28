@@ -1,0 +1,6 @@
+---
+:resource: Condition
+:profile_url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-encounter-diagnosis
+:profile_name: US Core Condition Encounter Diagnosis Profile
+:profile_version: 7.0.0
+:must_supports: {}
