@@ -20,7 +20,7 @@ enforces this requirement by failing when a custom extension not defined within
 CRD is found within a response returned by Inferno. While client requests are typically
 allowed to have custom extensions, if portions of the request containing them are echoed back in
 Inferno responses (e.g., mocked coverage-information systemActions, or templates using
-the `com.inferno.resourceSelectionCriteria` extension), they will cause failures
+the `gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension), they will cause failures
 on the responses. This may be relaxed in the future and testers are welcome to
 provide feedback on the current behavior via [GitHub issues](https://github.com/inferno-framework/davinci-crd-test-kit/issues).
 
@@ -146,9 +146,9 @@ Cards can be found in the top-level `cards` field. Testers are responsible for p
 replace it with a random uuid each time it is returned so that it will always be unique. The
 same is true for the `suggestion.uuid` field. The following configuration options are
 available to control which cards are returned for a given request and their content:
-- The [`com.inferno.includeForServices` extension](#cominfernoincludeforservices-extension) can
+- The [`gov.healthit.inferno.test-kits.davinci-crd.includeForServices` extension](#govhealthitinfernotest-kitsdavinci-crdincludeforservices-extension) can
   be included to limit the Inferno service endpoints for which the card is included in the response.
-- The [`com.inferno.inclusionCriteria` extension](#cominfernoinclusioncriteria-extension) can
+- The [`gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdinclusioncriteria-extension) can
   be included to limit the requests for which the card is included in the response. 
 - [Expression tokens](#expression-tokens) can appear in any descendant field or FHIR element to
   make the value dependent on content in the request.
@@ -163,22 +163,26 @@ Testers must populate the [required](https://cds-hooks.hl7.org/2.0/#action) `typ
 and `description` fields of each action and may provide
 details in the `resource` or `resourceId` field depending on the `type`. Data in the
 `resource` field does not have to be a complete and valid resource as long as the
-[`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
+[`gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdresourceselectioncriteria-extension)
 is defined. In that case, the contents of the `resource` field will be merged into the selected
 resource(s) when instantiating the action.
 
 The same configuration options and logic apply in both cases:
-- The [`com.inferno.includeForServices` extension](#cominfernoincludeforservices-extension) can
+- The [`gov.healthit.inferno.test-kits.davinci-crd.includeForServices` extension](#govhealthitinfernotest-kitsdavinci-crdincludeforservices-extension) can
   be included to limit the Inferno service endpoints for which the action is included in the response.
-- The [`com.inferno.inclusionCriteria` extension](#cominfernoinclusioncriteria-extension) can
+- The [`gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdinclusioncriteria-extension) can
   be included to limit the requests for which the action is included in the response. 
-- The [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
+- The [`gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdresourceselectioncriteria-extension)
   can be included to specify target resources to use when building the action, which may cause
   multiple copies of the action each based on a different target resource to be included in a response.
 - [Expression tokens](#expression-tokens) can appear in any descendant field or FHIR element to
   make the value dependent on content in the request.
 
-#### `com.inferno.inclusionCriteria` Extension
+Note: earlier versions of this test kit named these extensions with a `com.inferno.` prefix
+(e.g., `com.inferno.inclusionCriteria`). Those names are deprecated but still accepted. If both
+the current and deprecated names are present on the same object, the current name is used.
+
+#### `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` Extension
 
 When defined on a card or action, this extension controls when the entity will be present in the
 response to a request. The extension value will either be a FHIRPath expression or the literal
@@ -193,9 +197,9 @@ string `default`. Specifics for each type of value:
   response.
 - *`default`*: The specifics depend on whether the entity is a card or action:
   - **Card**: If no other cards are (yet) included in the response, then this card will be included.
-  - **Action**: If there is no [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension)
+  - **Action**: If there is no [`gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdresourceselectioncriteria-extension)
     and no other actions are (yet) included in the response, then this action will be included.
-    If there is a [`com.inferno.resourceSelectionCriteria` extension](#cominfernoresourceselectioncriteria-extension),
+    If there is a [`gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension](#govhealthitinfernotest-kitsdavinci-crdresourceselectioncriteria-extension),
     then the action will be instantiated against any selected resource for which no action has yet been
     instantiated.
 
@@ -208,7 +212,7 @@ on a certain type of order:
     "summary": "MedicationRequest Instructions",
     ...,
     "extension": {
-      "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest)"
+      "gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest)"
     }
   }
 ]}
@@ -217,14 +221,14 @@ on a certain type of order:
 Notes:
 - This extension will be removed from the card or action before Inferno returns it to the requesting client.
 
-#### `com.inferno.includeForServices` Extension
+#### `gov.healthit.inferno.test-kits.davinci-crd.includeForServices` Extension
 
 When defined on a card or action, this extension limits the Inferno service endpoints for which
 the entity will be included in the response. The extension value is a comma-delimited list of
 relative URL strings. Specifics for each type of value:
 - *No value*: If the extension is not present or has an empty value, then no service-based
   filtering is applied and the entity is always eligible for inclusion (subject to any other
-  extensions such as `com.inferno.inclusionCriteria`).
+  extensions such as `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria`).
 - *Comma-delimited URL list*: The entity is included only if at least one of the listed strings
   is a substring of the URL path that received the hook request. Matching is case-sensitive.
 
@@ -242,7 +246,7 @@ For example, to return a card only when the request is received for any of the `
       "summary": "Subset endpoint instructions",
       "...",
       "extension": {
-        "com.inferno.includeForServices": "prefetch-subset"
+        "gov.healthit.inferno.test-kits.davinci-crd.includeForServices": "prefetch-subset"
       }
     }
   ]
@@ -254,21 +258,21 @@ Or to include a card for both of Inferno's named order-sign endpoints but not ot
 ```json
 {
   "extension": {
-    "com.inferno.includeForServices": "cds-services/order-sign-service, prefetch-subset/cds-services/order-sign-subset"
+    "gov.healthit.inferno.test-kits.davinci-crd.includeForServices": "cds-services/order-sign-service, prefetch-subset/cds-services/order-sign-subset"
   }
 }
 ```
 
 Notes:
-- This extension is evaluated before `com.inferno.inclusionCriteria`. If a card or action is
-  excluded by this extension, `com.inferno.inclusionCriteria` is not evaluated for that entity.
+- This extension is evaluated before `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria`. If a card or action is
+  excluded by this extension, `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` is not evaluated for that entity.
 - Shorter strings will match more broadly. For example, `prefetch-subset` matches any subset
   endpoint while `prefetch-subset/cds-services/order-sign-subset` matches only the order-sign subset endpoint.
 - You can target all order-sign endpoints using `order-sign` or all order hooks with `order-`.
 - This extension will be removed from the card or action before Inferno returns it to the
   requesting client.
 
-#### `com.inferno.resourceSelectionCriteria` Extension
+#### `gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` Extension
 
 When defined on an action, this extension controls how many copies of the action will be included
 in the response and the target resource for each. The extension value will be a FHIRPath expression.
@@ -310,7 +314,7 @@ in the `context.draftOrders` field of an `order-sign` request:
         ]
       },
       "extension": {
-        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource"
+        "gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria": "context.draftOrders.entry.resource"
       }
     }
   ]
@@ -318,17 +322,17 @@ in the `context.draftOrders` field of an `order-sign` request:
 ```
 
 Notes:
-- If the evaluation of the expression in a `com.inferno.resourceSelectionCriteria` extension
+- If the evaluation of the expression in a `gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension
   returns no resource, then no copies of the action will be included, even if the
-  expression in the `com.inferno.inclusionCriteria` extension directs the action to be included.
-- The `com.inferno.resourceSelectionCriteria` extension can be used with or without the 
-  `com.inferno.inclusionCriteria` extension and vice versa. Here are some example use
+  expression in the `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` extension directs the action to be included.
+- The `gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension can be used with or without the 
+  `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` extension and vice versa. Here are some example use
   cases for each combination:
-  - *`com.inferno.inclusionCriteria` extension only*: Include a suggestion with a `create` action for
+  - *`gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` extension only*: Include a suggestion with a `create` action for
     a static resource when a ServiceRequest with a specific code is included in the hook request.
-  - *`com.inferno.resourceSelectionCriteria` extension only*: Always add a coverage-information
+  - *`gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extension only*: Always add a coverage-information
     extension to each draftOrder.
-  - *Both `com.inferno.inclusionCriteria` and `com.inferno.resourceSelectionCriteria` extensions*:
+  - *Both `gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria` and `gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria` extensions*:
     For a specific patient only (inclusion criteria), add a suggestion to modify all MedicationRequest
     resources for a specific medication to use a generic version of that medication (resource selection
     criteria).
@@ -444,7 +448,7 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
               "type": "delete",
               "description": "Delete the proposed Advil order",
               "extension": {
-                "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil')"
+                "gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil')"
               }
             },
             {
@@ -469,7 +473,7 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
         }
       ],
       "extension": {
-        "com.inferno.inclusionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil').exists()"
+        "gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil').exists()"
       }
     }
   ],
@@ -503,8 +507,8 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
         ]
       },
       "extension": {
-        "com.inferno.inclusionCriteria": "default",
-        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource"
+        "gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria": "default",
+        "gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria": "context.draftOrders.entry.resource"
       }
     },
     {
@@ -532,7 +536,7 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
         ]
       },
       "extension": {
-        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil')"
+        "gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(MedicationRequest).where(subject.reference = 'Patient/pat015' and medication.coding.code = 'codeForAdvil')"
       }
     },{
       "type": "update",
@@ -571,7 +575,7 @@ prescription-strength Advil will be denied and a [card proposing](https://hl7.or
         ]
       },
       "extension": {
-        "com.inferno.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(ServiceRequest).where(code.coding.code = 'codeForMRI')"
+        "gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria": "context.draftOrders.entry.resource.ofType(ServiceRequest).where(code.coding.code = 'codeForMRI')"
       }
     }
   ]
