@@ -136,7 +136,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
     result = run(test, auth_token_headers_json: [token_header_no_jku.to_json])
     expect(result.result).to eq('skip')
-    expect(result.result_message).to match("JWK Set must be inputted if the CRD client's JWK Set is not available")
+    expect(result.result_message)
+      .to include("the CRD client's JWKS must be provided in the **CRD JSON Web Key Set (JWKS)** input")
   end
 
   it 'does not skip when all headers have jku even if no jwk_set is provided' do

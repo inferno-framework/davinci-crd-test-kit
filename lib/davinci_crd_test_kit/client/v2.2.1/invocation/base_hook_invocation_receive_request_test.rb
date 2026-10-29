@@ -1,6 +1,7 @@
 require_relative '../../client_wait_messages'
 require_relative '../client_urls'
 require_relative '../../../cross_suite/cards_identification'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -50,14 +51,11 @@ module DaVinciCRDTestKit
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
       payer_organization_id_inputs
       output :continuation_url
+      flag_as_tester_initiated_exchange
 
       def hook_key
         raise NotImplementedError, "#{self.class} must implement #hook_key"
@@ -94,21 +92,19 @@ module DaVinciCRDTestKit
       end
 
       def selected_response_types_string
-        response_types =
-          if selected_response_types.present?
-            selected_response_types
-          else
-            # matches the hook's default response type
-            primary_hook? ? [DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE] : [DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE]
-          end.map do |response_type|
-            if response_type == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
-              "#{response_type}_action"
-            else
-              "#{response_type}_card"
-            end
-          end
+        response_types = selected_response_types.presence || []
+        # mocked responses on primary hooks always include Coverage Information, whether or not it was selected
+        response_types |= [DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE] if primary_hook?
+        # an Instructions card is returned when nothing else would be
+        response_types = [DaVinciCRDTestKit::CardsIdentification::INSTRUCTIONS_RESPONSE_TYPE] if response_types.empty?
 
-        format_responded_response_types(response_types)
+        format_responded_response_types(response_types.map do |response_type|
+          if response_type == DaVinciCRDTestKit::CardsIdentification::COVERAGE_INFORMATION_RESPONSE_TYPE
+            "#{response_type}_action"
+          else
+            "#{response_type}_card"
+          end
+        end)
       end
 
       def format_responded_response_types(response_types)

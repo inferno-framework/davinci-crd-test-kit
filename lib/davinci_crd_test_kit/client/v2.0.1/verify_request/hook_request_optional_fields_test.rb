@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
 
         This test checks that the optional fields that are present are of the correct type. This test
         will not fail if the hook request does not contain an optional field, it only produces an informational message.
-        If the client provides its FHIR server URL in the `fhirServer` field, and it's authorization token in the
+        If the client provides its FHIR server URL in the `fhirServer` field, and its authorization token in the
         `fhirAuthorization` field object, they will be produced as an output from this test to be used in
         subsequent tests.
       )

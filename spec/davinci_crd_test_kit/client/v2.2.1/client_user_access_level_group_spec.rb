@@ -16,7 +16,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientUserAccessLevelGroup do
   end
 
   # these are set once on the group, so confirm they still reach the tests that read them
-  it 'accepts any hook and keeps the requests out of the cross-hook analyses' do
+  it 'accepts any hook and keeps the requests out of the cross-invocation analyses' do
     ['crd_v221_access_level_receive_request_full', 'crd_v221_access_level_receive_request_limited'].each do |suffix|
       options = test_with_suffix(suffix).config.options
 

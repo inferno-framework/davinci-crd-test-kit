@@ -9,13 +9,13 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_api_access
-      title 'FHIR API access to the target resource is scoped to the EHR user'
+      title 'FHIR API access to the target resource is scoped to the user'
       description %(
-        This test compares the FHIR reads that Inferno made during hook processing of the
-        resource referenced in the **Target Resource Reference** input using the access
-        token supplied in each of the full-access and
-        limited-access hook requests. For this test to pass, the full-access read must return the
-        target resource and the limited-access read must not. The manner in which the limited-access
+        During this test, Inferno will verify that the FHIR reads it made during hook processing of
+        the resource referenced in the **Target Resource Reference** input, using the access token
+        supplied in each of the full-access and limited-access hook requests, were scoped to the
+        user: the full-access read must return the target resource and the limited-access read
+        must not. The manner in which the limited-access
         read is denied is not checked, as the specification does not require a particular approach.
       )
 
@@ -117,7 +117,7 @@ module DaVinciCRDTestKit
         end
 
         assert_no_error_messages("Access to `#{access_level_target_reference}` was not correctly scoped to " \
-                                 'the EHR user. See Messages for details.')
+                                 'the user. See Messages for details.')
       end
     end
   end

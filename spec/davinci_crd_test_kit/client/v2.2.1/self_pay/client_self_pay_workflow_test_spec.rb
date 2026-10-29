@@ -58,7 +58,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayWorkflowTest, :request do
     expect(result.result).to eq('pass')
   end
 
-  it 'passes automatically after a hook request is received' do
+  it 'fails automatically after a hook request is received' do
     result = run(test, cds_jwt_iss: example_client_url)
     expect(result.result).to eq('wait')
 
@@ -66,7 +66,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayWorkflowTest, :request do
 
     expect(last_response).to be_ok
     result = results_repo.find(result.id)
-    expect(result.result).to eq('pass')
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('self-pay')
   end
 
   it 'tags requests with the self-pay group tag even when the request is invalid' do
@@ -82,7 +83,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientSelfPayWorkflowTest, :request do
 
     expect(last_response.status).to eq(400)
     result = results_repo.find(result.id)
-    expect(result.result).to eq('pass')
+    expect(result.result).to eq('fail')
 
     tagged_requests = Inferno::Repositories::Requests.new
       .tagged_requests(test_session.id, [DaVinciCRDTestKit::SELF_PAY_GROUP_TAG])

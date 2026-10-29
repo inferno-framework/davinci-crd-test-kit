@@ -10,6 +10,7 @@ module DaVinciCRDTestKit
         trusted CRD server that can access the CRD client's FHIR Server.
       )
 
+      flag_as_tester_initiated_exchange
       verifies_requirements 'cds-hooks_2.0@174'
 
       config options: { hook_requests_unavailable: true }

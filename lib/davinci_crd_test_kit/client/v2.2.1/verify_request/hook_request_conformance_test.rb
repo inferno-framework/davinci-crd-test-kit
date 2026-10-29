@@ -13,10 +13,11 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_hook_request_conformance
-      title 'Hook requests have the correct structure and contents'
+      title 'Hook requests have the correct structure and content'
       description %(
-        During this test, Inferno will check each request body against the structural and content
-        requirements for the invoked hook.
+        During this test, Inferno will verify that hook request bodies meet
+        structural and content requirements by checking that they conform to the [CRD CDSHooks Request](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-CRDHooksRequest.html)
+        logical model. Extensions not defined by CRD are allowed.
       )
 
       output :url, :smart_auth_info

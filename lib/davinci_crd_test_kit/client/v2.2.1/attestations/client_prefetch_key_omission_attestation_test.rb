@@ -8,11 +8,12 @@ module DaVinciCRDTestKit
       title ATTESTATION_TITLE
       description %(
         During this test, the tester will confirm that the CRD client omits prefetch keys when the relevant
-        data cannot be provided.
+        data cannot be provided, e.g., due to intermittent connectivity issues, and distinguishes it
+        from the "no data" case when the prefetch key must be present but empty.
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
       )
-      attestation
+      flag_as_attestation
       verifies_requirements 'cds-hooks_3.0.0-ballot@51'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 

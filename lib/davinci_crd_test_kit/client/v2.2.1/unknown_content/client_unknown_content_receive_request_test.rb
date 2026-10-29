@@ -1,5 +1,6 @@
 require_relative '../../client_wait_messages'
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -18,20 +19,17 @@ module DaVinciCRDTestKit
         level rather than within the FHIR resources carried in the response, and testers cannot change
         the response that is returned. The details of the request and its response do not matter for
         the purposes of this test and they will not be evaluated, checked for conformance, or included
-        in cross-hook evaluations. The test will automatically continue after Inferno receives a hook
+        in cross-invocation evaluations. The test will automatically continue after Inferno receives a hook
         request and returns a response.
       )
       config options: { accepts_multiple_requests: true }
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       run do
         identifier = cds_jwt_iss

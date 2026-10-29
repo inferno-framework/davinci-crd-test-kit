@@ -1,4 +1,5 @@
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -6,25 +7,32 @@ module DaVinciCRDTestKit
       include ClientURLs
 
       id :crd_v221_client_self_pay_workflow
-      title 'CRD client performs a self-pay workflow'
+      title 'CRD client does not invoke hooks when the patient intends to bypass insurance coverage'
       description %(
+        The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-26)
+        that CRD clients only invoke hooks on payer services where the patient record indicates
+        active coverage with the payer associated with the service and where there is no recorded
+        indication the patient intends to bypass insurance coverage, i.e., the service or product
+        is not flagged as 'self-pay' or 'patient-pay'.
+
         During this test, the tester will perform a self-pay scenario in which a patient has indicated
-        that they will pay for a service instead of asking their insurance to cover it. Because there
-        is a recorded indication that the patient intends to bypass insurance coverage, the CRD client
-        is required to not invoke any hooks that would send details of the service to the payer.
-        The scenario must include an action related to the service that would normally trigger a
-        hook request and Inferno will verify that no hook requests are received.
+        that they will pay for a product or service instead of asking their insurance to cover it.
+        The scenario must include an action related to the product or service that would normally
+        trigger a hook request. The test will fail immediately if Inferno receives a hook request
+        while the tester takes the necessary steps in the CRD client. If the tester's action in the
+        CRD client complete without triggering any hook requests to Inferno, the tester will provide
+        an attestation to that effect to complete the test.
       )
+
+      verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-26-B'
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
       output :continuation_url
+      flag_as_tester_initiated_exchange
+      flag_as_attestation
 
       run do
         identifier = cds_jwt_iss
@@ -45,8 +53,7 @@ module DaVinciCRDTestKit
             the steps that would normally trigger a hook request have been completed for a service
             marked as self-pay.
 
-            If Inferno receives a hook request, this test will automatically continue
-            and the next test will fail.
+            If Inferno receives a hook request, this test will immediately fail.
           )
         )
       end

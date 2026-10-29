@@ -2,6 +2,7 @@ require_relative '../../../cross_suite/cards_identification'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../multi_request_message_helper'
 require_relative '../../prefetched_coverage_payer_helper'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -25,7 +26,9 @@ module DaVinciCRDTestKit
         solicit coverage information for that one payer. If CRD clients invoke CRD on other payers, the
         CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-30)
         that response types that return coverage information are disabled for those 'likely
-        secondary' payers. During this test, Inferno verifies that the CRD client made one or two hook
+        secondary' payers.
+
+        During this test, Inferno will verify that the CRD client made one or two hook
         requests when the tester performed a workflow for a patient with two payer coverages during
         the previous test. If a single request was received, it must not disable coverage
         information responses. If two requests were received, each must have been made to a service
@@ -46,10 +49,10 @@ module DaVinciCRDTestKit
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
             description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. One of the patient's two Coverages must reference
+              #{ClientInputHelper.service_organization_id_intro('complete')}
+              One of the patient's two Coverages must reference
               this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
+              #{ClientInputHelper.rerun_registration_note}
             ),
             type: 'text',
             optional: true,
@@ -57,10 +60,10 @@ module DaVinciCRDTestKit
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. One of the patient's two Coverages must reference
+              #{ClientInputHelper.service_organization_id_intro('subset')}
+              One of the patient's two Coverages must reference
               this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
+              #{ClientInputHelper.rerun_registration_note}
             ),
             type: 'text',
             optional: true,

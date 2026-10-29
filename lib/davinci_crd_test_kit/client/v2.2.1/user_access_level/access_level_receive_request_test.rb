@@ -3,6 +3,7 @@ require_relative '../client_urls'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../../cross_suite/tags'
 require_relative 'access_level_target_reference'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -15,7 +16,7 @@ module DaVinciCRDTestKit
       include AccessLevelTargetReference
 
       id :crd_v221_access_level_receive_request
-      title 'CRD client invokes a hook as an EHR user'
+      title 'CRD client invokes a hook as a user' # updated when used to specify the kind of user
 
       input :access_level_target_reference,
             title: 'Target Resource Reference',
@@ -27,8 +28,10 @@ module DaVinciCRDTestKit
             )
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       def limited_access_run?
         crd_interaction_group == ACCESS_LEVEL_LIMITED_GROUP_TAG

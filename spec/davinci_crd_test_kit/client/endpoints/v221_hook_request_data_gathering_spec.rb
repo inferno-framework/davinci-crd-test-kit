@@ -464,7 +464,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       end
     end
 
-    it 'makes no reads for requests outside the cross hook analysis' do
+    it 'makes no reads for requests outside the cross-invocation analysis' do
       allow(module_instance).to receive(:include_in_cross_hook_analysis?).and_return(false)
 
       module_instance.request_additional_fhir_data

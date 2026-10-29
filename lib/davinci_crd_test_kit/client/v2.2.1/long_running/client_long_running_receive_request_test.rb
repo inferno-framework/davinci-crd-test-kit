@@ -1,5 +1,6 @@
 require_relative '../../client_wait_messages'
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -14,12 +15,12 @@ module DaVinciCRDTestKit
       id :crd_v221_client_long_running_receive_request
       title 'CRD client invokes any hook'
       description %(
-        During this test, Inferno will wait while the CRD client makes a single hook requests of any type.
+        During this test, Inferno will wait while the CRD client makes a single hook request of any type.
         Inferno will return a [mocked response](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
         but only after pausing for a configured amount of time, which must be #{MINIMUM_PAUSE_SECONDS} seconds or
         longer so that it exceeds the [5 or 10 second response window](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-3)
         CRD defines for each hook. The details of the request and its response do not matter for the purposes
-        of this test and they will not be evaluated, checked for conformance, or included in cross-hook
+        of this test and they will not be evaluated, checked for conformance, or included in cross-invocation
         evaluations. The test will automatically continue after Inferno receives a hook request, the
         configured pause time has elapsed, and a response has been returned.
       )
@@ -36,13 +37,10 @@ module DaVinciCRDTestKit
             default: MINIMUM_PAUSE_SECONDS.to_s
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
       payer_organization_id_inputs
+      flag_as_tester_initiated_exchange
 
       run do
         verify_long_running_pause_time_input
@@ -55,7 +53,7 @@ module DaVinciCRDTestKit
       # the indentation as a code block
       def wait_message
         <<~MESSAGE
-          #### Long Running Hook Request Test
+          #### Long-Running Hook Request Test
 
           Invoke any supported hook on one of the two Inferno simulated
           CRD servers. This test will automatically continue once Inferno

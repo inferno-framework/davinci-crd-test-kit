@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         Inferno simulates two CRD servers with discovery endpoints for the CRD client to connect to:
         - Discovery endpoint for services requesting the complete [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.discovery_url}`
-        - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
+        - Discovery endpoint for services requesting a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.prefetch_subset_discovery_url}`
 
         This group must be run before any other tests in the "Hook Invocation" group because inputs

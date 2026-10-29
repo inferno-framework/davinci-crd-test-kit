@@ -15,10 +15,10 @@ module DaVinciCRDTestKit
         During this test, the tester will confirm that the CRD client allows users to continue
         working in the system when a hook request is long-running. This could be accomplished,
         for example, by providing a bypass/continue mechanism when a CRD server is taking too long
-        to respond, or by always running hooks requests in the background and notifying users when they
+        to respond, or by always running hook requests in the background and notifying users when they
         return pertinent information.
       )
-      attestation
+      flag_as_attestation
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@found-6'
 
@@ -38,7 +38,7 @@ module DaVinciCRDTestKit
         wait(
           identifier:,
           message: <<~MESSAGE
-            **Long Running Request Attestation**:
+            **Long-Running Request Attestation**:
 
             I attest that the user was able to continue working in the system
             while waiting for the long-running hook request to return a response:

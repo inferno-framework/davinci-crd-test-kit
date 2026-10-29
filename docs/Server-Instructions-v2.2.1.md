@@ -18,7 +18,7 @@ Once those details are available, test execution can start.
 
 ## Quick Start
 
-To execute a simple set of tests targeting a single hook follow these steps:
+To execute a simple set of tests targeting a single hook, follow these steps:
 
 1. Create a "Da Vinci CRD Server v2.2.1 Test Suite" session.
 1. Select group "1 Discovery" from the list at the left and click the "RUN TESTS" button
@@ -47,11 +47,11 @@ group as described in [Quick Start](#quick-start). For a complete run, exercise 
 hook group under "3 Hooks": "3.1 appointment-book", "3.2 encounter-start",
 "3.3 order-select", "3.4 order-sign", "3.5 order-dispatch", and "3.6 encounter-discharge".
 
-### Cross-hook Requirements
+### Cross-Invocation Requirements
 
 Once groups associated with all supported hooks have been run, execute group
-"3.7 Cross-Hook Response Validation" to confirm that cross-hook requirements
-have been met. These tests use the requests made during other groups so cannot be run
+"3.7 Cross-Invocation Response Validation" to confirm that cross-invocation requirements
+have been met. These tests use the requests made during other groups so they cannot be run
 before they have been run.
 
 ### Specific Coverage Responses

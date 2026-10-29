@@ -1,8 +1,8 @@
 # Da Vinci CRD Client v2.2.1 Test Suite Testing Instructions
 
 This document provides a step-by-step guide for using the Da Vinci CRD Client v2.2.1 Test Suite to test
-a **CRD client**, including instructions for a [demonstration execution](#demonstration-execution)
-against the public [CRD client reference implementation](https://crd-request-generator.davinci.hl7.org/).
+a **CRD client**, including instructions for a [demonstration execution](#demonstration-executions)
+against the public [Da Vinci BR Provider reference implementation](https://br-provider.davinci.hl7.org/).
 
 ## Pre-execution Setup and Required Information
 
@@ -18,14 +18,14 @@ To run against the Da Vinci CRD Client v2.2.1 Test Suite, a CRD client implement
 
 Additional configuration and information is needed to demonstrate conformance to all tested requirements.
 In order to pass all tests in the suite, a CRD client implementation must
-- Be configured to make CRD hook requests to both suite's
+- Be configured to make CRD hook requests to both of the suite's
   [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
   Inferno will use requests to both endpoints to verify the client's ability to satisfy
   both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25).
 - Associate each of these endpoints with a FHIR Organization id representing the payer
   that provides the insurance coverage and is responsible for determining coverage requirements.
   Inferno will use this information to verify that Hook calls are made against the
-  [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformancedetails.html#ci-c-dev-26).
+  [correct payer's service](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/deviations.html#ci-c-dev-26).
 - Sign JWTs sent as a part of hook request authentication and provide the JSON Web Key Set (JWKS)
   containing the key used for the signature, either as a URL where it is publicly hosted or the
   raw JWKS as JSON.
@@ -62,7 +62,7 @@ you will need the following:
 Once you have that information, follow these steps:
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using your chosen version of US Core.
-1. Select the "1.1 Registration" group from the list at the left and and click
+1. Select the "1.1 Registration" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Provide the information gathered above into the associated inputs. Only the
    **CRD JWT Issuer** input, which will be used by Inferno to identify
@@ -72,10 +72,12 @@ Once you have that information, follow these steps:
    tests fail, e.g., because no JWKS was provided.
 1. Select the sub-group under "1.2 Hooks" that corresponds to a hook implemented by the
    tested client and click the "RUN TESTS" button in the upper right.
-1. Select the response types Inferno should respond with under the **Response types to return
-   from [hook name] hook requests** input (the options depend on which hook was chosen).
-1. Click the "SUBMIT" button and a "User Action Required" dialog will be appear asking for
-   hook invocations to be made against the Inferno's simulated service endpoint.
+1. Leave the **Response generation approach for [hook name]** input set to "Create simple mocks
+   based on selected response types" and select the response types Inferno should respond with
+   under the **Response types to return from [hook name] hook requests** input (the options
+   depend on which hook was chosen).
+1. Click the "SUBMIT" button and a "User Action Required" dialog will appear asking for
+   hook invocations to be made against Inferno's simulated service endpoint.
 1. Make one or more hook invocations of the target hook against Inferno's simulated service
    endpoint, including in the request a JWT with the `iss` field equal to the value provided
    in the **CRD JWT Issuer** input. If you make a request with a different `iss`
@@ -101,15 +103,24 @@ group as described in [Quick Start](#quick-start).
 
 ### Customizing Responses
 
-The "Custom response template for [hook name] hook requests" input can be used to customize the hook
-responses to better fit the configuration of the tested CRD client. When this input is populated,
-the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
+Each hook group, as well as the "Additional Hook Invocations" group under "1.4 Cross-Invocation
+Requirements", has a **Response generation approach for [hook name]** input that determines how
+Inferno builds its responses:
+- "Create simple mocks based on selected response types" (default): Inferno
+  [mocks](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+  each response type selected in the **Response types to return from [hook name] hook requests** input.
+- "Generate responses based on a tester-provided template": Inferno builds responses from the
+  [template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  provided in the **Custom response template for [hook name] hook requests** input, which can be
+  tailored to better fit the configuration of the tested CRD client.
+
+Only the input for the selected approach is displayed and used. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
-### Cross Hook Verification
+### Cross-Invocation Requirements
 
-After running one or more hook groups, run group "1.4 Cross Hook" to check if the client
+After running one or more hook groups, run group "1.4 Cross-Invocation Requirements" to check if the client
 has met requirements that must be demonstrated across all hook requests, but aren't required for each hook invocation.
 For example, clients must have received and attested to display support of the [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
 response type including all must support elements on the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
@@ -119,17 +130,17 @@ Re-run these tests to re-evaluate after making additional requests with adjusted
 (see [Customizing Responses](#customizing-responses)) so that the requisite support is
 demonstrated.
 
-### Long-running Hook Requests
+### Long-Running Hook Requests
 
-Run the "Long-running Hook Request" group under "1.3 Scenarios" to test that users can continue working during long-running
-responses. Inferno will pause for a specified number of seconds (at least 5) before responding to a hook
+Run the "Long-Running Hook Request" group under "1.3 Scenarios" to test that users can continue working during long-running
+responses. Inferno will pause for a specified number of seconds (at least 15) before responding to a hook
 invocation made during this test to allow testers to verify and demonstrate this capability in the tested
 CRD client.
 
 ### User Access Level Scoping
 
-Run the "User Access Level Scoping" group under "1.3 Scenarios" to demonstrate that FHIR API and prefetch
-access to payer data is scoped to the EHR user's access level.
+Run the "User Access Level Scoping" group under "1.3 Scenarios" to demonstrate that access to
+FHIR API and prefetch data provided by the CRD client is scoped to the user's access level.
 Provide a reference to a resource that a full-access user can read and a limited-access user cannot, then
 invoke any supported hook once as each user for the same order, appointment, or encounter. Inferno will use
 the access token from each request to read the target resource and compare the two requests. If the target
@@ -147,13 +158,14 @@ be run after the hook tests.
 
 A primary requirement for running the FHIR API tests is an access token for Inferno to send in the
 `Authorization` header that will grant the access needed to verify API support. The token provided
-in the most recent CDS Hooks invocation will be used by default. However, these should be short-lived
-per the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#passing-the-access-token-to-the-cds-service)
+in the most recent CDS Hooks invocation made in one of the "Hooks" sub-groups or the "Additional
+Hook Invocations" group will be used by default. However, these should be short-lived
+per the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#passing-the-access-token-to-the-cds-service),
 potentially only remaining active during the hook invocation itself. Since the FHIR API tests are performed
 outside of a hook invocation and are long-running due to their comprehensive nature, the token provided
-on in the hook request may not be usable for these tests. If the token is not usable, testers
+in the hook request may not be usable for these tests. If the token is not usable, testers
 may override the token and provide an appropriate token (and other details such as a refresh token and corresponding
-endpoints) in the "OAuth Credentials" input of the FHIR API tests. Note that the token
+endpoints) in the **OAuth Credentials** input of the FHIR API tests. Note that the token
 must have the same access scopes as those provided during the hook requests.
 
 ## Interpreting Results
@@ -169,7 +181,7 @@ With those caveats, a passing execution of this suite would include:
 - Passing all other groups, including
   - 1.1 Registration
   - 1.3 Scenarios
-  - 1.4 Cross Hook
+  - 1.4 Cross-Invocation Requirements
   - 2 FHIR API
 
 ## Demonstration Executions
@@ -197,13 +209,13 @@ a realistic UI to interact with the Inferno CRD client tests.
 
 1. Create a "Da Vinci CRD Client v2.2.1 Test Suite" session using any "US Core Version".
 1. Select the "Da Vinci BR Provider Reference Implementation" option from the Preset dropdown in the upper left.
-1. In a separate tab, navigate to https://br-provider.davinci.hl7.org/ and login (no password
+1. In a separate tab, navigate to https://br-provider.davinci.hl7.org/ and log in (no password
    needed) as a practitioner (any).
 1. Configure the connection to Inferno's simulated CRD server by:
    1. Clicking the gear icon in the upper right to open the settings dialog.
    1. Select the "Payor" tab
    1. Use the "Server" dropdown to select the "Custom" option.
-   1. In the "CDS Services URL" input, put `https://inferno.healthit.gov/suites/custom/crd_client_v221/cds-services`.
+   1. In the "CDS Services URL" field, put `https://inferno.healthit.gov/suites/custom/crd_client_v221/cds-services`.
    1. Click the "Bypass payor-handled check" box.
    1. Click the "Save" button and close the dialog to complete the setup.
 1. Select a patient (any) to open their chart.
@@ -217,7 +229,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    a few moments to analyze the interactions and check them for conformance. After it has done
    so, a new dialog will appear asking the tester to confirm that the returned responses
    were displayed or otherwise made available to the user appropriately, including
-   a instructions card, a external reference card, and the coverage-information system action.
+   an instructions card, an external reference card, and the coverage-information system action.
    Determining the right response is a judgement call, but return to the br-provider tab
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, only the two cards were clearly displayed, but the coverage-information
@@ -232,7 +244,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    a few moments to analyze the interactions and check them for conformance. After it has done
    so, a new dialog will appear asking the tester to confirm that the returned responses
    were displayed or otherwise made available to the user appropriately, including
-   a instructions card, a external reference card, and the coverage-information system action.
+   an instructions card, an external reference card, and the coverage-information system action.
    Determining the right response is a judgement call, but return to the br-provider tab
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, only the two cards were clearly displayed, but the coverage-information
@@ -247,7 +259,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    a few moments to analyze the interactions and check them for conformance. After it has done
    so, a new dialog will appear asking the tester to confirm that the returned responses
    were displayed or otherwise made available to the user appropriately, including
-   a instructions card, a external reference card, and the coverage-information system action.
+   an instructions card, an external reference card, and the coverage-information system action.
    Determining the right response is a judgement call, but return to the br-provider tab
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, the two cards were clearly displayed, and the details from the coverage-information
@@ -262,7 +274,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    a few moments to analyze the interactions and check them for conformance. After it has done
    so, a new dialog will appear asking the tester to confirm that the returned responses
    were displayed or otherwise made available to the user appropriately, including
-   a instructions card, a external reference card, and the coverage-information system action.
+   an instructions card, an external reference card, and the coverage-information system action.
    Determining the right response is a judgement call, but return to the br-provider tab
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, the two cards were clearly displayed, and the details from the coverage-information
@@ -276,7 +288,7 @@ a realistic UI to interact with the Inferno CRD client tests.
    a few moments to analyze the interactions and check them for conformance. After it has done
    so, a new dialog will appear asking the tester to confirm that the returned responses
    were displayed or otherwise made available to the user appropriately, including
-   a instructions card, a external reference card, and the coverage-information system action.
+   an instructions card, an external reference card, and the coverage-information system action.
    Determining the right response is a judgement call, but return to the br-provider tab
    and decide what you see and make the corresponding attestation in Inferno. At the time of
    this writing, no card details were displayed, but the systemAction details are still available
@@ -284,7 +296,7 @@ a realistic UI to interact with the Inferno CRD client tests.
 
 Those instructions demonstrate the bulk of the CRD ordering workflow. Not all tests are
 expected to pass. You can also
-- Login as a patient to schedule an appointment and verify the appointment-book hook behavior
+- Log in as a patient to schedule an appointment and verify the appointment-book hook behavior
   against Inferno.
 - Use the options to specify [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses),
   e.g., to demonstrate changing coverage-information details for the order across
@@ -294,7 +306,7 @@ expected to pass. You can also
 
 ### crd-request-generator reference implementation (old)
 
-The old [crd-request-generator public CRD reference client](https://crd-request-generator.davinci.hl7.org/),
+The old [crd-request-generator public CRD reference client](https://crd-request-generator.davinci.hl7.org/)
 supports the order-sign hook and can be used to demonstrate suite execution with the
 following steps. Note that this reference implementation has not been updated for the
 2.2.1 version of the CRD IG so many failures are expected during this execution. However,

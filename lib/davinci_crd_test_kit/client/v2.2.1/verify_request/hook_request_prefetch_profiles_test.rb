@@ -23,7 +23,7 @@ module DaVinciCRDTestKit
         including that the provided resources, which are part of the data included in the hook invocation,
         [conform to the appropriate CRD profile](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/hooks.html#ci-c-hook-21).
 
-        During this test, Inferno will verify that each FHIR resources found under the `prefetch`
+        During this test, Inferno will verify that each FHIR resource found under the `prefetch`
         field of each request body conforms to the appropriate CRD profile.
       )
 

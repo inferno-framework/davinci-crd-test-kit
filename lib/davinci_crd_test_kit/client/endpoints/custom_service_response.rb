@@ -9,6 +9,17 @@ module DaVinciCRDTestKit
     include DaVinciCRDTestKit::ReplaceTokens
     include DaVinciCRDTestKit::HookRequestDataAccess
 
+    EXTENSION_PREFIX = 'gov.healthit.inferno.test-kits.davinci-crd'.freeze
+    INCLUDE_FOR_SERVICES_EXTENSION = "#{EXTENSION_PREFIX}.includeForServices".freeze
+    INCLUSION_CRITERIA_EXTENSION = "#{EXTENSION_PREFIX}.inclusionCriteria".freeze
+    RESOURCE_SELECTION_CRITERIA_EXTENSION = "#{EXTENSION_PREFIX}.resourceSelectionCriteria".freeze
+    # deprecated names still accepted for backwards compatibility
+    LEGACY_EXTENSION_NAMES = {
+      INCLUDE_FOR_SERVICES_EXTENSION => 'com.inferno.includeForServices',
+      INCLUSION_CRITERIA_EXTENSION => 'com.inferno.inclusionCriteria',
+      RESOURCE_SELECTION_CRITERIA_EXTENSION => 'com.inferno.resourceSelectionCriteria'
+    }.freeze
+
     def custom_response_template
       @custom_response_template ||=
         JSON.parse(result.input_json)
@@ -169,7 +180,7 @@ module DaVinciCRDTestKit
       parent[list_element]&.select! do |object|
         next false unless enabled_on_service?(object)
 
-        remove_extension(object, 'com.inferno.includeForServices')
+        remove_extension(object, INCLUDE_FOR_SERVICES_EXTENSION)
 
         if object_has_inclusion_criteria?(object)
           if object_is_a_default?(object)
@@ -190,7 +201,7 @@ module DaVinciCRDTestKit
     end
 
     def enabled_on_service?(object)
-      services = get_extension_value(object, 'com.inferno.includeForServices')
+      services = get_extension_value(object, INCLUDE_FOR_SERVICES_EXTENSION)
       return true unless services.present?
 
       services.split(',').map(&:strip).any? { |url| request.env['PATH_INFO'].include?(url) }
@@ -201,7 +212,7 @@ module DaVinciCRDTestKit
     end
 
     def default_extension_name(list_element)
-      "com.inferno.internal.default#{list_element.capitalize}"
+      "#{EXTENSION_PREFIX}.internal.default#{list_element.capitalize}"
     end
 
     def defaults_extension?(object, list_element)
@@ -225,11 +236,11 @@ module DaVinciCRDTestKit
     end
 
     def get_object_inclusion_criteria_extension_value(object)
-      get_extension_value(object, 'com.inferno.inclusionCriteria')
+      get_extension_value(object, INCLUSION_CRITERIA_EXTENSION)
     end
 
     def remove_inclusion_criteria(object)
-      remove_extension(object, 'com.inferno.inclusionCriteria')
+      remove_extension(object, INCLUSION_CRITERIA_EXTENSION)
     end
 
     def object_has_resource_selection_criteria?(object)
@@ -237,11 +248,11 @@ module DaVinciCRDTestKit
     end
 
     def get_object_resource_selection_criteria_extension_value(object)
-      get_extension_value(object, 'com.inferno.resourceSelectionCriteria')
+      get_extension_value(object, RESOURCE_SELECTION_CRITERIA_EXTENSION)
     end
 
     def remove_resource_selection_criteria(object)
-      remove_extension(object, 'com.inferno.resourceSelectionCriteria')
+      remove_extension(object, RESOURCE_SELECTION_CRITERIA_EXTENSION)
     end
 
     def object_included_for_this_request?(object)
@@ -275,13 +286,17 @@ module DaVinciCRDTestKit
 
     def remove_extension(parent, extension)
       parent['extension']&.delete(extension)
+      parent['extension']&.delete(LEGACY_EXTENSION_NAMES[extension])
       return unless parent['extension'].blank?
 
       parent.delete('extension')
     end
 
     def get_extension_value(parent, extension)
-      parent.dig('extension', extension)
+      value = parent.dig('extension', extension)
+      return value unless value.nil? && LEGACY_EXTENSION_NAMES.key?(extension)
+
+      parent.dig('extension', LEGACY_EXTENSION_NAMES[extension])
     end
 
     def default_coverage_information_elements(coverage_info_ext)

@@ -123,7 +123,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientJwtIdsUniqueTest do
     expect(result_messages).to be_empty
   end
 
-  it 'includes requests from scenario groups left out of the cross hook analysis' do
+  it 'includes requests from scenario groups left out of the cross-invocation analysis' do
     create_hook_request("Bearer #{jwt('shared-jti')}")
     create_hook_request("Bearer #{jwt('shared-jti', iat: 1.minute.ago.to_i)}",
                         hook: 'encounter-start', hook_instance: 'scenario',

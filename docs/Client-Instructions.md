@@ -11,7 +11,7 @@ follow these steps:
 
 1. Create a "Da Vinci CRD Client v2.0.1 Test Suite" session using the default "SMART App Launch Version",
    which will not be used.
-1. Select the "1.1 Client Registration" group from the list at the left and and click
+1. Select the "1.1 Client Registration" group from the list at the left and click
    the "RUN TESTS" button in the upper right.
 1. Provide the **CRD JWT Issuer** input, which will be used by Inferno to identify
    CDS Hook invocation requests coming from the client under test. You can also provide
@@ -23,13 +23,13 @@ follow these steps:
    tested client and click the "RUN TESTS" button in the upper right.
 1. Select the response types Inferno should respond with under the **Response types to return
    from [hook name] hook requests** input (the options depend on which hook was chosen).
-1. Click the "SUBMIT" button and a "User Action Required" dialog will be appear asking for
-   hook invocations to be made against the Inferno's simulated service endpoint.
+1. Click the "SUBMIT" button and a "User Action Required" dialog will appear asking for
+   hook invocations to be made against Inferno's simulated service endpoint.
 1. Make one or more hook invocations of the target hook against Inferno's simulated service
    endpoint, including in the request a JWT with the `iss` field equal to the value provided
    in the **CRD JWT Issuer** input. If you make a request with a different `iss`
    value, Inferno will not be able to link the request to the test session and will not
-   respond or analyze the request.
+   respond to or analyze the request.
 1. Once all requests have been made, click the link in the "User Action Required" dialog
    and Inferno will analyze the requests to determine whether they were conformant.
 1. Assuming that at least one request was successfully made, a second "User Action Required"
@@ -48,9 +48,9 @@ group as described in [Quick Start](#quick-start).
 
 ### Customizing Responses
 
-The "Custom response template for [hook name] hook requests" input can be used to customize the hook
+The **Custom response template for [hook name] hook requests** input can be used to customize the hook
 responses to better fit the configuration of the tested CRD client. When this input is populated,
-the corresponding "Response types to return from [hook name] hook requests" input is ignored. See the
+the corresponding **Response types to return from [hook name] hook requests** input is ignored. See the
 [documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
@@ -75,8 +75,8 @@ are included in CRD STU 2.
 When starting the CRD client suite session, choose the appropriate version of the SMART
 specification in the "SMART App Launch Version" suite option.
 
-Running the tests require 4 types of inputs:
-- **FHIR Endpoint (required)**: the base FHIR url
+Running the tests requires 4 types of inputs:
+- **FHIR Endpoint (required)**: the base FHIR URL
 - **EHR Launch Credentials**: SMART client details corresponding to the version of SMART chosen
   when starting the session.
 - **[ResourceType] Resources**: FHIR resource of the [ResourceType] that Inferno will use to
@@ -85,7 +85,7 @@ Running the tests require 4 types of inputs:
   Inferno will use to perform a `read` interaction.
 
 NOTE: the resources and resource IDs for testing reads and updates are not required, but if
-no details or provided, those tests will be skipped.
+no details are provided, those tests will be skipped.
 
 To run them, follow these steps:
 1. Choose group "2 FHIR API" and click the "RUN ALL TESTS" button in the upper right.
@@ -109,8 +109,8 @@ you can do so using the following steps:
    which will not be used.
 1. Select the *CRD Request Generator Reference Implementation* option from the Preset dropdown in the upper left.
 1. Select the "1.2.4 order-sign" hook group on the left menu and click on the *RUN TESTS* button in the upper right.
-1. Select the response types Inferno should respond with under the "Response types to return
-   from order-sign hook requests" input and click the "SUBMIT" button.
+1. Select the response types Inferno should respond with under the **Response types to return
+   from order-sign hook requests** input and click the "SUBMIT" button.
 1. A "User Action Required" dialog will appear asking for order-sign hook invocations to be
    made against Inferno's simulated CRD server.
 1. Open the [reference client](https://crd-request-generator.davinci.hl7.org/) in another tab/browser.

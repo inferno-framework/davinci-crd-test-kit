@@ -13,9 +13,9 @@ module DaVinciCRDTestKit
         This group checks CRD requirements that pertain to specific scenarios
         that CRD clients need to handle.
 
-        These scenarios test specific situations and conformance details of requests
-        and responses beyond those required for the scenario and for Inferno to
-        recognize CRD client requests are not checked. Testers are expected to follow
+        These scenario tests do not check requirements beyond those required for
+        Inferno to recognize CRD client requests and confirm the exchange represents
+        the target scenario. However, testers are expected to follow
         the same workflows as used during other tests and should adhere to the
         same CRD requirements when performing these scenarios.
       DESCRIPTION
