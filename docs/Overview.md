@@ -17,7 +17,7 @@ an exchange partner for the system under test (when testing a CRD client Inferno
 a CRD server and vice-versa) and verifying that each exchange is conformant and that
 all exchanges in aggregate demonstrate the required capabilities.
 
-This test kit is [open source](#license) and freely available for use or
+This test kit is [open source](https://github.com/inferno-framework/davinci-crd-test-kit/?tab=readme-ov-file#license) and freely available for use or
 adoption by the health IT community including EHR vendors, payer systems, health app
 developers, and testing labs. It is built using the [Inferno
 Framework](https://inferno-framework.github.io/). The Inferno Framework is
@@ -30,11 +30,11 @@ The CRD Test Kit contains test suites to test the two actors defined by the CRD 
 - CRD clients: Clients are responsible for initiating CDS Hooks calls and consuming
   received decision support. They are also responsible for returning data requested by the CRD server
   needed to provide that decision support. This role is played by provider systems
-  in which orders are placed, such as EHRs. See the [Client Details](Client-Details.md) page
+  in which orders are placed, such as EHRs. See the [Client Details](Client-Details) page
   for more information.
-- CRD servers: Servers are responsible for responding to CDS Hooks calls and responding with appropriate
+- CRD servers: Servers are responsible for receiving CDS Hooks calls and responding with appropriate
   decision support, which may involve using FHIR requests to gather more data from
-  the client. See the [Server Details](Server-Details.md) page for more information.
+  the client. See the [Server Details](Server-Details) page for more information.
 
 In each case, content provided by the system under test will be checked individually
 for conformance and in aggregate to determine that the full set of features 
@@ -71,9 +71,9 @@ While these tests cover core aspects of the CRD IG, there are known limitations:
   of requests or responses will elicit specific behavior. It also does not want to
   dictate to the systems being tested the specifics of its data, configuration, or
   business rules. For these reasons, testers need to provide Inferno with
-  details the requests to make or responses to use.
+  details of the requests to make or responses to use.
 
-For a details on specific specific limitations, detailed requirements, and known
+For details on specific limitations, detailed requirements, and known
 issues, please consult the following resources: 
 - [Client Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#testing-limitations)
 - [Server Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details#testing-limitations)
@@ -102,7 +102,7 @@ solely constitute full CRD IG conformance. Systems should also meet requirements
 attestation or other means.
 
 For specific testing prerequisites and detailed test descriptions, refer to:
-* [Client v2.0.1 Suite Testing Instructions](Client-Instructions.md)
-* [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1.md)
-* [Server v2.0.1 Suite Testing Instructions](Server-Instructions.md)
-* [Server v2.2.1 Suite Testing Instructions](Server-Instructions-v2.2.1.md)
+* [Client v2.0.1 Suite Testing Instructions](Client-Instructions)
+* [Client v2.2.1 Suite Testing Instructions](Client-Instructions-v2.2.1)
+* [Server v2.0.1 Suite Testing Instructions](Server-Instructions)
+* [Server v2.2.1 Suite Testing Instructions](Server-Instructions-v2.2.1)

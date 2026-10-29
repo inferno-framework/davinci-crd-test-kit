@@ -14,7 +14,7 @@ module DaVinciCRDTestKit
         use it to protect against replay attacks. A CDS Service does so by rejecting a `jti` it has
         already received, so each hook request must carry a new JWT with its own `jti`.
 
-        During this test, Inferno will check that no `jti` value was sent on more than one of the hook
+        During this test, Inferno will verify that no `jti` value was sent on more than one of the hook
         requests it processed during these tests, including those made during the scenarios.
       DESCRIPTION
 

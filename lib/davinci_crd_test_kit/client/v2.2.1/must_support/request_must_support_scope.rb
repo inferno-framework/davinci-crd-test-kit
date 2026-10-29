@@ -9,7 +9,7 @@ module DaVinciCRDTestKit
         'the tester indicated that the CRD client does not support this resource type'.freeze
 
       # Reads the requests directly rather than going through `load_tagged_requests`, which would
-      # also associate every cross hook request with this test's own result. Only the relevant ones
+      # also associate every cross-invocation request with this test's own result. Only the relevant ones
       # are associated, by `associate_requests`.
       def must_support_requests
         @must_support_requests ||=

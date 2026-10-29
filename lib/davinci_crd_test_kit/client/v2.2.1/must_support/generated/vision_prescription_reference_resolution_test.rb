@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
         those profiles must be observed. Otherwise, a referenced resource must conform to any one of
         the element's target profiles.
 
-        During this test, Inferno will check that for each must support Reference element listed
+        During this test, Inferno will verify that for each must support Reference element listed
         below that was populated, at least one of its references resolved to a resource
         conforming to each target profile listed for the element, or to any one of them where the
         list says so. Target profiles for resource types the tester indicated the CRD client does
@@ -37,8 +37,8 @@ module DaVinciCRDTestKit
         other tests will fail in this case.
 
         Inferno will consider the same hook requests as the must support
-        element tests: those made during the latest run of each `Hooks` subgroup and the
-        `Additional Hook Invocations for Cross Hook Support Demonstration` group.
+        element tests: those made during the latest run of each "Hooks" subgroup and the
+        "Additional Hook Invocations" group.
 
         For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
         page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)

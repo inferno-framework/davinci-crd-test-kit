@@ -46,7 +46,7 @@ module DaVinciCRDTestKit
           client_access_token: { name: :encounter_discharge_client_access_token },
           client_fhir_server: { name: :encounter_discharge_client_fhir_server },
           crd_jwks_keys_json: { name: :encounter_discharge_crd_jwks_keys_json },
-          custom_response_template: { name: :encounter_discharge_custom_response_template },
+          response_approach: { name: :encounter_discharge_response_approach },
           selected_response_types: { name: :encounter_discharge_selected_response_types }
         },
         outputs: {

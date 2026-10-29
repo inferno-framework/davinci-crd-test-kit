@@ -1,4 +1,5 @@
 require_relative '../../client_wait_messages'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -7,7 +8,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ClientWaitMessages
 
       id :crd_v221_client_service_registration_attestation
-      title 'CRD client registers Inferno'
+      title "CRD client registers Inferno's simulated CRD servers"
       description %(
         Inferno simulates two CRD servers which can be discovered at the following endpoints:
         - Complete Prefetch Services Discovery Endpoint: #{ClientURLs.discovery_url}
@@ -25,14 +26,16 @@ module DaVinciCRDTestKit
           hook request field).
 
         Testers can make hook requests during this test, but Inferno will never return
-        a successful response. Typical error responses include:
+        a successful response while waiting here as hook requests are tested during other steps.
+        Typical error responses include:
         - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
           the request and associated it with this session, but will not return successful hook responses
           during this test.
         - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
           to associate the request with this session.
       )
-      attestation
+      flag_as_attestation
+      flag_as_tester_initiated_exchange
       verifies_requirements 'cds-hooks_3.0.0-ballot@174'
 
       config options: { hook_requests_unavailable: true }
@@ -40,25 +43,15 @@ module DaVinciCRDTestKit
       input :cds_jwt_iss
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
+            description: ClientInputHelper.service_organization_id_description(
+              'complete', ClientURLs.discovery_url
             ),
             type: 'text',
             optional: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. This Organization must be referenced
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
+            description: ClientInputHelper.service_organization_id_description(
+              'subset', ClientURLs.prefetch_subset_discovery_url
             ),
             type: 'text',
             optional: true
@@ -114,7 +107,7 @@ module DaVinciCRDTestKit
           message: <<~MESSAGE
             #### Register Inferno's CRD Servers
 
-            Setup the CRD client to connect to and trust Inferno's CRD servers
+            Set up the CRD client to connect to and trust Inferno's CRD servers
             and their services using the information below. Test connectivity
             if desired and then respond to the following statement as appropriate:
 
@@ -146,12 +139,12 @@ module DaVinciCRDTestKit
 
             *Responses*
 
-            During this test, Inferno will always respond with an error, but the details of the error will
-            indicate whether connectivity was successful:
-            - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded: Inferno recognized
-              the request and associated it with this session.
-            - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed: Inferno was not able
-              to associate the request with this session.
+            During this test, Inferno will always respond with an error to hook requests
+            but the details of the error will indicate whether connectivity was successful:
+            - HTTP 422 (*Unprocessable Content*) - indicates that connectivity succeeded:
+              Inferno recognized the request and associated it with this session.
+            - HTTP 500 (*Internal Server Error*) - indicates that connectivity failed:
+              Inferno was not able to associate the request with this session.
           MESSAGE
         )
       end

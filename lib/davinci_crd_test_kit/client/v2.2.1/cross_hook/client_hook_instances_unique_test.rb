@@ -13,7 +13,7 @@ module DaVinciCRDTestKit
         request be globally unique so that it can be used for tracking
         and auditing.
 
-        During this test, Inferno will check that across all hook invocations performed during these
+        During this test, Inferno will verify that across all hook invocations performed during these
         tests, the `hookInstance` field was never reused.
       DESCRIPTION
 

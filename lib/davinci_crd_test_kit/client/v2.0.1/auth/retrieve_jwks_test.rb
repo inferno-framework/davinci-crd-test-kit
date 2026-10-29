@@ -22,7 +22,7 @@ module DaVinciCRDTestKit
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
             description: %(
-            The client's registered JWK Set containing it's public key, either
+            The client's registered JWK Set containing its public key, either
             as a publicly accessible url containing the JWKS, or the raw JWKS.
             Run or re-run the **Client Registration** group to set or
             change this value. Used if the `jku` header is not found in the auth token jwt.

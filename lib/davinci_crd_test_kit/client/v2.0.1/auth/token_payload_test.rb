@@ -1,11 +1,13 @@
 require_relative '../../client_hook_request_validation'
 require_relative '../../jwt_claim_types'
+require_relative '../../jwt_expiration'
 
 module DaVinciCRDTestKit
   module V201
     class TokenPayloadTest < Inferno::Test
       include ClientHookRequestValidation
       include DaVinciCRDTestKit::JwtClaimTypes
+      include DaVinciCRDTestKit::JwtExpiration
       include ClientURLs
 
       id :crd_v201_token_payload
@@ -33,6 +35,10 @@ module DaVinciCRDTestKit
         REQUIRED_CLAIMS.dup
       end
 
+      def hook_name
+        config.options[:hook_name]
+      end
+
       def hook_url
         inferno_base_url + config.options[:hook_path]
       end
@@ -46,6 +52,8 @@ module DaVinciCRDTestKit
         auth_tokens_jwk = JSON.parse(auth_tokens_jwk_json)
         skip_if auth_tokens_list.empty?, 'No Authorization tokens produced from the previous tests.'
         skip_if auth_tokens_jwk.empty?, 'No Authorization token JWK produced from the previous test.'
+        # the same requests, in the same order, that the decode test took the tokens from
+        load_tagged_requests(hook_name) if hook_name.present?
 
         auth_tokens_jwk.each_with_index do |auth_token_jwk, index|
           @request_number = index + 1
@@ -75,9 +83,9 @@ module DaVinciCRDTestKit
               JWT::JWK.import(jwk).public_key,
               true,
               algorithms: [alg],
-              exp_leeway: 60,
               iss: cds_jwt_iss,
               aud: hook_url,
+              verify_expiration: false, # checked against when the request was received below
               verify_not_before: false,
               verify_iat: false,
               verify_jti: true,
@@ -87,6 +95,9 @@ module DaVinciCRDTestKit
           rescue StandardError => e
             add_message('error', "#{request_number}Token validation error: #{e.message}")
           end
+
+          expiration_error = jwt_expiration_error(unverified_payload, requests[index])
+          add_message('error', "#{request_number}#{expiration_error}") if expiration_error
 
           jwt_claim_type_errors(unverified_payload).each do |message|
             add_message('error', "#{request_number}#{message}")

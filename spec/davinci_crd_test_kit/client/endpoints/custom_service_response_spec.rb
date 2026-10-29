@@ -4,6 +4,10 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
   let(:suite_id) { 'crd_client' }
   let(:test) { DaVinciCRDTestKit::V201::OrderSignReceiveRequestTest }
 
+  let(:include_for_services_ext) { described_class::INCLUDE_FOR_SERVICES_EXTENSION }
+  let(:inclusion_criteria_ext) { described_class::INCLUSION_CRITERIA_EXTENSION }
+  let(:resource_selection_criteria_ext) { described_class::RESOURCE_SELECTION_CRITERIA_EXTENSION }
+
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
 
@@ -104,7 +108,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         }]
       },
       extension: {
-        'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
+        resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
       } }
   end
 
@@ -137,7 +141,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         }]
       },
       extension: {
-        'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
+        resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
       } }
   end
 
@@ -159,7 +163,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         }]
       },
       extension: {
-        'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
+        resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder)'
       } }
   end
 
@@ -207,7 +211,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       instructions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       response_template = { cards: [instructions_card_template] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
@@ -234,7 +238,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_delete_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
+        { resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
       response_template = { cards: [], systemActions: [system_action_template_delete_with_tokens] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
@@ -346,7 +350,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         type: 'delete',
         description: 'remove order',
         extension: {
-          'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest)'
+          resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest)'
         }
       }
       suggestions_card_template['suggestions'][0]['actions'] << {
@@ -360,7 +364,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         description: 'add service detail',
         resource: { extension: [{ url: 'test', valueString: 'not_added' }] },
         extension:
-          { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(ServiceRequest).exists()' }
+          { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(ServiceRequest).exists()' }
       }
       response_template = { cards: [suggestions_card_template] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -400,9 +404,9 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       instructions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       system_action_template_static['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       response_template = { cards: [instructions_card_template], systemActions: [system_action_template_static] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
@@ -430,9 +434,9 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       instructions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
       suggestions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'default' }
+        { inclusion_criteria_ext => 'default' }
       response_template = { cards: [instructions_card_template, suggestions_card_template] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
                 order_sign_custom_response_template: response_template.to_json)
@@ -462,9 +466,9 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       instructions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()' }
       suggestions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'default' }
+        { inclusion_criteria_ext => 'default' }
 
       response_template = { cards: [instructions_card_template, suggestions_card_template] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -494,11 +498,11 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       instructions_card_template['extension'] =
-        { 'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()' }
+        { inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()' }
       system_action_template_static['extension'] =
         {
           already: 'defined',
-          'com.inferno.inclusionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()'
+          inclusion_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder).exists()'
         }
       response_template = { cards: [instructions_card_template], systemActions: [system_action_template_static] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -516,7 +520,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       expect(cards[0]['extension']).to be_nil
       expect(actions.length).to eq(1)
       expect(actions[0]['extension']).to be_present
-      expect(actions[0]['extension']['com.inferno.inclusionCriteria']).to be_nil
+      expect(actions[0]['extension']['gov.healthit.inferno.test-kits.davinci-crd.inclusionCriteria']).to be_nil
     end
 
     it 'returns success and includes actions with replaced tokens' do
@@ -561,7 +565,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_delete_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder)' }
+        { resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder)' }
 
       response_template = { cards: [],
                             systemActions: [system_action_template_delete_with_tokens] }
@@ -602,7 +606,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_delete_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource' }
+        { resource_selection_criteria_ext => 'context.draftOrders.entry.resource' }
       response_template = { cards: [],
                             systemActions: [system_action_template_delete_with_tokens] }
       run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -659,11 +663,11 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_update_extension_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria':
+        { 'gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria':
             'context.draftOrders.entry.select(resource.ofType(ServiceRequest) | resource.ofType(MedicationRequest))' }
       system_action_template_update_extension_default['extension'] =
-        { 'com.inferno.inclusionCriteria': 'default',
-          'com.inferno.resourceSelectionCriteria':
+        { inclusion_criteria_ext => 'default',
+          'gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria':
             'context.draftOrders.entry.select(resource.ofType(ServiceRequest) | resource.ofType(DeviceRequest))' }
       response_template = { cards: [],
                             systemActions: [system_action_template_update_extension_with_tokens,
@@ -741,11 +745,11 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
       )
 
       system_action_template_update_extension_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria':
+        { 'gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria':
             'context.draftOrders.entry.select(resource.ofType(ServiceRequest) | resource.ofType(MedicationRequest))' }
       system_action_template_update_extension_default['extension'] =
-        { 'com.inferno.inclusionCriteria': 'default',
-          'com.inferno.resourceSelectionCriteria':
+        { inclusion_criteria_ext => 'default',
+          'gov.healthit.inferno.test-kits.davinci-crd.resourceSelectionCriteria':
             'context.draftOrders.entry.select(resource.ofType(ServiceRequest) | resource.ofType(DeviceRequest))' }
       suggestions_card_template['suggestions'][0]['actions'] << system_action_template_update_extension_with_tokens
       suggestions_card_template['suggestions'][0]['actions'] << system_action_template_update_extension_default
@@ -808,7 +812,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_update_extension_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
+        { resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(MedicationRequest)' }
 
       response_template = { cards: [],
                             systemActions: [system_action_template_update_extension_with_tokens] }
@@ -860,7 +864,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         encryption_method: 'RS384'
       )
       system_action_template_update_extension_with_tokens['extension'] =
-        { 'com.inferno.resourceSelectionCriteria': 'context.draftOrders.entry.resource.ofType(NutritionOrder)' }
+        { resource_selection_criteria_ext => 'context.draftOrders.entry.resource.ofType(NutritionOrder)' }
       system_action_template_update_extension_with_tokens[:resource][:extension] << {
         url: 'to_replace',
         valueString: 'new_value'
@@ -977,7 +981,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         .to_not eq(defaults_from_empty['extension'][4]['valueString'])
     end
 
-    describe 'com.inferno.includeForServices filter' do
+    describe 'gov.healthit.inferno.test-kits.davinci-crd.includeForServices filter' do
       let(:token) do
         jwt_helper.build(
           aud: order_sign_url,
@@ -1001,7 +1005,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes cards when the extension value matches the request URL' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices': 'cds-services/order-sign-service'
+          include_for_services_ext => 'cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
         run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -1016,7 +1020,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'excludes cards when the extension value does not match the request URL' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
+          include_for_services_ext => 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [instructions_card_template] }
         run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -1029,7 +1033,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes cards when any one of multiple comma-delimited service URLs matches' do
         instructions_card_template['extension'] = {
-          'com.inferno.includeForServices':
+          'gov.healthit.inferno.test-kits.davinci-crd.includeForServices':
             'prefetch-subset/cds-services/order-sign-subset, cds-services/order-sign-service'
         }
         response_template = { cards: [instructions_card_template] }
@@ -1043,7 +1047,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'includes systemActions when the extension value matches the request URL' do
         system_action_template_static['extension'] = {
-          'com.inferno.includeForServices': 'cds-services/order-sign-service'
+          include_for_services_ext => 'cds-services/order-sign-service'
         }
         response_template = { cards: [], systemActions: [system_action_template_static] }
         run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -1058,7 +1062,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
       it 'excludes systemActions when the extension value does not match the request URL' do
         system_action_template_static['extension'] = {
-          'com.inferno.includeForServices': 'prefetch-subset/cds-services/order-sign-subset'
+          include_for_services_ext => 'prefetch-subset/cds-services/order-sign-subset'
         }
         response_template = { cards: [], systemActions: [system_action_template_static] }
         run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -1085,10 +1089,10 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
 
         it 'includes only subset-targeted cards when the template has cards for both endpoints' do
           complete_card = JSON.parse(instructions_card_template.to_json).merge(
-            'extension' => { 'com.inferno.includeForServices' => 'cds-services/order-sign-service' }
+            'extension' => { include_for_services_ext => 'cds-services/order-sign-service' }
           )
           subset_card = JSON.parse(instructions_card_template.to_json).merge(
-            'extension' => { 'com.inferno.includeForServices' => 'prefetch-subset/cds-services/order-sign-subset' }
+            'extension' => { include_for_services_ext => 'prefetch-subset/cds-services/order-sign-subset' }
           )
           response_template = { cards: [complete_card, subset_card] }
           run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
@@ -1100,6 +1104,73 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
           expect(cards.length).to eq(1)
           expect(cards[0]['extension']).to be_nil
         end
+      end
+    end
+
+    describe 'legacy com.inferno extension names' do
+      let(:token) do
+        jwt_helper.build(
+          aud: order_sign_url,
+          iss: example_client_url,
+          jku: "#{example_client_url}/jwks.json",
+          encryption_method: 'RS384'
+        )
+      end
+
+      before { allow(test).to receive(:suite).and_return(suite) }
+
+      def post_template(response_template)
+        run(test, cds_jwt_iss: example_client_url, order_sign_response_approach: 'custom',
+                  order_sign_custom_response_template: response_template.to_json)
+        header('Authorization', "Bearer #{token}")
+        post_json(server_endpoint, body)
+        expect(last_response).to be_ok
+        JSON.parse(last_response.body)
+      end
+
+      it 'honors com.inferno.includeForServices' do
+        matching_card = JSON.parse(instructions_card_template.to_json).merge(
+          'extension' => { 'com.inferno.includeForServices' => 'cds-services/order-sign-service' }
+        )
+        other_card = JSON.parse(instructions_card_template.to_json).merge(
+          'extension' => { 'com.inferno.includeForServices' => 'prefetch-subset/cds-services/order-sign-subset' }
+        )
+        cards = post_template({ cards: [matching_card, other_card] })['cards']
+        expect(cards.length).to eq(1)
+        expect(cards[0]['extension']).to be_nil
+      end
+
+      it 'honors com.inferno.inclusionCriteria' do
+        stub_request(:post, "#{fhirpath_url}?path=entry.resource.ofType(MedicationRequest).exists()")
+          .to_return(status: 200, body: fhirpath_false_response_body.to_json)
+        instructions_card_template['extension'] =
+          { 'com.inferno.inclusionCriteria' => 'context.draftOrders.entry.resource.ofType(MedicationRequest).exists()' }
+        expect(post_template({ cards: [instructions_card_template] })['cards'].length).to eq(0)
+      end
+
+      it 'honors com.inferno.resourceSelectionCriteria' do
+        fhirpath_result = [{ type: 'resource',
+                             element: { resourceType: 'NutritionOrder', id: 'pureeddiet-simple',
+                                        status: 'details_elided' } }]
+        stub_request(:post, "#{fhirpath_url}?path=entry.resource.ofType(NutritionOrder)")
+          .to_return(status: 200, body: fhirpath_result.to_json)
+        system_action_template_delete_with_tokens['extension'] =
+          { 'com.inferno.resourceSelectionCriteria' => 'context.draftOrders.entry.resource.ofType(NutritionOrder)' }
+        actions = post_template({ cards: [], systemActions: [system_action_template_delete_with_tokens] })
+          .fetch('systemActions')
+        expect(actions.length).to eq(1)
+        expect(actions[0]['resourceId']).to eq('NutritionOrder/pureeddiet-simple')
+        expect(actions[0]['extension']).to be_nil
+      end
+
+      it 'uses the current name over the legacy name when both are present' do
+        instructions_card_template['extension'] = {
+          include_for_services_ext => 'cds-services/order-sign-service',
+          'com.inferno.includeForServices' => 'prefetch-subset/cds-services/order-sign-subset'
+        }
+        cards = post_template({ cards: [instructions_card_template] })['cards']
+        expect(cards.length).to eq(1)
+        expect(cards[0]['extension']).to be_nil
       end
     end
 
@@ -1131,7 +1202,7 @@ RSpec.describe DaVinciCRDTestKit::CustomServiceResponse, :request do
         jku: "#{example_client_url}/jwks.json",
         encryption_method: 'RS384'
       )
-      sytem_action_update_coverage_information_default_missing[:extension][:'com.inferno.resourceSelectionCriteria'] =
+      sytem_action_update_coverage_information_default_missing[:extension][resource_selection_criteria_ext.to_sym] =
         'context.draftOrders.entry.resource'
 
       response_template = { cards: [],

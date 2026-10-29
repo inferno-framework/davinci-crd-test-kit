@@ -3,6 +3,7 @@ require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
 require_relative '../client_urls'
 require_relative '../../prefetched_coverage_payer_helper'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -13,7 +14,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::PrefetchedCoveragePayerHelper
 
       id :crd_v221_hook_request_coverage_verification
-      title 'Prefetched coverages are valid'
+      title 'Prefetched coverages are issued by the payer associated with the invoked service'
       description %(
         During this test, Inferno will verify that the issuing payer Organization id from the `payor` element
         of each hook request's prefetched coverage matches the Organization id associated with the
@@ -28,27 +29,16 @@ module DaVinciCRDTestKit
 
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the `#{ClientURLs.discovery_url}`
-              discovery endpoint. The client suite may be run without this input, but it is required
-              for the tests to pass.
-              Re-run the "Registration" group to provide this detail.
+            description: ClientInputHelper.service_organization_id_description(
+              'complete', ClientURLs.discovery_url, locked: true
             ),
             type: 'text',
             optional: true,
             locked: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. This Organization must be referenced
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
-              Re-run the "Registration" group to provide this detail.
+            description: ClientInputHelper.service_organization_id_description(
+              'subset', ClientURLs.prefetch_subset_discovery_url, locked: true
             ),
             type: 'text',
             optional: true,
@@ -90,7 +80,8 @@ module DaVinciCRDTestKit
           if expected_payer_org_id.blank?
             add_request_message(
               'error',
-              'No Inferno Payer Organization id configured for this endpoint; skipping required coverage check.',
+              'No Inferno Payer Organization id configured for the invoked service, so the payer of the ' \
+              'prefetched Coverage could not be checked. Re-run the "Registration" group to provide it.',
               request_index
             )
             next

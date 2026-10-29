@@ -1,4 +1,5 @@
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V201
@@ -26,39 +27,19 @@ module DaVinciCRDTestKit
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the **Client Registration** group to set or
-              change this value.
-            ),
+            description: ClientInputHelper.v201_locked_cds_jwt_iss_description,
             locked: true
       input :appointment_book_response_approach,
             title: 'Response generation approach for appointment-book',
-            description: %(
-              Determines how Inferno will generate response for appointment-book
-              hook invocations.
-            ),
+            description: ClientInputHelper.response_approach_description('appointment-book'),
             type: 'radio',
             default: 'mocked',
-            options: {
-              list_options: [
-                {
-                  label: 'Create simple mocks based on selected response types',
-                  value: 'mocked'
-                },
-                {
-                  label: 'Generate responses based on a tester-provided template',
-                  value: 'custom'
-                }
-              ]
-            }
+            options: ClientInputHelper.response_approach_options
       input :appointment_book_selected_response_types,
             title: 'Response types to return from appointment-book hook requests',
             description: %(
-              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. If no types are selected, Inferno will mock and return
-              a [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
-              response for this primary hook.
+              #{ClientInputHelper.mocked_response_types_intro}
+              #{ClientInputHelper.default_response_type_note(primary: true)}
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -94,14 +75,12 @@ module DaVinciCRDTestKit
             enable_when: { input_name: 'appointment_book_response_approach', value: 'mocked' }
       input :appointment_book_custom_response_template,
             title: 'Custom response template for appointment-book hook requests',
-            description: %(
-              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
-              in JSON form for Inferno to use when responding to hook invocations.
-            ),
+            description: ClientInputHelper.custom_response_template_description,
             type: 'textarea',
             optional: true,
             enable_when: { input_name: 'appointment_book_response_approach', value: 'custom' }
       output :continuation_url
+      flag_as_tester_initiated_exchange
 
       run do
         identifier = cds_jwt_iss

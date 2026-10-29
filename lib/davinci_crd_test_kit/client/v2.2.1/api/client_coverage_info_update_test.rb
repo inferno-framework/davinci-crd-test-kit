@@ -14,9 +14,9 @@ module DaVinciCRDTestKit
         it stores the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         and makes it available when accessing the associated resource.
 
-        During this test, Inferno will find all [Coverage Information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type),
-        attempt to read the updated FHIR resource from the CRD client's FHIR server, and verify
-        that the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
+        During this test, Inferno will verify that for the [Coverage Information responses](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
+        it returned, the updated FHIR resource read from the CRD client's FHIR server contains
+        the [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         in the response is now present in the returned resource. When comparing the
         [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html)
         in the response with what is returned from the CRD client's FHIR server, Inferno

@@ -47,7 +47,7 @@ module DaVinciCRDTestKit
           client_access_token: { name: :order_sign_client_access_token },
           client_fhir_server: { name: :order_sign_client_fhir_server },
           crd_jwks_keys_json: { name: :order_sign_crd_jwks_keys_json },
-          custom_response_template: { name: :order_sign_custom_response_template },
+          response_approach: { name: :order_sign_response_approach },
           selected_response_types: { name: :order_sign_selected_response_types }
         },
         outputs: {

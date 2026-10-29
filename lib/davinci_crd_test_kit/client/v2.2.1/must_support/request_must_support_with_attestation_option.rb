@@ -106,19 +106,19 @@ module DaVinciCRDTestKit
             that when a client "maintains a mustSupport data element and surfaces it to users, then it
             SHALL be exposed in their FHIR interface when the data exists and privacy constraints permit."
 
-            During this test, Inferno will check whether all must support elements defined in the
+            During this test, Inferno will verify that all must support elements defined in the
             profile(s) listed below are demonstrated within hook requests made during this session.
             This check may vacuously pass if the tester has attested that this resource type is not
             supported by the CRD client.
 
             If any must support elements are not demonstrated, the tester will have the option to attest
             that these elements are not supported by the CRD client or surfaced to its users. Testers
-            must setup scenarios in which the "data exists and privacy constraints permit" Inferno to view
+            must set up scenarios in which the "data exists and privacy constraints permit" Inferno to view
             the must support information.
 
             Inferno will consider resources present within the `context` and `prefetch` elements of all hook
-            requests made during the latest run of each `Hooks` subgroup and the `Additional Hook
-            Invocations for Cross Hook Support Demonstration` group, but not any made within the `Scenarios`
+            requests made during the latest run of each "Hooks" subgroup and the "Additional Hook
+            Invocations" group, but not any made within the "Scenarios"
             subgroups. If any of the considered groups are re-run, then requests made during prior runs will
             no longer be considered and must support elements demonstrated only during that prior run must
             be re-demonstrated on the new run or a subsequent one.
@@ -278,7 +278,7 @@ module DaVinciCRDTestKit
 
       def attestation_message(unobserved, attest_true_url, attest_false_url)
         <<~MESSAGE
-          **Must Support Attestation**
+          **Must Support Attestation**:
 
           #{unobserved.map { |entry| attestation_section(entry) }.join("\n\n")}
 
