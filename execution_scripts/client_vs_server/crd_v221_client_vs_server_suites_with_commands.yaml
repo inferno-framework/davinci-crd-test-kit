@@ -29,7 +29,9 @@ comparison_config:
     - replacement: <UUID>
       pattern: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
     - replacement: <RANDOM_KEY>
-      pattern: /'[a-z]{16}'/
+      patterns:
+        - /'[a-z]{16}'/
+        - /`[a-z]{16}`/
     - replacement: <INFERNO_URL>
       patterns:
         - https://inferno.healthit.gov/ # prod
@@ -621,7 +623,123 @@ steps:
     command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
     action_description: Attest that the cards have been displayed
 
-  - state_description: Finished Client Group 1.4 encounter-discharge
+  #############################################################
+  # Cross Hook Must Support (attest when elements are not observed)
+  #############################################################
+
+  - state_description: Wait at Client test 1.4.2.1.01 CRD Appointment must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.01
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.03 CRD Communication Request must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.03
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.05 CRD Coverage must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.05
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.07 CRD Device must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.07
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.08 CRD Device Request must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.08
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.10 CRD Encounter must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.10
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.12 CRD Location must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.12
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.14 CRD Medication must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.14
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.15 CRD Medication Request must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.15
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.17 CRD Nutrition Order must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.17
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.19 CRD Organization must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.19
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.21 CRD Patient must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.21
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.22 CRD Practitioner must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.22
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.23 HRex PractitionerRole Profile must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.23
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.25 CRD Service Request must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.25
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Wait at Client test 1.4.2.1.27 CRD Vision Prescription must support elements are observed
+    session: client
+    status: waiting
+    last_completed: 1.4.2.1.27
+    command: "curl -o /dev/null -s '{wait_outputs.attest_true_url}'"
+    action_description: Attest that the unobserved must support elements are not supported
+
+  - state_description: Finished Client Group 1.4 Cross-Invocation Requirements
     session: client
     status: done
     last_completed: 1.4
