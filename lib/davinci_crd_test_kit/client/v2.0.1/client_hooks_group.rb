@@ -4,6 +4,7 @@ require_relative 'client_encounter_start_group'
 require_relative 'client_order_dispatch_group'
 require_relative 'client_order_select_group'
 require_relative 'client_order_sign_group'
+require_relative '../client_input_helper'
 
 module DaVinciCRDTestKit
   module V201
@@ -43,11 +44,7 @@ module DaVinciCRDTestKit
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the **Client Registration** group to set or
-              change this value.
-            ),
+            description: ClientInputHelper.v201_locked_cds_jwt_iss_description,
             locked: true
 
       input_order :cds_jwt_iss, :cds_jwk_set

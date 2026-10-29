@@ -1,4 +1,5 @@
 require_relative 'base_hook_invocation_receive_request_test'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -20,31 +21,15 @@ module DaVinciCRDTestKit
 
       input :encounter_start_response_approach,
             title: 'Response generation approach for encounter-start',
-            description: %(
-              Determines how Inferno will generate responses for encounter-start
-              hook invocations.
-            ),
+            description: ClientInputHelper.response_approach_description('encounter-start'),
             type: 'radio',
             default: 'mocked',
-            options: {
-              list_options: [
-                {
-                  label: 'Create simple mocks based on selected response types',
-                  value: 'mocked'
-                },
-                {
-                  label: 'Generate responses based on a tester-provided template',
-                  value: 'custom'
-                }
-              ]
-            }
+            options: ClientInputHelper.response_approach_options
       input :encounter_start_selected_response_types,
             title: 'Response types to return from encounter-start hook requests',
             description: %(
-              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. If no types are selected, Inferno will mock and return
-              an [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
-              response for this secondary hook.
+              #{ClientInputHelper.mocked_response_types_intro}
+              #{ClientInputHelper.default_response_type_note(primary: false)}
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -53,10 +38,7 @@ module DaVinciCRDTestKit
             enable_when: { input_name: 'encounter_start_response_approach', value: 'mocked' }
       input :encounter_start_custom_response_template,
             title: 'Custom response template for encounter-start hook requests',
-            description: %(
-              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
-              in JSON form for Inferno to use when responding to hook invocations.
-            ),
+            description: ClientInputHelper.custom_response_template_description,
             type: 'textarea',
             optional: true,
             enable_when: { input_name: 'encounter_start_response_approach', value: 'custom' }

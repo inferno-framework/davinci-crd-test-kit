@@ -2,6 +2,7 @@ require_relative '../../../cross_suite/cards_identification'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../multi_request_message_helper'
 require_relative '../../prefetched_coverage_payer_helper'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -48,10 +49,10 @@ module DaVinciCRDTestKit
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
             description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. One of the patient's two Coverages must reference
+              #{ClientInputHelper.service_organization_id_intro('complete')}
+              One of the patient's two Coverages must reference
               this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
+              #{ClientInputHelper.rerun_registration_note}
             ),
             type: 'text',
             optional: true,
@@ -59,10 +60,10 @@ module DaVinciCRDTestKit
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
             description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. One of the patient's two Coverages must reference
+              #{ClientInputHelper.service_organization_id_intro('subset')}
+              One of the patient's two Coverages must reference
               this Organization as its payer.
-              Re-run the "Registration" group to provide this detail.
+              #{ClientInputHelper.rerun_registration_note}
             ),
             type: 'text',
             optional: true,

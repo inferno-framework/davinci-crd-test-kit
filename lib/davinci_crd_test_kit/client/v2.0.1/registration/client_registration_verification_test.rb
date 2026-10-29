@@ -1,4 +1,5 @@
 require 'jwt'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V201
@@ -25,12 +26,7 @@ module DaVinciCRDTestKit
       input :cds_jwk_set,
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
-            description: %(
-              The CRD client's JWK Set containing its public key. May be either
-              a publicly accessible url containing the JWKS, or the raw JWKS.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
-            ),
+            description: ClientInputHelper.registration_cds_jwk_set_description,
             optional: true
 
       run do

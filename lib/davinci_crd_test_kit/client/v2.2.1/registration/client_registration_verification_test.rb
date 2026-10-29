@@ -1,5 +1,6 @@
 require 'jwt'
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -47,34 +48,19 @@ module DaVinciCRDTestKit
       input :cds_jwk_set,
             title: 'CRD JSON Web Key Set (JWKS)',
             type: 'textarea',
-            description: %(
-              The CRD client's JWK Set containing its public key. May be either
-              a publicly accessible URL containing the JWKS, or the raw JWKS.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
-            ),
+            description: ClientInputHelper.registration_cds_jwk_set_description,
             optional: true
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
+            description: ClientInputHelper.service_organization_id_description(
+              'complete', ClientURLs.discovery_url
             ),
             type: 'text',
             optional: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
+            description: ClientInputHelper.service_organization_id_description(
+              'subset', ClientURLs.prefetch_subset_discovery_url
             ),
             type: 'text',
             optional: true

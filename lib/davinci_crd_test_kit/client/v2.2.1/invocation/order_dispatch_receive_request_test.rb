@@ -1,4 +1,5 @@
 require_relative 'base_hook_invocation_receive_request_test'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -20,32 +21,15 @@ module DaVinciCRDTestKit
 
       input :order_dispatch_response_approach,
             title: 'Response generation approach for order-dispatch',
-            description: %(
-              Determines how Inferno will generate responses for order-dispatch
-              hook invocations.
-            ),
+            description: ClientInputHelper.response_approach_description('order-dispatch'),
             type: 'radio',
             default: 'mocked',
-            options: {
-              list_options: [
-                {
-                  label: 'Create simple mocks based on selected response types',
-                  value: 'mocked'
-                },
-                {
-                  label: 'Generate responses based on a tester-provided template',
-                  value: 'custom'
-                }
-              ]
-            }
+            options: ClientInputHelper.response_approach_options
       input :order_dispatch_selected_response_types,
             title: 'Response types to return from order-dispatch hook requests',
             description: %(
-              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. Because CRD clients must support the
-              [Coverage Information](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#coverage-information-response-type)
-              response type on this primary hook, Inferno will always include a Coverage Information
-              response, even if it is not selected.
+              #{ClientInputHelper.mocked_response_types_intro}
+              #{ClientInputHelper.coverage_information_always_included_note}
             ),
             type: 'checkbox',
             default: ['coverage_information', 'external_reference', 'instructions'],
@@ -54,10 +38,7 @@ module DaVinciCRDTestKit
             enable_when: { input_name: 'order_dispatch_response_approach', value: 'mocked' }
       input :order_dispatch_custom_response_template,
             title: 'Custom response template for order-dispatch hook requests',
-            description: %(
-              Provide a [custom response template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
-              in JSON form for Inferno to use when responding to hook invocations.
-            ),
+            description: ClientInputHelper.custom_response_template_description,
             type: 'textarea',
             optional: true,
             enable_when: { input_name: 'order_dispatch_response_approach', value: 'custom' }

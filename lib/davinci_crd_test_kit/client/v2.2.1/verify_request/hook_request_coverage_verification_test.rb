@@ -3,6 +3,7 @@ require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
 require_relative '../client_urls'
 require_relative '../../prefetched_coverage_payer_helper'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -28,27 +29,16 @@ module DaVinciCRDTestKit
 
       input :complete_prefetch_service_organization_id,
             title: 'Complete Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              complete prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the `#{ClientURLs.discovery_url}`
-              discovery endpoint. The client suite may be run without this input, but it is required
-              for the tests to pass.
-              Re-run the "Registration" group to provide this detail.
+            description: ClientInputHelper.service_organization_id_description(
+              'complete', ClientURLs.discovery_url, locked: true
             ),
             type: 'text',
             optional: true,
             locked: true
       input :subset_prefetch_service_organization_id,
             title: 'Subset Prefetch Service Organization id',
-            description: %(
-              The FHIR Organization id associated with Inferno's simulated
-              subset prefetch CRD server. This Organization must be referenced as the
-              payer on Coverages in hook requests made to services described by the
-              `#{ClientURLs.prefetch_subset_discovery_url}` discovery endpoint.
-              The client suite may be run without this input, but it is required
-              for the tests to pass.
-              Re-run the "Registration" group to provide this detail.
+            description: ClientInputHelper.service_organization_id_description(
+              'subset', ClientURLs.prefetch_subset_discovery_url, locked: true
             ),
             type: 'text',
             optional: true,

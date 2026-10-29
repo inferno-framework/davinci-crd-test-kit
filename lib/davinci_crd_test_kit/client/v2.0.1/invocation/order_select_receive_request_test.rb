@@ -1,4 +1,5 @@
 require_relative '../client_urls'
+require_relative '../../client_input_helper'
 
 module DaVinciCRDTestKit
   module V201
@@ -23,32 +24,14 @@ module DaVinciCRDTestKit
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be sent on the Bearer token in the `Authorization`
-              header of all requests. Run or re-run the **Client Registration** group to set or
-              change this value.
-            ),
+            description: ClientInputHelper.v201_locked_cds_jwt_iss_description,
             locked: true
       input :order_select_response_approach,
             title: 'Response generation approach for order-select',
-            description: %(
-              Determines how Inferno will generate responses for order-select
-              hook invocations.
-            ),
+            description: ClientInputHelper.response_approach_description('order-select'),
             type: 'radio',
             default: 'mocked',
-            options: {
-              list_options: [
-                {
-                  label: 'Create simple mocks based on selected response types',
-                  value: 'mocked'
-                },
-                {
-                  label: 'Generate responses based on a tester-provided template',
-                  value: 'custom'
-                }
-              ]
-            }
+            options: ClientInputHelper.response_approach_options
       input :order_select_selected_response_types,
             title: 'Response types to return from order-select hook requests',
             description: %(
@@ -97,12 +80,7 @@ module DaVinciCRDTestKit
             enable_when: { input_name: 'order_select_response_approach', value: 'mocked' }
       input :order_select_custom_response_template,
             title: 'Custom response template for order-select hook requests',
-            description: %(
-              Select the CRD response types that the simulated Inferno CRD server will [mock](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-              when responding to hook invocations. If no types are selected, Inferno will mock and return
-              an [Instructions](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/cards.html#instructions-response-type)
-              response for this secondary hook.
-            ),
+            description: ClientInputHelper.custom_response_template_description,
             type: 'textarea',
             optional: true,
             enable_when: { input_name: 'order_select_response_approach', value: 'custom' }
