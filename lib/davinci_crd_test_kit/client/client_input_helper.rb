@@ -15,7 +15,7 @@ module DaVinciCRDTestKit
 
     # For optional inputs that the suite can execute without but that are needed for the tests to pass.
     def self.required_to_pass_note
-      'The client suite may be run without this input, but it is required for the tests to pass.'
+      'These tests may be run without this input, but it is required for the tests to pass.'
     end
 
     # For locked inputs that are set by the v2.2.1 "Registration" group.
