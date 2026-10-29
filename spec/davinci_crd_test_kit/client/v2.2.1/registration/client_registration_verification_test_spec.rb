@@ -38,6 +38,14 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result.result).to eq('pass')
   end
 
+  it 'fails, rather than errors, when retrieving the JWKS URL times out' do
+    stub_request(:get, example_jwks_url).to_raise(Net::ReadTimeout)
+    result = run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from #{example_jwks_url}:"))
+    expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
+  end
+
   it 'fails when no JWKS is provided' do
     result = run_with_defaults(cds_jwk_set: nil)
     expect(result.result).to eq('fail')

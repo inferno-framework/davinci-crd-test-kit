@@ -1,4 +1,5 @@
 require_relative '../prefetched_coverage_value'
+require_relative 'hook_request_data_access'
 
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
@@ -147,7 +148,8 @@ module DaVinciCRDTestKit
 
     # @private
     def connection
-      @connection ||= Faraday.new do |f|
+      timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
+      @connection ||= Faraday.new(request: { open_timeout: timeout, timeout: }) do |f|
         f.request :url_encoded
         f.use FaradayMiddleware::FollowRedirects
       end
@@ -162,6 +164,9 @@ module DaVinciCRDTestKit
       return if resource.entry.empty?
 
       resource.entry.first.resource
+    rescue Faraday::Error
+      # the response is built without the resource, as when the read is unsuccessful
+      nil
     end
 
     def patient_coverage

@@ -1,11 +1,13 @@
 require_relative '../../multi_request_message_helper'
 require_relative '../../../cross_suite/short_circuit_interaction'
+require_relative '../../../cross_suite/request_timeout_handling'
 
 module DaVinciCRDTestKit
   module V221
     class RetrieveJWKSTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::ShortCircuitInteraction
+      include DaVinciCRDTestKit::RequestTimeoutHandling
 
       id :crd_v221_retrieve_jwks
       title 'CRD client JWKS can be retrieved'
@@ -127,6 +129,9 @@ module DaVinciCRDTestKit
                               index)
           nil
         end
+      rescue *REQUEST_TIMEOUT_ERRORS
+        add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
+        nil
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)

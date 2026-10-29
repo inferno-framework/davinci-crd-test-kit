@@ -194,6 +194,18 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       expect(result.result_message).to include('Not all coverage-information extensions stored')
     end
 
+    it 'fails, rather than errors, when reading the target resource times out' do
+      stub_request(:get, "#{server_endpoint}/#{device_request_resource_type}/#{device_request_id}")
+        .to_raise(Net::ReadTimeout)
+
+      result = run(test, server_endpoint:, smart_auth_info:)
+
+      expect(result.result).to eq('fail')
+      result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
+      expect(result_messages.map(&:message))
+        .to include(end_with('Timed out waiting for a response from the read.'))
+    end
+
     it 'fails with an error message when the coverage-information extension is absent from the stored resource' do
       stub_request(:get, "#{server_endpoint}/#{device_request_resource_type}/#{device_request_id}")
         .with(headers: { Authorization: 'Bearer SAMPLE_TOKEN' })

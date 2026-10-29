@@ -390,6 +390,23 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(system_actions.first['resource'].resourceType).to eq('ServiceRequest')
     end
 
+    it 'finds no Coverage, rather than raising, when the Coverage search times out' do
+      coverage_search = stub_request(:get, 'https://example/r4/Coverage?patient=example&status=active')
+        .to_raise(Net::ReadTimeout)
+
+      creator = make_v221_creator(
+        types: [],
+        hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
+        body: {
+          'fhirServer' => 'https://example/r4',
+          'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+          'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
+        }
+      )
+      expect(creator.patient_coverage).to be_nil
+      expect(coverage_search).to have_been_made.once
+    end
+
     it 'make_resource_request follows a redirect from the FHIR server' do
       coverage = JSON.parse(File.read(File.join(__dir__, '..', '..', '..', 'fixtures', 'crd_coverage_example.json')))
       service_request = FHIR::ServiceRequest.new(id: 'example')

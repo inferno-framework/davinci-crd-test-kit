@@ -114,12 +114,15 @@ module DaVinciCRDTestKit
           end
 
         if jwk_body.blank?
-          retrieved = Faraday.get(jku) # try as url pointing to a jwk set
-          jwk_body =
+          jwk_body = # try as url pointing to a jwk set
             begin
-              JSON.parse(retrieved.body)
+              JSON.parse(Faraday.get(jku).body)
             rescue JSON::ParserError
               warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
+              nil
+            rescue Faraday::Error => e
+              # a bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno
+              warning_messages << "Failed to fetch JWKS from #{jku}: #{e.message}"
               nil
             end
         else

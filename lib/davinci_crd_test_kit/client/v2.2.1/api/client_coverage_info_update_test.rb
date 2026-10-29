@@ -1,11 +1,13 @@
 require_relative '../../../cross_suite/cards_identification'
 require_relative '../../tagged_request_load_helper'
+require_relative '../../../cross_suite/request_timeout_handling'
 
 module DaVinciCRDTestKit
   module V221
     class ClientCoverageInfoUpdateTest < Inferno::Test
       include CardsIdentification
       include TaggedRequestLoadHelper
+      include RequestTimeoutHandling
 
       title "CRD client's FHIR server stores updates from coverage-information responses"
       id :crd_v221_client_coverage_info_update
@@ -136,7 +138,12 @@ module DaVinciCRDTestKit
       end
 
       def check_for_stored_coverage_information_extension(resource_details)
-        fhir_read resource_details[:resource_type], resource_details[:target_id]
+        begin
+          fhir_read resource_details[:resource_type], resource_details[:target_id]
+        rescue *REQUEST_TIMEOUT_ERRORS
+          add_message('error', "#{error_prefix(resource_details)}#{request_timed_out_message('the read')}")
+          return
+        end
         unless resource.present? && resource.resourceType == resource_details[:resource_type]
           add_message('error', "#{error_prefix(resource_details)}Unable to read target resource.")
           return

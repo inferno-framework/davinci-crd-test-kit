@@ -92,6 +92,21 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to be_nil
   end
 
+  it 'fails, rather than errors, and checks the other requests if retrieving the jku times out' do
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_raise(Net::ReadTimeout).then
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
+                       cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message)
+      .to eq("(Request 1) Timed out waiting for a response from JWKS URL `#{example_client_jwks_url}`.")
+    expect(jwks_request).to have_been_made.times(2)
+    expect(session_output(:crd_jwks_keys_json).first).to be_nil
+    expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+  end
+
   it 'passes if it receives a valid jwk_set input' do
     token_header_no_jku = token_header.except(:jku)
 
