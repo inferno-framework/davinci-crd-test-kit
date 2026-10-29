@@ -338,7 +338,12 @@ module DaVinciCRDTestKit
       return unless continue_after_one_hook_request?
 
       sleep long_running_pause_time if long_running_group?
-      results_repo.update(result.id, result: 'pass', result_message: '')
+      if self_pay_group?
+        results_repo.update(result.id, result: 'fail',
+                                       result_message: 'Inferno received a hook request during a self-pay workflow.')
+      else
+        results_repo.update(result.id, result: 'pass', result_message: '')
+      end
     end
 
     # the multiple payers scenario is excluded so that the wait continues until the tester

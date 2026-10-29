@@ -1,5 +1,4 @@
 require_relative 'self_pay/client_self_pay_workflow_test'
-require_relative 'self_pay/client_self_pay_no_request_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -30,7 +29,6 @@ module DaVinciCRDTestKit
       )
 
       test from: :crd_v221_client_self_pay_workflow
-      test from: :crd_v221_client_self_pay_no_request
     end
   end
 end
