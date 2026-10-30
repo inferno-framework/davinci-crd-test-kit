@@ -107,6 +107,15 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
+  it 'limits how long it waits for the jku' do
+    jwks_request = stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+    allow(Faraday).to receive(:new).and_call_original
+
+    run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
+    expect(Faraday).to have_received(:new).with(request: { open_timeout: 10, timeout: 10 })
+    expect(jwks_request).to have_been_made.once
+  end
+
   it 'reports a TLS handshake that times out as a timeout' do
     # Net::HTTP raises this without the 'Failed to open TCP' message, so Inferno passes it through
     stub_request(:get, example_client_jwks_url).to_raise(Net::OpenTimeout.new('execution expired'))

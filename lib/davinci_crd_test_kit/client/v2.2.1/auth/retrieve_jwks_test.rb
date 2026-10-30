@@ -144,6 +144,16 @@ module DaVinciCRDTestKit
         false
       end
 
+      # Inferno's `get` uses this connection for an absolute URL, and its own sets no timeout. Bounded so
+      # that a jku that doesn't respond can't hold the test. Overrides an Inferno internal, so this can be
+      # removed once Inferno's HTTP clients support timeouts.
+      def connection
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS }) do |f|
+          f.request :url_encoded
+          f.use FaradayMiddleware::FollowRedirects
+        end
+      end
+
       def parse_or_fetch_jwks(jwk_set_input, index)
         if jwk_set_input.match?(%r{\Ahttps?://})
           fetch_jwks(jwk_set_input, 'Fetched JWK Set input url response', index)
