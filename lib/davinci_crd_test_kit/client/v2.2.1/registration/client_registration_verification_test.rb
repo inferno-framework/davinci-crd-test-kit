@@ -1,11 +1,13 @@
 require 'jwt'
 require_relative '../client_urls'
 require_relative '../../client_input_helper'
+require_relative '../../../cross_suite/request_timeout_handling'
 
 module DaVinciCRDTestKit
   module V221
     class CRDClientRegistrationVerification < Inferno::Test
       include ClientURLs
+      include RequestTimeoutHandling
 
       id :crd_v221_client_registration_verification
       title 'CRD client registration details are complete and valid'
@@ -114,12 +116,19 @@ module DaVinciCRDTestKit
           end
 
         if jwk_body.blank?
-          retrieved = Faraday.get(jku) # try as url pointing to a jwk set
-          jwk_body =
+          jwk_body = # try as url pointing to a jwk set
             begin
-              JSON.parse(retrieved.body)
+              JSON.parse(jwks_connection.get(jku).body)
             rescue JSON::ParserError
               warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
+              nil
+            rescue Faraday::Error => e
+              # a bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno
+              warning_messages << if timeout?(e)
+                                    request_timed_out_message("JWKS URL `#{jku}`")
+                                  else
+                                    "Failed to fetch JWKS from `#{jku}`: #{e.message}"
+                                  end
               nil
             end
         else
@@ -141,6 +150,10 @@ module DaVinciCRDTestKit
         end
 
         jwk_set
+      end
+
+      def jwks_connection
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS })
       end
     end
   end

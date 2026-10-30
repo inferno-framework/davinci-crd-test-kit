@@ -38,6 +38,31 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result.result).to eq('pass')
   end
 
+  [Net::ReadTimeout, Net::OpenTimeout].each do |timeout_error|
+    it "fails, rather than errors, when retrieving the JWKS URL raises #{timeout_error}" do
+      stub_request(:get, example_jwks_url).to_raise(timeout_error)
+      result = run_with_defaults(cds_jwk_set: example_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message))
+        .to include("Timed out waiting for a response from JWKS URL `#{example_jwks_url}`.")
+      expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
+    end
+  end
+
+  it 'fails, rather than errors, when the JWKS URL refuses the connection' do
+    stub_request(:get, example_jwks_url).to_raise(Errno::ECONNREFUSED)
+    result = run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from `#{example_jwks_url}`:"))
+  end
+
+  it 'limits how long it waits for the JWKS URL' do
+    stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+    allow(Faraday).to receive(:new).and_call_original
+    run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(Faraday).to have_received(:new).with(request: { open_timeout: 10, timeout: 10 })
+  end
+
   it 'fails when no JWKS is provided' do
     result = run_with_defaults(cds_jwk_set: nil)
     expect(result.result).to eq('fail')

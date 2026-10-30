@@ -1,8 +1,12 @@
 require_relative '../prefetched_coverage_value'
+require_relative '../../cross_suite/request_timeout_handling'
+require_relative 'hook_request_data_access'
 
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
+    include RequestTimeoutHandling
+
     def build_mock_hook_response
       hook_card_response = create_cards_and_system_actions
       update_specific_hook_card_info(hook_card_response)
@@ -147,9 +151,12 @@ module DaVinciCRDTestKit
 
     # @private
     def connection
-      @connection ||= Faraday.new do |f|
-        f.request :url_encoded
-        f.use FaradayMiddleware::FollowRedirects
+      @connection ||= begin
+        timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
+        Faraday.new(request: { open_timeout: timeout, timeout: }) do |f|
+          f.request :url_encoded
+          f.use FaradayMiddleware::FollowRedirects
+        end
       end
     end
 
@@ -162,10 +169,38 @@ module DaVinciCRDTestKit
       return if resource.entry.empty?
 
       resource.entry.first.resource
+    rescue Faraday::Error => e
+      # the response is built without the resource, as when the read is unsuccessful
+      warn_of_failed_response_read(uri, e)
+      nil
     end
 
+    # These reads are not recorded, so without a warning the tester could not tell why the
+    # response lacks the data.
+    def warn_of_failed_response_read(uri, error)
+      outcome, cause =
+        if timeout?(error)
+          ['Timed out reading', '']
+        else
+          ['Failed to read', ": `#{error.class}: #{error.message}`"]
+        end
+      Inferno::Repositories::Messages.new.create(
+        result_id: result.id,
+        type: 'warning',
+        message: "#{outcome} `#{uri}` from the CRD client's FHIR server while building the response to " \
+                 "hook request `#{request_body&.dig('hookInstance')}`#{cause}. Check the response for cards " \
+                 'or system actions that are missing or incomplete.'
+      )
+    rescue StandardError => e
+      # the warning must not cost the CRD client its hook response
+      Inferno::Application['logger'].error("Could not record the failed read of `#{uri}`: #{e.full_message}")
+    end
+
+    # Remembered even when absent, so that a search that failed is not repeated.
     def patient_coverage
-      @patient_coverage ||= get_patient_coverage
+      return @patient_coverage if defined?(@patient_coverage)
+
+      @patient_coverage = get_patient_coverage
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
