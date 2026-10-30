@@ -1,6 +1,7 @@
 require 'jwt'
 require_relative '../client_urls'
 require_relative '../../client_input_helper'
+require_relative '../../endpoints/hook_request_data_access'
 
 module DaVinciCRDTestKit
   module V221
@@ -114,17 +115,7 @@ module DaVinciCRDTestKit
           end
 
         if jwk_body.blank?
-          jwk_body = # try as url pointing to a jwk set
-            begin
-              JSON.parse(Faraday.get(jku).body)
-            rescue JSON::ParserError
-              warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
-              nil
-            rescue Faraday::Error => e
-              # a bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno
-              warning_messages << "Failed to fetch JWKS from #{jku}: #{e.message}"
-              nil
-            end
+          jwk_body = fetch_jwk_set(jku, warning_messages) # try as url pointing to a jwk set
         else
           warning_messages << 'Providing the JWK Set directly is strongly discouraged.'
         end
@@ -144,6 +135,34 @@ module DaVinciCRDTestKit
         end
 
         jwk_set
+      end
+
+      # A bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno.
+      def fetch_jwk_set(jku, warning_messages)
+        unless jwks_url?(jku)
+          warning_messages << 'JWKS input is neither a valid JSON Web Key Set nor an http(s) URL.'
+          return
+        end
+
+        JSON.parse(jwks_connection.get(jku).body)
+      rescue JSON::ParserError
+        warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
+        nil
+      rescue Faraday::Error => e
+        warning_messages << "Failed to fetch JWKS from #{jku}: #{e.message}"
+        nil
+      end
+
+      def jwks_url?(jku)
+        uri = URI.parse(jku)
+        uri.host.present? && ['http', 'https'].include?(uri.scheme)
+      rescue URI::InvalidURIError
+        false
+      end
+
+      def jwks_connection
+        timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
+        Faraday.new(request: { open_timeout: timeout, timeout: })
       end
     end
   end

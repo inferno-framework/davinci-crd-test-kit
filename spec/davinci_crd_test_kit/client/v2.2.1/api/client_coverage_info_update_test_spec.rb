@@ -203,7 +203,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientCoverageInfoUpdateTest do
       expect(result.result).to eq('fail')
       result_messages = Inferno::Repositories::Messages.new.messages_for_result(result.id)
       expect(result_messages.map(&:message))
-        .to include(end_with('Timed out waiting for a response from the read.'))
+        .to include(end_with('Timed out waiting for a response from ' \
+                             "`#{server_endpoint}/#{device_request_resource_type}/#{device_request_id}`."))
     end
 
     it 'fails with an error message when the coverage-information extension is absent from the stored resource' do

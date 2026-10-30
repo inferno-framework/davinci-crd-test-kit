@@ -4,6 +4,8 @@ require_relative 'hook_request_data_access'
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
+    include HookRequestDataAccess
+
     def build_mock_hook_response
       hook_card_response = create_cards_and_system_actions
       update_specific_hook_card_info(hook_card_response)
@@ -164,9 +166,26 @@ module DaVinciCRDTestKit
       return if resource.entry.empty?
 
       resource.entry.first.resource
-    rescue Faraday::Error
+    rescue Faraday::Error => e
+      # Other failures, such as a refused connection, still produce an error response so that the
+      # tester learns of them.
+      raise unless timeout?(e)
+
       # the response is built without the resource, as when the read is unsuccessful
+      warn_of_response_read_timeout(uri)
       nil
+    end
+
+    # These reads are not recorded, so without a warning the tester could not tell why the
+    # response lacks the data.
+    def warn_of_response_read_timeout(uri)
+      Inferno::Repositories::Messages.new.create(
+        result_id: result.id,
+        type: 'warning',
+        message: "Timed out reading `#{uri}` from the CRD client's FHIR server while building the " \
+                 "response to hook request `#{request_body&.dig('hookInstance')}`. Check the response for " \
+                 'cards or system actions that are missing or incomplete.'
+      )
     end
 
     def patient_coverage

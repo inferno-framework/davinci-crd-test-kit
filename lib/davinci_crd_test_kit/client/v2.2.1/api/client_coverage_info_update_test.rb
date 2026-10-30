@@ -141,7 +141,9 @@ module DaVinciCRDTestKit
         begin
           fhir_read resource_details[:resource_type], resource_details[:target_id]
         rescue *REQUEST_TIMEOUT_ERRORS
-          add_message('error', "#{error_prefix(resource_details)}#{request_timed_out_message('the read')}")
+          read_url = fhir_client.full_resource_url(resource: resource_details[:resource_type],
+                                                   id: resource_details[:target_id])
+          add_message('error', "#{error_prefix(resource_details)}#{request_timed_out_message("`#{read_url}`")}")
           return
         end
         unless resource.present? && resource.resourceType == resource_details[:resource_type]

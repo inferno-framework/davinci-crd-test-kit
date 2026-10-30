@@ -46,6 +46,22 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
   end
 
+  it 'fails, rather than errors, when the JWKS input is neither JSON nor a URL' do
+    ['{"keys": [}', 'not a url', 'example.com/jwks'].each do |cds_jwk_set|
+      result = run_with_defaults(cds_jwk_set:)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message))
+        .to include('JWKS input is neither a valid JSON Web Key Set nor an http(s) URL.')
+    end
+  end
+
+  it 'limits how long it waits for the JWKS URL' do
+    stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+    allow(Faraday).to receive(:new).and_call_original
+    run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(Faraday).to have_received(:new).with(request: { open_timeout: 10, timeout: 10 })
+  end
+
   it 'fails when no JWKS is provided' do
     result = run_with_defaults(cds_jwk_set: nil)
     expect(result.result).to eq('fail')

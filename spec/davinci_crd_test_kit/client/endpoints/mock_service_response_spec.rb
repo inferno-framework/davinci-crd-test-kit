@@ -390,21 +390,45 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(system_actions.first['resource'].resourceType).to eq('ServiceRequest')
     end
 
-    it 'finds no Coverage, rather than raising, when the Coverage search times out' do
-      coverage_search = stub_request(:get, 'https://example/r4/Coverage?patient=example&status=active')
-        .to_raise(Net::ReadTimeout)
+    context 'when the Coverage search fails before a response' do
+      let(:coverage_search_url) { 'https://example/r4/Coverage?patient=example&status=active' }
+      let(:messages_double) { instance_double(Inferno::Repositories::Messages, create: nil) }
+      let(:creator) do
+        make_v221_creator(
+          types: [],
+          hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
+          body: {
+            'fhirServer' => 'https://example/r4',
+            'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+            'hookInstance' => 'example-hook-instance',
+            'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
+          }
+        )
+      end
 
-      creator = make_v221_creator(
-        types: [],
-        hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
-        body: {
-          'fhirServer' => 'https://example/r4',
-          'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
-          'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
-        }
-      )
-      expect(creator.patient_coverage).to be_nil
-      expect(coverage_search).to have_been_made.once
+      before { allow(Inferno::Repositories::Messages).to receive(:new).and_return(messages_double) }
+
+      [Net::ReadTimeout, Net::OpenTimeout].each do |timeout_error|
+        it "finds no Coverage and warns the waiting test on a #{timeout_error}" do
+          coverage_search = stub_request(:get, coverage_search_url).to_raise(timeout_error)
+
+          expect(creator.patient_coverage).to be_nil
+          expect(coverage_search).to have_been_made.once
+          expect(messages_double).to have_received(:create).with(
+            result_id: 'test-result-id',
+            type: 'warning',
+            message: "Timed out reading `#{coverage_search_url}` from the CRD client's FHIR server while " \
+                     'building the response to hook request `example-hook-instance`. Check the ' \
+                     'response for cards or system actions that are missing or incomplete.'
+          )
+        end
+      end
+
+      it 'raises when the connection is refused, so that the failure is reported' do
+        stub_request(:get, coverage_search_url).to_raise(Errno::ECONNREFUSED)
+        expect { creator.patient_coverage }.to raise_error(Faraday::ConnectionFailed)
+        expect(messages_double).to_not have_received(:create)
+      end
     end
 
     it 'make_resource_request follows a redirect from the FHIR server' do
