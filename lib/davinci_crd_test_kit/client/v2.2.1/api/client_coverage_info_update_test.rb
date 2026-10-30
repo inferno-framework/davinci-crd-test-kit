@@ -137,15 +137,22 @@ module DaVinciCRDTestKit
         end
       end
 
+      # Returns false, after recording an error, if the read timed out.
+      def read_target_resource(resource_details)
+        fhir_read resource_details[:resource_type], resource_details[:target_id]
+        true
+      rescue StandardError => e
+        raise unless timeout?(e)
+
+        read_url = fhir_client.full_resource_url(resource: resource_details[:resource_type],
+                                                 id: resource_details[:target_id])
+        add_message('error', "#{error_prefix(resource_details)}#{request_timed_out_message("`#{read_url}`")}")
+        false
+      end
+
       def check_for_stored_coverage_information_extension(resource_details)
-        begin
-          fhir_read resource_details[:resource_type], resource_details[:target_id]
-        rescue *REQUEST_TIMEOUT_ERRORS
-          read_url = fhir_client.full_resource_url(resource: resource_details[:resource_type],
-                                                   id: resource_details[:target_id])
-          add_message('error', "#{error_prefix(resource_details)}#{request_timed_out_message("`#{read_url}`")}")
-          return
-        end
+        return unless read_target_resource(resource_details)
+
         unless resource.present? && resource.resourceType == resource_details[:resource_type]
           add_message('error', "#{error_prefix(resource_details)}Unable to read target resource.")
           return

@@ -75,13 +75,16 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
   end
 
   it 'fails, rather than errors, when the JWKS `keys` field or a key is malformed' do
+    off_curve_key = { 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'AAAA', 'y' => 'AAAA' }
     {
       { 'keys' => 'abc' } => 'JWKS `keys` field is missing or is not an array.',
       { 'kty' => 'RSA' } => 'JWKS `keys` field is missing or is not an array.',
       {} => 'JWKS `keys` field is missing or is not an array.',
       [] => 'JWKS content is not a JSON object.',
       { 'keys' => ['abc'] } => 'Key 0 invalid: not a JSON object.',
-      { 'keys' => [{ 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'a', 'y' => 'b' }] } => start_with('Key 0 invalid: ')
+      { 'keys' => [{ 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'a', 'y' => 'b' }] } => start_with('Key 0 invalid: '),
+      { 'keys' => [off_curve_key] } => start_with('Key 0 invalid: '),
+      { 'keys' => [{ 'kty' => 'RSA', 'n' => 5, 'e' => 'AQAB' }] } => start_with('Key 0 invalid: ')
     }.each do |jwks_content, warning|
       result = run_with_defaults(cds_jwk_set: jwks_content.to_json)
       expect(result.result).to eq('fail')

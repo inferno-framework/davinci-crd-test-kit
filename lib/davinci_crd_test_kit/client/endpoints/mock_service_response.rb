@@ -158,21 +158,27 @@ module DaVinciCRDTestKit
     end
 
     def make_resource_request(uri, access_token)
-      response = connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" })
-      # a body that isn't FHIR is treated like an unsuccessful read
-      return unless response.status == 200 && response.body.present?
+      # Faraday fails unhelpfully on a URL without a scheme, such as a `fhirServer` given without one
+      raise URI::InvalidURIError, 'not an absolute http(s) URL' unless ResourceIdentity.http_url?(uri)
 
-      resource = FHIR.from_contents(response.body)
-      return unless resource.is_a?(FHIR::Model) # from_contents can build a non-FHIR class named in the body
-      return resource unless resource.resourceType == 'Bundle'
-      return if resource.entry.empty?
-
-      resource.entry.first.resource
-    rescue JSON::ParserError
-      nil
+      resource_from_response(connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" }))
     rescue Faraday::Error, URI::InvalidURIError => e
       # the response is built without the resource, as when the read is unsuccessful
       warn_of_failed_response_read(uri, e)
+      nil
+    end
+
+    # A body that isn't FHIR is treated like an unsuccessful read.
+    def resource_from_response(response)
+      return unless response.status == 200 && response.body.present?
+
+      resource = FHIR.from_contents(response.body)
+      # from_contents builds whatever class the body names, which may be a datatype or not FHIR at all
+      return unless resource.respond_to?(:resourceType)
+      return resource unless resource.resourceType == 'Bundle'
+
+      resource.entry.first&.resource
+    rescue JSON::ParserError
       nil
     end
 
@@ -380,7 +386,8 @@ module DaVinciCRDTestKit
     end
 
     def create_system_actions(resource, coverage_id)
-      return unless resource.is_a?(FHIR::Model) # from_contents can build a non-FHIR class named in the body
+      # from_contents builds whatever class the body names, which may be a datatype or not FHIR at all
+      return unless resource.respond_to?(:resourceType)
 
       system_actions = []
       if resource.resourceType == 'Bundle'

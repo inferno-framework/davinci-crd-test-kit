@@ -445,11 +445,29 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         )
       end
 
-      ['', '<html></html>', 'not json', '{"resourceType":"Hash"}'].each do |body|
+      ['', '<html></html>', 'not json', '{"resourceType":"Hash"}', '{"resourceType":"Coding"}'].each do |body|
         it "finds no Coverage, rather than raising, when a 200 response has the body #{body.inspect}" do
           stub_request(:get, coverage_search_url).to_return(status: 200, body:)
           expect(creator.patient_coverage).to be_nil
         end
+      end
+
+      it 'finds no Coverage and warns the waiting test when the fhirServer has no scheme' do
+        no_scheme_creator = make_v221_creator(
+          types: [],
+          hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
+          body: {
+            'fhirServer' => 'example/r4',
+            'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+            'hookInstance' => 'example-hook-instance',
+            'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
+          }
+        )
+
+        expect(no_scheme_creator.patient_coverage).to be_nil
+        expect(messages_double).to have_received(:create).with(
+          hash_including(message: include('`URI::InvalidURIError: not an absolute http(s) URL`'))
+        )
       end
 
       it 'searches for the Coverage only once when the search fails' do

@@ -7,20 +7,18 @@ module DaVinciCRDTestKit
     # with its own Faraday connection.
     REQUEST_TIMEOUT_SECONDS = 10
 
-    # `get` reports a read timeout as a Faraday::TimeoutError, and the FHIR client (`fhir_read`, etc.),
-    # which uses RestClient, as a RestClient::Exceptions::Timeout. Connection timeouts from `get` are
-    # turned into a failure by Inferno's TCP exception handler.
-    REQUEST_TIMEOUT_ERRORS = [Faraday::TimeoutError, RestClient::Exceptions::Timeout].freeze
-
     def request_timed_out_message(target)
       "Timed out waiting for a response from #{target}."
     end
 
-    # Faraday reports a read timeout as a TimeoutError, but a connection timeout as a
-    # ConnectionFailed wrapping Net::OpenTimeout.
+    # Faraday, used by `get`, reports a read timeout as a TimeoutError, but a connection timeout as a
+    # ConnectionFailed wrapping Net::OpenTimeout. RestClient, used by the FHIR client (`fhir_read`,
+    # etc.), reports either as a RestClient::Exceptions::Timeout. Inferno's TCP exception handler turns
+    # some connection timeouts from `get` into a failure first.
     def timeout?(error)
       error.is_a?(Faraday::TimeoutError) ||
-        (error.is_a?(Faraday::Error) && error.wrapped_exception.is_a?(Net::OpenTimeout))
+        (error.is_a?(Faraday::Error) && error.wrapped_exception.is_a?(Net::OpenTimeout)) ||
+        error.is_a?(RestClient::Exceptions::Timeout)
     end
   end
 end

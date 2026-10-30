@@ -121,6 +121,24 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     end
   end
 
+  {
+    [{ 'kty' => 'RSA' }] => 'JWKS must be a JSON object',
+    { 'keys' => [5] } => 'Each key in the JWKS `keys` field must be a JSON object'
+  }.each do |jwks_content, error_message|
+    it "reports the JWKS #{jwks_content.to_json} and checks the other requests" do
+      other_jwks_url = 'https://cds.example.org/other-jwks.json'
+      stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_content.to_json)
+      stub_request(:get, other_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+
+      token_headers = [token_header.to_json, token_header.merge(jku: other_jwks_url).to_json]
+      result = run(test, auth_token_headers_json: token_headers, cds_jwk_set: example_client_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to eq("(Request 1) #{error_message}")
+      expect(session_output(:crd_jwks_keys_json).first).to be_nil
+      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+    end
+  end
+
   it 'reports a TLS handshake that times out as a timeout' do
     # Net::HTTP raises this without the 'Failed to open TCP' message, so Inferno passes it through
     stub_request(:get, example_client_jwks_url).to_raise(Net::OpenTimeout.new('execution expired'))

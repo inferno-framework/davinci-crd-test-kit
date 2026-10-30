@@ -69,6 +69,12 @@ module DaVinciCRDTestKit
             next
           end
 
+          unless jwks.is_a?(Hash)
+            add_request_message('error', 'JWKS must be a JSON object', index)
+            crd_jwks_keys_json << nil
+            next
+          end
+
           keys = jwks['keys']
           unless keys.is_a?(Array)
             add_request_message('error', 'JWKS `keys` field must be an array', index)
@@ -78,6 +84,12 @@ module DaVinciCRDTestKit
 
           if keys.blank?
             add_request_message('error', 'The JWK set returned contains no public keys', index)
+            crd_jwks_keys_json << nil
+            next
+          end
+
+          unless keys.all?(Hash)
+            add_request_message('error', 'Each key in the JWKS `keys` field must be a JSON object', index)
             crd_jwks_keys_json << nil
             next
           end

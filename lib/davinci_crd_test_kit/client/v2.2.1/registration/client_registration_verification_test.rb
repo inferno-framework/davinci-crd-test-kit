@@ -148,7 +148,7 @@ module DaVinciCRDTestKit
         end
 
         JWT::JWK.new(key_hash)
-      rescue JWT::DecodeError => e # includes JWT::JWKError, and the Base64DecodeError of malformed key values
+      rescue StandardError => e # malformed key values raise errors from JWT, OpenSSL, and Ruby itself
         id = key_hash['kid'] || index
         warning_messages << "Key #{id} invalid: #{e}"
         nil
