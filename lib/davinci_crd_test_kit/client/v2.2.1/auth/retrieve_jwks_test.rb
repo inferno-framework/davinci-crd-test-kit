@@ -119,6 +119,12 @@ module DaVinciCRDTestKit
       end
 
       def fetch_jwks(uri, entity, index)
+        # Inferno's `get` raises for a URL it can't request, which would end the test
+        unless uri.to_s.match?(%r{\A(?i:https?)://})
+          add_request_message('error', "JWKS URL `#{uri}` is not an absolute http(s) URL.", index)
+          return
+        end
+
         get(uri)
 
         if response[:status] == 200
@@ -135,6 +141,8 @@ module DaVinciCRDTestKit
       rescue Inferno::Exceptions::AssertionException => e
         # Inferno turns a connection that can't be opened, including one that times out, into a
         # failure, which would end the test before the other requests are checked.
+        raise unless e.cause.is_a?(Faraday::ConnectionFailed) || e.cause.is_a?(SocketError)
+
         message = timeout?(e.cause) ? request_timed_out_message("JWKS URL `#{uri}`") : e.message
         add_request_message('error', message, index)
         nil

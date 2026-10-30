@@ -78,7 +78,10 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     {
       { 'keys' => 'abc' } => 'JWKS `keys` field is missing or is not an array.',
       { 'kty' => 'RSA' } => 'JWKS `keys` field is missing or is not an array.',
-      { 'keys' => ['abc'] } => 'Key 0 invalid: not a JSON object.'
+      {} => 'JWKS `keys` field is missing or is not an array.',
+      [] => 'JWKS content is not a JSON object.',
+      { 'keys' => ['abc'] } => 'Key 0 invalid: not a JSON object.',
+      { 'keys' => [{ 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'a', 'y' => 'b' }] } => start_with('Key 0 invalid: ')
     }.each do |jwks_content, warning|
       result = run_with_defaults(cds_jwk_set: jwks_content.to_json)
       expect(result.result).to eq('fail')

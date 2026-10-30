@@ -177,8 +177,12 @@ module DaVinciCRDTestKit
     def warn_of_failed_response_read(uri, error)
       return unless respond_to?(:result) && result.present?
 
-      outcome = timeout?(error) ? 'Timed out reading' : 'Failed to read'
-      cause = timeout?(error) ? '' : ": `#{error.class}: #{error.message}`"
+      outcome, cause =
+        if timeout?(error)
+          ['Timed out reading', '']
+        else
+          ['Failed to read', ": `#{error.class}: #{error.message}`"]
+        end
       Inferno::Repositories::Messages.new.create(
         result_id: result.id,
         type: 'warning',

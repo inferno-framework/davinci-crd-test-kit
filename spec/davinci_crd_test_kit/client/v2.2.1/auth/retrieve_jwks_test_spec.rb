@@ -107,6 +107,18 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
+  it 'reports a jku that is not an absolute http(s) URL and checks the other requests' do
+    jwks_request = stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header.merge(jku: 'keys.json').to_json, token_header.to_json],
+                       cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(entity_result_message.message)
+      .to eq('(Request 1) JWKS URL `keys.json` is not an absolute http(s) URL.')
+    expect(jwks_request).to have_been_made.once
+    expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+  end
+
   context 'when the connection to the jku cannot be opened' do
     # Net::HTTP gives a connection failure this message, which Inferno looks for
     let(:open_failure_message) { 'Failed to open TCP connection to cds.example.org:443' }

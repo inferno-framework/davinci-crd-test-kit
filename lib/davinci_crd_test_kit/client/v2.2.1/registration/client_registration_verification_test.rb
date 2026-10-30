@@ -115,13 +115,13 @@ module DaVinciCRDTestKit
             nil
           end
 
-        if jwk_body.blank?
+        if jwk_body.nil?
           jwk_body = fetch_jwk_set(jku, warning_messages) # try as url pointing to a jwk set
         else
           warning_messages << 'Providing the JWK Set directly is strongly discouraged.'
         end
 
-        return jwk_set if jwk_body.blank?
+        return jwk_set if jwk_body.nil?
 
         unless jwk_body.is_a?(Hash)
           warning_messages << 'JWKS content is not a JSON object.'
@@ -148,7 +148,7 @@ module DaVinciCRDTestKit
         end
 
         JWT::JWK.new(key_hash)
-      rescue JWT::JWKError => e
+      rescue JWT::DecodeError => e # includes JWT::JWKError, and the Base64DecodeError of malformed key values
         id = key_hash['kid'] || index
         warning_messages << "Key #{id} invalid: #{e}"
         nil
