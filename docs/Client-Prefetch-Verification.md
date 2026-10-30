@@ -1,3 +1,5 @@
+# Client Prefetch Verification
+
 The 2.0.1 version of CRD does not require prefetch and the v2.0.1
 client suite handles prefetch checks differently than v2.2.1.
 This page describes how the v2.2.1 client suite checks prefetch
@@ -104,7 +106,7 @@ sent to the other service.
 
 Testers can do this by making sure that a FHIR element not included in the subset service's
 prefetch set is populated with a reference to a resource that is not referenced anywhere else.
-The reference elements that meet this criteria are:
+Reference elements that meet these criteria include:
 - On an `appointment-book` hook request, an Appointment with a `participant` entry that
   references a Practitioner or PractitionerRole resource in its `actor` element.
 - On an `encounter-start` or `encounter-discharge` hook request, an Encounter with a
@@ -112,8 +114,8 @@ The reference elements that meet this criteria are:
   `serviceProvider` element.
 - On an `order-select`, `order-sign`, or `order-dispatch` hook request, one of the following order resources:
   - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner
-    or PractitionerRole resource in its `requester` element, or
-  - A NutritionOrder that references a Practitioner or PractitionerRole resource in its `orderer` element
+    or PractitionerRole resource in its `requester` element,
+  - A NutritionOrder that references a Practitioner or PractitionerRole resource in its `orderer` element, or
   - A VisionPrescription that references a Practitioner or PractitionerRole resource in its `prescriber` element.
 
 ## Reference Resolution Within Hook Requests
@@ -176,7 +178,7 @@ rules [described above](#resource-identity).
 When executing the `resolve()` function, Inferno uses these same rules
 to identify the absolute URL for the target resource and match it back
 to a provided resource. When executing FHIRPath, only the identified
-resources within the hook request are considered; Inferno will not
+resources within the hook request's `prefetch` are considered; Inferno will not
 use fetched resources to supplement that set. Furthermore, if the
 `resolve()` function fails, Inferno will never continue execution
 even if it appears that the reference itself could supply the rest

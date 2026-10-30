@@ -368,7 +368,7 @@ will expect this resource to be available only during the hook request made by t
 
 #### Multiple Service Endpoints
 
-The v2.2.1 suite defines two sets of services [described here](Client-Prefetch-Verification#infernos-subset-services).
+The v2.2.1 suite defines two sets of services [described here](Client-Prefetch-Verification#inferno-requested-prefetches).
 
 #### Hook Configuration Options
 
