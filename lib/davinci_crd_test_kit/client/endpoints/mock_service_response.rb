@@ -225,8 +225,7 @@ module DaVinciCRDTestKit
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetched_coverage = PrefetchedCoverageValue.find(request_body['prefetch'])
       if prefetched_coverage.present?
-        coverage_or_bundle = FHIR.from_contents(prefetched_coverage.to_json)
-        coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
+        first_resource(FHIR.from_contents(prefetched_coverage.to_json))
       else
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
@@ -392,7 +391,9 @@ module DaVinciCRDTestKit
       bundle = FHIR.from_contents(prefetch_value.to_json)
       return unless bundle.is_a?(FHIR::Bundle)
 
-      bundle.entry.find { |e| e.resource.present? && e.resource.resourceType == resource_type && e.resource.id == id }
+      bundle.entry.find do |e|
+        fhir_resource?(e.resource) && e.resource.resourceType == resource_type && e.resource.id == id
+      end
     end
 
     def create_system_actions(resource, coverage_id)
@@ -423,7 +424,8 @@ module DaVinciCRDTestKit
           }
         )
       end
-      system_actions
+      # nil, like a failure, when no entry was a resource, so that the instructions card is still sent
+      system_actions.presence
     end
 
     def add_coverage_extension(resource, coverage_id)

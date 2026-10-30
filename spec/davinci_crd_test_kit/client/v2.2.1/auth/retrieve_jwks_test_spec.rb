@@ -33,11 +33,14 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
   end
   let(:jwks_hash_no_kids) { { keys: jwks_hash['keys'].map { |key| key.except('kid') } } }
 
-  def entity_result_message
+  def entity_result_messages
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [test])
       .first
       .messages
-      .first
+  end
+
+  def entity_result_message
+    entity_result_messages.first
   end
 
   def session_output(name)
@@ -128,7 +131,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     false => 'JWKS must be a JSON object',
     {} => 'JWKS `keys` field must be an array',
     { 'keys' => [5] } => 'Each key in the JWKS `keys` field must be a JSON object',
-    { 'keys' => [{ 'kty' => 'unknown', 'kid' => 'a' }] } => 'Invalid JWK: {"kty":"unknown","kid":"a"}'
+    { 'keys' => [{ 'kty' => 'unknown', 'kid' => 'a' }] } => 'The JWK set returned contains no keys that can be used'
   }.each do |jwks_content, error_message|
     it "reports the JWKS #{jwks_content.to_json} and checks the other requests" do
       other_jwks_url = 'https://cds.example.org/other-jwks.json'
@@ -138,10 +141,23 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       token_headers = [token_header.to_json, token_header.merge(jku: other_jwks_url).to_json]
       result = run(test, auth_token_headers_json: token_headers, cds_jwk_set: example_client_jwks_url)
       expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to eq("(Request 1) #{error_message}")
+      expect(entity_result_messages)
+        .to include(have_attributes(type: 'error', message: "(Request 1) #{error_message}"))
       expect(session_output(:crd_jwks_keys_json).first).to be_nil
       expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
     end
+  end
+
+  it 'warns about a key that cannot be imported, and passes using the other keys' do
+    unknown_key = { 'kty' => 'unknown', 'kid' => 'unknown-key' }
+    stub_request(:get, example_client_jwks_url)
+      .to_return(status: 200, body: { 'keys' => [jwk, unknown_key] }.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
+    expect(result.result).to eq('pass')
+    expect(entity_result_messages.map { |message| [message.type, message.message] })
+      .to eq([['warning', "(Request 1) Invalid JWK: #{unknown_key.to_json}"]])
+    expect(JSON.parse(session_output(:crd_jwks_keys_json).first)).to eq([jwk])
   end
 
   it 'reports a TLS handshake that times out as a timeout' do

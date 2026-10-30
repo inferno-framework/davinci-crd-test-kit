@@ -96,17 +96,7 @@ module DaVinciCRDTestKit
             next
           end
 
-          invalid_keys = keys.select do |jwk|
-            JWT::JWK.import(jwk.deep_symbolize_keys)
-            false
-          rescue StandardError
-            add_request_message('error', "Invalid JWK: #{jwk.to_json}", index)
-            true
-          end
-          if invalid_keys.present?
-            crd_jwks_keys_json << nil
-            next
-          end
+          usable_keys = keys.select { |jwk| importable_jwk?(jwk, index) }
 
           kid_presence = keys.all? { |key| key['kid'].present? }
           if kid_presence.blank?
@@ -124,12 +114,29 @@ module DaVinciCRDTestKit
             next
           end
 
-          crd_jwks_keys_json << keys.to_json
+          if usable_keys.blank?
+            add_request_message('error', 'The JWK set returned contains no keys that can be used', index)
+            crd_jwks_keys_json << nil
+            next
+          end
+
+          crd_jwks_keys_json << usable_keys.to_json
         end
 
         output crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
         assert_no_error_messages("#{requests_with_errors_prefix}Retrieving JWKS failed. See Messages for details.")
+      end
+
+      # A key that can't be imported, such as one with a `kty` that isn't understood, is left out of
+      # the keys passed to later tests, which can still use the others. RFC 7517 section 5 says such
+      # keys SHOULD be ignored, so this is only a warning.
+      def importable_jwk?(jwk, index)
+        JWT::JWK.import(jwk.deep_symbolize_keys)
+        true
+      rescue StandardError
+        add_request_message('warning', "Invalid JWK: #{jwk.to_json}", index)
+        false
       end
 
       def cds_jwk_set_input_needed?(auth_token_headers)
