@@ -1,3 +1,4 @@
+require_relative '../../cross_suite/request_timeout_handling'
 require_relative '../../cross_suite/resource_identity'
 require_relative '../../cross_suite/tags'
 require_relative '../prefetched_coverage_value'
@@ -8,6 +9,8 @@ module DaVinciCRDTestKit
   # them later. Shared by the data gathering for each CRD version, and by response generation,
   # which needs the Coverage the request is for.
   module HookRequestDataAccess
+    include RequestTimeoutHandling
+
     # Reads happen before the hook response is sent, so a server that stops responding must not
     # hold the response indefinitely.
     FHIR_SERVER_TIMEOUT_SECONDS = 10
@@ -175,13 +178,6 @@ module DaVinciCRDTestKit
 
     def server_timed_out?(query)
       timed_out_servers.include?(server_for(query))
-    end
-
-    # Faraday reports a read timeout as a TimeoutError, but a connection timeout as a
-    # ConnectionFailed wrapping Net::OpenTimeout.
-    def timeout?(error)
-      error.is_a?(Faraday::TimeoutError) ||
-        (error.is_a?(Faraday::Error) && error.wrapped_exception.is_a?(Net::OpenTimeout))
     end
 
     # Redirects are followed, and, as Inferno's FHIR client does, the read is recorded under the URL

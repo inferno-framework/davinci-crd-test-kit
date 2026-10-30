@@ -38,12 +38,31 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result.result).to eq('pass')
   end
 
-  it 'fails, rather than errors, when retrieving the JWKS URL times out' do
-    stub_request(:get, example_jwks_url).to_raise(Net::ReadTimeout)
+  [Net::ReadTimeout, Net::OpenTimeout].each do |timeout_error|
+    it "fails, rather than errors, when retrieving the JWKS URL raises #{timeout_error}" do
+      stub_request(:get, example_jwks_url).to_raise(timeout_error)
+      result = run_with_defaults(cds_jwk_set: example_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message))
+        .to include("Timed out waiting for a response from JWKS URL `#{example_jwks_url}`.")
+      expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
+    end
+  end
+
+  it 'fails, rather than errors, when the JWKS URL refuses the connection' do
+    stub_request(:get, example_jwks_url).to_raise(Errno::ECONNREFUSED)
     result = run_with_defaults(cds_jwk_set: example_jwks_url)
     expect(result.result).to eq('fail')
     expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from #{example_jwks_url}:"))
-    expect(result_messages.map(&:message)).to include(include('does not include any valid keys'))
+  end
+
+  it 'fails, rather than errors, when the JWKS content is not a JSON object' do
+    stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash['keys'].to_json)
+    [example_jwks_url, '5'].each do |cds_jwk_set|
+      result = run_with_defaults(cds_jwk_set:)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message)).to include('JWKS content is not a JSON object.')
+    end
   end
 
   it 'fails, rather than errors, when the JWKS input is neither JSON nor a URL' do

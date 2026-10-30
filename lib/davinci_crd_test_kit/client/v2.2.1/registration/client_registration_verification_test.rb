@@ -1,12 +1,13 @@
 require 'jwt'
 require_relative '../client_urls'
 require_relative '../../client_input_helper'
-require_relative '../../endpoints/hook_request_data_access'
+require_relative '../../../cross_suite/request_timeout_handling'
 
 module DaVinciCRDTestKit
   module V221
     class CRDClientRegistrationVerification < Inferno::Test
       include ClientURLs
+      include RequestTimeoutHandling
 
       id :crd_v221_client_registration_verification
       title 'CRD client registration details are complete and valid'
@@ -122,6 +123,11 @@ module DaVinciCRDTestKit
 
         return jwk_set if jwk_body.blank?
 
+        unless jwk_body.is_a?(Hash)
+          warning_messages << 'JWKS content is not a JSON object.'
+          return jwk_set
+        end
+
         jwk_body['keys']&.each_with_index do |key_hash, index|
           parsed_key =
             begin
@@ -149,7 +155,11 @@ module DaVinciCRDTestKit
         warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
         nil
       rescue Faraday::Error => e
-        warning_messages << "Failed to fetch JWKS from #{jku}: #{e.message}"
+        warning_messages << if timeout?(e)
+                              request_timed_out_message("JWKS URL `#{jku}`")
+                            else
+                              "Failed to fetch JWKS from #{jku}: #{e.message}"
+                            end
         nil
       end
 
@@ -161,8 +171,7 @@ module DaVinciCRDTestKit
       end
 
       def jwks_connection
-        timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
-        Faraday.new(request: { open_timeout: timeout, timeout: })
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS })
       end
     end
   end

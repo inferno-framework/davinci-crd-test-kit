@@ -132,6 +132,12 @@ module DaVinciCRDTestKit
       rescue *REQUEST_TIMEOUT_ERRORS
         add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
         nil
+      rescue Inferno::Exceptions::AssertionException => e
+        # Inferno turns a connection that can't be opened, including one that times out, into a
+        # failure, which would end the test before the other requests are checked.
+        message = timeout?(e.cause) ? request_timed_out_message("JWKS URL `#{uri}`") : e.message
+        add_request_message('error', message, index)
+        nil
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)

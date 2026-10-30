@@ -424,6 +424,13 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         end
       end
 
+      it 'still finds no Coverage, rather than raising, when the warning cannot be recorded' do
+        stub_request(:get, coverage_search_url).to_raise(Net::ReadTimeout)
+        allow(messages_double).to receive(:create).and_raise(StandardError, 'database unavailable')
+
+        expect(creator.patient_coverage).to be_nil
+      end
+
       it 'raises when the connection is refused, so that the failure is reported' do
         stub_request(:get, coverage_search_url).to_raise(Errno::ECONNREFUSED)
         expect { creator.patient_coverage }.to raise_error(Faraday::ConnectionFailed)

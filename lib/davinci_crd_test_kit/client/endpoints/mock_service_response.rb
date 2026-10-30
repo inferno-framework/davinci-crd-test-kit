@@ -179,6 +179,8 @@ module DaVinciCRDTestKit
     # These reads are not recorded, so without a warning the tester could not tell why the
     # response lacks the data.
     def warn_of_response_read_timeout(uri)
+      return unless respond_to?(:result) && result.present?
+
       Inferno::Repositories::Messages.new.create(
         result_id: result.id,
         type: 'warning',
@@ -186,6 +188,9 @@ module DaVinciCRDTestKit
                  "response to hook request `#{request_body&.dig('hookInstance')}`. Check the response for " \
                  'cards or system actions that are missing or incomplete.'
       )
+    rescue StandardError => e
+      # the warning must not cost the CRD client its hook response
+      Inferno::Application['logger'].error("Could not record the read timeout for `#{uri}`: #{e.full_message}")
     end
 
     def patient_coverage

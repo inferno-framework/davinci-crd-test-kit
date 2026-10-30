@@ -107,6 +107,38 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
+  context 'when the connection to the jku cannot be opened' do
+    # Net::HTTP gives a connection failure this message, which Inferno looks for
+    let(:open_failure_message) { 'Failed to open TCP connection to cds.example.org:443' }
+
+    it 'reports a timeout and checks the other requests if opening the connection times out' do
+      jwks_request = stub_request(:get, example_client_jwks_url)
+        .to_raise(Net::OpenTimeout.new("#{open_failure_message} (execution expired)")).then
+        .to_return(status: 200, body: jwks_hash.to_json)
+
+      result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
+                         cds_jwk_set: example_client_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message)
+        .to eq("(Request 1) Timed out waiting for a response from JWKS URL `#{example_client_jwks_url}`.")
+      expect(jwks_request).to have_been_made.times(2)
+      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+    end
+
+    it 'reports the failure and checks the other requests if the connection is refused' do
+      jwks_request = stub_request(:get, example_client_jwks_url)
+        .to_raise(Errno::ECONNREFUSED.new(open_failure_message)).then
+        .to_return(status: 200, body: jwks_hash.to_json)
+
+      result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
+                         cds_jwk_set: example_client_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to include(open_failure_message)
+      expect(jwks_request).to have_been_made.times(2)
+      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+    end
+  end
+
   it 'passes if it receives a valid jwk_set input' do
     token_header_no_jku = token_header.except(:jku)
 
