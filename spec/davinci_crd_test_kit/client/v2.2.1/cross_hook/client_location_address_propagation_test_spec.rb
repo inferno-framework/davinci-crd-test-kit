@@ -71,7 +71,8 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
   end
 
   def location_bundle(*locations)
-    { 'resourceType' => 'Bundle', 'entry' => locations.map { |r| { 'resource' => r } } }
+    { 'resourceType' => 'Bundle',
+      'entry' => locations.map { |r| { 'fullUrl' => "#{fhir_server}/Location/#{r['id']}", 'resource' => r } } }
   end
 
   describe 'when checking location address propagation' do
@@ -200,8 +201,7 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
     end
 
-    it 'resolves a relative partOf reference of a location with a urn fullUrl against the FHIR server' do
-      allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+    it 'does not resolve a relative partOf reference of a location with a urn fullUrl against the FHIR server' do
       child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
       create_hook_request(body: {
                             'hookInstance' => hook_instance, 'hook' => hook_name,
@@ -212,12 +212,29 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       create_parent_location_fetch_request(location: parent_location_with_address)
       result = run(test)
       expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message).join).to include("parent 'Location/parent-1' has an address")
-      expect(result_messages.map(&:message).join).to_not include('could not be fetched')
+      expect(result_messages.map(&:message).join)
+        .to include("relative `partOf` reference 'Location/parent-1' could not be resolved")
+      expect(result_messages.map(&:message).join).to_not include('has an address')
     end
 
-    # The prefetched parent is identified by its urn fullUrl, so it is not the `Location/parent-1` on the FHIR
-    # server that the child's relative reference names.
+    it 'does not resolve a relative partOf reference of a location in a bundle entry without a fullUrl' do
+      child = location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' })
+      create_hook_request(body: {
+                            'hookInstance' => hook_instance, 'hook' => hook_name,
+                            'prefetch' => { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+                              { 'resource' => child }, { 'resource' => parent_location_with_address }
+                            ] } }
+                          })
+      create_parent_location_fetch_request(location: parent_location_with_address)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message).join)
+        .to include("relative `partOf` reference 'Location/parent-1' could not be resolved")
+      expect(result_messages.map(&:message).join).to_not include('has an address')
+    end
+
+    # The relative reference held by a Location with a urn fullUrl cannot be resolved, so neither the
+    # prefetched parent nor `Location/parent-1` on the FHIR server is taken to be its parent.
     describe 'when the child and parent are both prefetched with urn fullUrls' do
       let(:child) { location_without_address.merge('partOf' => { 'reference' => 'Location/parent-1' }) }
 
@@ -235,14 +252,14 @@ RSpec.describe DaVinciCRDTestKit::V221::ClientLocationAddressPropagationTest do
       it 'does not resolve the relative partOf reference to the prefetched parent' do
         result = run(test)
         expect(result.result).to eq('fail')
-        expect(result_messages.map(&:message).join).to match(%r{Location/parent-1.*could not be fetched})
+        expect(result_messages.map(&:message).join)
+          .to include("relative `partOf` reference 'Location/parent-1' could not be resolved")
         expect(result_messages.map(&:message).join).to_not include('has an address')
       end
 
-      it 'resolves the relative partOf reference to the parent read from the FHIR server' do
-        allow_any_instance_of(test).to receive(:resource_is_valid?).and_return(true)
+      it 'does not resolve the relative partOf reference to a parent read from the FHIR server' do
         create_parent_location_fetch_request(location: parent_location_without_address)
-        expect(run(test).result).to eq('pass')
+        expect(run(test).result).to eq('fail')
       end
     end
 

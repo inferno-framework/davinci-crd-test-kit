@@ -81,8 +81,10 @@ resources that conform to certain profiles. If Inferno cannot find all the examp
 needs to see for a referencing resource type, the test will skip.
 
 When resolving references, Inferno first looks for the referenced resource
-within the `context` or `prefetch` fields of the hook request and falls back to obtaining
-the resource via a FHIR read during the hook invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
+within the `context` or `prefetch` fields of the hook request
+using the [reference resolution rules](Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+and falls back to obtaining the resource via a FHIR read during the hook
+invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
 section for details).
 
 Using the resolved references, Inferno then confirms support for one or more

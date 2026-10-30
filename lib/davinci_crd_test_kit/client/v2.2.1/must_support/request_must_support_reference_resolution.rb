@@ -95,7 +95,8 @@ module DaVinciCRDTestKit
             Inferno obtains the resources needed to perform these checks during the hook request by
             performing a FHIR read of any references in must support elements that aren't already
             present in the `context` or `prefetch` fields of the hook request. See the wiki's
-            documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
+            documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+            and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
             for details on how Inferno gets these resources.
 
             If no instances of the resource type were observed, the test skips unless the tester
@@ -202,7 +203,7 @@ module DaVinciCRDTestKit
 
       def bundle_identified_resources(bundle, fhir_server)
         identified = []
-        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server, nil) do |identity, raw|
+        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server) do |identity, raw|
           identified << [ResourceIdentity.normalized_url(identity), to_fhir_resource(raw)]
         end
         identified
@@ -215,7 +216,7 @@ module DaVinciCRDTestKit
         return {} unless reference.reference.is_a?(String)
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
-        base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]
+        base = ResourceIdentity.base_for(entry[:identity])
         url = ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference.reference, base))
         return {} if url.blank?
 
@@ -363,7 +364,8 @@ module DaVinciCRDTestKit
         skip_if unidentified.present?,
                 "Instances of #{unidentified.map { |resource_type| "`#{resource_type}`" }.to_sentence} were " \
                 'observed, but none could be identified by absolute URL, so their references could not be ' \
-                'checked. Include `fhirServer` in hook requests, and an id or `fullUrl` for each resource.'
+                'checked. Include `fhirServer` in hook requests, a `fullUrl` for each Bundle entry, and an id ' \
+                'for each resource outside a Bundle.'
       end
 
       run do

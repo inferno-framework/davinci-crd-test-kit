@@ -508,8 +508,9 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
             'coverage' => {
               'resourceType' => 'Bundle',
               'type' => 'searchset',
-              'entry' => [{ 'resource' => {
+              'entry' => [{ 'fullUrl' => "#{fhir_server}/Coverage/example", 'resource' => {
                 'resourceType' => 'Coverage',
+                'id' => 'example',
                 'payor' => [{ 'reference' => 'Organization/example-payer' }]
               } }]
             }
@@ -550,7 +551,7 @@ RSpec.describe DaVinciCRDTestKit::HookRequestEndpoint, :request do
             'locations' => {
               'resourceType' => 'Bundle',
               'type' => 'searchset',
-              'entry' => [{ 'resource' => {
+              'entry' => [{ 'fullUrl' => "#{fhir_server}/Location/child-loc", 'resource' => {
                 'resourceType' => 'Location',
                 'id' => 'child-loc',
                 'partOf' => { 'reference' => 'Location/parent-loc' }

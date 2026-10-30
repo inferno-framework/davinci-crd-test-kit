@@ -26,13 +26,21 @@ module DaVinciCRDTestKit
       cds_component, remaining_query = identify_cds_component(fhirpath_query)
       execution_targets = cds_component.present? ? get_cds_field(hook_request, cds_component) : hook_request
 
+      @current_fhirpath_query = fhirpath_query
       execution_targets.map do |execution_target|
         @current_base_fhir_server = hook_request['fhirServer']
+        @current_reference_holder = {
+          description: cds_component.presence || 'the request',
+          base_source: "the request's fhirServer",
+          base_unknown_reason: 'the request has no fhirServer'
+        }
         execute(execution_target, remaining_query)
       end.flatten.compact
     ensure
       # clean-up identity
       @current_base_fhir_server = nil
+      @current_reference_holder = nil
+      @current_fhirpath_query = nil
     end
 
     private
@@ -113,21 +121,52 @@ module DaVinciCRDTestKit
       end.flatten.compact
     end
 
+    # resolve() makes the resolved resource the holder of the references that follow it, so the
+    # holder is restored afterwards for any sibling references
     def execute_resolve(execution_target, fhirpath_query)
-      referenced = resolve(execution_target)
-      return nil unless referenced.present?
+      with_reference_holder_restored do
+        referenced = resolve(execution_target)
+        next nil unless referenced.present?
 
-      execute(referenced, fhirpath_query[10..])
+        execute(referenced, fhirpath_query[10..])
+      end
     end
 
     def execute_entry_resource_step(execution_target, fhirpath_query)
       validate_entry_resource_query!(fhirpath_query)
       return nil unless execution_target['entry'].present?
 
-      Array.wrap(execution_target['entry']).map do |entry|
-        @current_base_fhir_server = base_fhir_server_for_identity(entry['fullUrl'])
-        execute(entry['resource'], fhirpath_query[15..])
-      end.flatten.compact
+      bundle_description = @current_reference_holder&.dig(:description)
+      with_reference_holder_restored do
+        Array.wrap(execution_target['entry']).each_with_index.map do |entry, index|
+          @current_base_fhir_server = base_fhir_server_for_identity(entry['fullUrl'])
+          @current_reference_holder = entry_reference_holder(entry, index, bundle_description)
+          execute(entry['resource'], fhirpath_query[15..])
+        end.flatten.compact
+      end
+    end
+
+    def with_reference_holder_restored
+      saved_base_fhir_server = @current_base_fhir_server
+      saved_reference_holder = @current_reference_holder
+      yield
+    ensure
+      @current_base_fhir_server = saved_base_fhir_server
+      @current_reference_holder = saved_reference_holder
+    end
+
+    # describes the entry's resource as the holder of the references within it
+    def entry_reference_holder(entry, index, bundle_description)
+      type, id = ResourceIdentity.type_and_id(entry['resource'])
+      description = "Bundle entry #{index + 1}#{" (#{type}/#{id})" if type.present? && id.present?}" \
+                    "#{" of #{bundle_description}" if bundle_description.present?}"
+      base_unknown_reason =
+        if entry['fullUrl'].blank?
+          "#{description} has no fullUrl"
+        else
+          "#{description} has fullUrl '#{entry['fullUrl']}', which is not a RESTful URL"
+        end
+      { description:, base_source: 'its fullUrl', base_unknown_reason: }
     end
 
     def validate_entry_resource_query!(fhirpath_query)

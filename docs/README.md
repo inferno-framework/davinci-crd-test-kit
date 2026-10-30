@@ -24,6 +24,7 @@ to this test kit.
     and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
 *   **[Controlling Simulated CRD Server Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
 *   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what CRD clients must demonstrate to pass.
+*   **[Client Prefetch Verification](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification)**: Details on how the v2.2.1 client suite verifies prefetch data, including what Inferno's simulated services request and how Inferno resolves references within hook requests.
 
 ### Using the Da Vinci CRD Server Test Suites 
 *   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.

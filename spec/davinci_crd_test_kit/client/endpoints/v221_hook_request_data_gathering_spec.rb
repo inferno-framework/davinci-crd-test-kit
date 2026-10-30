@@ -9,8 +9,8 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
     let(:location2_fhir) { FHIR.from_contents(location2_example.to_json) }
     let(:location_prefetch_bundle) do
       bundle = FHIR::Bundle.new(type: 'searchset')
-      bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
-      bundle.entry << FHIR::Bundle::Entry.new(resource: location2_fhir)
+      bundle.entry << FHIR::Bundle::Entry.new(fullUrl: location_example_reference_absolute, resource: location_fhir)
+      bundle.entry << FHIR::Bundle::Entry.new(fullUrl: location2_example_reference_absolute, resource: location2_fhir)
       bundle
     end
 
@@ -34,6 +34,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         result = module_instance.prefetched_location_bundle
         expect(result).to be_a(FHIR::Bundle)
         expect(result.entry.first.resource.id).to eq('example')
+        expect(result.entry.first.fullUrl).to eq(location_example_reference_absolute)
       end
 
       it 'returns nil when prefetch locations is neither a Bundle nor a Location' do
@@ -67,18 +68,32 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       end
 
       it 'deduplicates entries identifying the same location' do
-        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(resource: location_fhir)
+        location_prefetch_bundle.entry << FHIR::Bundle::Entry.new(fullUrl: location_example_reference_absolute,
+                                                                  resource: location_fhir)
         order_sign_request['prefetch'] = { 'locations' => JSON.parse(location_prefetch_bundle.to_json) }
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
         result = module_instance.prefetched_locations_and_parents_hash
         expect(result.size).to eq(2)
       end
 
+      it 'does not read the parent of a location in a bundle entry without a fullUrl' do
+        child = location_example.merge('partOf' => { 'reference' => location2_example_reference_relative })
+        order_sign_request['prefetch'] = { 'locations' => { 'resourceType' => 'Bundle', 'entry' => [
+          { 'resource' => child }
+        ] } }
+        allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+        result = module_instance.prefetched_locations_and_parents_hash
+        expect(result.keys).to contain_exactly('Location/example')
+        expect(a_request(:get, location2_example_reference_absolute)).to_not have_been_made
+      end
+
       it 'fetches and includes parent locations when a prefetched location has partOf' do
         location_with_parent = FHIR.from_contents(location_example.to_json)
         location_with_parent.partOf = FHIR::Reference.new(reference: location2_example_reference_relative)
         bundle = FHIR::Bundle.new(type: 'searchset')
-        bundle.entry << FHIR::Bundle::Entry.new(resource: location_with_parent)
+        bundle.entry << FHIR::Bundle::Entry.new(fullUrl: location_example_reference_absolute,
+                                                resource: location_with_parent)
         order_sign_request['prefetch'] = { 'locations' => JSON.parse(bundle.to_json) }
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
 
@@ -92,9 +107,9 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         expect(parent_request).to have_been_made.once
       end
 
-      # The prefetched parent is identified by its urn fullUrl, so it is not the Location on the FHIR server
-      # that the child's relative reference names, even though it is in the hash first.
-      it 'reads the parent of a location with a urn fullUrl even when a parent with that id was prefetched' do
+      # A relative reference held by a Location with a urn fullUrl cannot be resolved, so neither the
+      # prefetched parent with that id nor the Location on the FHIR server is taken to be the parent.
+      it 'does not read the parent of a location with a urn fullUrl through a relative reference' do
         child_urn = 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90'
         parent_urn = 'urn:uuid:9e3c2b7d-1a4f-4c6e-8b5d-2f7a9c1e4b60'
         child = location_example.merge('partOf' => { 'reference' => location2_example_reference_relative })
@@ -104,12 +119,9 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         ] } }
         allow(module_instance).to receive(:request_body).and_return(order_sign_request)
 
-        parent_request = stub_request(:get, location2_example_reference_absolute)
-          .to_return(status: 200, body: location2_example.to_json)
-
         result = module_instance.prefetched_locations_and_parents_hash
-        expect(parent_request).to have_been_made.once
-        expect(result.keys).to contain_exactly(parent_urn, child_urn, location2_example_reference_absolute)
+        expect(a_request(:get, location2_example_reference_absolute)).to_not have_been_made
+        expect(result.keys).to contain_exactly(parent_urn, child_urn)
       end
     end
 
@@ -132,13 +144,18 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       end
 
       it 'adds a valid Location to the hash keyed by the absolute url identifying it' do
-        module_instance.add_location_to_hash(location_fhir, location_hash)
+        module_instance.add_location_to_hash(location_fhir, location_hash, location_example_reference_absolute)
         expect(location_hash[location_example_reference_absolute]).to eq(location_fhir)
+      end
+
+      it 'keys a Location with no identity by its type and id' do
+        module_instance.add_location_to_hash(location_fhir, location_hash)
+        expect(location_hash['Location/example']).to eq(location_fhir)
       end
 
       it 'does not re-add a Location already present in the hash' do
         location_hash[location_example_reference_absolute] = location_fhir
-        module_instance.add_location_to_hash(location_fhir, location_hash)
+        module_instance.add_location_to_hash(location_fhir, location_hash, location_example_reference_absolute)
         expect(location_hash.size).to eq(1)
       end
 
@@ -149,7 +166,7 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         loc_request = stub_request(:get, location2_example_reference_absolute)
           .to_return(status: 200, body: location2_example.to_json)
 
-        module_instance.add_location_to_hash(location_with_parent, location_hash)
+        module_instance.add_location_to_hash(location_with_parent, location_hash, location_example_reference_absolute)
         expect(location_hash.size).to eq(2)
         expect(location_hash[location_example_reference_absolute]).to eq(location_with_parent)
         expect(location_hash[location2_example_reference_absolute]).to eq(location2_fhir)
@@ -278,13 +295,26 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       expect(payer_request).to have_been_made.once
     end
 
+    it 'does not read a relative payer reference held by a Coverage in a Bundle entry without a fullUrl' do
+      coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
+      order_sign_request['prefetch'] = { 'coverage' => { 'resourceType' => 'Bundle', 'type' => 'searchset',
+                                                         'entry' => [{ 'resource' => coverage }] } }
+      allow(module_instance).to receive(:request_body).and_return(order_sign_request)
+
+      module_instance.request_coverage_payer
+
+      expect(a_request(:get, organization_example_reference_absolute)).to_not have_been_made
+    end
+
     it 'reads the payer of the first Coverage in a prefetched Bundle that holds other entries' do
       coverage = crd_coverage.merge('payor' => [{ 'reference' => organization_example_reference_relative }])
       outcome = { 'resourceType' => 'OperationOutcome',
                   'issue' => [{ 'severity' => 'information', 'code' => 'informational' }] }
       order_sign_request['prefetch'] = {
         'coverage' => { 'resourceType' => 'Bundle', 'type' => 'searchset',
-                        'entry' => [{ 'resource' => outcome }, { 'resource' => coverage }] }
+                        'entry' => [{ 'resource' => outcome },
+                                    { 'fullUrl' => "#{fhir_server}/Coverage/#{coverage['id']}",
+                                      'resource' => coverage }] }
       }
       allow(module_instance).to receive(:request_body).and_return(order_sign_request)
       allow(Inferno::Application['logger']).to receive(:error)
@@ -383,7 +413,9 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         'fhirServer' => fhir_server,
         'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
         'context' => {
-          'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => service_request }] }
+          'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [
+            { 'fullUrl' => "#{fhir_server}/ServiceRequest/sr1", 'resource' => service_request }
+          ] }
         },
         'prefetch' => { 'patient' => patient_example }
       }.as_json

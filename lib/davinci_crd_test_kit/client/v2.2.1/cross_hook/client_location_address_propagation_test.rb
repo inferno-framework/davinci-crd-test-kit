@@ -42,15 +42,11 @@ module DaVinciCRDTestKit
         return unless location.partOf.present? && location.partOf.reference.present?
 
         parent_identity = parent_identity(location.partOf.reference, identity)
+        return add_unresolvable_parent_message(location, root_id) if parent_identity.nil?
+
         parent = prefetched_location_hash[parent_identity] || fetched_location_hash[parent_identity]
         if parent.present?
-          check_location_conformance(parent, parent_identity, root_id)
-          if parent.address.present?
-            add_message('error', "Address missing on prefetched 'Location/#{root_id}': " \
-                                 "parent 'Location/#{parent.id}' has an address.")
-          else
-            check_location_address_propagation(parent, parent_identity, root_id)
-          end
+          check_parent_address(parent, parent_identity, root_id)
         else
           add_message('error', "Unable to check address propagation prefetched 'Location/#{root_id}': " \
                                "`partOf` reference '#{location.partOf.reference}' could not be fetched.")
@@ -59,13 +55,33 @@ module DaVinciCRDTestKit
         nil
       end
 
+      def check_parent_address(parent, parent_identity, root_id)
+        check_location_conformance(parent, parent_identity, root_id)
+        if parent.address.present?
+          add_message('error', "Address missing on prefetched 'Location/#{root_id}': " \
+                               "parent 'Location/#{parent.id}' has an address.")
+        else
+          check_location_address_propagation(parent, parent_identity, root_id)
+        end
+      end
+
+      def add_unresolvable_parent_message(location, root_id)
+        add_message('error', "Unable to check address propagation prefetched 'Location/#{root_id}': " \
+                             "relative `partOf` reference '#{location.partOf.reference}' could not be resolved " \
+                             'because the Location holding it is not identified by a RESTful URL, from its ' \
+                             "Bundle entry's fullUrl or the request's fhirServer.")
+        nil
+      end
+
       # The identity of the Location a `partOf` reference names, resolved against the base of the
       # Location holding it, following the FHIR rules for resolving references. As when Inferno read
-      # the parent during the hook request, a prefetched Location whose identity is not a RESTful URL,
-      # such as a `urn:uuid:` fullUrl, falls back to its request's FHIR server. A reference with no
-      # absolute form is used as given.
+      # the parent during the hook request, a relative reference held by a prefetched Location whose
+      # identity is not a RESTful URL, such as a `urn:uuid:` fullUrl, cannot be resolved, so it gives
+      # nil. Any other reference with no absolute form is used as given.
       def parent_identity(reference, child_identity)
-        base = ResourceIdentity.base_for(child_identity) || prefetched_location_fhir_servers[child_identity]
+        base = ResourceIdentity.base_for(child_identity)
+        return if base.blank? && !ResourceIdentity.absolute_url?(reference)
+
         ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference, base)) || reference
       end
 
@@ -113,30 +129,17 @@ module DaVinciCRDTestKit
       end
 
       def add_prefetched_locations(request_body, location_hash)
-        fhir_server = ResourceIdentity.fhir_server_base(request_body)
         extract_prefetched_location_bundle(request_body)&.entry&.each do |entry|
           location = entry.resource
           next unless location.is_a?(FHIR::Location) && location.id.present?
 
-          add_prefetched_location(location_hash, prefetched_location_identity(entry, fhir_server), location,
-                                  fhir_server)
+          location_hash[prefetched_location_identity(entry)] ||= location
         end
       end
 
-      def add_prefetched_location(location_hash, identity, location, fhir_server)
-        location_hash[identity] ||= location
-        prefetched_location_fhir_servers[identity] ||= fhir_server
-      end
-
-      # The FHIR server of the hook request that carried each prefetched Location, by identity.
-      def prefetched_location_fhir_servers
-        @prefetched_location_fhir_servers ||= {}
-      end
-
-      # A Location given without a fullUrl is taken to be on the request's FHIR server.
-      def prefetched_location_identity(entry, fhir_server)
-        identity = entry.fullUrl.presence || ResourceIdentity.restful_identity(entry.resource, fhir_server)
-        ResourceIdentity.normalized_url(identity) || "Location/#{entry.resource.id}"
+      # A Location given without a fullUrl has no identity, so it is keyed by `Location/id`.
+      def prefetched_location_identity(entry)
+        ResourceIdentity.normalized_url(entry.fullUrl.presence) || "Location/#{entry.resource.id}"
       end
 
       def extract_prefetched_location_bundle(request_body)
@@ -145,7 +148,9 @@ module DaVinciCRDTestKit
         return locations if locations.is_a?(FHIR::Bundle)
         return nil unless locations.is_a?(FHIR::Location)
 
-        FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
+        # a Location given outside a Bundle is on the request's FHIR server
+        full_url = ResourceIdentity.restful_identity(locations, ResourceIdentity.fhir_server_base(request_body))
+        FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ fullUrl: full_url, resource: locations })] })
       end
 
       # The parent Locations read during hook requests, keyed by the normalized URL each was read from. A read

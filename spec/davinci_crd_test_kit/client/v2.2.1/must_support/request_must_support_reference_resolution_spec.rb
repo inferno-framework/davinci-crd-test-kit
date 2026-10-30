@@ -26,7 +26,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
   # A hook request carrying the given draft orders and a patient prefetch, along with a successful
   # read of each of the given resources made while it was processed. An order or extra prefetched
-  # resource given as a [fullUrl, resource] pair is placed in its Bundle under that fullUrl. External
+  # resource given as a [fullUrl, resource] pair is placed in its Bundle under that fullUrl, any other
+  # under its URL on the FHIR server when it has an id. External
   # reads map the URL each was read from to the resource returned.
   def create_hook_request(orders, read: [], failed_reads: [], external_reads: {}, prefetched: [])
     hook_instance = SecureRandom.uuid
@@ -46,7 +47,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
   def bundle_of(resources)
     entries = resources.map do |one|
-      one.is_a?(Array) ? { fullUrl: one.first, resource: one.last } : { resource: one }
+      if one.is_a?(Array)
+        { fullUrl: one.first, resource: one.last }
+      elsif one[:id].present?
+        { fullUrl: "#{fhir_server}/#{one[:resourceType]}/#{one[:id]}", resource: one }
+      else
+        { resource: one }
+      end
     end
     { resourceType: 'Bundle', type: 'collection', entry: entries }
   end
