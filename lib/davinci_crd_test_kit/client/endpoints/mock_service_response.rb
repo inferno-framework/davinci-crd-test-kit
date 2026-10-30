@@ -159,13 +159,17 @@ module DaVinciCRDTestKit
 
     def make_resource_request(uri, access_token)
       response = connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" })
-      return unless response.status == 200
+      # a body that isn't FHIR is treated like an unsuccessful read
+      return unless response.status == 200 && response.body.present?
 
       resource = FHIR.from_contents(response.body)
+      return if resource.nil?
       return resource unless resource.resourceType == 'Bundle'
       return if resource.entry.empty?
 
       resource.entry.first.resource
+    rescue JSON::ParserError
+      nil
     rescue Faraday::Error, URI::InvalidURIError => e
       # the response is built without the resource, as when the read is unsuccessful
       warn_of_failed_response_read(uri, e)

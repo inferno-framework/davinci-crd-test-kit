@@ -445,6 +445,13 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         )
       end
 
+      ['', '<html></html>', 'not json'].each do |body|
+        it "finds no Coverage, rather than raising, when a 200 response has the body #{body.inspect}" do
+          stub_request(:get, coverage_search_url).to_return(status: 200, body:)
+          expect(creator.patient_coverage).to be_nil
+        end
+      end
+
       it 'searches for the Coverage only once when the search fails' do
         coverage_search = stub_request(:get, coverage_search_url).to_raise(Net::ReadTimeout)
 

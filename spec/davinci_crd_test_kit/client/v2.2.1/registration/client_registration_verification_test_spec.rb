@@ -97,6 +97,14 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
       .to include("Unexpected response status from JWKS URL #{example_jwks_url}: expected 200, but received 404.")
   end
 
+  it 'follows a redirect from the JWKS URL' do
+    redirected_url = 'https://cds.example.org/keys/jwks.json'
+    stub_request(:get, example_jwks_url).to_return(status: 301, headers: { 'Location' => redirected_url })
+    stub_request(:get, redirected_url).to_return(status: 200, body: jwks_hash.to_json)
+    result = run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(result.result).to eq('pass')
+  end
+
   it 'limits how long it waits for the JWKS URL' do
     stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
     allow(Faraday).to receive(:new).and_call_original

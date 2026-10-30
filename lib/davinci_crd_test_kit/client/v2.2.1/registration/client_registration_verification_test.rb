@@ -189,7 +189,9 @@ module DaVinciCRDTestKit
       end
 
       def jwks_connection
-        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS })
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS }) do |f|
+          f.use FaradayMiddleware::FollowRedirects # as Inferno's `get` does
+        end
       end
     end
   end

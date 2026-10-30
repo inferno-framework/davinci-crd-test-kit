@@ -107,15 +107,31 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
-  it 'reports a jku that is not an absolute http(s) URL and checks the other requests' do
-    jwks_request = stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
+  ['keys.json', 'HTTPS://cds.example.org/jwks.json', 'https://exa mple.org/jwks.json'].each do |bad_jku|
+    it "reports the jku `#{bad_jku}` as not an absolute http(s) URL and checks the other requests" do
+      jwks_request = stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
 
-    result = run(test, auth_token_headers_json: [token_header.merge(jku: 'keys.json').to_json, token_header.to_json],
+      result = run(test, auth_token_headers_json: [token_header.merge(jku: bad_jku).to_json, token_header.to_json],
+                         cds_jwk_set: example_client_jwks_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message)
+        .to eq("(Request 1) JWKS URL `#{bad_jku}` is not an absolute http(s) URL.")
+      expect(jwks_request).to have_been_made.once
+      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
+    end
+  end
+
+  it 'reports other failures to get a response, such as a TLS error, and checks the other requests' do
+    jwks_request = stub_request(:get, example_client_jwks_url)
+      .to_raise(OpenSSL::SSL::SSLError.new('certificate verify failed')).then
+      .to_return(status: 200, body: jwks_hash.to_json)
+
+    result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
                        cds_jwk_set: example_client_jwks_url)
     expect(result.result).to eq('fail')
     expect(entity_result_message.message)
-      .to eq('(Request 1) JWKS URL `keys.json` is not an absolute http(s) URL.')
-    expect(jwks_request).to have_been_made.once
+      .to eq("(Request 1) Failed to fetch JWKS URL `#{example_client_jwks_url}`: certificate verify failed")
+    expect(jwks_request).to have_been_made.times(2)
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 

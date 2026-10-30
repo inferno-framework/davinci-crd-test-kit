@@ -120,7 +120,7 @@ module DaVinciCRDTestKit
 
       def fetch_jwks(uri, entity, index)
         # Inferno's `get` raises for a URL it can't request, which would end the test
-        unless uri.to_s.match?(%r{\A(?i:https?)://})
+        unless requestable_url?(uri)
           add_request_message('error', "JWKS URL `#{uri}` is not an absolute http(s) URL.", index)
           return
         end
@@ -146,6 +146,17 @@ module DaVinciCRDTestKit
         message = timeout?(e.cause) ? request_timed_out_message("JWKS URL `#{uri}`") : e.message
         add_request_message('error', message, index)
         nil
+      rescue Faraday::Error => e
+        # other failures to get a response, such as an invalid TLS certificate, which Inferno passes through
+        add_request_message('error', "Failed to fetch JWKS URL `#{uri}`: #{e.message}", index)
+        nil
+      end
+
+      # Matches the scheme check in Inferno's `get`, which is case-sensitive.
+      def requestable_url?(uri)
+        uri.to_s.match?(%r{\Ahttps?://}) && URI.parse(uri.to_s).host.present?
+      rescue URI::InvalidURIError
+        false
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)
