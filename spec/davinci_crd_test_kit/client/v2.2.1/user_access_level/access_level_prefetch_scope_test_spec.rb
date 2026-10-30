@@ -117,18 +117,28 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
   end
 
-  it 'checks presence by type and id when the hook request does not identify a FHIR server' do
-    full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource },
-                          fhir_server: nil)
-    limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => target_resource },
-                             fhir_server: nil)
-    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
-    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
+  it 'fails without checking prefetch when the full-access hook request does not identify a FHIR server' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+                        hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource },
+                                  fhir_server: nil))
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG,
+                        hook_body(hook_instance: 'limited-instance'))
 
-    # without a fhirServer the prefetched resources have no absolute url, but presence is by type and id
     result = run(test, access_level_target_reference: target_reference)
     expect(result.result).to eq('fail')
-    expect(result.result_message).to include('is present in both the full-access and limited-access prefetch data')
+    expect(result.result_message).to include('full-access hook request does not include `fhirServer`')
+  end
+
+  it 'fails without checking prefetch when the limited-access hook request does not identify a FHIR server' do
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG,
+                        hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => other_resource }))
+    create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG,
+                        hook_body(hook_instance: 'limited-instance', fhir_server: nil))
+
+    # the target is absent from the full-access prefetch, so this would otherwise ask for an attestation
+    result = run(test, access_level_target_reference: target_reference)
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('limited-access hook request does not include `fhirServer`')
   end
 
   context 'when the target resource is not present in the full-access prefetch' do

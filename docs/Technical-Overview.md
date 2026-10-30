@@ -124,7 +124,8 @@ directory includes:
   - **[`prefetch_completeness_checker.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_completeness_checker.rb)**:
     In the 2.2.1 version, prefetch support is required including standard prefetch templates that payers can use and expect
     the corresponding data. This module checks the prefetch field of a request against a prefetch definition
-    from a discovery response.
+    from a discovery response. The [Client Prefetch Verification](Client-Prefetch-Verification#infernos-verification)
+    page contains details on the checks performed here.
   - **[`prefetch_profile_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_profile_validation.rb)**:
     Checks that the resources provided under the prefetch field conform to the associated CRD profiles.
 * **FHIRPath Support**: Prefetch checking and custom response generation leverage FHIRPath executed on CDS Hooks requests.

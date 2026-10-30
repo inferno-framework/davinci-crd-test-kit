@@ -95,7 +95,8 @@ module DaVinciCRDTestKit
             Inferno obtains the resources needed to perform these checks during the hook request by
             performing a FHIR read of any references in must support elements that aren't already
             present in the `context` or `prefetch` fields of the hook request. See the wiki's
-            documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
+            documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+            and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
             for details on how Inferno gets these resources.
 
             If no instances of the resource type were observed, the test skips unless the tester

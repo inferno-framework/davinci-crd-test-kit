@@ -34,6 +34,13 @@ module DaVinciCRDTestKit
         PrefetchCompletenessChecker.new(request_body, nil, nil).prefetched_resource_present?(reference)
       end
 
+      # Without a fhirServer, the target reference cannot be matched against the prefetched resources.
+      def assert_fhir_server_present(request_body, access_level)
+        assert ResourceIdentity.fhir_server_base(request_body).present?,
+               "The #{access_level} hook request does not include `fhirServer`, so the prefetched data " \
+               'cannot be checked for the target resource.'
+      end
+
       run do
         full_requests = load_tagged_requests(ACCESS_LEVEL_FULL_GROUP_TAG)
         limited_requests = load_tagged_requests(ACCESS_LEVEL_LIMITED_GROUP_TAG)
@@ -47,6 +54,8 @@ module DaVinciCRDTestKit
 
         full_body = JSON.parse(full_requests.first.request_body)
         limited_body = JSON.parse(limited_requests.first.request_body)
+        assert_fhir_server_present(full_body, 'full-access')
+        assert_fhir_server_present(limited_body, 'limited-access')
 
         if prefetch_contains_reference?(full_body, access_level_target_reference)
           assert !prefetch_contains_reference?(limited_body, access_level_target_reference),
