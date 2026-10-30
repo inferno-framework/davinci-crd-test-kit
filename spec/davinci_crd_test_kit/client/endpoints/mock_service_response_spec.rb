@@ -431,10 +431,26 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         expect(creator.patient_coverage).to be_nil
       end
 
-      it 'raises when the connection is refused, so that the failure is reported' do
+      it 'finds no Coverage and warns the waiting test, naming the error, when the connection is refused' do
         stub_request(:get, coverage_search_url).to_raise(Errno::ECONNREFUSED)
-        expect { creator.patient_coverage }.to raise_error(Faraday::ConnectionFailed)
-        expect(messages_double).to_not have_received(:create)
+
+        expect(creator.patient_coverage).to be_nil
+        expect(messages_double).to have_received(:create).with(
+          hash_including(
+            type: 'warning',
+            message: start_with("Failed to read `#{coverage_search_url}` from the CRD client's FHIR server " \
+                                'while building the response to hook request `example-hook-instance`: ' \
+                                '`Faraday::ConnectionFailed: ')
+          )
+        )
+      end
+
+      it 'searches for the Coverage only once when the search fails' do
+        coverage_search = stub_request(:get, coverage_search_url).to_raise(Net::ReadTimeout)
+
+        2.times { expect(creator.patient_coverage).to be_nil }
+        expect(coverage_search).to have_been_made.once
+        expect(messages_double).to have_received(:create).once
       end
     end
 

@@ -74,6 +74,26 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     end
   end
 
+  it 'fails, rather than errors, when the JWKS `keys` field or a key is malformed' do
+    {
+      { 'keys' => 'abc' } => 'JWKS `keys` field is missing or is not an array.',
+      { 'kty' => 'RSA' } => 'JWKS `keys` field is missing or is not an array.',
+      { 'keys' => ['abc'] } => 'Key 0 invalid: not a JSON object.'
+    }.each do |jwks_content, warning|
+      result = run_with_defaults(cds_jwk_set: jwks_content.to_json)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message)).to include(warning)
+    end
+  end
+
+  it 'reports the status, rather than using the body, when the JWKS URL does not return 200' do
+    stub_request(:get, example_jwks_url).to_return(status: 404, body: { 'resourceType' => 'OperationOutcome' }.to_json)
+    result = run_with_defaults(cds_jwk_set: example_jwks_url)
+    expect(result.result).to eq('fail')
+    expect(result_messages.map(&:message))
+      .to include("Unexpected response status from JWKS URL #{example_jwks_url}: expected 200, but received 404.")
+  end
+
   it 'limits how long it waits for the JWKS URL' do
     stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
     allow(Faraday).to receive(:new).and_call_original

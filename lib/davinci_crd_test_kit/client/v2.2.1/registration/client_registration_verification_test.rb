@@ -128,19 +128,30 @@ module DaVinciCRDTestKit
           return jwk_set
         end
 
-        jwk_body['keys']&.each_with_index do |key_hash, index|
-          parsed_key =
-            begin
-              JWT::JWK.new(key_hash)
-            rescue JWT::JWKError => e
-              id = key_hash['kid'] || index
-              warning_messages << "Key #{id} invalid: #{e}"
-              nil
-            end
+        unless jwk_body['keys'].is_a?(Array)
+          warning_messages << 'JWKS `keys` field is missing or is not an array.'
+          return jwk_set
+        end
+
+        jwk_body['keys'].each_with_index do |key_hash, index|
+          parsed_key = parse_key(key_hash, index, warning_messages)
           jwk_set << parsed_key unless parsed_key.blank?
         end
 
         jwk_set
+      end
+
+      def parse_key(key_hash, index, warning_messages)
+        unless key_hash.is_a?(Hash)
+          warning_messages << "Key #{index} invalid: not a JSON object."
+          return
+        end
+
+        JWT::JWK.new(key_hash)
+      rescue JWT::JWKError => e
+        id = key_hash['kid'] || index
+        warning_messages << "Key #{id} invalid: #{e}"
+        nil
       end
 
       # A bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno.
@@ -150,7 +161,14 @@ module DaVinciCRDTestKit
           return
         end
 
-        JSON.parse(jwks_connection.get(jku).body)
+        response = jwks_connection.get(jku)
+        unless response.status == 200
+          warning_messages << "Unexpected response status from JWKS URL #{jku}: expected 200, but received " \
+                              "#{response.status}."
+          return
+        end
+
+        JSON.parse(response.body)
       rescue JSON::ParserError
         warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
         nil

@@ -166,35 +166,36 @@ module DaVinciCRDTestKit
       return if resource.entry.empty?
 
       resource.entry.first.resource
-    rescue Faraday::Error => e
-      # Other failures, such as a refused connection, still produce an error response so that the
-      # tester learns of them.
-      raise unless timeout?(e)
-
+    rescue Faraday::Error, URI::InvalidURIError => e
       # the response is built without the resource, as when the read is unsuccessful
-      warn_of_response_read_timeout(uri)
+      warn_of_failed_response_read(uri, e)
       nil
     end
 
     # These reads are not recorded, so without a warning the tester could not tell why the
     # response lacks the data.
-    def warn_of_response_read_timeout(uri)
+    def warn_of_failed_response_read(uri, error)
       return unless respond_to?(:result) && result.present?
 
+      outcome = timeout?(error) ? 'Timed out reading' : 'Failed to read'
+      cause = timeout?(error) ? '' : ": `#{error.class}: #{error.message}`"
       Inferno::Repositories::Messages.new.create(
         result_id: result.id,
         type: 'warning',
-        message: "Timed out reading `#{uri}` from the CRD client's FHIR server while building the " \
-                 "response to hook request `#{request_body&.dig('hookInstance')}`. Check the response for " \
-                 'cards or system actions that are missing or incomplete.'
+        message: "#{outcome} `#{uri}` from the CRD client's FHIR server while building the response to " \
+                 "hook request `#{request_body&.dig('hookInstance')}`#{cause}. Check the response for cards " \
+                 'or system actions that are missing or incomplete.'
       )
     rescue StandardError => e
       # the warning must not cost the CRD client its hook response
-      Inferno::Application['logger'].error("Could not record the read timeout for `#{uri}`: #{e.full_message}")
+      Inferno::Application['logger'].error("Could not record the failed read of `#{uri}`: #{e.full_message}")
     end
 
+    # Remembered even when absent, so that a search that failed is not repeated.
     def patient_coverage
-      @patient_coverage ||= get_patient_coverage
+      return @patient_coverage if defined?(@patient_coverage)
+
+      @patient_coverage = get_patient_coverage
     end
 
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
