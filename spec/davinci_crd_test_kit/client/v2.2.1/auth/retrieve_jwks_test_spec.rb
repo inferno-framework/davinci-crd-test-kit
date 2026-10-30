@@ -33,14 +33,11 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
   end
   let(:jwks_hash_no_kids) { { keys: jwks_hash['keys'].map { |key| key.except('kid') } } }
 
-  def entity_result_messages
+  def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [test])
       .first
       .messages
-  end
-
-  def entity_result_message
-    entity_result_messages.first
+      .first
   end
 
   def session_output(name)
@@ -110,56 +107,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
-  ['keys.json', 'HTTPS://cds.example.org/jwks.json', 'https://exa mple.org/jwks.json'].each do |bad_jku|
-    it "reports the jku `#{bad_jku}` as not a valid absolute http(s) URL and checks the other requests" do
-      jwks_request = stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
-
-      result = run(test, auth_token_headers_json: [token_header.merge(jku: bad_jku).to_json, token_header.to_json],
-                         cds_jwk_set: example_client_jwks_url)
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message)
-        .to eq("(Request 1) JWKS URL `#{bad_jku}` is not a valid absolute http(s) URL.")
-      expect(jwks_request).to have_been_made.once
-      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
-    end
-  end
-
-  {
-    [{ 'kty' => 'RSA' }] => 'JWKS must be a JSON object',
-    [] => 'JWKS must be a JSON object',
-    nil => 'JWKS must be a JSON object',
-    false => 'JWKS must be a JSON object',
-    {} => 'JWKS `keys` field must be an array',
-    { 'keys' => [5] } => 'Each key in the JWKS `keys` field must be a JSON object',
-    { 'keys' => [{ 'kty' => 'unknown', 'kid' => 'a' }] } => 'The JWK set returned contains no keys that can be used'
-  }.each do |jwks_content, error_message|
-    it "reports the JWKS #{jwks_content.to_json} and checks the other requests" do
-      other_jwks_url = 'https://cds.example.org/other-jwks.json'
-      stub_request(:get, example_client_jwks_url).to_return(status: 200, body: jwks_content.to_json)
-      stub_request(:get, other_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
-
-      token_headers = [token_header.to_json, token_header.merge(jku: other_jwks_url).to_json]
-      result = run(test, auth_token_headers_json: token_headers, cds_jwk_set: example_client_jwks_url)
-      expect(result.result).to eq('fail')
-      expect(entity_result_messages)
-        .to include(have_attributes(type: 'error', message: "(Request 1) #{error_message}"))
-      expect(session_output(:crd_jwks_keys_json).first).to be_nil
-      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
-    end
-  end
-
-  it 'warns about a key that cannot be imported, and passes using the other keys' do
-    unknown_key = { 'kty' => 'unknown', 'kid' => 'unknown-key' }
-    stub_request(:get, example_client_jwks_url)
-      .to_return(status: 200, body: { 'keys' => [jwk, unknown_key] }.to_json)
-
-    result = run(test, auth_token_headers_json: [token_header.to_json], cds_jwk_set: example_client_jwks_url)
-    expect(result.result).to eq('pass')
-    expect(entity_result_messages.map { |message| [message.type, message.message] })
-      .to eq([['warning', "(Request 1) Invalid JWK: #{unknown_key.to_json}"]])
-    expect(JSON.parse(session_output(:crd_jwks_keys_json).first)).to eq([jwk])
-  end
-
   it 'reports a TLS handshake that times out as a timeout' do
     # Net::HTTP raises this without the 'Failed to open TCP' message, so Inferno passes it through
     stub_request(:get, example_client_jwks_url).to_raise(Net::OpenTimeout.new('execution expired'))
@@ -168,20 +115,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
     expect(result.result).to eq('fail')
     expect(entity_result_message.message)
       .to eq("(Request 1) Timed out waiting for a response from JWKS URL `#{example_client_jwks_url}`.")
-  end
-
-  it 'reports other failures to get a response, such as a TLS error, and checks the other requests' do
-    jwks_request = stub_request(:get, example_client_jwks_url)
-      .to_raise(OpenSSL::SSL::SSLError.new('certificate verify failed')).then
-      .to_return(status: 200, body: jwks_hash.to_json)
-
-    result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
-                       cds_jwk_set: example_client_jwks_url)
-    expect(result.result).to eq('fail')
-    expect(entity_result_message.message)
-      .to eq("(Request 1) Failed to fetch JWKS URL `#{example_client_jwks_url}`: certificate verify failed")
-    expect(jwks_request).to have_been_made.times(2)
-    expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
   end
 
   context 'when the connection to the jku cannot be opened' do
@@ -198,19 +131,6 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
       expect(result.result).to eq('fail')
       expect(entity_result_message.message)
         .to eq("(Request 1) Timed out waiting for a response from JWKS URL `#{example_client_jwks_url}`.")
-      expect(jwks_request).to have_been_made.times(2)
-      expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
-    end
-
-    it 'reports the failure and checks the other requests if the connection is refused' do
-      jwks_request = stub_request(:get, example_client_jwks_url)
-        .to_raise(Errno::ECONNREFUSED.new(open_failure_message)).then
-        .to_return(status: 200, body: jwks_hash.to_json)
-
-      result = run(test, auth_token_headers_json: [token_header.to_json, token_header.to_json],
-                         cds_jwk_set: example_client_jwks_url)
-      expect(result.result).to eq('fail')
-      expect(entity_result_message.message).to include(open_failure_message)
       expect(jwks_request).to have_been_made.times(2)
       expect(session_output(:crd_jwks_keys_json).last).to_not be_nil
     end

@@ -390,47 +390,6 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
       expect(system_actions.first['resource'].resourceType).to eq('ServiceRequest')
     end
 
-    it 'finds no Coverage when the prefetched Coverage Bundle holds something other than a resource' do
-      creator = make_v221_creator(
-        types: [],
-        body: {
-          'prefetch' => {
-            'coverage' => { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => { 'resourceType' => 'Coding' } }] }
-          },
-          'context' => { 'patientId' => 'example' }
-        }
-      )
-      expect(creator.patient_coverage).to be_nil
-    end
-
-    it 'skips prefetched order-dispatch entries that are not resources' do
-      creator = make_v221_creator(
-        types: [],
-        hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
-        body: {
-          'prefetch' => {
-            'orders' => {
-              'resourceType' => 'Bundle',
-              'entry' => [
-                { 'resource' => { 'resourceType' => 'Coding', 'id' => 'example' } },
-                { 'resource' => { 'resourceType' => 'ServiceRequest', 'id' => 'example' } }
-              ]
-            }
-          },
-          'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
-        }
-      )
-      orders = creator.find_prefetched_order_dispatch_orders
-      expect(orders.entry.map { |entry| entry.resource.resourceType }).to eq(['ServiceRequest'])
-    end
-
-    it 'creates no system actions, rather than an empty list, when no Bundle entry is a resource' do
-      creator = make_v221_creator(types: [], body: { 'context' => { 'patientId' => 'example' } })
-      bundle = FHIR.from_contents({ 'resourceType' => 'Bundle',
-                                    'entry' => [{ 'resource' => { 'resourceType' => 'Coding' } }] }.to_json)
-      expect(creator.create_system_actions(bundle, 'coverage-id')).to be_nil
-    end
-
     context 'when the Coverage search fails before a response' do
       let(:coverage_search_url) { 'https://example/r4/Coverage?patient=example&status=active' }
       let(:messages_double) { instance_double(Inferno::Repositories::Messages, create: nil) }
@@ -483,35 +442,6 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
                                 'while building the response to hook request `example-hook-instance`: ' \
                                 '`Faraday::ConnectionFailed: ')
           )
-        )
-      end
-
-      [
-        '', '<html></html>', 'not json', '{"resourceType":"Hash"}', '{"resourceType":"Coding"}',
-        '{"resourceType":"Bundle","entry":[{"resource":{"resourceType":"Coding"}}]}',
-        '{"resourceType":"Coding","extension":[{"url":"http://x/resourceType","valueString":"Bundle"}]}'
-      ].each do |body|
-        it "finds no Coverage, rather than raising, when a 200 response has the body #{body.inspect}" do
-          stub_request(:get, coverage_search_url).to_return(status: 200, body:)
-          expect(creator.patient_coverage).to be_nil
-        end
-      end
-
-      it 'finds no Coverage and warns the waiting test when the fhirServer has no scheme' do
-        no_scheme_creator = make_v221_creator(
-          types: [],
-          hook: DaVinciCRDTestKit::ORDER_DISPATCH_TAG,
-          body: {
-            'fhirServer' => 'example/r4',
-            'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
-            'hookInstance' => 'example-hook-instance',
-            'context' => { 'patientId' => 'example', 'dispatchedOrders' => ['ServiceRequest/example'] }
-          }
-        )
-
-        expect(no_scheme_creator.patient_coverage).to be_nil
-        expect(messages_double).to have_received(:create).with(
-          hash_including(message: include('`URI::InvalidURIError: not an absolute http(s) URL`'))
         )
       end
 

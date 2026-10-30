@@ -56,58 +56,6 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from #{example_jwks_url}:"))
   end
 
-  it 'fails, rather than errors, when the JWKS content is not a JSON object' do
-    stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash['keys'].to_json)
-    [example_jwks_url, '5'].each do |cds_jwk_set|
-      result = run_with_defaults(cds_jwk_set:)
-      expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include('JWKS content is not a JSON object.')
-    end
-  end
-
-  it 'fails, rather than errors, when the JWKS input is neither JSON nor a URL' do
-    ['{"keys": [}', 'not a url', 'example.com/jwks'].each do |cds_jwk_set|
-      result = run_with_defaults(cds_jwk_set:)
-      expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message))
-        .to include('JWKS input is neither a valid JSON Web Key Set nor an http(s) URL.')
-    end
-  end
-
-  it 'fails, rather than errors, when the JWKS `keys` field or a key is malformed' do
-    off_curve_key = { 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'AAAA', 'y' => 'AAAA' }
-    {
-      { 'keys' => 'abc' } => 'JWKS `keys` field is missing or is not an array.',
-      { 'kty' => 'RSA' } => 'JWKS `keys` field is missing or is not an array.',
-      {} => 'JWKS `keys` field is missing or is not an array.',
-      [] => 'JWKS content is not a JSON object.',
-      { 'keys' => ['abc'] } => 'Key 0 invalid: not a JSON object.',
-      { 'keys' => [{ 'kty' => 'EC', 'crv' => 'P-256', 'x' => 'a', 'y' => 'b' }] } => start_with('Key 0 invalid: '),
-      { 'keys' => [off_curve_key] } => start_with('Key 0 invalid: '),
-      { 'keys' => [{ 'kty' => 'RSA', 'n' => 5, 'e' => 'AQAB' }] } => start_with('Key 0 invalid: ')
-    }.each do |jwks_content, warning|
-      result = run_with_defaults(cds_jwk_set: jwks_content.to_json)
-      expect(result.result).to eq('fail')
-      expect(result_messages.map(&:message)).to include(warning)
-    end
-  end
-
-  it 'reports the status, rather than using the body, when the JWKS URL does not return 200' do
-    stub_request(:get, example_jwks_url).to_return(status: 404, body: { 'resourceType' => 'OperationOutcome' }.to_json)
-    result = run_with_defaults(cds_jwk_set: example_jwks_url)
-    expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message))
-      .to include("Unexpected response status from JWKS URL #{example_jwks_url}: expected 200, but received 404.")
-  end
-
-  it 'follows a redirect from the JWKS URL' do
-    redirected_url = 'https://cds.example.org/keys/jwks.json'
-    stub_request(:get, example_jwks_url).to_return(status: 301, headers: { 'Location' => redirected_url })
-    stub_request(:get, redirected_url).to_return(status: 200, body: jwks_hash.to_json)
-    result = run_with_defaults(cds_jwk_set: example_jwks_url)
-    expect(result.result).to eq('pass')
-  end
-
   it 'limits how long it waits for the JWKS URL' do
     stub_request(:get, example_jwks_url).to_return(status: 200, body: jwks_hash.to_json)
     allow(Faraday).to receive(:new).and_call_original

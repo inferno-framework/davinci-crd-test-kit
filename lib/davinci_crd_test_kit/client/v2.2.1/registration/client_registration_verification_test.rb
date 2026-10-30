@@ -115,83 +115,45 @@ module DaVinciCRDTestKit
             nil
           end
 
-        if jwk_body.nil?
-          jwk_body = fetch_jwk_set(jku, warning_messages) # try as url pointing to a jwk set
+        if jwk_body.blank?
+          jwk_body = # try as url pointing to a jwk set
+            begin
+              JSON.parse(jwks_connection.get(jku).body)
+            rescue JSON::ParserError
+              warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
+              nil
+            rescue Faraday::Error => e
+              # a bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno
+              warning_messages << if timeout?(e)
+                                    request_timed_out_message("JWKS URL `#{jku}`")
+                                  else
+                                    "Failed to fetch JWKS from #{jku}: #{e.message}"
+                                  end
+              nil
+            end
         else
           warning_messages << 'Providing the JWK Set directly is strongly discouraged.'
         end
 
-        return jwk_set if jwk_body.nil?
+        return jwk_set if jwk_body.blank?
 
-        unless jwk_body.is_a?(Hash)
-          warning_messages << 'JWKS content is not a JSON object.'
-          return jwk_set
-        end
-
-        unless jwk_body['keys'].is_a?(Array)
-          warning_messages << 'JWKS `keys` field is missing or is not an array.'
-          return jwk_set
-        end
-
-        jwk_body['keys'].each_with_index do |key_hash, index|
-          parsed_key = parse_key(key_hash, index, warning_messages)
+        jwk_body['keys']&.each_with_index do |key_hash, index|
+          parsed_key =
+            begin
+              JWT::JWK.new(key_hash)
+            rescue JWT::JWKError => e
+              id = key_hash['kid'] || index
+              warning_messages << "Key #{id} invalid: #{e}"
+              nil
+            end
           jwk_set << parsed_key unless parsed_key.blank?
         end
 
         jwk_set
       end
 
-      def parse_key(key_hash, index, warning_messages)
-        unless key_hash.is_a?(Hash)
-          warning_messages << "Key #{index} invalid: not a JSON object."
-          return
-        end
-
-        JWT::JWK.new(key_hash)
-      rescue StandardError => e # malformed key values raise errors from JWT, OpenSSL, and Ruby itself
-        id = key_hash['kid'] || index
-        warning_messages << "Key #{id} invalid: #{e}"
-        nil
-      end
-
-      # A bare Faraday request, so connection failures and timeouts arrive here unhandled by Inferno.
-      def fetch_jwk_set(jku, warning_messages)
-        unless jwks_url?(jku)
-          warning_messages << 'JWKS input is neither a valid JSON Web Key Set nor an http(s) URL.'
-          return
-        end
-
-        response = jwks_connection.get(jku)
-        unless response.status == 200
-          warning_messages << "Unexpected response status from JWKS URL #{jku}: expected 200, but received " \
-                              "#{response.status}."
-          return
-        end
-
-        JSON.parse(response.body)
-      rescue JSON::ParserError
-        warning_messages << "Failed to fetch valid JSON from JWKS URL #{jku}."
-        nil
-      rescue Faraday::Error => e
-        warning_messages << if timeout?(e)
-                              request_timed_out_message("JWKS URL `#{jku}`")
-                            else
-                              "Failed to fetch JWKS from #{jku}: #{e.message}"
-                            end
-        nil
-      end
-
-      def jwks_url?(jku)
-        uri = URI.parse(jku)
-        uri.host.present? && ['http', 'https'].include?(uri.scheme)
-      rescue URI::InvalidURIError
-        false
-      end
-
       def jwks_connection
-        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS }) do |f|
-          f.use FaradayMiddleware::FollowRedirects # as Inferno's `get` does
-        end
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS })
       end
     end
   end

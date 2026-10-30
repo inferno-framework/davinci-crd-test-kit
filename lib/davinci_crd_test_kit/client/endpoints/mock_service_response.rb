@@ -1,10 +1,11 @@
 require_relative '../prefetched_coverage_value'
+require_relative '../../cross_suite/request_timeout_handling'
 require_relative 'hook_request_data_access'
 
 module DaVinciCRDTestKit
   # Serve responses to CRD hook invocations
   module MockServiceResponse
-    include HookRequestDataAccess
+    include RequestTimeoutHandling
 
     def build_mock_hook_response
       hook_card_response = create_cards_and_system_actions
@@ -158,38 +159,18 @@ module DaVinciCRDTestKit
     end
 
     def make_resource_request(uri, access_token)
-      # Faraday fails unhelpfully on a URL without a scheme, such as a `fhirServer` given without one
-      raise URI::InvalidURIError, 'not an absolute http(s) URL' unless ResourceIdentity.http_url?(uri)
+      response = connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" })
+      return unless response.status == 200
 
-      resource_from_response(connection.get(uri, nil, { 'Authorization' => "Bearer #{access_token}" }))
-    rescue Faraday::Error, URI::InvalidURIError => e
+      resource = FHIR.from_contents(response.body)
+      return resource unless resource.resourceType == 'Bundle'
+      return if resource.entry.empty?
+
+      resource.entry.first.resource
+    rescue Faraday::Error => e
       # the response is built without the resource, as when the read is unsuccessful
       warn_of_failed_response_read(uri, e)
       nil
-    end
-
-    # A body that isn't FHIR is treated like an unsuccessful read.
-    def resource_from_response(response)
-      return unless response.status == 200 && response.body.present?
-
-      first_resource(FHIR.from_contents(response.body))
-    rescue JSON::ParserError
-      nil
-    end
-
-    # A Bundle stands for the resource in its first entry.
-    def first_resource(resource)
-      return unless fhir_resource?(resource)
-
-      resource = resource.entry.first&.resource if resource.resourceType == 'Bundle'
-      resource if fhir_resource?(resource)
-    end
-
-    # FHIR.from_contents builds whatever class the content names, which may be a datatype or not FHIR
-    # at all. Checked on the class, since a FHIR model's `respond_to?` also answers for any name used by
-    # one of its extensions.
-    def fhir_resource?(object)
-      object.class.method_defined?(:resourceType)
     end
 
     # These reads are not recorded, so without a warning the tester could not tell why the
@@ -225,7 +206,8 @@ module DaVinciCRDTestKit
     def get_patient_coverage # rubocop:disable Naming/AccessorMethodName
       prefetched_coverage = PrefetchedCoverageValue.find(request_body['prefetch'])
       if prefetched_coverage.present?
-        first_resource(FHIR.from_contents(prefetched_coverage.to_json))
+        coverage_or_bundle = FHIR.from_contents(prefetched_coverage.to_json)
+        coverage_or_bundle.is_a?(FHIR::Bundle) ? coverage_or_bundle.entry.first&.resource : coverage_or_bundle
       else
         fhir_server = request_body['fhirServer']
         if fhir_server.present?
@@ -391,20 +373,16 @@ module DaVinciCRDTestKit
       bundle = FHIR.from_contents(prefetch_value.to_json)
       return unless bundle.is_a?(FHIR::Bundle)
 
-      bundle.entry.find do |e|
-        fhir_resource?(e.resource) && e.resource.resourceType == resource_type && e.resource.id == id
-      end
+      bundle.entry.find { |e| e.resource.present? && e.resource.resourceType == resource_type && e.resource.id == id }
     end
 
     def create_system_actions(resource, coverage_id)
-      return unless fhir_resource?(resource)
+      return if resource.nil?
 
       system_actions = []
       if resource.resourceType == 'Bundle'
         resource.entry.each do |entry|
           entry_resource = entry.resource
-          next unless fhir_resource?(entry_resource)
-
           add_coverage_extension(entry_resource, coverage_id)
           system_actions.append(
             {
@@ -424,8 +402,7 @@ module DaVinciCRDTestKit
           }
         )
       end
-      # nil, like a failure, when no entry was a resource, so that the instructions card is still sent
-      system_actions.presence
+      system_actions
     end
 
     def add_coverage_extension(resource, coverage_id)

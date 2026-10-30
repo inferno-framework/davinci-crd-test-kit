@@ -64,15 +64,7 @@ module DaVinciCRDTestKit
             else
               parse_or_fetch_jwks(cds_jwk_set, index)
             end
-          # nil when retrieving or parsing the JWKS failed, which has already been reported, but also
-          # when the JWKS is a JSON null
-          if jwks.nil? && error_request_numbers.include?(index + 1)
-            crd_jwks_keys_json << nil
-            next
-          end
-
-          unless jwks.is_a?(Hash)
-            add_request_message('error', 'JWKS must be a JSON object', index)
+          if jwks.blank?
             crd_jwks_keys_json << nil
             next
           end
@@ -90,13 +82,11 @@ module DaVinciCRDTestKit
             next
           end
 
-          unless keys.all?(Hash)
-            add_request_message('error', 'Each key in the JWKS `keys` field must be a JSON object', index)
-            crd_jwks_keys_json << nil
-            next
+          keys.each do |jwk|
+            JWT::JWK.import(jwk.deep_symbolize_keys)
+          rescue StandardError
+            add_request_message('error', "Invalid JWK: #{jwk.to_json}", index)
           end
-
-          usable_keys = keys.select { |jwk| importable_jwk?(jwk, index) }
 
           kid_presence = keys.all? { |key| key['kid'].present? }
           if kid_presence.blank?
@@ -114,29 +104,12 @@ module DaVinciCRDTestKit
             next
           end
 
-          if usable_keys.blank?
-            add_request_message('error', 'The JWK set returned contains no keys that can be used', index)
-            crd_jwks_keys_json << nil
-            next
-          end
-
-          crd_jwks_keys_json << usable_keys.to_json
+          crd_jwks_keys_json << keys.to_json
         end
 
         output crd_jwks_keys_json: crd_jwks_keys_json.to_json
 
         assert_no_error_messages("#{requests_with_errors_prefix}Retrieving JWKS failed. See Messages for details.")
-      end
-
-      # A key that can't be imported, such as one with a `kty` that isn't understood, is left out of
-      # the keys passed to later tests, which can still use the others. RFC 7517 section 5 says such
-      # keys SHOULD be ignored, so this is only a warning.
-      def importable_jwk?(jwk, index)
-        JWT::JWK.import(jwk.deep_symbolize_keys)
-        true
-      rescue StandardError
-        add_request_message('warning', "Invalid JWK: #{jwk.to_json}", index)
-        false
       end
 
       def cds_jwk_set_input_needed?(auth_token_headers)
@@ -146,12 +119,6 @@ module DaVinciCRDTestKit
       end
 
       def fetch_jwks(uri, entity, index)
-        # Inferno's `get` raises for a URL it can't request, which would end the test
-        unless requestable_url?(uri)
-          add_request_message('error', "JWKS URL `#{uri}` is not a valid absolute http(s) URL.", index)
-          return
-        end
-
         get(uri)
 
         if response[:status] == 200
@@ -162,31 +129,13 @@ module DaVinciCRDTestKit
                               index)
           nil
         end
-      rescue Inferno::Exceptions::AssertionException => e
-        # Inferno turns a connection that can't be opened, including one that times out, into a
-        # failure, which would end the test before the other requests are checked.
-        raise unless e.cause.is_a?(Faraday::ConnectionFailed) || e.cause.is_a?(SocketError)
+      rescue Faraday::Error, Inferno::Exceptions::AssertionException => e
+        # Inferno turns some connection timeouts into a failure, with the Faraday error as its cause,
+        # which would end the test before the other requests are checked.
+        raise unless timeout?(e) || timeout?(e.cause)
 
-        add_request_message('error', fetch_failure_message(uri, e.cause, e.message), index)
+        add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
         nil
-      rescue Faraday::Error => e
-        # timeouts, and other failures to get a response that Inferno passes through, such as an
-        # invalid TLS certificate or a TLS handshake that times out
-        add_request_message('error',
-                            fetch_failure_message(uri, e, "Failed to fetch JWKS URL `#{uri}`: #{e.message}"),
-                            index)
-        nil
-      end
-
-      def fetch_failure_message(uri, error, other_message)
-        timeout?(error) ? request_timed_out_message("JWKS URL `#{uri}`") : other_message
-      end
-
-      # Matches the scheme check in Inferno's `get`, which is case-sensitive.
-      def requestable_url?(uri)
-        uri.to_s.match?(%r{\Ahttps?://}) && URI.parse(uri.to_s).host.present?
-      rescue URI::InvalidURIError
-        false
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)
