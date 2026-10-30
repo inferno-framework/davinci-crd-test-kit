@@ -25,14 +25,14 @@ directory. Key subdirectories and files under that include:
 * **[`server`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/server) directory**:
   contains code related to the server actor test suites.
 
-Files that control the display of the test kit itself within an inferno platform deployment include
+Files that control the display of the test kit itself within an Inferno platform deployment include:
 * **[`metadata.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/metadata.rb)**: Contains metadata for the CRD test kit, including its title, description (which appears in the Inferno UI), and suite IDs. This is a crucial file for how the test kit presents itself in the Inferno Framework.
 * **[`version.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/version.rb)**: Specifies the version of the test kit.
 * **[`requirements/`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/requirements) directory**: contains extracted CRD and CDS Hooks requirements and related files used by the [Inferno Requirements Tools](https://inferno-framework.github.io/docs/advanced-test-features/requirements.html).
 
 ### Actor-specific Organization and Key Files
 
-Within the `client` and `server` actor directories, files are generally organized as follows
+Within the `client` and `server` actor directories, files are generally organized as follows:
 * directories corresponding to specific versions, e.g., [`client/v2.2.1`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/v2.2.1),
   contain the suite, group, and test definitions for the suite corresponding to that version. They contain
   one level of sub-folders corresponding to different functional areas.
@@ -56,14 +56,14 @@ Within the `client` and `server` actor directories, files are generally organize
     different for [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations) and [v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval).
   - [*`mock_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mock_service_response.rb):
     Used by *hook_request_endpoint.rb* to create simple mocked hook responses based on types selected when running the tests. Templates
-    for the responses live in the [`mocked_card_responses` subdirectory](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses)
-  [*`custom_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mock_service_response.rb):
-    used by *hook_request_endpoint.rb* to generate [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses) based on a tester-provided template specified when running the tests.
+    for the responses live in the [`mocked_card_responses` subdirectory](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses).
+  - [*`custom_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/custom_service_response.rb):
+    Used by *hook_request_endpoint.rb* to generate [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses) based on a tester-provided template specified when running the tests.
 - [**`crd_client_options.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/crd_client_options.rb):
   Inferno [suite option](https://inferno-framework.github.io/docs/advanced-test-features/test-configuration.html#suite-options)
   constants used across all client suites.
 - [**`tagged_request_load_helper.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/tagged_request_load_helper.rb):
-  A utility module design to help load request messages tagged by the simulated CRD server endpoints. Many tests load these
+  A utility module designed to help load request messages tagged by the simulated CRD server endpoints. Many tests load these
   requests to evaluate them and their responses so this module reduces code duplication significantly. It contains options
   for loading requests related to a specific hook or all hooks.
 - [**`multi_request_message_helper.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/multi_request_message_helper.rb):
@@ -81,7 +81,7 @@ Within the `client` and `server` actor directories, files are generally organize
   expected to scale to large numbers of resources, but it successfully served the [Inferno Reference Server data](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/endpoints/mock_ehr/stress-test-Bundle.json)
   used to verify the (g)(10) test kit behavior at least as fast as the Inferno Reference Server itself.
 - [**JSON Web Key Set hosting**](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/server/endpoints):
-  Within the `server/endpoints` directory are several files that handle the publication of a jwks that the Inferno's simulated CRD
+  Within the `server/endpoints` directory are several files that handle the publication of a JWKS that Inferno's simulated CRD
   client will use to identify itself and sign JWTs on hook invocations made as a part of the server tests.
 - [**Hook invocation job**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/server/jobs/invoke_hook.rb):
   In order to support the simulated FHIR server based on a Bundle in a session input and make it active during hook invocations made by
@@ -96,23 +96,22 @@ Within the `client` and `server` actor directories, files are generally organize
 Key shared logic within the [`cross_suite`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/cross_suite)
 directory includes:
 * **[`base_urls.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/base_urls.rb)**:
-  defines urls used by suites for both client and server actors, such as pass and fail continuation urls displayed in wait dialogs.
+  defines URLs used by suites for both client and server actors, such as pass and fail continuation URLs displayed in wait dialogs.
 * **[`profiles_and_resource_types.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/profiles_and_resource_types.rb)**: contains constants and methods related to CRD allowed resource types and profiles used in many places
   within the code base.
-  defines urls used by suites for both client and server actors, such as pass and fail continuation urls displayed in wait dialogs.
 * **[`cards_identification.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/cards_identification.rb)**: Defines the logic for identifying the CRD type of a CDS Hook card or system action (e.g., [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions) or [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)).
 * **Manual Verification Logic**: Several files define logic for verifying the conformance of CDS Hooks requests and responses,
   including cards to CRD card profiles (e.g., [Instructions](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#instructions)
   or [Coverage Information](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html#coverage-information)). Starting with the v2.2.1
-  version, the CRD IG publishes logical models which can be used by the HL7 FHIR validator to verify. However, the published models
+  version, the CRD IG publishes logical models which can be used by the HL7 FHIR validator to verify conformance. However, the published models
   are incomplete and contain some inconsistencies that mean these hand-created versions are still in use.
   - **[`cards_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/cards_validation.rb)**
   - **[`hook_request_field_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/hook_request_field_validation.rb)**
   - **[`suggestion_actions_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/suggestion_actions_validation.rb)**
-* **Logical Model-based Verification Logic**: Logical models describing CRD requests and responses are new as of the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#structures-logical-models).
+* **Logical Model-based Verification Logic**: Logical models describing CRD requests and responses are new as of the [2.2.1 version of the IG](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/artifacts.html#4).
   Shared modules for performing validation against these models that attempt to correct for gaps and bugs in them are available:
   - **[`response_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/response_logical_model_validation.rb)**:
-    Card logical models in the 2.2.1 version require some response mangling to get to work, which is handled by this module.
+    Card logical models in the 2.2.1 version require some response mangling to get them to work, which is handled by this module.
   - **[`requests_logical_model_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/requests_logical_model_validation.rb)**: Unlike card models, request models can be used directly.
   - **[`logical_models_override_helper.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/logical_models_override_helper.rb)**: Contains helper functions designed to correctly verify conformance of CRD requests
     and responses in situations where the logical models are incorrect, don't work correctly with the HL7 validator, or the HL7
@@ -129,11 +128,11 @@ directory includes:
   - **[`prefetch_profile_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_profile_validation.rb)**:
     Checks that the resources provided under the prefetch field conform to the associated CRD profiles.
 * **FHIRPath Support**: Prefetch checking and custom response generation leverage FHIRPath executed on CDS Hooks requests.
-  The FHIRPath module that Inferno uses does not support execution on general json objects like CDS Hooks requests
+  The FHIRPath module that Inferno uses does not support execution on general JSON objects like CDS Hooks requests
   or handle functions like `resolve()`. A wrapper is provided to support these capabilities for use in the test kit, including:
-  - **[`fhirpath_on_cds_request.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/fhirpath_on_cds_request.rb)**: Contains logic to execute FHIRPath expression on CDS Hook requests. Note that there
+  - **[`fhirpath_on_cds_request.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/fhirpath_on_cds_request.rb)**: Contains logic to execute FHIRPath expressions on CDS Hook requests. Note that there
   are [critical limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#fhirpath-evaluation-limitations).
-  - **[`replace_tokens.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/replace_tokens.rb)**: Contains logic to replace [dynamic tokens in custom response templates](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#expression-tokens), which is used in the creation of [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  - **[`replace_tokens.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/replace_tokens.rb)**: Contains logic to replace [dynamic tokens in custom response templates](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#expression-tokens), which is used in the creation of [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
   as well as when evaluating prefetch templates.
 
 ### Additional Files and Directories
@@ -144,7 +143,7 @@ At the top level of this repository are some additional files and directories of
 *   **[`docs/`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/docs) Directory**: Contains Markdown documentation files that are mirrored to the [GitHub wiki](/inferno-framework/davinci-crd-test-kit/wiki) for this repository.
 *   **[`spec/`](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/spec) Directory**: Contains RSpec-based unit tests for the CRD test kit.
 *   **`.env*` files**: Contains environment settings. [`.env.production`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/.env.production) is used when run in Docker-mode and [`.env.development`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/.env.development) is used when run in the Ruby-based developer mode.
-*   **`docker-componse*.yml` files**: Contains Docker configuration details for us when running in Docker-mode ([`docker-compose.yml`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/docker-compose.yml)) and in Ruby-based developer mode ([`docker-compose.background.yml`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/docker-compose.background.yml)). These files define the services that Inferno needs to run, such as the FHIR Validator and nginx.
+*   **`docker-compose*.yml` files**: Contains Docker configuration details for use when running in Docker-mode ([`docker-compose.yml`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/docker-compose.yml)) and in Ruby-based developer mode ([`docker-compose.background.yml`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/docker-compose.background.yml)). These files define the services that Inferno needs to run, such as the FHIR Validator and nginx.
 
 ## Related Systems and Dependencies
 
@@ -154,7 +153,7 @@ At the top level of this repository are some additional files and directories of
     - [v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2)
     - [v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1)
 *   **[CDS Hooks Implementation Guide](https://cds-hooks.hl7.org)**: The underlying framework for integrating decision support into clinical workflows. Each CRD IG version uses a specific CDS Hooks version:
-    - [CRD v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2) uses [CDS Hooks v2.0.1](https://cds-hooks.hl7.org/STU2/)
+    - [CRD v2.0.1](https://hl7.org/fhir/us/davinci-crd/STU2) uses [CDS Hooks v2.0](https://cds-hooks.hl7.org/STU2/)
     - [CRD v2.2.1](https://hl7.org/fhir/us/davinci-crd/2.2.1) uses [CDS Hooks v3.0.0-ballot](https://cds-hooks.hl7.org/2026Jan)
 *   **[FHIR Java Validator](https://confluence.hl7.org/spaces/FHIR/pages/35718580/Using+the+FHIR+Validator)**: Used for validating resource conformance.
 *   **Terminology Server ([`tx.fhir.org`](https://tx.fhir.org/))**: Used by the validator to resolve terminology and validate code bindings.
@@ -176,9 +175,8 @@ When making changes to the test kit itself, it's important to ensure the changes
     *   Manually execute the test suites/groups affected by your changes against:
         *   The public reference implementations (if applicable).
         *   Any local test servers or client simulators you have.
-        *   The provided Postman collection for client tests.
     *   This helps catch issues that RSpec tests might miss, especially those related to UI interactions or workflow logic as experienced by a user.
-6.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details,
+5.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details,
     update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's
     [GitHub Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
 
@@ -186,47 +184,62 @@ When making changes to the test kit itself, it's important to ensure the changes
 
 Consistency in naming and documentation helps to make the test kit and its suites clear
 and understandable to users. The maintainers of this repository strongly recommend following
-the naming and style guidelines in this section. See the "Da Vinci CRD Client v2.2.1 Test Suite"
-for an example a suite that follows these guidelines. Other suites in this test kit may not
-currently follow these guidelines.
+the naming and style guidelines in this section, which apply to suite, group, test, and input
+definitions, wait dialog messages, and the pages in the `docs/` folder. See the "Da Vinci CRD
+Client v2.2.1 Test Suite" for an example of a suite that follows these guidelines. Other suites
+in this test kit may not currently follow these guidelines.
+
+### Terminology
+
+- Refer to the tested system by its actor name: "CRD client" or "CRD server", rather than
+  "client", "server", or "system under test".
+- Hook names (e.g., `order-sign`) are never capitalized. Put them in backticks in descriptions,
+  messages, and documentation, but not in titles.
 
 ### Suite, Group, and Test Titles
 
 - **Capitalization scheme**
-  - *Suites* and *Groups*: Capitalize each word of the title of suites and groups.
-  - *Tests*: Capitalize only the first word of test titles.
-  - *Exceptions*: Formal entities from the specifications with specific capitalization schemes,
-    e.g., hook names like `appointment-book` are never capitalized and formal response types
-    defined in the CRD guide like "Coverage Information" are always capitalized.
-- Naming scheme
+  - *Suites* and *Groups*: Use title case. Capitalize each word except articles, conjunctions,
+    and short prepositions (e.g., "a", "and", "of", "to") that are not the first word. Capitalize
+    each part of a hyphenated word, e.g., "Long-Running", "Self-Pay", and "Cross-Invocation".
+  - *Tests*: Use sentence case. Capitalize only the first word of test titles.
+  - *Exceptions*: Names with their own capitalization are always written as defined, e.g.,
+    hook names like `appointment-book` are never capitalized, and formal response types
+    ("Coverage Information"), profile names ("CRD Medication Request"), and acronyms
+    (JWT, JWKS, FHIR, TLS) keep their capitalization.
+- **Naming scheme**
   - *Suites*: For suite titles, use the form "<IG> <Actor> <Version> Test Suite",
     e.g., "Da Vinci CRD Client v2.2.1 Test Suite".
   - *Groups*: For group titles, use a short noun or noun phrase representing what
     is being checked within the group, e.g., "Registration", "order-sign", or
     "Response Handling".
   - *Tests*: The form of test titles depends on the type of test
-    - Verification tests (most): For tests that verify behavior, use the form 
-      "<Subject> <criteria checked>", e.g., "Client made additional FHIR data available
+    - Verification tests (most): For tests that verify behavior, use the form
+      "<Subject> <criteria checked>", e.g., "CRD client made additional FHIR data available
       during hook request processing" and "Prefetched resources conform to the required
       CRD profiles".
-    - Interaction tests: For tests where the primary activity is an interaction, use the
-      form "<Subject> <action>", e.g., "Client invokes the order-sign hook".
+    - Interaction and workflow tests: For tests where the primary activity is an interaction
+      or a tester-performed workflow, use the form "<Subject> <action>", e.g., "CRD client
+      invokes the order-sign hook".
+    - Attestation tests: Use the attested statement, e.g., "CRD client retains logs of all
+      CRD-related hook invocations".
 
-### References to Inferno Entiries
+### References to Inferno Entities
 
-- *Suites*, *Groups*, and *Tests*: When referencing an Inferno suite, group, or test,
-  put the name in double quotes. Optionally include the short Id as a prefix. For example,
-  the following phrases are both acceptable:
+- *Suites*, *Groups*, *Tests*, and *Presets*: When referencing an Inferno suite, group, test,
+  or preset, put the name in double quotes, not backticks or bold. Optionally include the
+  short ID as a prefix. For example, the following phrases are both acceptable:
   - group "1.1 Registration"
   - the "Registration" group
-- *Presets*: When referencing a preset, put the name in double quotes.
-- *Inputs*: When referencing an input, **bold** the name.
+- *Inputs*: When referencing an input, **bold** its title, e.g., the **CRD JWT Issuer** input.
+- *Other systems*: Put the names of UI elements in the tested system or other tools in double
+  quotes, e.g., the "CDS Services URL" field.
 
 ### Suite, Group, and Test Descriptions
 
 - *Suites*: Suite descriptions should contain brief text with references to additional
 details within this wiki. The following important details should be included or
-highlighted as available on a linked pagee:
+highlighted as available on a linked page:
   - Required setup and information needed to run the tests,
   - Instructions for execution including how to populate inputs, ideally both a
     minimal and maximal run, and
@@ -235,18 +248,30 @@ highlighted as available on a linked pagee:
 - *Groups*: Groups don't necessarily need descriptions. When present, group descriptions
   can provide context, explain how the contained groups/tests are run, and/or
   explain what a passing run looks like.
-- *Tests*: Tests must have a description. Test descriptions can provide additional
-  context to explain the test and how it works. They must provide a paragraph
-  explaining what the test checks (or does, for interaction tests), starting
-  with “During this test, Inferno will verify …” for verification tetss and
-  “During this test, Inferno will wait for …”
+- *Tests*: Tests must have a description. Test descriptions can start with additional
+  context, such as the requirement being tested, and can explain how the test works. They
+  must include a paragraph explaining what the test checks (or does, for interaction and
+  workflow tests), starting with:
+  - "During this test, Inferno will verify ..." for verification tests,
+  - "During this test, Inferno will wait while ..." for interaction tests, and
+  - "During this test, the tester will confirm ..." or "During this test, the tester will
+    perform ..." for attestation and tester-performed workflow tests.
+
+### Wait Dialog Messages
+
+- Interaction dialogs start with a `####` heading naming the action, e.g.,
+  "#### Invoke the `order-sign` Hook", and use `####` headings for supporting sections.
+- Attestation dialogs start with a bold title ending in "Attestation" followed by a colon,
+  e.g., "**Card Display Attestation**:", state the attested statement, and end with the
+  **true** and **false** links.
+- Keep message lines flush left in heredocs so that Markdown does not render them as code blocks.
 
 ## Contribution Guidelines
 
 We welcome contributions in the form of bug reports or enhancement suggestions as well as implementations
 submitted for our review via a pull request.
 
-To report an bug or suggest an enhancement, use the [GitHub Issues page](https://github.com/inferno-framework/davinci-crd-test-kit/issues) for the repository.
+To report a bug or suggest an enhancement, use the [GitHub Issues page](https://github.com/inferno-framework/davinci-crd-test-kit/issues) for the repository.
 
 When submitting a PR with an update to the code base for us to review, follow these guidelines
 to ensure that your update is one that we can commit to reviewing and maintaining:
@@ -268,4 +293,4 @@ to ensure that your update is one that we can commit to reviewing and maintainin
     CRD or underlying specifications. To ensure that Inferno's use of tester-provided content
     demonstrates conformant exchange, the content is checked against the relevant requirements
     for the actor that Inferno is simulating as a part of testing the exchange (these tests
-    are labled as "simulation verification" tests).
+    are labeled as "simulation verification" tests).

@@ -5,6 +5,7 @@ require_relative 'client_order_dispatch_group'
 require_relative 'client_order_select_group'
 require_relative 'client_order_sign_group'
 require_relative 'client_urls'
+require_relative '../client_input_helper'
 
 module DaVinciCRDTestKit
   module V221
@@ -40,7 +41,7 @@ module DaVinciCRDTestKit
           * `order-sign` service id: `order-sign-service`
           * `order-dispatch` service id: `order-dispatch-service`
           * `encounter-discharge` service id: `encounter-discharge-service`
-        - Discovery endpoint for services requesting the a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
+        - Discovery endpoint for services requesting a subset of the [standard prefetch data set](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch):
           `#{ClientURLs.prefetch_subset_discovery_url}`
           * `appointment-book` service id: `appointment-book-subset`
           * `encounter-start` service id: `encounter-start-subset`
@@ -53,11 +54,7 @@ module DaVinciCRDTestKit
 
       input :cds_jwt_iss,
             title: 'CRD JWT Issuer',
-            description: %(
-              Value of the `iss` claim that must be present in the JWT used to authorize the CRD client's hook
-              request sent as the Bearer token in the `Authorization` header.
-              Run or re-run the "Registration" group to set or change this value.
-            ),
+            description: ClientInputHelper.locked_cds_jwt_iss_description,
             locked: true
 
       input_order :cds_jwt_iss, :cds_jwk_set

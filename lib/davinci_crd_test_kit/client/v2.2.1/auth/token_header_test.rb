@@ -11,12 +11,14 @@ module DaVinciCRDTestKit
       title 'Authorization token headers contain required information'
       description %(
         During this test, Inferno will verify that for each request the JWT header is conformant to the
-        requirements in the [CDS hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
+        requirements in the [CDS Hooks specification](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients),
         including the following:
         - The `alg`, `kid`, and `typ` fields are required.
         - The `alg` and `kid` fields must be strings.
+        - The `alg` field must not be `none`.
         - The `typ` field must be "JWT".
-        - The key used to sign the token must be present in the JWKS.
+        - The JWKS retrieved for the request in the previous test must contain a key whose `kid` matches
+          the header's `kid`. That key is used to verify the token's signature in the next test.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@181', 'cds-hooks_3.0.0-ballot@182', 'cds-hooks_3.0.0-ballot@184',

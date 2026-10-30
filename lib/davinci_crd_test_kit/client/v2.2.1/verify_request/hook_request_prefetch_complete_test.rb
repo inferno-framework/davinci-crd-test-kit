@@ -32,7 +32,7 @@ module DaVinciCRDTestKit
         for the invoked service as calculated by Inferno based on the resources provided in the request.
 
         Note that Inferno requires **all** requested prefetch keys to be present in the request even if there is no
-        data for that key. This because the [CDS Hook specification requires](https://cds-hooks.hl7.org/2026Jan/en/#example-of-pagination-in-prefetch)
+        data for that key. This is because the [CDS Hooks specification requires](https://cds-hooks.hl7.org/2026Jan/en/#example-of-pagination-in-prefetch)
         that if "the CDS Client has no data to populate a template prefetch key, the prefetch template key MUST have a
         value of null." For templates that request the results of a FHIR search interaction, an empty Bundle is also
         acceptable.

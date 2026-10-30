@@ -9,7 +9,7 @@ require_relative 'client_cross_hook_interaction_group'
 module DaVinciCRDTestKit
   module V221
     class ClientCrossHookGroup < Inferno::TestGroup
-      title 'Cross Hook'
+      title 'Cross-Invocation Requirements'
       id :crd_v221_client_cross_hook
       description <<~DESCRIPTION
         This group checks CRD requirements that pertain across all hooks

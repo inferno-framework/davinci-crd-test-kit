@@ -14,7 +14,7 @@ module DaVinciCRDTestKit
       description %(
         Since Inferno has no way to evaluate the client's UI, testers must manually
         verify that the cards and system actions returned by Inferno are presented
-        to the user in an appopriate way that allows for consideration and action
+        to the user in an appropriate way that allows for consideration and action
         if warranted.
       )
 

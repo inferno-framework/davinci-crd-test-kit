@@ -21,13 +21,13 @@ module DaVinciCRDTestKit
 
         During this test, Inferno will verify that the CRD client has demonstrated requests
         - made against both of Inferno's simulated CRD servers,
-          one of which requests the all standard prefetch resources while the
+          one of which requests all standard prefetch resources while the
           other requests only a subset.
         - which demonstrate the capability to distinguish the difference between
           the two prefetch sets.
 
         The CRD server that requests only a subset of the standard prefetch data does not request
-        resources referenced from the following elements. Request made to each Inferno service
+        resources referenced from the following elements. Requests made to each Inferno service
         endpoint with one of these elements populated with a reference to a resource not referenced
         elsewhere will demonstrate the required capability.
           - On an `appointment-book` hook request, an Appointment with a participant entry that

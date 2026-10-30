@@ -1,5 +1,4 @@
 require_relative 'self_pay/client_self_pay_workflow_test'
-require_relative 'self_pay/client_self_pay_no_request_test'
 
 module DaVinciCRDTestKit
   module V221
@@ -16,7 +15,7 @@ module DaVinciCRDTestKit
         will verify that no hook requests are made.
 
         Any hook requests made during these tests will not be checked for conformance
-        or included in the cross-hook analyses around must support and other coverage requirements.
+        or included in the cross-invocation analyses around must support and other coverage requirements.
       DESCRIPTION
 
       run_as_group
@@ -30,7 +29,6 @@ module DaVinciCRDTestKit
       )
 
       test from: :crd_v221_client_self_pay_workflow
-      test from: :crd_v221_client_self_pay_no_request
     end
   end
 end

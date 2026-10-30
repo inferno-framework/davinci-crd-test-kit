@@ -14,9 +14,9 @@ module DaVinciCRDTestKit
       description %(
         During this test, the tester will confirm that the received cards and actions in the
         hook responses have been displayed or otherwise made available to users of the CRD client
-        in an appopriate way that allows for consideration and action if warranted.
+        in an appropriate way that allows for consideration and action if warranted.
       )
-      attestation
+      flag_as_attestation
 
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@resp-49'
 

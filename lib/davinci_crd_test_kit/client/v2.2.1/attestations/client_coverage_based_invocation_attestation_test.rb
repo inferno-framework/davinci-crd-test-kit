@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
         based on the patient's active coverages. To see the specifics of the attested requirements, click
         the "View Specification Requirements" link for this test.
       )
-      attestation
+      flag_as_attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@dev-32'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS
 

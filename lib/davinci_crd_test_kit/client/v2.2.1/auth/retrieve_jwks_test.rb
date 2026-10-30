@@ -8,13 +8,13 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::ShortCircuitInteraction
 
       id :crd_v221_retrieve_jwks
-      title 'JWKSs can be retrieved'
+      title 'CRD client JWKS can be retrieved'
       description %(
-        During this test, Inferno will verify that for each request the JWKS can be retrieved from the JWKS uri if
-        it is present in the `jku` field within the JWT token header. Additionally, keys will be extracted and
-        outputted for use in subsequent tests. If the CRD client does not provide a uri in the `jku` field,
-        Inferno will use the JWK Set provided out of band as a part of the "Registration" group, either
-        retrieving it from a url or, if provided directly, extracting keys from the raw JWKS JSON.
+        During this test, Inferno will verify that for each request the CRD client's JWKS can be retrieved
+        from the URL in the `jku` field of the JWT header, when present. If the JWT header has no `jku`
+        field, Inferno uses the JWKS provided in the "Registration" group instead, either retrieving it
+        from the provided URL or reading the raw JWKS JSON. The keys in the JWKS are then saved as an output
+        for use in subsequent tests.
       )
 
       verifies_requirements 'cds-hooks_3.0.0-ballot@183', 'cds-hooks_3.0.0-ballot@185', 'cds-hooks_3.0.0-ballot@197',
@@ -29,8 +29,8 @@ module DaVinciCRDTestKit
             type: 'textarea',
             description: %(
             The CRD client's registered JWK Set, provided during the "Registration" group, containing
-            it's public key. Used only when a request was received with a JWT without the `jku`
-            header. May be either a publicly accessible url containing the JWKS, or the raw JWKS
+            its public key. Used only when a request was received with a JWT without the `jku`
+            header. May be either a publicly accessible URL containing the JWKS, or the raw JWKS
             JSON. Run or re-run the "Registration" group to set or change this value.
           ),
             locked: true,
@@ -45,7 +45,8 @@ module DaVinciCRDTestKit
         auth_token_headers = JSON.parse(auth_token_headers_json.presence || '[]') # NOTE: pre-verified json
         skip_if auth_token_headers.compact.empty?, 'No Authorization tokens produced from the previous test.'
         skip_if cds_jwk_set.blank? && cds_jwk_set_input_needed?(auth_token_headers),
-                "JWK Set must be inputted if the CRD client's JWK Set is not available"
+                'A request JWT has no `jku` header, so the CRD client\'s JWKS must be provided in the ' \
+                '**CRD JSON Web Key Set (JWKS)** input. Re-run the "Registration" group to provide it.'
 
         crd_jwks_keys_json = []
         auth_token_headers.each_with_index do |token_header, index|

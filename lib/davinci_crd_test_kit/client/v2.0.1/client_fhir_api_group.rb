@@ -74,7 +74,7 @@ module DaVinciCRDTestKit
               Under [Privacy, Security, and Safety](https://hl7.org/fhir/us/davinci-crd/STU2/security.html),
               the CRD Implementation Guide imposes the following rule about TLS:
 
-              As per the [CDS Hook specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
+              As per the [CDS Hooks specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
               communications between CRD clients and CRD servers SHALL
               use TLS. Mutual TLS is not required by this specification but is permitted. CRD servers and
               CRD clients SHOULD enforce a minimum version and other TLS configuration requirements based
@@ -104,7 +104,7 @@ module DaVinciCRDTestKit
               Under [Privacy, Security, and Safety](https://hl7.org/fhir/us/davinci-crd/STU2/security.html),
               the CRD Implementation Guide imposes the following rule about TLS:
 
-              As per the [CDS Hook specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
+              As per the [CDS Hooks specification](https://cds-hooks.hl7.org/2.0/#security-and-safety),
               communications between CRD clients and CRD servers SHALL
               use TLS. Mutual TLS is not required by this specification but is permitted. CRD servers and
               CRD clients SHOULD enforce a minimum version and other TLS configuration requirements based

@@ -14,8 +14,8 @@ module DaVinciCRDTestKit
       id :crd_v221_access_level_same_scenario
       title 'Full-access and limited-access requests represent the same scenario'
       description %(
-        This test compares the full-access and limited-access hook requests made earlier in this
-        scenario and confirms that they invoke the same hook for the same patient, on the same
+        During this test, Inferno will verify that the full-access and limited-access hook requests
+        made earlier in this scenario invoke the same hook for the same patient, on the same
         Inferno simulated CRD server, with the same content. See
         [Matching Requests in the User Access Level Scoping Scenario](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#matching-requests-in-the-user-access-level-scoping-scenario)
         for what is compared for each hook, and where those details are taken from.

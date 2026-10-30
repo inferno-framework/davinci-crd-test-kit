@@ -12,7 +12,7 @@ module DaVinciCRDTestKit
         To see the specifics of the attested requirements, click the "View Specification Requirements" link for this
         test.
       )
-      attestation
+      flag_as_attestation
       verifies_requirements 'hl7.fhir.us.davinci-crd_2.2.1@conf-10', 'hl7.fhir.us.davinci-crd_2.2.1@conf-12',
                             'hl7.fhir.us.davinci-crd_2.2.1@conf-13', 'hl7.fhir.us.davinci-crd_2.2.1@found-33'
       input_instructions ATTESTATION_INPUT_INSTRUCTIONS

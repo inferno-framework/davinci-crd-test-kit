@@ -1,3 +1,5 @@
+require_relative 'client_input_helper'
+
 module DaVinciCRDTestKit
   # Text shared by the wait dialogs of tests that receive hook requests. Requires the `cds_jwt_iss` input,
   # and the payer Organization id inputs declared by `payer_organization_id_inputs` for the endpoint sections.
@@ -13,9 +15,8 @@ module DaVinciCRDTestKit
         input :complete_prefetch_service_organization_id,
               title: 'Complete Prefetch Service Organization id',
               description: %(
-                The FHIR Organization id associated with Inferno's simulated
-                complete prefetch CRD server.
-                Re-run the "Registration" group to provide this detail.
+                #{ClientInputHelper.service_organization_id_intro('complete')}
+                #{ClientInputHelper.rerun_registration_note}
               ),
               type: 'text',
               optional: true,
@@ -23,9 +24,8 @@ module DaVinciCRDTestKit
         input :subset_prefetch_service_organization_id,
               title: 'Subset Prefetch Service Organization id',
               description: %(
-                The FHIR Organization id associated with Inferno's simulated
-                subset prefetch CRD server.
-                Re-run the "Registration" group to provide this detail.
+                #{ClientInputHelper.service_organization_id_intro('subset')}
+                #{ClientInputHelper.rerun_registration_note}
               ),
               type: 'text',
               optional: true,
