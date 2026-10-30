@@ -163,7 +163,7 @@ module DaVinciCRDTestKit
       return unless response.status == 200 && response.body.present?
 
       resource = FHIR.from_contents(response.body)
-      return if resource.nil?
+      return unless resource.is_a?(FHIR::Model) # from_contents can build a non-FHIR class named in the body
       return resource unless resource.resourceType == 'Bundle'
       return if resource.entry.empty?
 
@@ -380,7 +380,7 @@ module DaVinciCRDTestKit
     end
 
     def create_system_actions(resource, coverage_id)
-      return if resource.nil?
+      return unless resource.is_a?(FHIR::Model) # from_contents can build a non-FHIR class named in the body
 
       system_actions = []
       if resource.resourceType == 'Bundle'

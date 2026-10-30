@@ -445,7 +445,7 @@ RSpec.describe DaVinciCRDTestKit::MockServiceResponse do
         )
       end
 
-      ['', '<html></html>', 'not json'].each do |body|
+      ['', '<html></html>', 'not json', '{"resourceType":"Hash"}'].each do |body|
         it "finds no Coverage, rather than raising, when a 200 response has the body #{body.inspect}" do
           stub_request(:get, coverage_search_url).to_return(status: 200, body:)
           expect(creator.patient_coverage).to be_nil

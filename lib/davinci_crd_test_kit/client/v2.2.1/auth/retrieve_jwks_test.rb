@@ -121,7 +121,7 @@ module DaVinciCRDTestKit
       def fetch_jwks(uri, entity, index)
         # Inferno's `get` raises for a URL it can't request, which would end the test
         unless requestable_url?(uri)
-          add_request_message('error', "JWKS URL `#{uri}` is not an absolute http(s) URL.", index)
+          add_request_message('error', "JWKS URL `#{uri}` is not a valid absolute http(s) URL.", index)
           return
         end
 
@@ -135,21 +135,24 @@ module DaVinciCRDTestKit
                               index)
           nil
         end
-      rescue *REQUEST_TIMEOUT_ERRORS
-        add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
-        nil
       rescue Inferno::Exceptions::AssertionException => e
         # Inferno turns a connection that can't be opened, including one that times out, into a
         # failure, which would end the test before the other requests are checked.
         raise unless e.cause.is_a?(Faraday::ConnectionFailed) || e.cause.is_a?(SocketError)
 
-        message = timeout?(e.cause) ? request_timed_out_message("JWKS URL `#{uri}`") : e.message
-        add_request_message('error', message, index)
+        add_request_message('error', fetch_failure_message(uri, e.cause, e.message), index)
         nil
       rescue Faraday::Error => e
-        # other failures to get a response, such as an invalid TLS certificate, which Inferno passes through
-        add_request_message('error', "Failed to fetch JWKS URL `#{uri}`: #{e.message}", index)
+        # timeouts, and other failures to get a response that Inferno passes through, such as an
+        # invalid TLS certificate or a TLS handshake that times out
+        add_request_message('error',
+                            fetch_failure_message(uri, e, "Failed to fetch JWKS URL `#{uri}`: #{e.message}"),
+                            index)
         nil
+      end
+
+      def fetch_failure_message(uri, error, other_message)
+        timeout?(error) ? request_timed_out_message("JWKS URL `#{uri}`") : other_message
       end
 
       # Matches the scheme check in Inferno's `get`, which is case-sensitive.
