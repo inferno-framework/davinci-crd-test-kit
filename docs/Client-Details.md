@@ -207,14 +207,14 @@ in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-cr
 
 CRD clients are required to demonstrate support for some elements which appear only
 under certain conditions. See the **[Client Must Support](Client-Must-Support)**
-section for details on what Inferno checks for and the underlying requirements
+page for details on what Inferno checks for and the underlying requirements
 that drive those tests.
 
 ## Prefetch Tests
 
-Starting in the version 2.2.1 of the CRD IG, CRD clients are required
+Starting in version 2.2.1 of the CRD IG, CRD clients are required
 to support prefetch. See the **[Client Prefetch Verification](Client-Prefetch-Verification)**
-section for details on [what Inferno checks for when confirming prefetch
+page for details on [what Inferno checks for when confirming prefetch
 support](Client-Prefetch-Verification#infernos-verification), what Inferno's
 simulated service endpoints [request for prefetched data](Client-Prefetch-Verification#inferno-requested-prefetches),
 and how Inferno [resolves references](Client-Prefetch-Verification#reference-resolution-within-hook-requests)

@@ -1,6 +1,6 @@
 # Client Prefetch Verification
 
-The 2.0.1 version of CRD does not require prefetch and the v2.0.1
+The 2.0.1 version of CRD does not require prefetch, and the v2.0.1
 client suite handles prefetch checks differently than v2.2.1.
 This page describes how the v2.2.1 client suite checks prefetch
 requirements for CRD clients.
@@ -34,9 +34,9 @@ the CRD client involve prefetch verification. This includes:
     for the invoked service, [resolving references](#reference-resolution-within-hook-requests)
     and executing FHIRPath.
   - "Prefetched coverages are issued by the payer associated with the invoked
-    service": Coverages are issued by payers and each payer is associated
-    with a CDS Hooks endpoint. Likewise in Inferno, testers must assign each
-    Inferno simulated CRD server the Organization `id` representing the payer
+    service": Coverages are issued by payers, and each payer is associated
+    with a CDS Hooks endpoint. Likewise, in Inferno, testers must assign each
+    Inferno-simulated CRD server the Organization `id` representing the payer
     associated with the endpoint within the CRD client. Inferno checks
     that the Organization `id` indicated in
     the Coverage matches the one assigned to the invoked server.
@@ -48,7 +48,7 @@ the CRD client involve prefetch verification. This includes:
     within prefetch templates.
   - "CRD client can provide both the complete standard prefetch data set and
     a subset": CRD clients must demonstrate the ability to make hook requests
-    against Inferno simulated CRD servers: the [complete prefetch services](#infernos-standard-services),
+    against Inferno-simulated CRD servers: the [complete prefetch services](#infernos-standard-services)
     and the [subset prefetch services](#infernos-subset-services). These
     requests must include at least one to each simulated server where the
     prefetched data set would not be the same if the same hook request were sent
@@ -63,7 +63,7 @@ one requesting the full "standard" set and the other requesting a strict subset 
 
 ### Inferno's Standard Services
 
-Each of Inferno's standard set of services, available under
+Each of Inferno's standard services, available under
 `custom/crd_client_v221/cds-services`, requests the complete CRD
 [standard prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch)
 data set. That includes resources representing:
@@ -89,7 +89,7 @@ the subset drops the following information from the prefetch, by hook:
 - `order-*`: no ordering providers, no Organizations, and no participants linked
   only from the Encounter.
 
-Additionally, it uses non-standard prefetch keys. The discovery response returned
+Additionally, the subset services use non-standard prefetch keys. The discovery response
 that requests this information can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
 
 ### Demonstrating Prefetch Calculation
@@ -109,8 +109,8 @@ prefetch set is populated with a reference to a resource that is not referenced 
 Reference elements that meet these criteria include:
 - On an `appointment-book` hook request, an Appointment with a `participant` entry that
   references a Practitioner or PractitionerRole resource in its `actor` element.
-- On an `encounter-start` or `encounter-discharge` hook request, an Encounter with a
-  referenced Location via the `location` element or referenced Organization via the
+- On an `encounter-start` or `encounter-discharge` hook request, an Encounter that
+  references a Location in its `location` element or an Organization in its
   `serviceProvider` element.
 - On an `order-select`, `order-sign`, or `order-dispatch` hook request, one of the following order resources:
   - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner
@@ -129,8 +129,8 @@ already present within the hook request.
 
 Many, but not all, of the resources within a hook request are found inside
 FHIR Bundles, which have [well-defined rules](https://hl7.org/fhir/R4/bundle.html#references)
-for determining both the absolute URL for a resource within it and how to
-determine the absolute URL for a relative reference. References and resources
+for determining both the absolute URL of a resource within it and the
+absolute URL that a relative reference points to. References and resources
 in the hook request that are not within a Bundle use the required
 `fhirServer` property as the base FHIR server. The following sections describe
 the specific rules by which Inferno determines the absolute URL for each
@@ -147,7 +147,7 @@ refers to.
   to that resource.
 - Unbundled resources: Other resources, including direct `context` and
   `prefetch` non-Bundle resource values, are required to have an `id`.
-  To form the absolute URL for such a resource, append the relative
+  Inferno forms the absolute URL for such a resource by appending the relative
   reference formed by the resource's `resourceType` and `id` to the
   value of the `fhirServer` property in the containing hook request.
 
@@ -158,7 +158,7 @@ that the reference points to. If the reference is not already
 absolute, Inferno performs the conversion differently depending on
 where the reference was found:
 - Relative references that appear in bundled resources: Inferno uses the
-  [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references)
+  [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references),
   which create a [FHIR RESTful URL](https://hl7.org/fhir/R4/references.html#regex)
   using the relative reference and the base FHIR server extracted from the
   enclosing entry's `fullUrl`, if possible. Relative references within
@@ -180,17 +180,17 @@ to identify the absolute URL for the target resource and match it back
 to a provided resource. When executing FHIRPath, only the identified
 resources within the hook request's `prefetch` are considered; Inferno will not
 use fetched resources to supplement that set. Furthermore, if the
-`resolve()` function fails, Inferno will never continue execution
+`resolve()` function fails, Inferno does not continue evaluating that path
 even if it appears that the reference itself could supply the rest
 of the information (e.g., `resolve().ofType(Patient).id` on the
 reference `Patient/123`).
 
 ### Example
 
-In the stripped-down hook request example, with malformed comments, below, there is a mix
+In the stripped-down example hook request below, which includes comments that are not valid JSON, there is a mix
 of resources from and references to resources on `inferno.healthit.gov` and
 `inferno-qa.healthit.gov`. Each relative reference has a comment following it
-indicating the absolute URL it resolves to and the Patient resource that is
+indicating the absolute URL it resolves to, and the Patient resource that is
 outside of a Bundle has its identity indicated in a comment as well.
 
 The only reference that doesn't resolve to a resource within the hook request is
@@ -239,6 +239,7 @@ on the other server.
     },
     "practitionerRoles": {
       "resourceType": "Bundle",
+      "type": "searchset",
       "entry": [
         {
           "fullUrl": "https://inferno-qa.healthit.gov/fhir/PractitionerRole/role-performer",
@@ -254,6 +255,7 @@ on the other server.
     },
     "practitioners": {
       "resourceType": "Bundle",
+      "type": "searchset",
       "entry": [
         {
           "fullUrl": "https://inferno.healthit.gov/fhir/Practitioner/orderer",
