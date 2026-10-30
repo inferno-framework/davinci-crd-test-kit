@@ -151,10 +151,12 @@ module DaVinciCRDTestKit
 
     # @private
     def connection
-      timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
-      @connection ||= Faraday.new(request: { open_timeout: timeout, timeout: }) do |f|
-        f.request :url_encoded
-        f.use FaradayMiddleware::FollowRedirects
+      @connection ||= begin
+        timeout = HookRequestDataAccess::FHIR_SERVER_TIMEOUT_SECONDS
+        Faraday.new(request: { open_timeout: timeout, timeout: }) do |f|
+          f.request :url_encoded
+          f.use FaradayMiddleware::FollowRedirects
+        end
       end
     end
 
@@ -176,8 +178,6 @@ module DaVinciCRDTestKit
     # These reads are not recorded, so without a warning the tester could not tell why the
     # response lacks the data.
     def warn_of_failed_response_read(uri, error)
-      return unless respond_to?(:result) && result.present?
-
       outcome, cause =
         if timeout?(error)
           ['Timed out reading', '']

@@ -53,7 +53,7 @@ RSpec.describe DaVinciCRDTestKit::V221::CRDClientRegistrationVerification do
     stub_request(:get, example_jwks_url).to_raise(Errno::ECONNREFUSED)
     result = run_with_defaults(cds_jwk_set: example_jwks_url)
     expect(result.result).to eq('fail')
-    expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from #{example_jwks_url}:"))
+    expect(result_messages.map(&:message)).to include(start_with("Failed to fetch JWKS from `#{example_jwks_url}`:"))
   end
 
   it 'limits how long it waits for the JWKS URL' do

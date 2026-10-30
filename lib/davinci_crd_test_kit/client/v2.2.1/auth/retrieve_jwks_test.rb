@@ -119,7 +119,7 @@ module DaVinciCRDTestKit
       end
 
       def fetch_jwks(uri, entity, index)
-        get(uri)
+        return unless get_jwks(uri, index)
 
         if response[:status] == 200
           parse_json_request_entity(response[:body], entity, index)
@@ -129,13 +129,19 @@ module DaVinciCRDTestKit
                               index)
           nil
         end
+      end
+
+      # Returns false, after recording an error, if the request timed out. Inferno turns some
+      # connection timeouts into a failure, with the Faraday error as its cause, which would end the
+      # test before the other requests are checked.
+      def get_jwks(uri, index)
+        get(uri)
+        true
       rescue Faraday::Error, Inferno::Exceptions::AssertionException => e
-        # Inferno turns some connection timeouts into a failure, with the Faraday error as its cause,
-        # which would end the test before the other requests are checked.
         raise unless timeout?(e) || timeout?(e.cause)
 
         add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
-        nil
+        false
       end
 
       def parse_or_fetch_jwks(jwk_set_input, index)

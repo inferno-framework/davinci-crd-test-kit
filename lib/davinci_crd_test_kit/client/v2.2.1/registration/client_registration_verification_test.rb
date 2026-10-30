@@ -127,7 +127,7 @@ module DaVinciCRDTestKit
               warning_messages << if timeout?(e)
                                     request_timed_out_message("JWKS URL `#{jku}`")
                                   else
-                                    "Failed to fetch JWKS from #{jku}: #{e.message}"
+                                    "Failed to fetch JWKS from `#{jku}`: #{e.message}"
                                   end
               nil
             end

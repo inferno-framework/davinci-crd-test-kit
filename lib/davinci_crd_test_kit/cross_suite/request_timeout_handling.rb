@@ -1,7 +1,8 @@
 module DaVinciCRDTestKit
-  # Inferno's HTTP and FHIR clients raise rather than return a response when the server doesn't respond
-  # in time, which would make the test error. These helpers report the timeout against the system under
-  # test instead.
+  # HTTP clients raise rather than return a response when the server doesn't respond in time, which
+  # would make a test error or cost the CRD client its hook response. These helpers recognize such
+  # timeouts, whether from Inferno's HTTP and FHIR clients or from the kit's own Faraday connections,
+  # so that they can be reported against the system under test instead.
   module RequestTimeoutHandling
     # How long a test waits to connect to a server, and then for its response, when making a request
     # with its own Faraday connection.
