@@ -172,14 +172,24 @@ module DaVinciCRDTestKit
     def resource_from_response(response)
       return unless response.status == 200 && response.body.present?
 
-      resource = FHIR.from_contents(response.body)
-      # from_contents builds whatever class the body names, which may be a datatype or not FHIR at all
-      return unless resource.respond_to?(:resourceType)
-      return resource unless resource.resourceType == 'Bundle'
-
-      resource.entry.first&.resource
+      first_resource(FHIR.from_contents(response.body))
     rescue JSON::ParserError
       nil
+    end
+
+    # A Bundle stands for the resource in its first entry.
+    def first_resource(resource)
+      return unless fhir_resource?(resource)
+
+      resource = resource.entry.first&.resource if resource.resourceType == 'Bundle'
+      resource if fhir_resource?(resource)
+    end
+
+    # FHIR.from_contents builds whatever class the content names, which may be a datatype or not FHIR
+    # at all. Checked on the class, since a FHIR model's `respond_to?` also answers for any name used by
+    # one of its extensions.
+    def fhir_resource?(object)
+      object.class.method_defined?(:resourceType)
     end
 
     # These reads are not recorded, so without a warning the tester could not tell why the
@@ -386,13 +396,14 @@ module DaVinciCRDTestKit
     end
 
     def create_system_actions(resource, coverage_id)
-      # from_contents builds whatever class the body names, which may be a datatype or not FHIR at all
-      return unless resource.respond_to?(:resourceType)
+      return unless fhir_resource?(resource)
 
       system_actions = []
       if resource.resourceType == 'Bundle'
         resource.entry.each do |entry|
           entry_resource = entry.resource
+          next unless fhir_resource?(entry_resource)
+
           add_coverage_extension(entry_resource, coverage_id)
           system_actions.append(
             {

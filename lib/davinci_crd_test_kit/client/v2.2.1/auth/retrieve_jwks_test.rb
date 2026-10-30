@@ -64,7 +64,9 @@ module DaVinciCRDTestKit
             else
               parse_or_fetch_jwks(cds_jwk_set, index)
             end
-          if jwks.blank?
+          # nil when retrieving or parsing the JWKS failed, which has already been reported, but also
+          # when the JWKS is a JSON null
+          if jwks.nil? && error_request_numbers.include?(index + 1)
             crd_jwks_keys_json << nil
             next
           end
@@ -94,10 +96,16 @@ module DaVinciCRDTestKit
             next
           end
 
-          keys.each do |jwk|
+          invalid_keys = keys.select do |jwk|
             JWT::JWK.import(jwk.deep_symbolize_keys)
+            false
           rescue StandardError
             add_request_message('error', "Invalid JWK: #{jwk.to_json}", index)
+            true
+          end
+          if invalid_keys.present?
+            crd_jwks_keys_json << nil
+            next
           end
 
           kid_presence = keys.all? { |key| key['kid'].present? }

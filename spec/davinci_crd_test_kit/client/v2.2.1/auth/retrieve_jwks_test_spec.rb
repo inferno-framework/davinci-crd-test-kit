@@ -123,7 +123,12 @@ RSpec.describe DaVinciCRDTestKit::V221::RetrieveJWKSTest do
 
   {
     [{ 'kty' => 'RSA' }] => 'JWKS must be a JSON object',
-    { 'keys' => [5] } => 'Each key in the JWKS `keys` field must be a JSON object'
+    [] => 'JWKS must be a JSON object',
+    nil => 'JWKS must be a JSON object',
+    false => 'JWKS must be a JSON object',
+    {} => 'JWKS `keys` field must be an array',
+    { 'keys' => [5] } => 'Each key in the JWKS `keys` field must be a JSON object',
+    { 'keys' => [{ 'kty' => 'unknown', 'kid' => 'a' }] } => 'Invalid JWK: {"kty":"unknown","kid":"a"}'
   }.each do |jwks_content, error_message|
     it "reports the JWKS #{jwks_content.to_json} and checks the other requests" do
       other_jwks_url = 'https://cds.example.org/other-jwks.json'
