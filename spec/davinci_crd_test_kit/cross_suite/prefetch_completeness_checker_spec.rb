@@ -369,7 +369,10 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       errors = errors_for(order_sign_request, templates)
       expect(errors)
         .to eq(["(Request 1) Prefetch Template patient - resource 'https://example/r4/Patient/example' needed to " \
-                'instantiate the query was not provided in the prefetched values.'])
+                "instantiate the query 'context.draftOrders.entry.resource.patient.resolve().id' was not provided " \
+                "in the prefetched values. The reference 'Patient/example' is held by Bundle entry 1 " \
+                '(NutritionOrder/pureeddiet-simple) of context.draftOrders and was made absolute against base ' \
+                "'https://example/r4' from its fullUrl."])
     end
 
     it 'resolves absolute references directly without base server lookup' do
@@ -394,7 +397,118 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                    body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
 
       errors = errors_for(order_sign_request, templates)
-      expect(errors).to include(match('is a relative reference, but the base FHIR Server is not known'))
+      expect(errors).to include(
+        "(Request 1) Prefetch Template patient - 'Patient/example' needed to instantiate the query is a " \
+        'relative reference, but the base FHIR Server is not known when evaluating ' \
+        "'context.draftOrders.entry.resource.patient.resolve().id': Bundle entry 1 " \
+        '(NutritionOrder/pureeddiet-simple) of context.draftOrders has no fullUrl.'
+      )
+    end
+
+    it 'explains that a Bundle entry with a non-RESTful fullUrl gives no base FHIR server' do
+      order_sign_request['context']['draftOrders']['entry'] = [
+        order_sign_request['context']['draftOrders']['entry'][0].merge('fullUrl' => 'urn:uuid:order-1')
+      ]
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(
+        end_with("not known when evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
+                 'Bundle entry 1 (NutritionOrder/pureeddiet-simple) of context.draftOrders has fullUrl ' \
+                 "'urn:uuid:order-1', which is not a RESTful URL.")
+      )
+    end
+
+    it 'notes a resource with the same type and id prefetched under a different URL' do
+      other_server_patient_bundle = {
+        'resourceType' => 'Bundle',
+        'entry' => [{ 'fullUrl' => 'https://other-server/r4/Patient/example', 'resource' => crd_patient_example }]
+      }
+      order_sign_request['prefetch'] = { 'patient' => other_server_patient_bundle }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(
+        end_with("from its fullUrl. A Patient/example was prefetched as 'https://other-server/r4/Patient/example', " \
+                 'which does not match.')
+      )
+    end
+
+    it 'restores the base FHIR server after resolve() for sibling references' do
+      order_sign_request['context']['draftOrders']['entry'] = [{
+        'fullUrl' => "#{base_fhir_url}/NutritionOrder/example",
+        'resource' => { 'resourceType' => 'NutritionOrder', 'id' => 'example' }
+      }]
+      other_server_patient = crd_patient_example.merge('id' => 'other')
+      order_sign_request['prefetch'] = {
+        'patient' => {
+          'resourceType' => 'Bundle',
+          'entry' => [
+            { 'fullUrl' => 'https://other-server/r4/Patient/other', 'resource' => other_server_patient },
+            { 'fullUrl' => "#{base_fhir_url}/Patient/example", 'resource' => crd_patient_example }
+          ]
+        }
+      }
+      stub_request(:post, "#{fhirpath_url}?path=basedOn")
+        .to_return(status: 200,
+                   body: [
+                     { type: 'Reference', element: { 'reference' => 'https://other-server/r4/Patient/other' } },
+                     { type: 'Reference', element: { 'reference' => 'Patient/example' } }
+                   ].to_json)
+      stub_request(:post, "#{fhirpath_url}?path=id")
+        .with(body: /"id":"other"/)
+        .to_return(status: 200, body: [{ type: 'id', element: 'other' }].to_json)
+      stub_request(:post, "#{fhirpath_url}?path=id")
+        .with(body: /"id":"example"/)
+        .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
+
+      errors = errors_for(order_sign_request,
+                          { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.basedOn.resolve().id}}' })
+      expect(errors).to be_empty
+    end
+
+    it 'explains that a resource outside a Bundle gives no base FHIR server when the request has no fhirServer' do
+      order_sign_request.delete('fhirServer')
+      coverage_templates = { 'patient' => 'Patient?_id={{%coverage.beneficiary.resolve().id}}' }
+      order_sign_request['prefetch'] = { 'coverage' => crd_coverage_example,
+                                         'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=beneficiary")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, coverage_templates)
+      expect(errors).to include(
+        end_with("not known when evaluating '%coverage.beneficiary.resolve().id': the request has no fhirServer.")
+      )
+    end
+
+    it 'explains that a resolved resource with a non-RESTful identity gives no base FHIR server' do
+      chained_templates = {
+        'practitioner' =>
+          'Practitioner?_id={{context.draftOrders.entry.resource.patient.resolve().generalPractitioner.resolve().id}}'
+      }
+      patient = crd_patient_example.merge('generalPractitioner' => [{ 'reference' => 'Practitioner/example' }])
+      order_sign_request['prefetch'] = {
+        'patients' => { 'resourceType' => 'Bundle',
+                        'entry' => [{ 'fullUrl' => 'urn:uuid:patient-1', 'resource' => patient }] },
+        'practitioner' => { 'resourceType' => 'Bundle' }
+      }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'urn:uuid:patient-1' } }].to_json)
+      stub_request(:post, "#{fhirpath_url}?path=generalPractitioner")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Practitioner/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, chained_templates)
+      expect(errors).to include(
+        end_with("it is held by resource 'urn:uuid:patient-1', which is not identified by a RESTful URL.")
+      )
     end
 
     it 'returns an error for a reference with too many path segments' do
@@ -461,7 +575,9 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                           { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.basedOn.resolve().id}}' })
       expect(errors).to eq(
         ["(Request 1) Prefetch Template patient - resource 'https://other-server/r4/Patient/missing' " \
-         'needed to instantiate the query was not provided in the prefetched values.']
+         "needed to instantiate the query 'context.draftOrders.entry.resource.basedOn.resolve().id' was not " \
+         'provided in the prefetched values. The reference is held by Bundle entry 1 (NutritionOrder/example) ' \
+         'of context.draftOrders.']
       )
     end
   end
@@ -594,16 +710,18 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => crd_patient_example }] }
       end
 
-      it 'are registered using the fhirServer-based key and can be resolved' do
+      it 'are not registered, so references to them are not resolved even when fhirServer is present' do
         order_sign_request['prefetch'] = { 'patient' => bundle_without_fullurl }
         stub_request(:post, "#{fhirpath_url}?path=patient")
           .to_return(status: 200,
                      body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
-        stub_request(:post, "#{fhirpath_url}?path=id")
-          .with(body: /"resourceType":"Patient"/)
-          .to_return(status: 200, body: [{ type: 'id', element: 'example' }].to_json)
 
-        expect(errors_for(order_sign_request, resolve_patient_template)).to be_empty
+        errors = errors_for(order_sign_request, resolve_patient_template)
+        expect(errors).to include(
+          start_with("(Request 1) Prefetch Template patient - resource '#{base_fhir_url}/Patient/example' needed to")
+            .and(end_with('A Patient/example was prefetched in a Bundle entry without a fullUrl, which cannot be ' \
+                          'referenced.'))
+        )
       end
 
       it 'are not registered when fhirServer is absent, causing resource not found during resolve' do
@@ -703,15 +821,14 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(index['https://elsewhere.example/r4/Patient/example']).to be(crd_patient_example)
     end
 
-    it 'indexes an entry without a fullUrl by fhirServer and Type/id, and one with a fullUrl by that fullUrl' do
+    it 'indexes an entry with a fullUrl by that fullUrl, and does not index one without a fullUrl' do
       bundle = { 'resourceType' => 'Bundle', 'entry' => [
         { 'resource' => service_request },
         { 'fullUrl' => 'https://elsewhere.example/r4/Patient/example', 'resource' => crd_patient_example }
       ] }
       index = indexed({ 'mixed' => bundle })
 
-      expect(index.keys).to contain_exactly("#{base_fhir_url}/ServiceRequest/sr-1",
-                                            'https://elsewhere.example/r4/Patient/example')
+      expect(index.keys).to contain_exactly('https://elsewhere.example/r4/Patient/example')
     end
 
     it 'keeps the first resource indexed under an identity' do
@@ -961,6 +1078,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(checker_for({ 'obs' => observation }).prefetched_resource('Observation/123')).to eq(observation)
     end
 
+    # presence is by type and id, though a reference cannot resolve to such an entry
     it 'finds a resource in a Bundle entry with no fullUrl' do
       bundle = { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => observation }] }
 

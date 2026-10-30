@@ -56,7 +56,7 @@ module DaVinciCRDTestKit
     def must_support_references_to_read(resource, identity)
       return [] unless resource.respond_to?(:resourceType)
 
-      base = ResourceIdentity.base_for(identity) || ResourceIdentity.fhir_server_base(request_body)
+      base = ResourceIdentity.base_for(identity)
       metadata = ProfileMetadata.for_resource_type(MUST_SUPPORT_IG_VERSION, resource.resourceType)
       navigator = MustSupportReferences::Navigator.new(metadata)
       MustSupportReferences.reference_elements(metadata).flat_map do |element|
@@ -103,19 +103,24 @@ module DaVinciCRDTestKit
       fetch_reference(payer_reference, additional_tag: PAYER_ORG_FETCH_TAG) if payer_reference.present?
     end
 
-    # The absolute URL identifying the prefetched Coverage (see ResourceIdentity).
+    # The absolute URL identifying the prefetched Coverage (see ResourceIdentity), nil for a Bundle
+    # entry without a fullUrl.
     def prefetched_coverage_identity
-      full_url = prefetched_coverage_entry&.fullUrl if prefetched_coverage.is_a?(FHIR::Bundle)
-      full_url.presence || ResourceIdentity.restful_identity(prefetched_coverage_resource, fhir_server_base)
+      return prefetched_coverage_entry&.fullUrl.presence if prefetched_coverage.is_a?(FHIR::Bundle)
+
+      ResourceIdentity.restful_identity(prefetched_coverage_resource, fhir_server_base)
     end
 
     # The normalized absolute form of a reference held by the resource identified by the given URL,
     # following the FHIR rules for resolving references, or the reference as given when it has no
-    # absolute form. nil for a reference that is not a string, which cannot be read.
+    # absolute form. nil for a reference that is not a string, or a relative one held by a resource
+    # whose identity is not a RESTful URL, neither of which can be read.
     def resolved_reference(reference, holder_identity)
       return unless reference.is_a?(String)
 
-      base = ResourceIdentity.base_for(holder_identity) || fhir_server_base
+      base = ResourceIdentity.base_for(holder_identity)
+      return if base.blank? && !ResourceIdentity.absolute_url?(reference)
+
       ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference, base)) || reference
     end
 
@@ -133,7 +138,9 @@ module DaVinciCRDTestKit
       return locations if locations.is_a?(FHIR::Bundle)
       return nil unless locations.is_a?(FHIR::Location)
 
-      FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ resource: locations })] })
+      # a Location given outside a Bundle is on the request's FHIR server
+      full_url = ResourceIdentity.restful_identity(locations, fhir_server_base)
+      FHIR::Bundle.new({ entry: [FHIR::Bundle::Entry.new({ fullUrl: full_url, resource: locations })] })
     end
 
     # The prefetched Locations and their ancestors, keyed by the normalized absolute URL identifying each (see
@@ -162,9 +169,9 @@ module DaVinciCRDTestKit
       add_location_to_hash(parent_location, location_hash, parent_reference)
     end
 
-    # A Location given without a fullUrl is taken to be on the request's FHIR server.
+    # A Location given without a fullUrl has no identity, so it is keyed by `Location/id`.
     def location_identity(location)
-      ResourceIdentity.restful_identity(location, fhir_server_base) || "Location/#{location.id}"
+      "Location/#{location.id}"
     end
   end
 end

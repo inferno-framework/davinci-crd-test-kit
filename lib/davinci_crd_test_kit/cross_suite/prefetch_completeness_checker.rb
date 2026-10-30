@@ -57,14 +57,13 @@ module DaVinciCRDTestKit
     end
 
     # prefetched Bundle entries are indexed by their fullUrl, which may be rooted somewhere other
-    # than the fhirServer given in the request, so fall back to the resource's own type and id
+    # than the fhirServer given in the request, or not at all when an entry has none, so fall back
+    # to the resource's own type and id
     def prefetched_resource_by_reference(relative_reference)
       resource_type, id = relative_reference.split('/')
       return if resource_type.blank? || id.blank?
 
-      prefetched_resources.values.find do |resource|
-        resource.is_a?(Hash) && resource['resourceType'] == resource_type && resource['id'] == id
-      end
+      all_prefetched_resources.find { |resource| ResourceIdentity.type_and_id(resource) == [resource_type, id] }
     end
 
     # -----------------------------------------------------------------------
@@ -382,10 +381,18 @@ module DaVinciCRDTestKit
       @prefetched_resources ||= {}
     end
 
+    # including those without an identity, which references cannot resolve to
+    def all_prefetched_resources
+      @all_prefetched_resources ||= []
+    end
+
     # Prefetched resources are indexed by the absolute URL identifying them, the first one wins.
     def extract_prefetched_resources
-      ResourceIdentity.each_identified_prefetch_resource(hook_request) do |identity, resource|
-        prefetched_resources[identity] = resource unless prefetched_resources.key?(identity)
+      ResourceIdentity.each_prefetch_resource(hook_request) do |identity, resource|
+        all_prefetched_resources << resource
+        next if identity.blank? || prefetched_resources.key?(identity)
+
+        prefetched_resources[identity] = resource
       end
     end
 
@@ -408,14 +415,63 @@ module DaVinciCRDTestKit
       return nil unless key.present?
 
       unless prefetched_resources[key].present?
-        errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
-                  'was not provided in the prefetched values.'
-
+        report_missing_resource(reference, key)
         return nil
       end
 
       @current_base_fhir_server = base_fhir_server_for_identity(key)
+      @current_reference_holder = {
+        description: "resource '#{key}'",
+        base_source: 'its URL',
+        base_unknown_reason: "it is held by resource '#{key}', which is not identified by a RESTful URL"
+      }
       prefetched_resources[key]
+    end
+
+    # reported once per query for each missing resource, with the first reference found to it, so that
+    # many resources referencing the same missing one do not each produce an error
+    def report_missing_resource(reference, key)
+      return unless reported_missing_resources.add?([@current_prefetch_key, @current_fhirpath_query, key])
+
+      details = [reference_origin(reference, key), mismatched_prefetch_note(key)].compact.join(' ')
+      errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
+                "'#{@current_fhirpath_query}' was not provided in the prefetched values." \
+                "#{" #{details}" if details.present?}"
+    end
+
+    def reported_missing_resources
+      @reported_missing_resources ||= Set.new
+    end
+
+    # where the reference was found and, for a relative reference, the base it was made absolute against
+    def reference_origin(reference, key)
+      reference = reference['reference'] if reference.is_a?(Hash)
+      holder = @current_reference_holder&.dig(:description)
+      return if holder.blank?
+      return "The reference is held by #{holder}." if reference == key
+
+      "The reference '#{reference}' is held by #{holder} and was made absolute against base " \
+        "'#{@current_base_fhir_server}' from #{@current_reference_holder[:base_source]}."
+    end
+
+    # a resource with the same type and id prefetched under a different URL usually means the
+    # reference and the prefetched fullUrl disagree about the server, and one prefetched without
+    # an identity cannot be referenced at all
+    def mismatched_prefetch_note(key)
+      type, id = key.match(ResourceIdentity::RESTFUL_URL_PATTERN)&.captures
+      return if type.blank? || id.blank?
+
+      other_url = identity_of_prefetched("#{type}/#{id}", other_than: key)
+      return "A #{type}/#{id} was prefetched as '#{other_url}', which does not match." if other_url.present?
+      return unless prefetched_resource_by_reference("#{type}/#{id}")
+
+      "A #{type}/#{id} was prefetched in a Bundle entry without a fullUrl, which cannot be referenced."
+    end
+
+    def identity_of_prefetched(type_and_id, other_than:)
+      prefetched_resources.find do |url, resource|
+        url != other_than && ResourceIdentity.type_and_id(resource) == type_and_id.split('/')
+      end&.first
     end
 
     def absolute_reference(reference)
@@ -438,7 +494,8 @@ module DaVinciCRDTestKit
 
       if @current_base_fhir_server.nil?
         errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
-                  'is a relative reference, but the base FHIR Server is not known.'
+                  'is a relative reference, but the base FHIR Server is not known when evaluating ' \
+                  "'#{@current_fhirpath_query}': #{@current_reference_holder&.dig(:base_unknown_reason)}."
         return nil
       end
 

@@ -202,7 +202,7 @@ module DaVinciCRDTestKit
 
       def bundle_identified_resources(bundle, fhir_server)
         identified = []
-        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server, nil) do |identity, raw|
+        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server) do |identity, raw|
           identified << [ResourceIdentity.normalized_url(identity), to_fhir_resource(raw)]
         end
         identified
@@ -215,7 +215,7 @@ module DaVinciCRDTestKit
         return {} unless reference.reference.is_a?(String)
         return resolve_contained(reference, entry[:resource]) if reference.reference.start_with?('#')
 
-        base = ResourceIdentity.base_for(entry[:identity]) || request_data[:fhir_server]
+        base = ResourceIdentity.base_for(entry[:identity])
         url = ResourceIdentity.normalized_url(ResourceIdentity.absolute_reference(reference.reference, base))
         return {} if url.blank?
 
@@ -363,7 +363,8 @@ module DaVinciCRDTestKit
         skip_if unidentified.present?,
                 "Instances of #{unidentified.map { |resource_type| "`#{resource_type}`" }.to_sentence} were " \
                 'observed, but none could be identified by absolute URL, so their references could not be ' \
-                'checked. Include `fhirServer` in hook requests, and an id or `fullUrl` for each resource.'
+                'checked. Include `fhirServer` in hook requests, a `fullUrl` for each Bundle entry, and an id ' \
+                'for each resource outside a Bundle.'
       end
 
       run do

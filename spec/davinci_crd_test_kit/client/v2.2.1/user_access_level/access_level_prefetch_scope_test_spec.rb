@@ -117,8 +117,7 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     expect(run(test, access_level_target_reference: target_reference).result).to eq('pass')
   end
 
-  it 'falls back to attestation when the hook request does not identify a FHIR server' do
-    allow(SecureRandom).to receive(:hex).and_return(known_token)
+  it 'checks presence by type and id when the hook request does not identify a FHIR server' do
     full_body = hook_body(hook_instance: 'full-instance', prefetch: { 'observation' => target_resource },
                           fhir_server: nil)
     limited_body = hook_body(hook_instance: 'limited-instance', prefetch: { 'observation' => target_resource },
@@ -126,11 +125,10 @@ RSpec.describe DaVinciCRDTestKit::V221::AccessLevelPrefetchScopeTest, :request d
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_FULL_GROUP_TAG, full_body)
     create_hook_request(DaVinciCRDTestKit::ACCESS_LEVEL_LIMITED_GROUP_TAG, limited_body)
 
-    # without a fhirServer the prefetched resources have no absolute url to be matched against,
-    # so presence cannot be established and the tester is asked to attest instead
+    # without a fhirServer the prefetched resources have no absolute url, but presence is by type and id
     result = run(test, access_level_target_reference: target_reference)
-    expect(result.result).to eq('wait')
-    expect(result.result_message).to include('I attest')
+    expect(result.result).to eq('fail')
+    expect(result.result_message).to include('is present in both the full-access and limited-access prefetch data')
   end
 
   context 'when the target resource is not present in the full-access prefetch' do

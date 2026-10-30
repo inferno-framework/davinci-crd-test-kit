@@ -50,14 +50,14 @@ RSpec.describe DaVinciCRDTestKit::ResourceIdentity do
       expect(identified(hook_request)).to eq([["#{base}/Patient/1", '1']])
     end
 
-    it 'identifies a Bundle entry by its fullUrl, falling back to the FHIR server without one' do
+    it 'identifies a Bundle entry by its fullUrl, and does not identify one without a fullUrl' do
       urn = 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90'
       bundle = { 'resourceType' => 'Bundle', 'entry' => [
         { 'fullUrl' => urn, 'resource' => resource('Location', 'a') },
         { 'resource' => resource('Location', 'b') }
       ] }
       hook_request = { 'fhirServer' => base, 'prefetch' => { 'locations' => bundle } }
-      expect(identified(hook_request)).to eq([[urn, 'a'], ["#{base}/Location/b", 'b']])
+      expect(identified(hook_request)).to eq([[urn, 'a']])
     end
 
     it 'identifies resources in context before those in prefetch' do

@@ -4,10 +4,11 @@ module DaVinciCRDTestKit
   # Identifies the resources carried in a CDS Hooks request, and the references within them, by
   # absolute URL, so that a reference only resolves to the resource it actually names.
   #
-  # A resource in a Bundle is identified by the entry's `fullUrl`. Any other resource, or an entry
-  # without a `fullUrl`, is assumed to be a RESTful resource on the `fhirServer` of the request. A
-  # relative reference is made absolute against the base of the resource that holds it, following
-  # the FHIR rules for resolving references.
+  # A resource in a Bundle is identified by the entry's `fullUrl`, so an entry without one has no
+  # identity. Any other resource is assumed to be a RESTful resource on the `fhirServer` of the
+  # request. A relative reference is made absolute against the base of the resource that holds it,
+  # following the FHIR rules for resolving references, so it cannot be resolved when that resource
+  # has no identity or one that is not a RESTful URL.
   module ResourceIdentity
     RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}\z}
     RESTFUL_URL_PATTERN = %r{\A(?i:https?)://\S+/([A-Z][A-Za-z]+)/([A-Za-z0-9\-.]{1,64})\z}
@@ -39,35 +40,56 @@ module DaVinciCRDTestKit
       each_identified_section_resource(hook_request, 'prefetch', &)
     end
 
+    def each_identified_section_resource(hook_request, section)
+      each_section_resource(hook_request, section) do |identity, resource|
+        yield identity, resource if identity.present?
+      end
+    end
+
+    # Yields every resource in the request's prefetch, along with the absolute URL identifying it, or
+    # nil when it has none, such as a Bundle entry without a fullUrl.
+    def each_prefetch_resource(hook_request, &)
+      each_section_resource(hook_request, 'prefetch', &)
+    end
+
     # check in each key in this json object (as Hash) for FHIR resources
-    def each_identified_section_resource(hook_request, section, &block)
+    def each_section_resource(hook_request, section, &block)
       values = hook_request[section] if hook_request.is_a?(Hash)
       return unless values.is_a?(Hash)
 
       base = fhir_server_base(hook_request)
-      values.each_value { |value| each_identified_within(value, base, nil, &block) }
+      values.each_value { |value| each_resource_within(value, base, &block) }
     end
 
-    def each_identified_within(value, base, full_url, &block)
-      case value
-      when Array then value.each { |element| each_identified_within(element, base, nil, &block) }
-      when Hash then each_identified_within_hash(value, base, full_url, &block)
+    # Yields each resource within the value that has an identity, along with it. `base` is the
+    # server a resource outside a Bundle is on.
+    def each_identified_within(value, base)
+      each_resource_within(value, base) do |identity, resource|
+        yield identity, resource if identity.present?
       end
     end
 
-    def each_identified_within_hash(value, base, full_url, &block)
-      return if value['resourceType'].blank?
-      return each_identified_bundle_entry(value, base, &block) if value['resourceType'] == 'Bundle'
-
-      identity = full_url.presence || restful_identity(value, base)
-      block.call(identity, value) if identity.present?
+    # `bundle_entry` is the entry holding the value, when it is in a Bundle
+    def each_resource_within(value, base, bundle_entry = nil, &block)
+      case value
+      when Array then value.each { |element| each_resource_within(element, base, &block) }
+      when Hash then each_resource_within_hash(value, base, bundle_entry, &block)
+      end
     end
 
-    def each_identified_bundle_entry(bundle, base, &block)
+    def each_resource_within_hash(value, base, bundle_entry, &block)
+      return if value['resourceType'].blank?
+      return each_bundle_entry_resource(value, base, &block) if value['resourceType'] == 'Bundle'
+
+      identity = bundle_entry ? bundle_entry['fullUrl'].presence : restful_identity(value, base)
+      block.call(identity, value)
+    end
+
+    def each_bundle_entry_resource(bundle, base, &block)
       Array(bundle['entry']).each do |entry|
         next unless entry.is_a?(Hash)
 
-        each_identified_within(entry['resource'], base, entry['fullUrl'], &block)
+        each_resource_within(entry['resource'], base, entry, &block)
       end
     end
 
