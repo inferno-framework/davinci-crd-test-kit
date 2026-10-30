@@ -19,7 +19,7 @@ module DaVinciCRDTestKit
         that they will pay for a product or service instead of asking their insurance to cover it.
         The scenario must include an action related to the product or service that would normally
         trigger a hook request. The test will fail immediately if Inferno receives a hook request
-        while the tester takes the necessary steps in the CRD client. If the tester's action in the
+        while the tester takes the necessary steps in the CRD client. If the tester's actions in the
         CRD client complete without triggering any hook requests to Inferno, the tester will provide
         an attestation to that effect to complete the test.
       )
