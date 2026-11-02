@@ -1,4 +1,5 @@
 require_relative 'fhir_request_handler'
+require_relative '../../server_base_urls'
 require 'us_core_test_kit'
 
 module DaVinciCRDTestKit
@@ -6,6 +7,7 @@ module DaVinciCRDTestKit
     class FHIRSearchEndpoint < Inferno::DSL::SuiteEndpoint
       include Inferno::DSL::FHIRResourceNavigation
       include FHIRRequestHandler
+      include ServerBaseURLs
 
       error_response_format :operation_outcome
 
@@ -40,19 +42,21 @@ module DaVinciCRDTestKit
       end
 
       # Each result is identified by the URL it can be read from on this server, as a FHIR server's
-      # search results are, so that references to it can be resolved.
+      # search results are, so that references to it can be resolved. The base is the one hook requests
+      # give as their fhirServer, rather than the scheme and host the search arrived with, which may
+      # differ, e.g., behind a reverse proxy.
       def search_entry(resource, mode)
         FHIR::Bundle::Entry.new({ fullUrl: full_url_for(resource), resource:,
                                   search: FHIR::Bundle::Entry::Search.new({ mode: }) })
       end
 
       def full_url_for(resource)
-        "#{fhir_base_url}/#{resource.resourceType}/#{resource.id}" if resource.id.present?
+        "#{fhir_url}/#{resource.resourceType}/#{resource.id}" if resource.id.present?
       end
 
-      # The base of this mock FHIR server, from a type-level GET search or a POST to `_search`.
-      def fhir_base_url
-        @fhir_base_url ||= request.url.split('?').first.delete_suffix('/_search').delete_suffix("/#{resource_type}")
+      # from a path of the form /custom/:suite_id/fhir/...
+      def suite_id
+        request.path.split('/')[2]
       end
 
       # ---------------------------------------------------------------------------
@@ -113,8 +117,9 @@ module DaVinciCRDTestKit
       # Self Link search parameters identification
       # ---------------------------------------------------------------------------
 
+      # in GET form on the fhirServer base, whether the search was a GET or a POST to `_search`
       def self_link
-        host_and_path = request.url.split('?').first
+        host_and_path = "#{fhir_url}/#{resource_type}"
         param_list =
           (supported_search_param_names + supported_include_param_paths.keys).map do |name|
             "#{name}=#{request_params[name]}"
