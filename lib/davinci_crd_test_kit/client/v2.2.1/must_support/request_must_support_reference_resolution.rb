@@ -373,13 +373,14 @@ module DaVinciCRDTestKit
       # identified, but the relative references it holds cannot be resolved, which explains why
       # references that would otherwise resolve did not.
       def non_restful_note
-        types = hook_request_data.flat_map { |request_data| request_data[:resources] }
-          .select { |entry| ResourceIdentity.base_for(entry[:identity]).blank? }
-          .map { |entry| entry[:resource].resourceType }.uniq & profile_resource_types
-        return if types.blank?
+        non_restful = hook_request_data.flat_map { |request_data| request_data[:resources] }.any? do |entry|
+          profile_resource_types.include?(entry[:resource].resourceType) &&
+            ResourceIdentity.base_for(entry[:identity]).blank?
+        end
+        return unless non_restful
 
-        " Relative references held by #{types.map { |resource_type| "`#{resource_type}`" }.to_sentence} instances " \
-          'identified by a fullUrl that is not a RESTful URL, such as a `urn:uuid:`, cannot be resolved.'
+        ' Some relative references were not checked because no base FHIR server could be identified from the ' \
+          '`fullUrl` of their holding instance.'
       end
 
       run do
