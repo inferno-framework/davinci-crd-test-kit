@@ -306,15 +306,15 @@ request body; otherwise it will not be sent. Non-literal references will be igno
 
 #### CDS Hooks Responses
 
-The CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+The CRD client test suite contains [basic logic to generate CDS Hooks responses](Controlling-Simulated-Responses#mocked-responses)
 that meet each of the [CRD Card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
 However, these simple cards may not support the target client in demonstrating the full CRD
 capabilities of its system. The CRD client test suite also allows testers to
-[provide a template for the responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+[provide a template for the responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 for Inferno to provide back, including directives that determine details of the actual responses
 based on the request. This way, testers can configure the responses to match the patients, orders,
 and other relevant details of their system, allowing a complete demonstration. See the
-[documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+[documentation on controlling Inferno's simulated CRD responses](Controlling-Simulated-Responses)
 for complete details.
 
 In either case, Inferno will check that the responses it generates to send back to the client are
@@ -408,8 +408,8 @@ behaviors are correct. However, not all areas of the IG are exercised.
 
 Limitations across all versions include:
 - This suite does not implement any payer business logic, so testers must either
-  use [Inferno's simple hard-coded responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-  or [tell Inferno how to return responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  use [Inferno's simple hard-coded responses](Controlling-Simulated-Responses#mocked-responses)
+  or [tell Inferno how to return responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
   that are conformant and drive the desired behavior in the tested system.
 - The tests cannot verify that a client is able to consume the received
   decision support. Testers should consider this requirement to be verified

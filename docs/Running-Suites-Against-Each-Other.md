@@ -40,7 +40,7 @@ Notes:
 ## v2.2.1
 
 Running the v2.2.1 suites against each other requires 2 server sessions, one connecting to each
-of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+of the [v2.2.1 service endpoints](Client-Details#multiple-service-endpoints).
 
 1. Start a "Da Vinci CRD Client v2.2.1 Test Suite" session using US Core 3.1.1
 1. Apply preset "Run against the CRD Server Suite"

@@ -15,27 +15,27 @@ to this test kit.
 ## Using this Test Kit
 
 *   **[Getting Started](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/README.md#getting-started)**: Instructions on how to set up and run the test kit.
-*   **[Test Kit Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
+*   **[Test Kit Overview](Overview)**: A detailed explanation of what the test kit does, its scope, and how its tests are structured.
 
 ### Using the Da Vinci CRD Client Test Suites
-*   **[Client Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details)**: Description of the client tests.
+*   **[Client Testing Details](Client-Details)**: Description of the client tests.
 *   **Client Testing Instructions**: Step-by-step guide for testing CRD clients, including demonstration executions for both
-    the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions)
-    and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Instructions-v2.2.1)
-*   **[Controlling Simulated CRD Server Responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
-*   **[Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)**: Details on how the client suites evaluate must support elements and what CRD clients must demonstrate to pass.
-*   **[Client Prefetch Verification](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification)**: Details on how the v2.2.1 client suite verifies prefetch data, including what Inferno's simulated services request and how Inferno resolves references within hook requests.
+    the [v2.0.1 version](Client-Instructions)
+    and the [v2.2.1 version](Client-Instructions-v2.2.1)
+*   **[Controlling Simulated CRD Server Responses](Controlling-Simulated-Responses)**: Details on how testers can control the responses returned by Inferno's simulated CRD server during client testing.
+*   **[Client Must Support Tests](Client-Must-Support)**: Details on how the client suites evaluate must support elements and what CRD clients must demonstrate to pass.
+*   **[Client Prefetch Verification](Client-Prefetch-Verification)**: Details on how the v2.2.1 client suite verifies prefetch data, including what Inferno's simulated services request and how Inferno resolves references within hook requests.
 
 ### Using the Da Vinci CRD Server Test Suites 
-*   **[Server Testing Details](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details)**: Description of the server tests.
+*   **[Server Testing Details](Server-Details)**: Description of the server tests.
 *   **Server Testing Instructions**: Step-by-step guide for testing server systems, including demonstration executions for both
-    the [v2.0.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions)
-    and the [v2.2.1 version](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Instructions-v2.2.1)
+    the [v2.0.1 version](Server-Instructions)
+    and the [v2.2.1 version](Server-Instructions-v2.2.1)
 
 ## Contributing to this Test Kit
 
-*   **[Technical Overview](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
-*   **[Running the Client and Server Suites Against Each Other](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Running-Suites-Against-Each-Other)**:
+*   **[Technical Overview](Technical-Overview)**: An overview of the test kit's technical design and architecture for developers and contributors.
+*   **[Running the Client and Server Suites Against Each Other](Running-Suites-Against-Each-Other)**:
     Step-by-step guide for using the client and server suites to demonstrate the test execution without a separate CRD
     implementation, which can be useful for learning as well as debugging.
 

@@ -10,7 +10,7 @@ against the public [Da Vinci BR Provider reference implementation](https://br-pr
 
 To run against the Da Vinci CRD Client v2.2.1 Test Suite, a CRD client implementation must at minimum
 - Be configured to make CRD hook requests to one of the suite's
-  [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+  [simulated CDS Hooks endpoints](Client-Details#multiple-service-endpoints).
 - [Authenticate](https://cds-hooks.hl7.org/2026Jan/en/#trusting-cds-clients) each hook request
   by sending a JWT with a known `iss` (issuer) claim in the payload.
 
@@ -19,7 +19,7 @@ To run against the Da Vinci CRD Client v2.2.1 Test Suite, a CRD client implement
 Additional configuration and information is needed to demonstrate conformance to all tested requirements.
 In order to pass all tests in the suite, a CRD client implementation must
 - Be configured to make CRD hook requests to both of the suite's
-  [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+  [simulated CDS Hooks endpoints](Client-Details#multiple-service-endpoints).
   Inferno will use requests to both endpoints to verify the client's ability to satisfy
   both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25). See [Inferno's Requested Prefetches](Client-Prefetch-Verification#inferno-requested-prefetches)
   for details.
@@ -37,10 +37,10 @@ In order to pass all tests in the suite, a CRD client implementation must
 - Be able to provide Inferno with a long-lived or refreshable access token to use when verifying support for
   the US Core FHIR API. This can come from the hook request itself, or be provided via a test input.
 
-Additionally, because the [mocked responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+Additionally, because the [mocked responses](Controlling-Simulated-Responses#mocked-responses)
 created by Inferno's simulation do not demonstrate all of the must support elements on the
 [coverage-information extension](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/StructureDefinition-ext-coverage-information.html),
-testers will need to provide some [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+testers will need to provide some [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 that demonstrate all of those elements as required by the
 [must support definition](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/conformance.html#ci-c-conf-6).
 
@@ -108,15 +108,15 @@ Each hook group, as well as the "Additional Hook Invocations" group under "1.4 C
 Requirements", has a **Response generation approach for [hook name]** input that determines how
 Inferno builds its responses:
 - "Create simple mocks based on selected response types" (default): Inferno
-  [mocks](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+  [mocks](Controlling-Simulated-Responses#mocked-responses)
   each response type selected in the **Response types to return from [hook name] hook requests** input.
 - "Generate responses based on a tester-provided template": Inferno builds responses from the
-  [template](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  [template](Controlling-Simulated-Responses#tester-directed-custom-responses)
   provided in the **Custom response template for [hook name] hook requests** input, which can be
   tailored to better fit the configuration of the tested CRD client.
 
 Only the input for the selected approach is displayed and used. See the
-[documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+[documentation on controlling Inferno's simulated CRD responses](Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
 ### Cross-Invocation Requirements
@@ -171,8 +171,8 @@ must have the same access scopes as those provided during the hook requests.
 
 ## Interpreting Results
 
-Due to [limitations of these tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#test-scope-and-limitations),
-passing this test suite in its entirety [does not prove conformance to the specification](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Overview#conformance-criteria--interpreting-results).
+Due to [limitations of these tests](Overview#test-scope-and-limitations),
+passing this test suite in its entirety [does not prove conformance to the specification](Overview#conformance-criteria--interpreting-results).
 Additionally, some of the capabilities tested by this suite are optional including many of the hooks
 and response types, meaning that a conformant system will not necessarily be able to pass all tests
 in the suite.
@@ -299,7 +299,7 @@ Those instructions demonstrate the bulk of the CRD ordering workflow. Not all te
 expected to pass. You can also
 - Log in as a patient to schedule an appointment and verify the appointment-book hook behavior
   against Inferno.
-- Use the options to specify [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses),
+- Use the options to specify [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses),
   e.g., to demonstrate changing coverage-information details for the order across
   different hooks or different orders.
 - Execute some of the other scenario tests in Inferno and trigger a request from the

@@ -75,8 +75,8 @@ While these tests cover core aspects of the CRD IG, there are known limitations:
 
 For details on specific limitations, detailed requirements, and known
 issues, please consult the following resources: 
-- [Client Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#testing-limitations)
-- [Server Testing Limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Server-Details#testing-limitations)
+- [Client Testing Limitations](Client-Details#testing-limitations)
+- [Server Testing Limitations](Server-Details#testing-limitations)
 - Relevant [requirements](https://inferno-framework.github.io/docs/advanced-test-features/requirements.html)
   including those in the
   - CRD Requirements Spreadsheets
