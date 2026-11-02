@@ -155,12 +155,11 @@ module DaVinciCRDTestKit
           request_body = parse_request_body(request)
           next unless request_body.is_a?(Hash)
 
-          fhir_server = ResourceIdentity.fhir_server_base(request_body)
           resources = request_fhir_resources(request_body)
           reads = reads_for(request_body['hookInstance'])
-          available = available_from_reads(reads, fhir_server)
+          available = available_from_reads(reads)
           resources.each { |entry| available[entry[:identity]] = entry }
-          { request:, fhir_server:, resources:, available:, reads: }
+          { request:, resources:, available:, reads: }
         end
       end
 
@@ -180,30 +179,32 @@ module DaVinciCRDTestKit
           .tagged_requests(test_session_id, [TagMethods.hook_instance_data_fetch_tag(hook_instance)])
       end
 
-      def available_from_reads(reads, fhir_server)
+      def available_from_reads(reads)
         reads.each_with_object({}) do |read, available|
-          identified_read_resources(read, fhir_server).each do |identity, resource|
+          identified_read_resources(read).each do |identity, resource|
             available[identity] ||= { identity:, resource:, read: }
           end
         end
       end
 
       # A read resource is identified by the URL it was read from, and only counts when it is the
-      # resource that URL names. Search results are identified as entries in any other Bundle.
-      def identified_read_resources(read, fhir_server)
+      # resource that URL names. Search results are identified by their entries' fullUrls, as in any
+      # other Bundle.
+      def identified_read_resources(read)
         return [] unless read.status.to_s.start_with?('2')
 
         resource = FHIR.from_contents(read.response_body.to_s)
-        return bundle_identified_resources(resource, fhir_server) if resource.is_a?(FHIR::Bundle)
+        return bundle_identified_resources(resource) if resource.is_a?(FHIR::Bundle)
 
         ResourceIdentity.names?(read.url, resource) ? [[ResourceIdentity.normalized_url(read.url), resource]] : []
       rescue JSON::ParserError
         []
       end
 
-      def bundle_identified_resources(bundle, fhir_server)
+      # every resource in a Bundle is identified by its entry's fullUrl, so no base server is needed
+      def bundle_identified_resources(bundle)
         identified = []
-        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), fhir_server, nil) do |identity, raw|
+        ResourceIdentity.each_identified_within(JSON.parse(bundle.to_json), nil, nil) do |identity, raw|
           identified << [ResourceIdentity.normalized_url(identity), to_fhir_resource(raw)]
         end
         identified
