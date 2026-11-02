@@ -308,6 +308,45 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to_not include('not a RESTful URL')
   end
 
+  it 'does not explain urn fullUrls held only by resources of other types' do
+    create_hook_request([vision_prescription], read: [practitioner], failed_reads: [encounter],
+                                               prefetched: [['urn:uuid:9e3c2b7d-1a4f-4c6e-8b5d-2f7a9c1e4b60', patient]])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to_not include('not a RESTful URL')
+  end
+
+  # A search made while processing the hook request, such as for the Coverage when none was
+  # prefetched, returns a Bundle whose entries are identified only by their fullUrls.
+  describe 'with resources read through a search' do
+    let(:search_url) { "#{fhir_server}/Practitioner?_id=pr1" }
+
+    def searchset(entry)
+      { resourceType: 'Bundle', type: 'searchset', entry: [entry] }
+    end
+
+    it 'resolves a reference to a search result identified by its fullUrl' do
+      search_result = searchset({ fullUrl: "#{fhir_server}/Practitioner/pr1", resource: practitioner })
+      create_hook_request([vision_prescription], read: [encounter], external_reads: { search_url => search_result })
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(result.result).to eq('pass')
+    end
+
+    it 'does not resolve a reference to a search result without a fullUrl' do
+      search_result = searchset({ resource: practitioner })
+      create_hook_request([vision_prescription], read: [encounter], external_reads: { search_url => search_result })
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('`prescriber`')
+    end
+  end
+
   describe 'with a reference to a resource on another server' do
     let(:external_url) { 'https://elsewhere.example/r4/Practitioner/pr1' }
     let(:order) { vision_prescription(prescriber: external_url) }
