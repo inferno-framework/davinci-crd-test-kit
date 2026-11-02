@@ -434,35 +434,13 @@ module DaVinciCRDTestKit
       " (from reference '#{reference}' against base '#{@current_base_fhir_server}')"
     end
 
-    # a resource with the same type and id prefetched under a different URL usually means the reference
-    # and the prefetched fullUrl disagree about the server, and one prefetched without a RESTful identity,
-    # such as one in a Bundle entry without a fullUrl or with a `urn:uuid:` fullUrl, cannot be referenced
-    # by its type and id
+    # a resource with the same type and id was prefetched, but is not identified by the URL referenced
+    # (see the documented reference resolution rules)
     def unidentified_prefetch_note(key)
       type, id = key.match(ResourceIdentity::RESTFUL_URL_PATTERN)&.captures
-      return if type.blank?
+      return if type.blank? || prefetched_resource_by_reference("#{type}/#{id}").nil?
 
-      other_url = prefetched_resources.keys.find { |url| url != key && url.end_with?("/#{type}/#{id}") }
-      return " A #{type}/#{id} was prefetched as '#{other_url}', which does not match." if other_url.present?
-
-      resource = prefetched_resource_by_reference("#{type}/#{id}")
-      return if resource.nil?
-
-      " A #{type}/#{id} was prefetched #{unidentified_prefetch_reason(resource)}"
-    end
-
-    # A resource with an identity here has one that does not end in its type and id. Without one, it is
-    # in a Bundle entry without a fullUrl, unless the request has no fhirServer, when it may also be
-    # outside a Bundle. The identity is found by object, since another prefetched resource may be equal.
-    def unidentified_prefetch_reason(resource)
-      identity = prefetched_resources.find { |_, prefetched| prefetched.equal?(resource) }&.first
-      if identity.present?
-        "as '#{identity}', which does not match."
-      elsif base_fhir_server.present?
-        'in a Bundle entry without a fullUrl, which cannot be referenced.'
-      else
-        'without a fullUrl, and the request has no fhirServer to identify it by, so it cannot be referenced.'
-      end
+      " A #{type}/#{id} resource was prefetched, but not under this URL."
     end
 
     def absolute_reference(reference)
@@ -496,8 +474,7 @@ module DaVinciCRDTestKit
     # References outside a Bundle are made absolute against the fhirServer, so when the request has one,
     # the base is only unknown because the resource holding the reference has no RESTful identity.
     def base_unknown_reason
-      no_restful_identity = 'the resource holding it is not identified by a RESTful URL, such as a Bundle entry ' \
-                            'without a fullUrl or with a `urn:uuid:` fullUrl'
+      no_restful_identity = 'the resource holding it is not identified by a RESTful URL'
       return no_restful_identity if base_fhir_server.present?
 
       "the request has no fhirServer, or #{no_restful_identity}"

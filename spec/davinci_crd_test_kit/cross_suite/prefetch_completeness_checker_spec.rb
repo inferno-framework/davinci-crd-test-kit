@@ -399,8 +399,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       expect(errors).to include(end_with('is a relative reference, but the base FHIR Server is not known when ' \
                                          "evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
                                          'the request has no fhirServer, or the resource holding it is not ' \
-                                         'identified by a RESTful URL, such as a Bundle entry without a fullUrl ' \
-                                         'or with a `urn:uuid:` fullUrl.'))
+                                         'identified by a RESTful URL.'))
     end
 
     it 'explains that the holder has no RESTful identity when the base is unknown despite a fhirServer' do
@@ -412,8 +411,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
       errors = errors_for(order_sign_request, templates)
       expect(errors).to include(end_with("evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
-                                         'the resource holding it is not identified by a RESTful URL, such as a ' \
-                                         'Bundle entry without a fullUrl or with a `urn:uuid:` fullUrl.'))
+                                         'the resource holding it is not identified by a RESTful URL.'))
     end
 
     it 'notes a resource with the same type and id prefetched under a different server' do
@@ -425,7 +423,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
       errors = errors_for(order_sign_request, templates)
       expect(errors).to include(
-        end_with("A Patient/example was prefetched as 'https://other-server/r4/Patient/example', which does not match.")
+        end_with('A Patient/example resource was prefetched, but not under this URL.')
       )
     end
 
@@ -687,8 +685,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         errors = errors_for(order_sign_request, resolve_patient_template)
         expect(errors).to include(
           start_with("(Request 1) Prefetch Template patient - resource '#{base_fhir_url}/Patient/example' needed to")
-            .and(end_with('A Patient/example was prefetched in a Bundle entry without a fullUrl, which cannot be ' \
-                          'referenced.'))
+            .and(end_with('A Patient/example resource was prefetched, but not under this URL.'))
         )
       end
 
@@ -702,8 +699,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
         errors = errors_for(order_sign_request, resolve_patient_template)
         expect(errors).to include(
-          end_with("A Patient/example was prefetched as 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', " \
-                   'which does not match.')
+          end_with('A Patient/example resource was prefetched, but not under this URL.')
         )
       end
 
@@ -717,8 +713,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         errors = errors_for(order_sign_request, resolve_patient_template)
         expect(errors).to include(
           match("resource '#{base_fhir_url}/Patient/example' needed to instantiate")
-            .and(end_with('A Patient/example was prefetched without a fullUrl, and the request has no fhirServer ' \
-                          'to identify it by, so it cannot be referenced.'))
+            .and(end_with('A Patient/example resource was prefetched, but not under this URL.'))
         )
       end
     end
@@ -760,8 +755,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         errors = errors_for(order_sign_request, resolve_patient_template)
         expect(errors).to include(
           match("resource '#{base_fhir_url}/Patient/example' needed to instantiate")
-            .and(end_with('A Patient/example was prefetched without a fullUrl, and the request has no fhirServer ' \
-                          'to identify it by, so it cannot be referenced.'))
+            .and(end_with('A Patient/example resource was prefetched, but not under this URL.'))
         )
       end
 
