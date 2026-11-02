@@ -659,6 +659,21 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
         )
       end
 
+      it 'notes a resource prefetched under a fullUrl that does not end in its type and id' do
+        order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle', 'entry' => [
+          { 'fullUrl' => 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', 'resource' => crd_patient_example }
+        ] } }
+        stub_request(:post, "#{fhirpath_url}?path=patient")
+          .to_return(status: 200,
+                     body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+        errors = errors_for(order_sign_request, resolve_patient_template)
+        expect(errors).to include(
+          end_with("A Patient/example was prefetched as 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', " \
+                   'which does not match.')
+        )
+      end
+
       it 'are not registered when fhirServer is absent, causing resource not found during resolve' do
         order_sign_request.delete('fhirServer')
         order_sign_request['prefetch'] = { 'patient' => bundle_without_fullurl }
@@ -667,7 +682,11 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                      body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
 
         errors = errors_for(order_sign_request, resolve_patient_template)
-        expect(errors).to include(match("resource '#{base_fhir_url}/Patient/example' needed to instantiate"))
+        expect(errors).to include(
+          match("resource '#{base_fhir_url}/Patient/example' needed to instantiate")
+            .and(end_with('A Patient/example was prefetched without a fullUrl, and the request has no fhirServer ' \
+                          'to identify it by, so it cannot be referenced.'))
+        )
       end
     end
 
@@ -706,7 +725,11 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
           .to_return(status: 200, body: [].to_json)
 
         errors = errors_for(order_sign_request, resolve_patient_template)
-        expect(errors).to include(match("resource '#{base_fhir_url}/Patient/example' needed to instantiate"))
+        expect(errors).to include(
+          match("resource '#{base_fhir_url}/Patient/example' needed to instantiate")
+            .and(end_with('A Patient/example was prefetched without a fullUrl, and the request has no fhirServer ' \
+                          'to identify it by, so it cannot be referenced.'))
+        )
       end
 
       it 'are registered correctly when fhirServer has a trailing slash' do

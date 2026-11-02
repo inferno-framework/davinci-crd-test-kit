@@ -425,14 +425,30 @@ module DaVinciCRDTestKit
       prefetched_resources[key]
     end
 
-    # a resource with the same type and id prefetched in a Bundle entry without a fullUrl has no
-    # identity, so cannot be referenced
+    # a resource with the same type and id prefetched without a RESTful identity, such as one in a Bundle
+    # entry without a fullUrl or with a `urn:uuid:` fullUrl, cannot be referenced by its type and id
     def unidentified_prefetch_note(key)
       type, id = key.match(ResourceIdentity::RESTFUL_URL_PATTERN)&.captures
       return if type.blank? || prefetched_resources.keys.any? { |url| url.end_with?("/#{type}/#{id}") }
-      return unless prefetched_resource_by_reference("#{type}/#{id}")
 
-      " A #{type}/#{id} was prefetched in a Bundle entry without a fullUrl, which cannot be referenced."
+      resource = prefetched_resource_by_reference("#{type}/#{id}")
+      return if resource.nil?
+
+      " A #{type}/#{id} was prefetched #{unidentified_prefetch_reason(resource)}"
+    end
+
+    # A resource with an identity here has one that does not end in its type and id. Without one, it is
+    # in a Bundle entry without a fullUrl, unless the request has no fhirServer, when it may also be
+    # outside a Bundle.
+    def unidentified_prefetch_reason(resource)
+      identity = prefetched_resources.key(resource)
+      if identity.present?
+        "as '#{identity}', which does not match."
+      elsif base_fhir_server.present?
+        'in a Bundle entry without a fullUrl, which cannot be referenced.'
+      else
+        'without a fullUrl, and the request has no fhirServer to identify it by, so it cannot be referenced.'
+      end
     end
 
     def absolute_reference(reference)
