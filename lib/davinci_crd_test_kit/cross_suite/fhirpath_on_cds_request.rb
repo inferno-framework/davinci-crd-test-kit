@@ -26,6 +26,7 @@ module DaVinciCRDTestKit
       cds_component, remaining_query = identify_cds_component(fhirpath_query)
       execution_targets = cds_component.present? ? get_cds_field(hook_request, cds_component) : hook_request
 
+      @current_fhirpath_query = fhirpath_query
       execution_targets.map do |execution_target|
         @current_base_fhir_server = ResourceIdentity.fhir_server_base(hook_request)
         execute(execution_target, remaining_query)
@@ -33,6 +34,7 @@ module DaVinciCRDTestKit
     ensure
       # clean-up identity
       @current_base_fhir_server = nil
+      @current_fhirpath_query = nil
     end
 
     private

@@ -369,7 +369,9 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
       errors = errors_for(order_sign_request, templates)
       expect(errors)
         .to eq(["(Request 1) Prefetch Template patient - resource 'https://example/r4/Patient/example' needed to " \
-                'instantiate the query was not provided in the prefetched values.'])
+                'instantiate the query was not provided in the prefetched values when evaluating ' \
+                "'context.draftOrders.entry.resource.patient.resolve().id' (from reference 'Patient/example' " \
+                "against base 'https://example/r4')."])
     end
 
     it 'resolves absolute references directly without base server lookup' do
@@ -394,7 +396,8 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                    body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
 
       errors = errors_for(order_sign_request, templates)
-      expect(errors).to include(match('is a relative reference, but the base FHIR Server is not known'))
+      expect(errors).to include(end_with('is a relative reference, but the base FHIR Server is not known when ' \
+                                         "evaluating 'context.draftOrders.entry.resource.patient.resolve().id'."))
     end
 
     it 'returns an error for a reference with too many path segments' do
@@ -461,7 +464,8 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                           { 'patient' => 'Patient?_id={{context.draftOrders.entry.resource.basedOn.resolve().id}}' })
       expect(errors).to eq(
         ["(Request 1) Prefetch Template patient - resource 'https://other-server/r4/Patient/missing' " \
-         'needed to instantiate the query was not provided in the prefetched values.']
+         'needed to instantiate the query was not provided in the prefetched values when evaluating ' \
+         "'context.draftOrders.entry.resource.basedOn.resolve().id'."]
       )
     end
   end

@@ -416,13 +416,22 @@ module DaVinciCRDTestKit
 
       unless prefetched_resources[key].present?
         errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
-                  "was not provided in the prefetched values.#{unidentified_prefetch_note(key)}"
+                  "was not provided in the prefetched values when evaluating '#{@current_fhirpath_query}'" \
+                  "#{relative_reference_origin(reference, key)}.#{unidentified_prefetch_note(key)}"
 
         return nil
       end
 
       @current_base_fhir_server = base_fhir_server_for_identity(key)
       prefetched_resources[key]
+    end
+
+    # for a relative reference, the reference as written and the base it was made absolute against
+    def relative_reference_origin(reference, key)
+      reference = reference['reference'] if reference.is_a?(Hash)
+      return if reference == key
+
+      " (from reference '#{reference}' against base '#{@current_base_fhir_server}')"
     end
 
     # a resource with the same type and id prefetched without a RESTful identity, such as one in a Bundle
@@ -471,7 +480,8 @@ module DaVinciCRDTestKit
 
       if @current_base_fhir_server.nil?
         errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
-                  'is a relative reference, but the base FHIR Server is not known.'
+                  'is a relative reference, but the base FHIR Server is not known when evaluating ' \
+                  "'#{@current_fhirpath_query}'."
         return nil
       end
 
