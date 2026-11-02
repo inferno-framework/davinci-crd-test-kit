@@ -21,24 +21,10 @@ module DaVinciCRDTestKit
 
         During this test, Inferno will verify that the CRD client has demonstrated requests
         - made against both of Inferno's simulated CRD servers,
-          one of which requests all standard prefetch resources while the
-          other requests only a subset.
-        - which demonstrate the capability to distinguish the difference between
-          the two prefetch sets.
-
-        The CRD server that requests only a subset of the standard prefetch data does not request
-        resources referenced from the following elements. Requests made to each Inferno service
-        endpoint with one of these elements populated with a reference to a resource not referenced
-        elsewhere will demonstrate the required capability.
-          - On an `appointment-book` hook request, an Appointment with a participant entry that
-            references a Practitioner or PractitionerRole resource in its actor element
-          - On an `encounter-start` or `encounter-discharge` hook request, an Encounter with a
-            referenced Location via the `location` element or referenced Organization via the
-            `serviceProvider` element.
-          - On an `order-select`, `order-sign`, or `order-dispatch` hook request, one of the following order resources:
-            - A CommunicationRequest, DeviceRequest, MedicationRequest, or ServiceRequest that references a Practitioner or PractitionerRole resource in its `requester` element, or
-            - A NutritionOrder that references a Practitioner or PractitionerRole resource in its `orderer` element
-            - A VisionPrescription that references a Practitioner or PractitionerRole resource in its `prescriber` element
+          [one of which requests all standard prefetch resources](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#infernos-standard-services)
+          while the other [requests only a subset](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#infernos-subset-services).
+        - which demonstrate the capability to [distinguish the difference between
+          the two prefetch sets](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#demonstrating-prefetch-calculation).
 
         This test relies on the evaluation performed by the "Hook requests include the
         requested prefetch data" tests present in each hook-specific "Requests" group. One of these groups must

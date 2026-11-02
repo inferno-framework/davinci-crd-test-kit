@@ -10,6 +10,7 @@
 *   [Client v2.2.1 Testing Instructions](Client-Instructions-v2.2.1)
 *   [Simulated CRD Server Responses](Controlling-Simulated-Responses)
 *   [Client Must Support Tests](Client-Must-Support)
+*   [Client Prefetch Verification](Client-Prefetch-Verification)
 
 **Server Suites**
 *   [Server Testing Details](Server-Details)

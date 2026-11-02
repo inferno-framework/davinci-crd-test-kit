@@ -27,7 +27,7 @@ module DaVinciCRDTestKit
       execution_targets = cds_component.present? ? get_cds_field(hook_request, cds_component) : hook_request
 
       execution_targets.map do |execution_target|
-        @current_base_fhir_server = hook_request['fhirServer']
+        @current_base_fhir_server = ResourceIdentity.fhir_server_base(hook_request)
         execute(execution_target, remaining_query)
       end.flatten.compact
     ensure
@@ -113,11 +113,16 @@ module DaVinciCRDTestKit
       end.flatten.compact
     end
 
+    # resolve() makes the resolved resource's server the base for the references that follow it, so
+    # the base is restored afterwards for any sibling references
     def execute_resolve(execution_target, fhirpath_query)
+      saved_base_fhir_server = @current_base_fhir_server
       referenced = resolve(execution_target)
       return nil unless referenced.present?
 
       execute(referenced, fhirpath_query[10..])
+    ensure
+      @current_base_fhir_server = saved_base_fhir_server
     end
 
     def execute_entry_resource_step(execution_target, fhirpath_query)

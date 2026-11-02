@@ -4,10 +4,10 @@ module DaVinciCRDTestKit
   # Identifies the resources carried in a CDS Hooks request, and the references within them, by
   # absolute URL, so that a reference only resolves to the resource it actually names.
   #
-  # A resource in a Bundle is identified by the entry's `fullUrl`. Any other resource, or an entry
-  # without a `fullUrl`, is assumed to be a RESTful resource on the `fhirServer` of the request. A
-  # relative reference is made absolute against the base of the resource that holds it, following
-  # the FHIR rules for resolving references.
+  # A resource in a Bundle is identified by the entry's `fullUrl`, so an entry without one has no
+  # identity. Any other resource is assumed to be a RESTful resource on the `fhirServer` of the
+  # request. A relative reference is made absolute against the base of the resource that holds it,
+  # following the FHIR rules for resolving references.
   module ResourceIdentity
     RELATIVE_REFERENCE_PATTERN = %r{\A[A-Z][A-Za-z]+/[A-Za-z0-9\-.]{1,64}\z}
     RESTFUL_URL_PATTERN = %r{\A(?i:https?)://\S+/([A-Z][A-Za-z]+)/([A-Za-z0-9\-.]{1,64})\z}
@@ -48,18 +48,19 @@ module DaVinciCRDTestKit
       values.each_value { |value| each_identified_within(value, base, nil, &block) }
     end
 
-    def each_identified_within(value, base, full_url, &block)
+    # `bundle_entry` is the entry holding the value, when it is in a Bundle
+    def each_identified_within(value, base, bundle_entry, &block)
       case value
       when Array then value.each { |element| each_identified_within(element, base, nil, &block) }
-      when Hash then each_identified_within_hash(value, base, full_url, &block)
+      when Hash then each_identified_within_hash(value, base, bundle_entry, &block)
       end
     end
 
-    def each_identified_within_hash(value, base, full_url, &block)
+    def each_identified_within_hash(value, base, bundle_entry, &block)
       return if value['resourceType'].blank?
       return each_identified_bundle_entry(value, base, &block) if value['resourceType'] == 'Bundle'
 
-      identity = full_url.presence || restful_identity(value, base)
+      identity = bundle_entry ? bundle_entry['fullUrl'].presence : restful_identity(value, base)
       block.call(identity, value) if identity.present?
     end
 
@@ -67,7 +68,7 @@ module DaVinciCRDTestKit
       Array(bundle['entry']).each do |entry|
         next unless entry.is_a?(Hash)
 
-        each_identified_within(entry['resource'], base, entry['fullUrl'], &block)
+        each_identified_within(entry['resource'], base, entry, &block)
       end
     end
 

@@ -383,7 +383,9 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
         'fhirServer' => fhir_server,
         'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
         'context' => {
-          'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => service_request }] }
+          'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [
+            { 'fullUrl' => "#{fhir_server}/ServiceRequest/sr1", 'resource' => service_request }
+          ] }
         },
         'prefetch' => { 'patient' => patient_example }
       }.as_json

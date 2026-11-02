@@ -21,7 +21,8 @@ In order to pass all tests in the suite, a CRD client implementation must
 - Be configured to make CRD hook requests to both of the suite's
   [simulated CDS Hooks endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
   Inferno will use requests to both endpoints to verify the client's ability to satisfy
-  both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25).
+  both [the complete standard prefetch as well as a subset of it](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-25). See [Inferno's Requested Prefetches](Client-Prefetch-Verification#inferno-requested-prefetches)
+  for details.
 - Associate each of these endpoints with a FHIR Organization id representing the payer
   that provides the insurance coverage and is responsible for determining coverage requirements.
   Inferno will use this information to verify that Hook calls are made against the

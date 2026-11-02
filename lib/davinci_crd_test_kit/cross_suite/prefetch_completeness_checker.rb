@@ -1,4 +1,5 @@
 require_relative 'fhirpath_on_cds_request'
+require_relative 'hook_request_resource_extraction'
 require_relative 'replace_tokens'
 require_relative 'resource_identity'
 require 'uri'
@@ -57,14 +58,13 @@ module DaVinciCRDTestKit
     end
 
     # prefetched Bundle entries are indexed by their fullUrl, which may be rooted somewhere other
-    # than the fhirServer given in the request, so fall back to the resource's own type and id
+    # than the fhirServer given in the request, or not at all when an entry has none, so fall back
+    # to the resource's own type and id
     def prefetched_resource_by_reference(relative_reference)
       resource_type, id = relative_reference.split('/')
       return if resource_type.blank? || id.blank?
 
-      prefetched_resources.values.find do |resource|
-        resource.is_a?(Hash) && resource['resourceType'] == resource_type && resource['id'] == id
-      end
+      all_prefetched_resources.find { |resource| ResourceIdentity.type_and_id(resource) == [resource_type, id] }
     end
 
     # -----------------------------------------------------------------------
@@ -382,6 +382,13 @@ module DaVinciCRDTestKit
       @prefetched_resources ||= {}
     end
 
+    # including those without an identity, which references cannot resolve to
+    def all_prefetched_resources
+      @all_prefetched_resources ||= [].tap do |resources|
+        HookRequestResourceExtraction.each_prefetch_resource(hook_request['prefetch']) { |one| resources << one }
+      end
+    end
+
     # Prefetched resources are indexed by the absolute URL identifying them, the first one wins.
     def extract_prefetched_resources
       ResourceIdentity.each_identified_prefetch_resource(hook_request) do |identity, resource|
@@ -409,13 +416,23 @@ module DaVinciCRDTestKit
 
       unless prefetched_resources[key].present?
         errors << "#{error_prefix} resource '#{key}' needed to instantiate the query " \
-                  'was not provided in the prefetched values.'
+                  "was not provided in the prefetched values.#{unidentified_prefetch_note(key)}"
 
         return nil
       end
 
       @current_base_fhir_server = base_fhir_server_for_identity(key)
       prefetched_resources[key]
+    end
+
+    # a resource with the same type and id prefetched in a Bundle entry without a fullUrl has no
+    # identity, so cannot be referenced
+    def unidentified_prefetch_note(key)
+      type, id = key.match(ResourceIdentity::RESTFUL_URL_PATTERN)&.captures
+      return if type.blank? || prefetched_resources.keys.any? { |url| url.end_with?("/#{type}/#{id}") }
+      return unless prefetched_resource_by_reference("#{type}/#{id}")
+
+      " A #{type}/#{id} was prefetched in a Bundle entry without a fullUrl, which cannot be referenced."
     end
 
     def absolute_reference(reference)

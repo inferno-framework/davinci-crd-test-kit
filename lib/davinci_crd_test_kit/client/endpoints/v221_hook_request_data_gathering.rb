@@ -56,7 +56,7 @@ module DaVinciCRDTestKit
     def must_support_references_to_read(resource, identity)
       return [] unless resource.respond_to?(:resourceType)
 
-      base = ResourceIdentity.base_for(identity) || ResourceIdentity.fhir_server_base(request_body)
+      base = ResourceIdentity.base_for(identity)
       metadata = ProfileMetadata.for_resource_type(MUST_SUPPORT_IG_VERSION, resource.resourceType)
       navigator = MustSupportReferences::Navigator.new(metadata)
       MustSupportReferences.reference_elements(metadata).flat_map do |element|
