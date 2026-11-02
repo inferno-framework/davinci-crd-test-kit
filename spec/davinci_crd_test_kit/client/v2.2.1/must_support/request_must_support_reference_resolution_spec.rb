@@ -295,9 +295,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to include('Some relative references were not checked because no base FHIR ' \
-                                             'server could be identified from the `fullUrl` of their holding ' \
-                                             'instance.')
+    expect(result.result_message).to include('Relative references on some instances were not checked because no ' \
+                                             'base FHIR server could be identified.')
   end
 
   it 'does not explain urn fullUrls when no resource under test has one' do
@@ -306,7 +305,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to_not include('Some relative references were not checked')
+    expect(result.result_message).to_not include('Relative references on some instances were not checked')
   end
 
   it 'does not explain urn fullUrls held only by resources of other types' do
@@ -316,7 +315,7 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message).to_not include('Some relative references were not checked')
+    expect(result.result_message).to_not include('Relative references on some instances were not checked')
   end
 
   # A search made while processing the hook request, such as for the Coverage when none was

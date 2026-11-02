@@ -379,8 +379,7 @@ module DaVinciCRDTestKit
         end
         return unless non_restful
 
-        ' Some relative references were not checked because no base FHIR server could be identified from the ' \
-          '`fullUrl` of their holding instance.'
+        ' Relative references on some instances were not checked because no base FHIR server could be identified.'
       end
 
       run do
