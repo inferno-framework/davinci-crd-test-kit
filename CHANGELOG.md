@@ -1,3 +1,14 @@
+# 0.15.0
+* ID-215: multiple payers scenario by @abhinandan2012 in https://github.com/inferno-framework/davinci-crd-test-kit/pull/141
+* Id 216 access level tests by @ljtucker in https://github.com/inferno-framework/davinci-crd-test-kit/pull/136
+* ID-213: Add CRD request must support checks by @FlexonyoPizza in https://github.com/inferno-framework/davinci-crd-test-kit/pull/137
+* ID-262/256/273: must support reference and other cleanup for g31 by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/147
+* ID-262: requirements cleanup by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/149
+* ID-289: endpoint no-session errors use OperationOutcome by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/151
+* ID-291: interaction wait dialog consistency by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/152
+* Documentation cleanup by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/153
+* ID-297: Tighten reference resolution rules by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/156
+
 # 0.14.2
 * ID-170 client v221 attestations by @FlexonyoPizza in https://github.com/inferno-framework/davinci-crd-test-kit/pull/132
 * ID-211: no custom extensions in client responses and refactor for additional tests by @karlnaden in https://github.com/inferno-framework/davinci-crd-test-kit/pull/133
