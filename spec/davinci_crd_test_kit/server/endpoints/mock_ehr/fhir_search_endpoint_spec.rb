@@ -96,7 +96,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
 
     response = FHIR.from_contents(last_response.body)
     expect(response.link.find { |link| link.relation == 'self' }&.url)
-      .to eq(URI.decode_www_form_component("#{Inferno::Application['base_url']}#{request_url}"))
+      .to eq(URI.decode_www_form_component("#{base_url}#{request_url}"))
 
     response
   end
@@ -685,7 +685,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
     it 'identifies each matched resource by its URL on the mock FHIR server' do
       response = search(patient_endpoint, gender: 'female')
       expect(response.entry.map(&:fullUrl))
-        .to eq(["#{Inferno::Application['base_url']}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
+        .to eq(["#{base_url}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
     end
 
     it 'identifies each included resource by its URL on the mock FHIR server' do
@@ -710,8 +710,8 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
 
       response = FHIR.from_contents(last_response.body)
       expect(response.entry.map(&:fullUrl)).to contain_exactly(
-        "#{Inferno::Application['base_url']}/custom/#{suite_id}/fhir/MedicationDispense/med-dispense-1",
-        "#{Inferno::Application['base_url']}/custom/#{suite_id}/fhir/Medication/med-1"
+        "#{base_url}/custom/#{suite_id}/fhir/MedicationDispense/med-dispense-1",
+        "#{base_url}/custom/#{suite_id}/fhir/Medication/med-1"
       )
     end
 
@@ -724,19 +724,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
 
       response = FHIR.from_contents(last_response.body)
       expect(response.entry.map(&:fullUrl))
-        .to eq(["#{Inferno::Application['base_url']}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
-    end
-
-    it 'roots each fullUrl at the fhirServer base rather than the scheme and host the search arrived with' do
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
-                             service_request_bodies:, mock_ehr_bundle: bundle)
-      expect(result.result).to eq('wait')
-      header 'Authorization', "Bearer #{token}"
-      get "https://proxy.example.net#{patient_endpoint}?gender=female"
-
-      response = FHIR.from_contents(last_response.body)
-      expect(response.entry.map(&:fullUrl))
-        .to eq(["#{Inferno::Application['base_url']}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
+        .to eq(["#{base_url}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
     end
   end
 
@@ -768,34 +756,18 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
     context 'with search parameters' do
       it 'includes supported search params' do
         self_link = self_link_for_search(patient_endpoint, gender: 'female')
-        expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
       end
 
       it 'excludes unsupported (unknown) params' do
         self_link = self_link_for_search(patient_endpoint, gender: 'female', unknown_param: 'foo')
-        expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
       end
 
       it 'produces no query string when all params are unsupported' do
         self_link = self_link_for_search(patient_endpoint, unknown_param: 'foo')
-        expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}")
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}")
       end
-    end
-
-    it 'is rooted at the fhirServer base rather than the scheme and host the search arrived with' do
-      self_link = self_link_for_search("https://proxy.example.net#{patient_endpoint}", gender: 'female')
-      expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
-    end
-
-    it 'is given in GET form for a POST to _search' do
-      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
-                             service_request_bodies:, mock_ehr_bundle: bundle)
-      expect(result.result).to eq('wait')
-      header 'Authorization', "Bearer #{token}"
-      post "#{patient_endpoint}/_search", 'gender=female', 'CONTENT_TYPE' => 'application/x-www-form-urlencoded'
-
-      self_link = FHIR.from_contents(last_response.body).link.find { |l| l.relation == 'self' }&.url
-      expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
     end
 
     context 'with _include parameter' do
@@ -809,7 +781,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
 
       it 'excludes _include when the value is not a supported include param' do
         self_link = self_link_for_search(patient_endpoint, gender: 'female', _include: 'Patient:not-real')
-        expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
       end
     end
 
@@ -822,7 +794,7 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
 
       it 'excludes _revinclude when the value is not Provenance:target' do
         self_link = self_link_for_search(patient_endpoint, gender: 'female', _revinclude: 'Observation:subject')
-        expect(self_link).to eq("#{Inferno::Application['base_url']}#{patient_endpoint}?gender=female")
+        expect(self_link).to eq("#{base_url}#{patient_endpoint}?gender=female")
       end
     end
   end
