@@ -1,5 +1,4 @@
 require_relative 'fhirpath_on_cds_request'
-require_relative 'hook_request_resource_extraction'
 require_relative 'replace_tokens'
 require_relative 'resource_identity'
 require 'uri'
@@ -385,7 +384,7 @@ module DaVinciCRDTestKit
     # including those without an identity, which references cannot resolve to
     def all_prefetched_resources
       @all_prefetched_resources ||= [].tap do |resources|
-        HookRequestResourceExtraction.each_prefetch_resource(hook_request['prefetch']) { |one| resources << one }
+        ResourceIdentity.each_section_resource(hook_request, 'prefetch') { |_identity, resource| resources << resource }
       end
     end
 
