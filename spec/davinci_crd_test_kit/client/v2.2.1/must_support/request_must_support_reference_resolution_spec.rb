@@ -142,6 +142,28 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     expect(result.result_message).to include('a `fullUrl` for each Bundle entry')
   end
 
+  it 'does not resolve a relative reference held by an instance without an identity' do
+    unidentified = vision_prescription(encounter: { reference: 'Encounter/e1' })
+    create_hook_request([vision_prescription.except(:encounter), [nil, unidentified]], read: [practitioner, encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('`encounter`')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
+  end
+
+  it 'resolves an absolute reference held by an instance without an identity' do
+    identified = vision_prescription(encounter: { reference: 'Encounter/e1' })
+    unidentified = vision_prescription(encounter: { reference: "#{fhir_server}/Encounter/e2" })
+    create_hook_request([identified, [nil, unidentified]],
+                        read: [practitioner, encounter.merge(id: 'e2')], failed_reads: [encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('pass')
+  end
+
   it 'checks the references of identified instances when only some could be identified' do
     create_hook_request([vision_prescription.except(:id), vision_prescription,
                          vision_prescription(prescriber: 'PractitionerRole/role1')],

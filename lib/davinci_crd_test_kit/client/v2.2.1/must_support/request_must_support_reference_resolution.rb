@@ -88,28 +88,21 @@ module DaVinciCRDTestKit
             During this test, Inferno will verify that for each must support Reference element listed
             below that was populated, at least one of its references resolved to a resource
             conforming to each target profile listed for the element, or to any one of them where the
-            list says so. Target profiles for resource types the tester indicated the CRD client does
+            list says so. Target profiles for resource types the tester indicated that the CRD client does
             not support are not checked. The test will skip if Inferno does not observe all of the
             required references, indicating that additional data is needed to demonstrate conformance.
 
-            Inferno obtains the resources needed to perform these checks during the hook request by
-            performing a FHIR read of any references in must support elements that aren't already
-            present in the `context` or `prefetch` fields of the hook request. See the wiki's
-            documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+            Inferno will look at references found in resources in the same hook requests as the must support
+            element tests: those made during the latest run of each "Hooks" subgroup and the "Additional Hook
+            Invocations" group. If no instances of the target resource type were observed, the test skips
+            unless the tester indicated that the CRD client does not support the resource type.
+
+            Inferno obtains the reference targets during the hook request by performing a FHIR read of any
+            references in must support elements for which an absolute FHIR RESTful URL can be identified
+            that aren't already present in the `context` or `prefetch` fields of the hook request. See the
+            wiki's documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
             and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
             for details on how Inferno gets these resources.
-
-            If no instances of the resource type were observed, the test skips unless the tester
-            indicated that the CRD client does not support the resource type. Resolution of references
-            requires the ability to determine an identity for the referencing resource including
-            the source FHIR server. The absence of this information for referencing resources may cause
-            this test to produce an inaccurate pass result. Since CRD conformance rules require this
-            information (`fhirServer` on the hook request, `fullUrl` in Bundle entries, and `id` on resource)
-            other tests will fail in this case.
-
-            Inferno will consider the same hook requests as the must support
-            element tests: those made during the latest run of each "Hooks" subgroup and the
-            "Additional Hook Invocations" group.
 
             For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
             page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)
@@ -148,28 +141,33 @@ module DaVinciCRDTestKit
           ProfileMetadata.for_profile_url(ig_version, target_profile)&.resource
       end
 
-      # For each hook request, its resources and every resource available to resolve references
-      # made within it, all identified by absolute URL (see ResourceIdentity).
+      # For each hook request, its instances, each with the absolute URL identifying it (see
+      # ResourceIdentity) or nil when it has none, the instances that have one, and every resource
+      # available to resolve references made within it. Every instance's references are checked, but
+      # only an identified resource can be the target of a reference, and a relative reference
+      # cannot be resolved when the instance holding it has no RESTful identity.
       def hook_request_data
         @hook_request_data ||= must_support_requests.filter_map do |request|
           request_body = parse_request_body(request)
           next unless request_body.is_a?(Hash)
 
-          resources = request_fhir_resources(request_body)
+          instances = request_instances(request_body)
+          resources = instances.select { |entry| entry[:identity].present? }
           reads = reads_for(request_body['hookInstance'])
           available = available_from_reads(reads)
           resources.each { |entry| available[entry[:identity]] = entry }
-          { request:, resources:, available:, reads: }
+          { request:, instances:, resources:, available:, reads: }
         end
       end
 
-      def request_fhir_resources(request_body)
-        resources = []
-        ResourceIdentity.each_identified_resource(request_body) do |identity, raw_resource|
+      # An instance with an identity is only listed once, however many times the request carries it.
+      def request_instances(request_body)
+        instances = []
+        ResourceIdentity.each_resource(request_body) do |identity, raw_resource|
           resource = to_fhir_resource(raw_resource)
-          resources << { identity: ResourceIdentity.normalized_url(identity), resource: } if resource.present?
+          instances << { identity: ResourceIdentity.normalized_url(identity), resource: } if resource.present?
         end
-        resources.uniq { |entry| entry[:identity] }
+        instances.uniq { |entry| entry[:identity] || entry.object_id }
       end
 
       # The data fetches made while processing the hook request with the given instance, whether
@@ -235,7 +233,7 @@ module DaVinciCRDTestKit
       # Each reference found at the path across every hook request, with what it resolved to.
       def reference_attempts(navigator, resource_type, path)
         hook_request_data.flat_map do |request_data|
-          request_data[:resources].select { |entry| entry[:resource].resourceType == resource_type }
+          request_data[:instances].select { |entry| entry[:resource].resourceType == resource_type }
             .flat_map do |entry|
               navigator.references(entry[:resource], path).map do |reference|
                 resolve(reference, entry, request_data)
@@ -303,7 +301,7 @@ module DaVinciCRDTestKit
 
       def relevant_requests
         hook_request_data.filter_map do |request_data|
-          carried = request_data[:resources].any? do |entry|
+          carried = request_data[:instances].any? do |entry|
             profile_resource_types.include?(entry[:resource].resourceType)
           end
           request_data[:request] if carried
@@ -369,11 +367,11 @@ module DaVinciCRDTestKit
                 'for each resource outside a Bundle.'
       end
 
-      # A resource identified by a fullUrl that is not a RESTful URL, such as a `urn:uuid:`, counts as
-      # identified, but the relative references it holds cannot be resolved, which explains why
+      # The relative references held by an instance with no identity, or one identified by a fullUrl
+      # that is not a RESTful URL, such as a `urn:uuid:`, cannot be resolved, which may explain why
       # references that would otherwise resolve did not.
       def non_restful_note
-        non_restful = hook_request_data.flat_map { |request_data| request_data[:resources] }.any? do |entry|
+        non_restful = hook_request_data.flat_map { |request_data| request_data[:instances] }.any? do |entry|
           profile_resource_types.include?(entry[:resource].resourceType) &&
             ResourceIdentity.base_for(entry[:identity]).blank?
         end

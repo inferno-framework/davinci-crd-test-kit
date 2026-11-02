@@ -19,12 +19,11 @@ module DaVinciCRDTestKit
         does not always need the complete set of standard prefetch resources to evaluate
         coverage.
 
-        During this test, Inferno will verify that the CRD client has demonstrated requests
-        - made against both of Inferno's simulated CRD servers,
+        During this test, Inferno will verify that the CRD client has made requests that:
+        - Target both of Inferno's simulated CRD servers,
           [one of which requests all standard prefetch resources](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#infernos-standard-services)
           while the other [requests only a subset](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#infernos-subset-services).
-        - which demonstrate the capability to [distinguish the difference between
-          the two prefetch sets](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#demonstrating-prefetch-calculation).
+        - Demonstrate the capability to [distinguish between the two prefetch sets](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#demonstrating-prefetch-calculation).
 
         This test relies on the evaluation performed by the "Hook requests include the
         requested prefetch data" tests present in each hook-specific "Requests" group. One of these groups must

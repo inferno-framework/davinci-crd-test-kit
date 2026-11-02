@@ -463,7 +463,7 @@ module DaVinciCRDTestKit
 
       if @current_base_fhir_server.nil?
         errors << "#{error_prefix} '#{relative_reference}' needed to instantiate the query " \
-                  'is a relative reference, but the base FHIR Server is not known when evaluating ' \
+                  'is a relative reference, but the base FHIR server is not known when evaluating ' \
                   "'#{@current_fhirpath_query}': #{base_unknown_reason}."
         return nil
       end

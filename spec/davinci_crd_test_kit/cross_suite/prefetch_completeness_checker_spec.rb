@@ -396,7 +396,7 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
                    body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
 
       errors = errors_for(order_sign_request, templates)
-      expect(errors).to include(end_with('is a relative reference, but the base FHIR Server is not known when ' \
+      expect(errors).to include(end_with('is a relative reference, but the base FHIR server is not known when ' \
                                          "evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
                                          'the request has no fhirServer, or the resource holding it is not ' \
                                          'identified by a RESTful URL.'))
