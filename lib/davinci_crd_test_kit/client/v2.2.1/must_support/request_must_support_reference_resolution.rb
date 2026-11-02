@@ -369,6 +369,19 @@ module DaVinciCRDTestKit
                 'for each resource outside a Bundle.'
       end
 
+      # A resource identified by a fullUrl that is not a RESTful URL, such as a `urn:uuid:`, counts as
+      # identified, but the relative references it holds cannot be resolved, which explains why
+      # references that would otherwise resolve did not.
+      def non_restful_note
+        types = hook_request_data.flat_map { |request_data| request_data[:resources] }
+          .select { |entry| ResourceIdentity.base_for(entry[:identity]).blank? }
+          .map { |entry| entry[:resource].resourceType }.uniq & profile_resource_types
+        return if types.blank?
+
+        " Relative references held by #{types.map { |resource_type| "`#{resource_type}`" }.to_sentence} instances " \
+          'identified by a fullUrl that is not a RESTful URL, such as a `urn:uuid:`, cannot be resolved.'
+      end
+
       run do
         skip_if must_support_requests.blank?, 'No hook requests received.'
         associate_requests(relevant_requests)
@@ -381,7 +394,7 @@ module DaVinciCRDTestKit
 
         skip_if unresolved.present?,
                 'Could not resolve and validate any must support references for ' \
-                "#{unresolved.map { |target| target_description(target) }.to_sentence}."
+                "#{unresolved.map { |target| target_description(target) }.to_sentence}.#{non_restful_note}"
 
         pass 'At least one reference within each populated must support Reference element resolved to a ' \
              'conforming resource.'

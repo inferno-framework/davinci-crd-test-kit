@@ -288,6 +288,26 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
     end
   end
 
+  it 'explains that relative references held by resources with a urn fullUrl cannot be resolved' do
+    create_hook_request([['urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', vision_prescription]],
+                        read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('Relative references held by `VisionPrescription` instances ' \
+                                             'identified by a fullUrl that is not a RESTful URL')
+  end
+
+  it 'does not explain urn fullUrls when no resource under test has one' do
+    create_hook_request([vision_prescription], read: [practitioner], failed_reads: [encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to_not include('not a RESTful URL')
+  end
+
   describe 'with a reference to a resource on another server' do
     let(:external_url) { 'https://elsewhere.example/r4/Practitioner/pr1' }
     let(:order) { vision_prescription(prescriber: external_url) }
