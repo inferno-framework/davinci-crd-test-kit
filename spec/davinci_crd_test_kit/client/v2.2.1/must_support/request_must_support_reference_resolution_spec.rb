@@ -131,6 +131,17 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
       .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
   end
 
+  it 'does not identify an instance in a Bundle entry without a fullUrl, even when the request has a fhirServer' do
+    create_hook_request([[nil, vision_prescription]], read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, all_types_selected)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message)
+      .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
+    expect(result.result_message).to include('a `fullUrl` for each Bundle entry')
+  end
+
   it 'checks the references of identified instances when only some could be identified' do
     create_hook_request([vision_prescription.except(:id), vision_prescription,
                          vision_prescription(prescriber: 'PractitionerRole/role1')],

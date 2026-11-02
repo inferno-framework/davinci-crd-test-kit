@@ -397,7 +397,36 @@ RSpec.describe DaVinciCRDTestKit::PrefetchCompletenessChecker do
 
       errors = errors_for(order_sign_request, templates)
       expect(errors).to include(end_with('is a relative reference, but the base FHIR Server is not known when ' \
-                                         "evaluating 'context.draftOrders.entry.resource.patient.resolve().id'."))
+                                         "evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
+                                         'the request has no fhirServer, or the resource holding it is not ' \
+                                         'identified by a RESTful URL, such as a Bundle entry without a fullUrl ' \
+                                         'or with a `urn:uuid:` fullUrl.'))
+    end
+
+    it 'explains that the holder has no RESTful identity when the base is unknown despite a fhirServer' do
+      order_sign_request['context']['draftOrders']['entry'].each { |e| e.delete('fullUrl') }
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle' } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200,
+                   body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(end_with("evaluating 'context.draftOrders.entry.resource.patient.resolve().id': " \
+                                         'the resource holding it is not identified by a RESTful URL, such as a ' \
+                                         'Bundle entry without a fullUrl or with a `urn:uuid:` fullUrl.'))
+    end
+
+    it 'notes a resource with the same type and id prefetched under a different server' do
+      order_sign_request['prefetch'] = { 'patient' => { 'resourceType' => 'Bundle', 'entry' => [
+        { 'fullUrl' => 'https://other-server/r4/Patient/example', 'resource' => crd_patient_example }
+      ] } }
+      stub_request(:post, "#{fhirpath_url}?path=patient")
+        .to_return(status: 200, body: [{ type: 'Reference', element: { 'reference' => 'Patient/example' } }].to_json)
+
+      errors = errors_for(order_sign_request, templates)
+      expect(errors).to include(
+        end_with("A Patient/example was prefetched as 'https://other-server/r4/Patient/example', which does not match.")
+      )
     end
 
     it 'returns an error for a reference with too many path segments' do
