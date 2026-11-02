@@ -32,20 +32,27 @@ module DaVinciCRDTestKit
         bundle = FHIR::Bundle.new({ type: 'searchset' })
         bundle.link << FHIR::Bundle::Link.new({ relation: 'self', url: self_link })
 
-        matching_entry_list.each do |entry|
-          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
-                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'match' }) })
-        end
-        included_entry_list.each do |entry|
-          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
-                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'include' }) })
-        end
-        revincluded_entry_list.each do |entry|
-          bundle.entry << FHIR::Bundle::Entry.new({ resource: entry.resource,
-                                                    search: FHIR::Bundle::Entry::Search.new({ mode: 'include' }) })
-        end
+        matching_entry_list.each { |entry| bundle.entry << search_entry(entry.resource, 'match') }
+        included_entry_list.each { |entry| bundle.entry << search_entry(entry.resource, 'include') }
+        revincluded_entry_list.each { |entry| bundle.entry << search_entry(entry.resource, 'include') }
 
         bundle
+      end
+
+      # Each result is identified by the URL it can be read from on this server, as a FHIR server's
+      # search results are, so that references to it can be resolved.
+      def search_entry(resource, mode)
+        FHIR::Bundle::Entry.new({ fullUrl: full_url_for(resource), resource:,
+                                  search: FHIR::Bundle::Entry::Search.new({ mode: }) })
+      end
+
+      def full_url_for(resource)
+        "#{fhir_base_url}/#{resource.resourceType}/#{resource.id}" if resource.id.present?
+      end
+
+      # The base of this mock FHIR server, from a type-level GET search or a POST to `_search`.
+      def fhir_base_url
+        @fhir_base_url ||= request.url.split('?').first.delete_suffix('/_search').delete_suffix("/#{resource_type}")
       end
 
       # ---------------------------------------------------------------------------

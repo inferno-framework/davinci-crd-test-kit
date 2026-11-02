@@ -679,6 +679,56 @@ RSpec.describe DaVinciCRDTestKit::V201::ServerInvokeHookTest, :request do
   end
 
   # =========================================================================
+  # fullUrl values
+  # =========================================================================
+  describe 'fullUrl on bundle entries' do
+    it 'identifies each matched resource by its URL on the mock FHIR server' do
+      response = search(patient_endpoint, gender: 'female')
+      expect(response.entry.map(&:fullUrl))
+        .to eq(["#{base_url}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
+    end
+
+    it 'identifies each included resource by its URL on the mock FHIR server' do
+      medication = FHIR::Medication.new(id: 'med-1')
+      medication_dispense = FHIR::MedicationDispense.new(
+        id: 'med-dispense-1',
+        status: 'completed',
+        subject: FHIR::Reference.new(reference: 'Patient/patient-search-1'),
+        medicationReference: FHIR::Reference.new(reference: 'Medication/med-1')
+      )
+      med_bundle = FHIR::Bundle.new
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: patient)
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication)
+      med_bundle.entry << FHIR::Bundle::Entry.new(resource: medication_dispense)
+
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle: med_bundle.to_json)
+      expect(result.result).to eq('wait')
+      header 'Authorization', "Bearer #{token}"
+      get "/custom/#{suite_id}/fhir/MedicationDispense?patient=patient-search-1" \
+          '&_include=MedicationDispense%3Amedication'
+
+      response = FHIR.from_contents(last_response.body)
+      expect(response.entry.map(&:fullUrl)).to contain_exactly(
+        "#{base_url}/custom/#{suite_id}/fhir/MedicationDispense/med-dispense-1",
+        "#{base_url}/custom/#{suite_id}/fhir/Medication/med-1"
+      )
+    end
+
+    it 'identifies results of a POST search by their URL on the mock FHIR server' do
+      result = run(runnable, base_url:, inferno_base_url:, service_ids:, encryption_method:,
+                             service_request_bodies:, mock_ehr_bundle: bundle)
+      expect(result.result).to eq('wait')
+      header 'Authorization', "Bearer #{token}"
+      post "#{patient_endpoint}/_search", 'gender=female', 'CONTENT_TYPE' => 'application/x-www-form-urlencoded'
+
+      response = FHIR.from_contents(last_response.body)
+      expect(response.entry.map(&:fullUrl))
+        .to eq(["#{base_url}/custom/#{suite_id}/fhir/Patient/patient-search-1"])
+    end
+  end
+
+  # =========================================================================
   # No search parameters (resource-type-only search)
   # =========================================================================
   describe 'search with no search parameters' do
