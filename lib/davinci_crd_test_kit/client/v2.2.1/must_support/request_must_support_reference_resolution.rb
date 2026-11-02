@@ -94,15 +94,15 @@ module DaVinciCRDTestKit
 
             Inferno will look at references found in resources in the same hook requests as the must support
             element tests: those made during the latest run of each "Hooks" subgroup and the "Additional Hook
-            Invocations" group. If no instances of the target resource type were observed, the test skips
+            Invocations" group. If no instances of the tested resource type were observed, the test skips
             unless the tester indicated that the CRD client does not support the resource type.
 
-            Inferno obtains the reference targets during the hook request by performing a FHIR read of any
-            references in must support elements for which an absolute FHIR RESTful URL can be identified
-            that aren't already present in the `context` or `prefetch` fields of the hook request. See the
-            wiki's documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+            Inferno obtains the reference targets during the hook request by performing FHIR reads of
+            referenced resources whose absolute URL can be determined and that are not already present
+            in the `context` or `prefetch` fields of the hook request. See the wiki's documentation
+            on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
             and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
-            for details on how Inferno gets these resources.
+            for details on how Inferno identifies and obtains these resources.
 
             For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
             page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)
@@ -142,8 +142,8 @@ module DaVinciCRDTestKit
       end
 
       # For each hook request, its instances, each with the absolute URL identifying it (see
-      # ResourceIdentity) or nil when it has none, the instances that have one, and every resource
-      # available to resolve references made within it. Every instance's references are checked, but
+      # ResourceIdentity) or nil when it has none, and every resource available to resolve references
+      # made within it. Every instance's references are checked, but
       # only an identified resource can be the target of a reference, and a relative reference
       # cannot be resolved when the instance holding it has no RESTful identity.
       def hook_request_data
@@ -152,11 +152,10 @@ module DaVinciCRDTestKit
           next unless request_body.is_a?(Hash)
 
           instances = request_instances(request_body)
-          resources = instances.select { |entry| entry[:identity].present? }
           reads = reads_for(request_body['hookInstance'])
           available = available_from_reads(reads)
-          resources.each { |entry| available[entry[:identity]] = entry }
-          { request:, instances:, resources:, available:, reads: }
+          instances.each { |entry| available[entry[:identity]] = entry if entry[:identity].present? }
+          { request:, instances:, available:, reads: }
         end
       end
 
@@ -315,18 +314,9 @@ module DaVinciCRDTestKit
       end
 
       # Counted the same way as for the must support element tests, so the two agree on which types
-      # were observed. That includes resources that could not be identified by absolute URL, such as
-      # those in a hook request without a `fhirServer`, whose references cannot be checked (see
-      # #check_unidentified_types).
+      # were observed.
       def observed_types
         fhir_resources_by_type(must_support_requests).keys
-      end
-
-      # The types of the resources whose references can be checked, those identified by absolute URL.
-      def identified_types
-        hook_request_data.flat_map do |request_data|
-          request_data[:resources].map { |entry| entry[:resource].resourceType }
-        end.uniq
       end
 
       def target_description(target)
@@ -355,18 +345,6 @@ module DaVinciCRDTestKit
              "#{DECLARED_UNSUPPORTED_REASON}."
       end
 
-      # References are resolved against the URL identifying the resource holding them, so when no
-      # instance of an observed type could be identified, none of its references could be checked.
-      # That calls for hook requests with the details needed, not a pass on references never examined.
-      def check_unidentified_types
-        unidentified = (profile_resource_types.uniq & observed_types) - identified_types
-        skip_if unidentified.present?,
-                "Instances of #{unidentified.map { |resource_type| "`#{resource_type}`" }.to_sentence} were " \
-                'observed, but none could be identified by absolute URL, so their references could not be ' \
-                'checked. Include `fhirServer` in hook requests, a `fullUrl` for each Bundle entry, and an id ' \
-                'for each resource outside a Bundle.'
-      end
-
       # The relative references held by an instance with no identity, or one identified by a fullUrl
       # that is not a RESTful URL, such as a `urn:uuid:`, cannot be resolved, which may explain why
       # references that would otherwise resolve did not.
@@ -385,7 +363,6 @@ module DaVinciCRDTestKit
         associate_requests(relevant_requests)
 
         check_unobserved_types
-        check_unidentified_types
 
         unresolved = config.options[:profiles].flat_map { |profile| unresolved_targets(profile) }
         requests.concat(consulted_reads.uniq(&:id))

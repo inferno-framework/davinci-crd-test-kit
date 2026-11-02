@@ -24,15 +24,15 @@ module DaVinciCRDTestKit
 
         Inferno will look at references found in resources in the same hook requests as the must support
         element tests: those made during the latest run of each "Hooks" subgroup and the "Additional Hook
-        Invocations" group. If no instances of the target resource type were observed, the test skips
+        Invocations" group. If no instances of the tested resource type were observed, the test skips
         unless the tester indicated that the CRD client does not support the resource type.
 
-        Inferno obtains the reference targets during the hook request by performing a FHIR read of any
-        references in must support elements for which an absolute FHIR RESTful URL can be identified
-        that aren't already present in the `context` or `prefetch` fields of the hook request. See the
-        wiki's documentation on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+        Inferno obtains the reference targets during the hook request by performing FHIR reads of
+        referenced resources whose absolute URL can be determined and that are not already present
+        in the `context` or `prefetch` fields of the hook request. See the wiki's documentation
+        on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
         and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
-        for details on how Inferno gets these resources.
+        for details on how Inferno identifies and obtains these resources.
 
         For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
         page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)

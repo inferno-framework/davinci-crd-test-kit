@@ -119,27 +119,26 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
   end
 
   # The must support element test counts such an instance, so this test must not report the type as
-  # unobserved, but with no identity to resolve its references against none could be checked.
-  it 'skips when instances were observed but none could be identified by absolute URL' do
+  # unobserved, but with no identity to resolve its relative references against they cannot be checked.
+  it 'skips when no instance could be identified and its references cannot be resolved' do
     create_hook_request([vision_prescription.except(:id)])
 
     result = run(vision_prescription_test, all_types_selected)
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to_not include('no instances were observed')
-    expect(result.result_message)
-      .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
   end
 
-  it 'does not identify an instance in a Bundle entry without a fullUrl, even when the request has a fhirServer' do
+  it 'checks the absolute references of instances when none could be identified' do
     create_hook_request([[nil, vision_prescription]], read: [encounter, practitioner])
 
-    result = run(vision_prescription_test, all_types_selected)
+    result = run(vision_prescription_test, without_practitioner_role)
 
     expect(result.result).to eq('skip')
-    expect(result.result_message)
-      .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
-    expect(result.result_message).to include('a `fullUrl` for each Bundle entry')
+    expect(result.result_message).to include('`prescriber`')
+    expect(result.result_message).to_not include('`encounter`')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
   end
 
   it 'does not resolve a relative reference held by an instance without an identity' do

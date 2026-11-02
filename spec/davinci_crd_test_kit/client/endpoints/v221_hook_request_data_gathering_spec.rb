@@ -481,6 +481,29 @@ RSpec.describe DaVinciCRDTestKit::V221HookRequestDataGathering do
       end
     end
 
+    context 'when the resource holding the references has no identity' do
+      let(:performer) { [{ reference: practitioner_example_reference_relative }] }
+      let(:hook_request) do
+        {
+          'hook' => 'order-sign',
+          'hookInstance' => 'instance-1',
+          'fhirServer' => fhir_server,
+          'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' },
+          'context' => {
+            'draftOrders' => { 'resourceType' => 'Bundle', 'entry' => [{ 'resource' => service_request }] }
+          },
+          'prefetch' => { 'patient' => patient_example }
+        }.as_json
+      end
+
+      it 'reads its absolute references but not its relative ones' do
+        module_instance.request_additional_fhir_data
+
+        expect(practitioner_role_request).to have_been_made.once
+        expect(practitioner_request).to_not have_been_made
+      end
+    end
+
     context 'when two elements hold the same reference' do
       let(:performer) { [{ reference: practitioner_role_example_reference_relative }] }
 
