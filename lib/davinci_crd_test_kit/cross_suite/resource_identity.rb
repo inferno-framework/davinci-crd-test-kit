@@ -24,21 +24,11 @@ module DaVinciCRDTestKit
       hook_request['fhirServer'].to_s.chomp('/').presence if hook_request.is_a?(Hash)
     end
 
-    # Yields the absolute URL identifying each resource in the request's context and prefetch,
-    # along with the resource as given.
-    def each_identified_resource(hook_request, &block)
-      each_resource(hook_request, &only_identified(block))
-    end
-
     # Yields every resource in the request's context and prefetch, along with the absolute URL
     # identifying it, or nil when it has none, such as a Bundle entry without a fullUrl.
     def each_resource(hook_request, &)
       each_section_resource(hook_request, 'context', &)
       each_section_resource(hook_request, 'prefetch', &)
-    end
-
-    def each_identified_context_resource(hook_request, &block)
-      each_section_resource(hook_request, 'context', &only_identified(block))
     end
 
     def each_identified_prefetch_resource(hook_request, &block)

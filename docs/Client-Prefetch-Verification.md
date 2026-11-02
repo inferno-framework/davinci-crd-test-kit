@@ -191,13 +191,14 @@ In the stripped-down example hook request below, which includes comments that ar
 of resources from and references to resources on `inferno.healthit.gov` and
 `inferno-qa.healthit.gov`. Each relative reference has a comment following it
 indicating the absolute URL it resolves to, and the Patient resource that is
-outside of a Bundle has its identity indicated in a comment as well.
+outside of a Bundle has its identity indicated in a comment as well. The example
+illustrates the rules above; not every reference in it is resolved by one of Inferno's checks.
 
 The only reference that doesn't resolve to a resource within the hook request is
 the "Practitioner/user" reference in the `context.userId` field. Because the
 reference is found outside of a bundled resource, the `fhirServer` is used
-as the base FHIR server. So Inferno looks for a resource in the hook request
-with identity "https://inferno.healthit.gov/fhir/Practitioner/user". There is
+as the base FHIR server, so the reference points to a resource with identity
+"https://inferno.healthit.gov/fhir/Practitioner/user". There is
 a Practitioner resource with `id` "user", but it has identity
 "https://inferno-qa.healthit.gov/fhir/Practitioner/user", indicating it lives
 on the other server.
@@ -208,7 +209,7 @@ on the other server.
   "fhirServer": "https://inferno.healthit.gov/fhir",
   "context": {
     "userId": "Practitioner/user", // resolves to https://inferno.healthit.gov/fhir/Practitioner/user (not present)
-    "patientId": "patient", // resolves to https://inferno.healthit.gov/fhir/Patient/patient
+    "patientId": "patient", // an id, read as Patient/patient: https://inferno.healthit.gov/fhir/Patient/patient
     "draftOrders": {
       "resourceType": "Bundle",
       "type": "collection",
