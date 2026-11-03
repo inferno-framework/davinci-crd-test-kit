@@ -29,7 +29,9 @@ module DaVinciCRDTestKit
 
         During this test, Inferno will verify that each hook request body includes a `prefetch` field populated with
         valid JSON that contains exactly the requested prefetch keys and data sets described in the service description
-        for the invoked service as calculated by Inferno based on the resources provided in the request.
+        for the invoked service as calculated by Inferno based on the resources provided in the request (see [Reference
+        Resolution Within Hook Requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+        in the CRD Test Kit wiki for details of resource identity, reference resolution, and FHIRPath execution).
 
         Note that Inferno requires **all** requested prefetch keys to be present in the request even if there is no
         data for that key. This is because the [CDS Hooks specification requires](https://cds-hooks.hl7.org/2026Jan/en/#example-of-pagination-in-prefetch)

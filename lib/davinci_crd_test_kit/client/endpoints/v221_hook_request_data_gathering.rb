@@ -27,7 +27,9 @@ module DaVinciCRDTestKit
     # the request, so that the must support reference tests can later check that they resolved.
     # Inferno cannot reach the CRD client's FHIR server once the hook request is over, so they have
     # to be read now. Must support requirements are satisfied by the resources the request carries,
-    # so references within the resources read are not followed.
+    # so references within the resources read are not followed. A resource without an identity, such as
+    # one in a Bundle entry without a fullUrl, still has its absolute references read, though its relative
+    # ones cannot be resolved.
     #
     # Resources and references are compared by normalized absolute URL (see ResourceIdentity), so a
     # resource the request already carries, or that was already read for it, is not read again. A reference
@@ -37,8 +39,8 @@ module DaVinciCRDTestKit
     def request_must_support_references
       carried = Set.new
       to_read = []
-      ResourceIdentity.each_identified_resource(request_body) do |identity, raw_resource|
-        carried << ResourceIdentity.normalized_url(identity)
+      ResourceIdentity.each_resource(request_body) do |identity, raw_resource|
+        carried << ResourceIdentity.normalized_url(identity) if identity.present?
         to_read.concat(must_support_references_to_read(HookRequestResourceExtraction.to_fhir_resource(raw_resource),
                                                        identity))
       end
@@ -52,11 +54,11 @@ module DaVinciCRDTestKit
     end
 
     # The absolute URLs of the readable references in the must support Reference elements of a
-    # resource identified by the given URL.
+    # resource identified by the given URL, or by none.
     def must_support_references_to_read(resource, identity)
       return [] unless resource.respond_to?(:resourceType)
 
-      base = ResourceIdentity.base_for(identity) || ResourceIdentity.fhir_server_base(request_body)
+      base = ResourceIdentity.base_for(identity)
       metadata = ProfileMetadata.for_resource_type(MUST_SUPPORT_IG_VERSION, resource.resourceType)
       navigator = MustSupportReferences::Navigator.new(metadata)
       MustSupportReferences.reference_elements(metadata).flat_map do |element|

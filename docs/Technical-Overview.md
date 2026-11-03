@@ -53,12 +53,12 @@ Within the `client` and `server` actor directories, files are generally organize
     later use during evaluation.
   - [*`v201_hook_request_data_gathering.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/v201_hook_request_data_gathering.rb) and [*`v221_hook_request_data_gathering.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/v221_hook_request_data_gathering.rb):
     Used by `hook_request_endpoint.rb` to make FHIR requests against the invoking client's FHIR APIs. The scope of these requests is
-    different for [v2.0.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#data-fetching-during-hook-invocations) and [v2.2.1](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval).
+    different for [v2.0.1](Client-Details#data-fetching-during-hook-invocations) and [v2.2.1](Client-Details#prefetch-and-additional-data-retrieval).
   - [*`mock_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/mock_service_response.rb):
     Used by *hook_request_endpoint.rb* to create simple mocked hook responses based on types selected when running the tests. Templates
     for the responses live in the [`mocked_card_responses` subdirectory](https://github.com/inferno-framework/davinci-crd-test-kit/tree/main/lib/davinci_crd_test_kit/client/endpoints/mocked_card_responses).
   - [*`custom_service_response.rb`*](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/endpoints/custom_service_response.rb):
-    Used by *hook_request_endpoint.rb* to generate [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses) based on a tester-provided template specified when running the tests.
+    Used by *hook_request_endpoint.rb* to generate [custom responses](Controlling-Simulated-Responses) based on a tester-provided template specified when running the tests.
 - [**`crd_client_options.rb`**](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/crd_client_options.rb):
   Inferno [suite option](https://inferno-framework.github.io/docs/advanced-test-features/test-configuration.html#suite-options)
   constants used across all client suites.
@@ -124,15 +124,16 @@ directory includes:
   - **[`prefetch_completeness_checker.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_completeness_checker.rb)**:
     In the 2.2.1 version, prefetch support is required including standard prefetch templates that payers can use and expect
     the corresponding data. This module checks the prefetch field of a request against a prefetch definition
-    from a discovery response.
+    from a discovery response. The [Client Prefetch Verification](Client-Prefetch-Verification#infernos-verification)
+    page contains details on the checks performed here.
   - **[`prefetch_profile_validation.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/prefetch_profile_validation.rb)**:
     Checks that the resources provided under the prefetch field conform to the associated CRD profiles.
 * **FHIRPath Support**: Prefetch checking and custom response generation leverage FHIRPath executed on CDS Hooks requests.
   The FHIRPath module that Inferno uses does not support execution on general JSON objects like CDS Hooks requests
   or handle functions like `resolve()`. A wrapper is provided to support these capabilities for use in the test kit, including:
   - **[`fhirpath_on_cds_request.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/fhirpath_on_cds_request.rb)**: Contains logic to execute FHIRPath expressions on CDS Hook requests. Note that there
-  are [critical limitations](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#fhirpath-evaluation-limitations).
-  - **[`replace_tokens.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/replace_tokens.rb)**: Contains logic to replace [dynamic tokens in custom response templates](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#expression-tokens), which is used in the creation of [custom responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  are [critical limitations](Controlling-Simulated-Responses#fhirpath-evaluation-limitations).
+  - **[`replace_tokens.rb`](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/cross_suite/replace_tokens.rb)**: Contains logic to replace [dynamic tokens in custom response templates](Controlling-Simulated-Responses#expression-tokens), which is used in the creation of [custom responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
   as well as when evaluating prefetch templates.
 
 ### Additional Files and Directories
@@ -178,7 +179,7 @@ When making changes to the test kit itself, it's important to ensure the changes
     *   This helps catch issues that RSpec tests might miss, especially those related to UI interactions or workflow logic as experienced by a user.
 5.  **Update Documentation**: If your changes affect user-facing behavior, test procedures, or technical details,
     update the relevant documentation files in `/docs/`. These will be automatically mirrored to the repository's
-    [GitHub Wiki](https://github.com/inferno-framework/davinci-crd-test-kit/wiki).
+    [GitHub Wiki](Home).
 
 ## Naming and Style Guidelines
 

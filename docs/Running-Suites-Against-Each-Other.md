@@ -40,7 +40,7 @@ Notes:
 ## v2.2.1
 
 Running the v2.2.1 suites against each other requires 2 server sessions, one connecting to each
-of the [v2.2.1 service endpoints](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#multiple-service-endpoints).
+of the [v2.2.1 service endpoints](Client-Details#multiple-service-endpoints).
 
 1. Start a "Da Vinci CRD Client v2.2.1 Test Suite" session using US Core 3.1.1
 1. Apply preset "Run against the CRD Server Suite"
@@ -71,7 +71,7 @@ Some tests will fail, including
 - Client tests 1.2.x.3.01 and 1.4.1.3.01 validating the hook request structure and content will fail with errors
   on 4 requests each because the server suite purposefully sends non-conformant requests with unexpected
   fields to verify that the server ignores them.
-- Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, and CRD Vision Prescription (skip).
+- Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, CRD Service Request, and CRD Vision Prescription (skip).
 
 ### Additional Optional Steps for Long-Running Hook Request
 

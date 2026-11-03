@@ -38,10 +38,10 @@ RSpec.describe DaVinciCRDTestKit::ResourceIdentity do
     end
   end
 
-  describe '.each_identified_resource' do
+  describe '.each_resource' do
     def identified(hook_request)
       results = []
-      identity.each_identified_resource(hook_request) { |url, raw| results << [url, raw['id']] }
+      identity.each_resource(hook_request) { |url, raw| results << [url, raw['id']] }
       results
     end
 
@@ -50,14 +50,14 @@ RSpec.describe DaVinciCRDTestKit::ResourceIdentity do
       expect(identified(hook_request)).to eq([["#{base}/Patient/1", '1']])
     end
 
-    it 'identifies a Bundle entry by its fullUrl, falling back to the FHIR server without one' do
+    it 'identifies a Bundle entry by its fullUrl, and gives one without a fullUrl no identity' do
       urn = 'urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90'
       bundle = { 'resourceType' => 'Bundle', 'entry' => [
         { 'fullUrl' => urn, 'resource' => resource('Location', 'a') },
         { 'resource' => resource('Location', 'b') }
       ] }
       hook_request = { 'fhirServer' => base, 'prefetch' => { 'locations' => bundle } }
-      expect(identified(hook_request)).to eq([[urn, 'a'], ["#{base}/Location/b", 'b']])
+      expect(identified(hook_request)).to eq([[urn, 'a'], [nil, 'b']])
     end
 
     it 'identifies resources in context before those in prefetch' do
@@ -74,8 +74,8 @@ RSpec.describe DaVinciCRDTestKit::ResourceIdentity do
       expect(identified(hook_request)).to eq([["#{base}/ServiceRequest/sr", 'sr']])
     end
 
-    it 'skips a resource with no identity when the request names no FHIR server' do
-      expect(identified({ 'context' => { 'patient' => resource('Patient', '1') } })).to be_empty
+    it 'gives a resource outside a Bundle no identity when the request names no FHIR server' do
+      expect(identified({ 'context' => { 'patient' => resource('Patient', '1') } })).to eq([[nil, '1']])
     end
   end
 

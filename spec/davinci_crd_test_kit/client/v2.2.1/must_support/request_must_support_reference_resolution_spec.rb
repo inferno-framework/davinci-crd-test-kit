@@ -26,7 +26,8 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
   # A hook request carrying the given draft orders and a patient prefetch, along with a successful
   # read of each of the given resources made while it was processed. An order or extra prefetched
-  # resource given as a [fullUrl, resource] pair is placed in its Bundle under that fullUrl. External
+  # resource given as a [fullUrl, resource] pair is placed in its Bundle under that fullUrl, any other
+  # under its URL on the FHIR server when it has an id. External
   # reads map the URL each was read from to the resource returned.
   def create_hook_request(orders, read: [], failed_reads: [], external_reads: {}, prefetched: [])
     hook_instance = SecureRandom.uuid
@@ -46,7 +47,13 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
   def bundle_of(resources)
     entries = resources.map do |one|
-      one.is_a?(Array) ? { fullUrl: one.first, resource: one.last } : { resource: one }
+      if one.is_a?(Array)
+        { fullUrl: one.first, resource: one.last }
+      elsif one[:id].present?
+        { fullUrl: "#{fhir_server}/#{one[:resourceType]}/#{one[:id]}", resource: one }
+      else
+        { resource: one }
+      end
     end
     { resourceType: 'Bundle', type: 'collection', entry: entries }
   end
@@ -112,16 +119,48 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
   end
 
   # The must support element test counts such an instance, so this test must not report the type as
-  # unobserved, but with no identity to resolve its references against none could be checked.
-  it 'skips when instances were observed but none could be identified by absolute URL' do
+  # unobserved, but with no identity to resolve its relative references against they cannot be checked.
+  it 'skips when no instance could be identified and its references cannot be resolved' do
     create_hook_request([vision_prescription.except(:id)])
 
     result = run(vision_prescription_test, all_types_selected)
 
     expect(result.result).to eq('skip')
     expect(result.result_message).to_not include('no instances were observed')
-    expect(result.result_message)
-      .to include('Instances of `VisionPrescription` were observed, but none could be identified by absolute URL')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
+  end
+
+  it 'checks the absolute references of instances when none could be identified' do
+    create_hook_request([[nil, vision_prescription]], read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('`prescriber`')
+    expect(result.result_message).to_not include('`encounter`')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
+  end
+
+  it 'does not resolve a relative reference held by an instance without an identity' do
+    unidentified = vision_prescription(encounter: { reference: 'Encounter/e1' })
+    create_hook_request([vision_prescription.except(:encounter), [nil, unidentified]], read: [practitioner, encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('`encounter`')
+    expect(result.result_message).to include('Relative references on some instances were not checked')
+  end
+
+  it 'resolves an absolute reference held by an instance without an identity' do
+    identified = vision_prescription(encounter: { reference: 'Encounter/e1' })
+    unidentified = vision_prescription(encounter: { reference: "#{fhir_server}/Encounter/e2" })
+    create_hook_request([identified, [nil, unidentified]],
+                        read: [practitioner, encounter.merge(id: 'e2')], failed_reads: [encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('pass')
   end
 
   it 'checks the references of identified instances when only some could be identified' do
@@ -267,6 +306,65 @@ RSpec.describe DaVinciCRDTestKit::V221::RequestMustSupportReferenceResolution, :
 
       expect(result.result).to eq('skip')
       expect(result.result_message).to include('`encounter`')
+    end
+  end
+
+  it 'explains that relative references held by resources with a urn fullUrl cannot be resolved' do
+    create_hook_request([['urn:uuid:5b0e7a1c-3f2d-4e8b-9c6a-1d4f7e2b8a90', vision_prescription]],
+                        read: [encounter, practitioner])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to include('Relative references on some instances were not checked because no ' \
+                                             'base FHIR server could be identified.')
+  end
+
+  it 'does not explain urn fullUrls when no resource under test has one' do
+    create_hook_request([vision_prescription], read: [practitioner], failed_reads: [encounter])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to_not include('Relative references on some instances were not checked')
+  end
+
+  it 'does not explain urn fullUrls held only by resources of other types' do
+    create_hook_request([vision_prescription], read: [practitioner], failed_reads: [encounter],
+                                               prefetched: [['urn:uuid:9e3c2b7d-1a4f-4c6e-8b5d-2f7a9c1e4b60', patient]])
+
+    result = run(vision_prescription_test, without_practitioner_role)
+
+    expect(result.result).to eq('skip')
+    expect(result.result_message).to_not include('Relative references on some instances were not checked')
+  end
+
+  # A search made while processing the hook request, such as for the Coverage when none was
+  # prefetched, returns a Bundle whose entries are identified only by their fullUrls.
+  describe 'with resources read through a search' do
+    let(:search_url) { "#{fhir_server}/Practitioner?_id=pr1" }
+
+    def searchset(entry)
+      { resourceType: 'Bundle', type: 'searchset', entry: [entry] }
+    end
+
+    it 'resolves a reference to a search result identified by its fullUrl' do
+      search_result = searchset({ fullUrl: "#{fhir_server}/Practitioner/pr1", resource: practitioner })
+      create_hook_request([vision_prescription], read: [encounter], external_reads: { search_url => search_result })
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(result.result).to eq('pass')
+    end
+
+    it 'does not resolve a reference to a search result without a fullUrl' do
+      search_result = searchset({ resource: practitioner })
+      create_hook_request([vision_prescription], read: [encounter], external_reads: { search_url => search_result })
+
+      result = run(vision_prescription_test, without_practitioner_role)
+
+      expect(result.result).to eq('skip')
+      expect(result.result_message).to include('`prescriber`')
     end
   end
 

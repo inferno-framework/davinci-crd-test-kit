@@ -207,8 +207,18 @@ in versions that support them (e.g., [v2.2.1](https://hl7.org/fhir/us/davinci-cr
 
 CRD clients are required to demonstrate support for some elements which appear only
 under certain conditions. See the **[Client Must Support](Client-Must-Support)**
-section for details on what Inferno checks for and the underlying requirements
+page for details on what Inferno checks for and the underlying requirements
 that drive those tests.
+
+## Prefetch Tests
+
+Starting in version 2.2.1 of the CRD IG, CRD clients are required
+to support prefetch. See the **[Client Prefetch Verification](Client-Prefetch-Verification)**
+page for details on [what Inferno checks for when confirming prefetch
+support](Client-Prefetch-Verification#infernos-verification), what Inferno's
+simulated service endpoints [request for prefetched data](Client-Prefetch-Verification#inferno-requested-prefetches),
+and how Inferno [resolves references](Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+to determine whether the requested data is present.
 
 ## CRD Server Simulation
 
@@ -296,15 +306,15 @@ request body; otherwise it will not be sent. Non-literal references will be igno
 
 #### CDS Hooks Responses
 
-The CRD client test suite contains [basic logic to generate CDS Hooks responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
+The CRD client test suite contains [basic logic to generate CDS Hooks responses](Controlling-Simulated-Responses#mocked-responses)
 that meet each of the [CRD Card profiles](https://hl7.org/fhir/us/davinci-crd/STU2/cards.html).
 However, these simple cards may not support the target client in demonstrating the full CRD
 capabilities of its system. The CRD client test suite also allows testers to
-[provide a template for the responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+[provide a template for the responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
 for Inferno to provide back, including directives that determine details of the actual responses
 based on the request. This way, testers can configure the responses to match the patients, orders,
 and other relevant details of their system, allowing a complete demonstration. See the
-[documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+[documentation on controlling Inferno's simulated CRD responses](Controlling-Simulated-Responses)
 for complete details.
 
 In either case, Inferno will check that the responses it generates to send back to the client are
@@ -347,7 +357,7 @@ server for the rest of the hook request.
 When requesting data, Inferno will only attempt to read literal references. It will use the Bearer
 token provided in the `fhirAuthorization.access_token` field of the hook request as long as the
 reference points to a resource on the `fhirServer` indicated in the hook request, as determined
-by [Bundle reference resolution rules](https://hl7.org/fhir/R4/bundle.html#references). If the
+by the suite's [reference resolution rules](Client-Prefetch-Verification#reference-resolution-within-hook-requests). If the
 reference refers to a resource on another FHIR server, Inferno does not include an access token
 on the read request. Such reads do not count as evidence that Inferno can access data from the
 CRD client's FHIR server during a hook request.
@@ -358,12 +368,7 @@ will expect this resource to be available only during the hook request made by t
 
 #### Multiple Service Endpoints
 
-The v2.2.1 suite defines two sets of services rooted at the following discovery endpoints:
-- `custom/crd_client_v221/cds-services`: requests the complete [standard prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch)
-  data set. The discovery response returned can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-v221.json).
-- `custom/crd_client_v221/prefetch-subset/cds-services`: requests a subset of the [standard prefetch](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#standard-prefetch)
-  data set using non-standard prefetch keys to allow clients to demonstrate their ability to react to the
-  service definitions provided by payers. The discovery response returned can be found [here](https://github.com/inferno-framework/davinci-crd-test-kit/blob/main/lib/davinci_crd_test_kit/client/v2.2.1/cds-services-prefetch-subset-v221.json).
+The v2.2.1 suite defines two sets of services [described here](Client-Prefetch-Verification#inferno-requested-prefetches).
 
 #### Hook Configuration Options
 
@@ -403,8 +408,8 @@ behaviors are correct. However, not all areas of the IG are exercised.
 
 Limitations across all versions include:
 - This suite does not implement any payer business logic, so testers must either
-  use [Inferno's simple hard-coded responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#mocked-responses)
-  or [tell Inferno how to return responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses#tester-directed-custom-responses)
+  use [Inferno's simple hard-coded responses](Controlling-Simulated-Responses#mocked-responses)
+  or [tell Inferno how to return responses](Controlling-Simulated-Responses#tester-directed-custom-responses)
   that are conformant and drive the desired behavior in the tested system.
 - The tests cannot verify that a client is able to consume the received
   decision support. Testers should consider this requirement to be verified

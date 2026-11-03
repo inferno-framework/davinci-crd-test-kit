@@ -18,27 +18,21 @@ module DaVinciCRDTestKit
         During this test, Inferno will verify that for each must support Reference element listed
         below that was populated, at least one of its references resolved to a resource
         conforming to each target profile listed for the element, or to any one of them where the
-        list says so. Target profiles for resource types the tester indicated the CRD client does
+        list says so. Target profiles for resource types the tester indicated that the CRD client does
         not support are not checked. The test will skip if Inferno does not observe all of the
         required references, indicating that additional data is needed to demonstrate conformance.
 
-        Inferno obtains the resources needed to perform these checks during the hook request by
-        performing a FHIR read of any references in must support elements that aren't already
-        present in the `context` or `prefetch` fields of the hook request. See the wiki's
-        documentation on [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
-        for details on how Inferno gets these resources.
+        Inferno will look at references found in resources in the same hook requests as the must support
+        element tests: those made during the latest run of each "Hooks" subgroup and the "Additional Hook
+        Invocations" group. If no instances of the tested resource type were observed, the test skips
+        unless the tester indicated that the CRD client does not support the resource type.
 
-        If no instances of the resource type were observed, the test skips unless the tester
-        indicated that the CRD client does not support the resource type. Resolution of references
-        requires the ability to determine an identity for the referencing resource including
-        the source FHIR server. The absence of this information for referencing resources may cause
-        this test to produce an inaccurate pass result. Since CRD conformance rules require this
-        information (`fhirServer` on the hook request, `fullUrl` in Bundle entries, and `id` on resource)
-        other tests will fail in this case.
-
-        Inferno will consider the same hook requests as the must support
-        element tests: those made during the latest run of each "Hooks" subgroup and the
-        "Additional Hook Invocations" group.
+        Inferno obtains the reference targets during the hook request by performing FHIR reads of
+        referenced resources whose absolute URL can be determined and that are not already present
+        in the `context` or `prefetch` fields of the hook request. See the wiki's documentation
+        on [reference resolution within hook requests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+        and [simulated CRD server behavior](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Details#prefetch-and-additional-data-retrieval)
+        for details on how Inferno identifies and obtains these resources.
 
         For additional details on this test, see the [Client Must Support Tests](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support)
         page and specifically the [Must Support References](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Client-Must-Support#must-support-references)

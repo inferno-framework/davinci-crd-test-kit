@@ -81,8 +81,10 @@ resources that conform to certain profiles. If Inferno cannot find all the examp
 needs to see for a referencing resource type, the test will skip.
 
 When resolving references, Inferno first looks for the referenced resource
-within the `context` or `prefetch` fields of the hook request and falls back to obtaining
-the resource via a FHIR read during the hook invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
+within the `context` or `prefetch` fields of the hook request
+using the [reference resolution rules](Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+and falls back to obtaining the resource via a FHIR read during the hook
+invocation (see the [Prefetch and Additional Data Retrieval](Client-Details#prefetch-and-additional-data-retrieval)
 section for details).
 
 Using the resolved references, Inferno then confirms support for one or more
@@ -125,6 +127,11 @@ Additionally, the following is a list of reasons that Inferno can consider a pop
 Reference element to not represent an example of a reference that resolves to a certain profile:
 - It is a logical reference, carrying only an `identifier` or `display` without a `reference`.
 - Its `reference` is neither a contained reference (`#id`), a relative `Type/id` reference, nor an absolute URL.
+- It is a relative reference that cannot be converted to an absolute reference because its holding
+  resource is not identified by a RESTful URL. For example, this could occur
+  when the holding resource is in a Bundle entry without a `fullUrl`. See the [Reference Resolution
+  Within Hook Requests](Client-Prefetch-Verification#reference-resolution-within-hook-requests)
+  section for details.
 - It is a versioned reference (`Type/id/_history/vid`, relative or absolute), which
   Inferno does not currently resolve.
 - It points to a contained resource whose id does not match any resource in `contained`.

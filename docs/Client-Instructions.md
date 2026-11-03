@@ -51,7 +51,7 @@ group as described in [Quick Start](#quick-start).
 The **Custom response template for [hook name] hook requests** input can be used to customize the hook
 responses to better fit the configuration of the tested CRD client. When this input is populated,
 the corresponding **Response types to return from [hook name] hook requests** input is ignored. See the
-[documentation on controlling Inferno's simulated CRD responses](https://github.com/inferno-framework/davinci-crd-test-kit/wiki/Controlling-Simulated-Responses)
+[documentation on controlling Inferno's simulated CRD responses](Controlling-Simulated-Responses)
 for complete details on how to use these inputs.
 
 ### Card Must Support
