@@ -38,35 +38,35 @@ comparison_config:
     client:
       expected_results_file: crd_v221_client_vs_server_suites_with_commands_client_expected.json
       alternate_expected_files:
-        - file: crd_v221_client_vs_server_suites_with_commands_no_ssl_client_expected.json
+        - file: crd_v221_client_vs_server_suites_with_commands_client_no_ssl_expected.json
           when:
             - field: inferno_base_url
               not_matches: https
     server-full:
       expected_results_file: crd_v221_client_vs_server_suites_with_commands_server-full_expected.json
       alternate_expected_files:
-        - file: crd_v221_client_vs_server_suites_with_commands_no_ssl_server-full_expected.json
+        - file: crd_v221_client_vs_server_suites_with_commands_server-full_no_ssl_expected.json
           when:
             - field: inferno_base_url
               not_matches: https
     server-full-additional:
       expected_results_file: crd_v221_client_vs_server_suites_with_commands_server-full-additional_expected.json
       alternate_expected_files:
-        - file: crd_v221_client_vs_server_suites_with_commands_no_ssl_server-full-additional_expected.json
+        - file: crd_v221_client_vs_server_suites_with_commands_server-full-additional_no_ssl_expected.json
           when:
             - field: inferno_base_url
               not_matches: https
     server-subset:
       expected_results_file: crd_v221_client_vs_server_suites_with_commands_server-subset_expected.json
       alternate_expected_files:
-        - file: crd_v221_client_vs_server_suites_with_commands_no_ssl_server-subset_expected.json
+        - file: crd_v221_client_vs_server_suites_with_commands_server-subset_no_ssl_expected.json
           when:
             - field: inferno_base_url
               not_matches: https
     server-subset-additional:
       expected_results_file: crd_v221_client_vs_server_suites_with_commands_server-subset-additional_expected.json
       alternate_expected_files:
-        - file: crd_v221_client_vs_server_suites_with_commands_no_ssl_server-subset-additional_expected.json
+        - file: crd_v221_client_vs_server_suites_with_commands_server-subset-additional_no_ssl_expected.json
           when:
             - field: inferno_base_url
               not_matches: https
