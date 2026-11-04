@@ -57,7 +57,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.6.2)
-    domain_name (0.6.20260829)
+    domain_name (0.6.20260902)
     dotenv (2.8.1)
     drb (2.2.3)
     dry-auto_inject (1.0.1)

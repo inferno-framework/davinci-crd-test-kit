@@ -1,6 +1,7 @@
 require_relative '../../multi_request_message_helper'
 require_relative '../../tagged_request_load_helper'
 require_relative '../../jwt_claim_types'
+require_relative '../../jwt_expiration'
 
 module DaVinciCRDTestKit
   module V221
@@ -8,6 +9,7 @@ module DaVinciCRDTestKit
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::TaggedRequestLoadHelper
       include DaVinciCRDTestKit::JwtClaimTypes
+      include DaVinciCRDTestKit::JwtExpiration
       include ClientURLs
 
       id :crd_v221_token_payload
@@ -91,9 +93,9 @@ module DaVinciCRDTestKit
               JWT::JWK.import(jwk).public_key,
               true,
               algorithms: [alg],
-              exp_leeway: 60,
               iss: cds_jwt_iss,
               aud: public_hook_url(request),
+              verify_expiration: false, # checked against when the request was received below
               verify_not_before: false,
               verify_iat: false,
               verify_jti: true,
@@ -103,6 +105,9 @@ module DaVinciCRDTestKit
           rescue StandardError => e
             add_request_message('error', "Token validation error: #{e.message}", index)
           end
+
+          expiration_error = jwt_expiration_error(unverified_payload, request)
+          add_request_message('error', expiration_error, index) if expiration_error
 
           jwt_claim_type_errors(unverified_payload).each { |message| add_request_message('error', message, index) }
 

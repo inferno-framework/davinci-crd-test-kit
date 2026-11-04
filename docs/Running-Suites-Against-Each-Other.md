@@ -73,7 +73,7 @@ Some tests will fail, including
   fields to verify that the server ignores them.
 - Some client must support tests will fail or skip, including any attestations of missing elements for which "false" was answered (fail), test "1.4.2.1.29 Observed order types were submitted as draftOrders on the order-sign hook" (fail), and must support reference resolution tests for CRD Appointment, CRD Communication Request, CRD Device Request, CRD Encounter, CRD Nutrition Order, CRD Service Request, and CRD Vision Prescription (skip).
 
-### Additional Optional Steps for Long-Running Hook Request
+### Additional Optional Steps for the Long-running Hook Request Scenario
 
 1. In the client session, run group "1.3.1 Long-Running Hook Request" with no changes to the inputs.
 1. In the "complete prefetch" server session, run group "2 Hook Response Demonstration" with no
@@ -89,6 +89,22 @@ Some tests will fail, including
    you had the option of cancelling Inferno's tests.
 
 All tests should pass.
+
+### Additional Optional Steps for the Unknown Response Content Scenario
+
+TODO
+
+### Additional Optional Steps for the Self-Pay Scenario
+
+TODO
+
+### Additional Optional Steps for the Multiple Payers Scenario
+
+TODO
+
+### Additional Optional Steps for the User Access Level Scoping Scenario
+
+TODO
 
 ### Additional Optional Steps for FHIR API Testing
 
