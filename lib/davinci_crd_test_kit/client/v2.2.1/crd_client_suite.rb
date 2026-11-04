@@ -117,7 +117,7 @@ module DaVinciCRDTestKit
                             'hl7.fhir.us.davinci-crd_2.2.1@impl-3' # suite verifies system interactions
 
       CRD_MESSAGE_FILTERS = [
-        /\A\S+: \S+: URL value '.*' does not resolve/,
+        # Not covered by regression tests: it isn't known when the validator produces this message.
         %r{This element is not allowed by the profile http://hl7\.org/fhir/tools/StructureDefinition/CDSHooksExtensions\|1\.1\.2},
         /No definition could be found for URL value/
       ].freeze
