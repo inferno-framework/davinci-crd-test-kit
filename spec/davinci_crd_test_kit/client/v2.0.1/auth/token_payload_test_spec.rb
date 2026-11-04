@@ -6,6 +6,8 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
   let(:jwt_helper) { Class.new(DaVinciCRDTestKit::JwtHelper) }
   let(:results_repo) { Inferno::Repositories::Results.new }
   let(:runnable) { Inferno::Repositories::Tests.new.find('crd_v201_token_payload') }
+  # one result for all the hook requests, as when they arrive during a single run of the wait test
+  let(:hook_request_result) { repo_create(:result, test_session_id: test_session.id) }
 
   let(:example_client_url) { 'https://cds.example.org' }
   let(:base_url) { "#{Inferno::Application['base_url']}/custom/crd_client" }
@@ -37,6 +39,20 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
     }
   end
 
+  def create_appointment_hook_request(created_at:)
+    repo_create(
+      :request,
+      name: 'appointment_book',
+      direction: 'incoming',
+      url: appointment_book_url,
+      test_session_id: test_session.id,
+      result: hook_request_result,
+      status: 200,
+      tags: ['appointment-book'],
+      created_at:
+    )
+  end
+
   def entity_result_message
     results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
       .first
@@ -48,7 +64,7 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
     let(:test) do
       Class.new(DaVinciCRDTestKit::V201::TokenPayloadTest) do
         config(
-          options: { hook_path: '/cds-services/appointment-book-service' }
+          options: { hook_name: 'appointment-book', hook_path: '/cds-services/appointment-book-service' }
         )
       end
     end
@@ -242,6 +258,80 @@ RSpec.describe DaVinciCRDTestKit::V201::TokenPayloadTest do
                    cds_jwt_iss: example_client_url)
       expect(result.result).to eq('fail')
       expect(entity_result_message.message).to include('JWT payload missing required claims: `exp`')
+    end
+
+    it 'passes when exp has since elapsed but was still valid when the request was received' do
+      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request(created_at: 5.minutes.ago)
+
+      # Expired 2 minutes ago by wall-clock time, but was still unexpired when the request came in.
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 2.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('pass')
+    end
+
+    it 'fails when the token was already expired when the request was received' do
+      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request(created_at: 5.minutes.ago)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 10.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to include('Token had expired when the request was received')
+    end
+
+    it 'judges each token against when its own request was received' do
+      allow(test).to receive(:suite).and_return(suite)
+      create_appointment_hook_request(created_at: 10.minutes.ago)
+      create_appointment_hook_request(created_at: 2.minutes.ago)
+
+      # Valid when the first request came in 10 minutes ago, but expired before the second one 2 minutes ago.
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 5.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token, token], auth_tokens_jwk_json: [jwk.to_json, jwk.to_json],
+                         cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+
+      messages = results_repo.current_results_for_test_session_and_runnables(test_session.id, [runnable])
+        .first.messages.map(&:message)
+      expect(messages.length).to eq(1)
+      expect(messages.first).to match(/\ARequest 2: Token had expired when the request was received/)
+    end
+
+    it 'fails when exp has passed and no request was recorded' do
+      allow(test).to receive(:suite).and_return(suite)
+
+      token = jwt_helper.build(
+        aud: appointment_book_url,
+        iss: example_client_url,
+        jku: "#{example_client_url}/jwks.json",
+        encryption_method: 'RS384',
+        exp: 2.minutes.ago.to_i
+      )
+
+      result = run(test, auth_tokens: [token], auth_tokens_jwk_json: [jwk.to_json], cds_jwt_iss: example_client_url)
+      expect(result.result).to eq('fail')
+      expect(entity_result_message.message).to include('Token had expired when the request was received')
     end
 
     describe 'claim types' do
