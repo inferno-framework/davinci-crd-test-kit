@@ -38,6 +38,19 @@ Additional information is provided in the [Da Vinci CRD Test Kit documentation](
 More information on using Inferno Test Kits is available on the [Inferno
 Framework documentation site](https://inferno-framework.github.io/docs).
 
+### Using an Alternate Container Registry
+
+By default, the test kit pulls its background service images from Docker Hub.
+To pull Inferno Community images from a different compatible container registry,
+set `CONTAINER_REGISTRY` before starting the test kit or its background services:
+
+```sh
+export CONTAINER_REGISTRY=registry.example.org:5000
+bundle exec inferno services start
+```
+
+When `CONTAINER_REGISTRY` is not set, the test kit continues to use Docker Hub.
+
 ### Multi-user Installations
 
 The default configuration of this test kit uses SQLite for data persistence and
@@ -74,5 +87,5 @@ specific language governing permissions and limitations under the License.
 
 ## Trademark Notice
 
-HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health
-Level Seven International and their use does not constitute endorsement by HL7.
+HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of HL7 and
+their use does not constitute endorsement by HL7.
