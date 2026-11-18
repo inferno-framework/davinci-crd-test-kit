@@ -87,5 +87,5 @@ specific language governing permissions and limitations under the License.
 
 ## Trademark Notice
 
-HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of HL7 and
-their use does not constitute endorsement by HL7.
+HL7, FHIR and the FHIR [FLAME DESIGN] are the registered trademarks of Health
+Level Seven International and their use does not constitute endorsement by HL7.
