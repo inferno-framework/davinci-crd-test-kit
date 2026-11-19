@@ -38,6 +38,19 @@ Additional information is provided in the [Da Vinci CRD Test Kit documentation](
 More information on using Inferno Test Kits is available on the [Inferno
 Framework documentation site](https://inferno-framework.github.io/docs).
 
+### Using an Alternate Container Registry
+
+By default, the test kit pulls its background service images from Docker Hub.
+To pull Inferno Community images from a different compatible container registry,
+set `CONTAINER_REGISTRY` before starting the test kit or its background services:
+
+```sh
+export CONTAINER_REGISTRY=registry.example.org:5000
+bundle exec inferno services start
+```
+
+When `CONTAINER_REGISTRY` is not set, the test kit continues to use Docker Hub.
+
 ### Multi-user Installations
 
 The default configuration of this test kit uses SQLite for data persistence and
