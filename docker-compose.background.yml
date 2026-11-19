@@ -1,4 +1,3 @@
-version: '3'
 services:
   fhirpath:
     image: ${CONTAINER_REGISTRY:-docker.io}/infernocommunity/fhirpath-service
