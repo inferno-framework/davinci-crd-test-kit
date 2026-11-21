@@ -1,11 +1,13 @@
 require_relative '../../multi_request_message_helper'
 require_relative '../../../cross_suite/short_circuit_interaction'
+require_relative '../../../cross_suite/request_timeout_handling'
 
 module DaVinciCRDTestKit
   module V221
     class RetrieveJWKSTest < Inferno::Test
       include DaVinciCRDTestKit::MultiRequestMessageHelper
       include DaVinciCRDTestKit::ShortCircuitInteraction
+      include DaVinciCRDTestKit::RequestTimeoutHandling
 
       id :crd_v221_retrieve_jwks
       title 'CRD client JWKS can be retrieved'
@@ -117,7 +119,7 @@ module DaVinciCRDTestKit
       end
 
       def fetch_jwks(uri, entity, index)
-        get(uri)
+        return unless get_jwks(uri, index)
 
         if response[:status] == 200
           parse_json_request_entity(response[:body], entity, index)
@@ -126,6 +128,29 @@ module DaVinciCRDTestKit
                               "Unexpected response status: expected 200, but received #{response[:status]}",
                               index)
           nil
+        end
+      end
+
+      # Returns false, after recording an error, if the request timed out. Inferno turns some
+      # connection timeouts into a failure, with the Faraday error as its cause, which would end the
+      # test before the other requests are checked.
+      def get_jwks(uri, index)
+        get(uri)
+        true
+      rescue Faraday::Error, Inferno::Exceptions::AssertionException => e
+        raise unless timeout?(e) || timeout?(e.cause)
+
+        add_request_message('error', request_timed_out_message("JWKS URL `#{uri}`"), index)
+        false
+      end
+
+      # Inferno's `get` uses this connection for an absolute URL, and its own sets no timeout. Bounded so
+      # that a jku that doesn't respond can't hold the test. Overrides an Inferno internal, so this can be
+      # removed once Inferno's HTTP clients support timeouts.
+      def connection
+        Faraday.new(request: { open_timeout: REQUEST_TIMEOUT_SECONDS, timeout: REQUEST_TIMEOUT_SECONDS }) do |f|
+          f.request :url_encoded
+          f.use FaradayMiddleware::FollowRedirects
         end
       end
 
