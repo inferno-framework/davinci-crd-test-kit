@@ -366,6 +366,51 @@ During the "User Access Level Scoping" scenario, Inferno will attempt to read an
 tester-specified resource. Whereas the other resources listed above must be accessible, Inferno
 will expect this resource to be available only during the hook request made by the full-access user.
 
+#### Access Token Scopes
+
+The CRD IG [requires](https://hl7.org/fhir/us/davinci-crd/2.2.1/en/foundation.html#ci-c-found-21) that
+CRD clients limit the scopes provided in their access token as narrowly as feasible to the data the CRD
+server identifies as necessary for its decision support. Inferno's simulated CRD servers identify the
+scopes below, which the tester grants when registering them (the "CRD client registers Inferno's
+simulated CRD servers" test). The "Hook requests grant the requested scopes" test in each hook group
+checks the `fhirAuthorization.scope` field of the hook requests against them. Inferno uses the access
+token for the FHIR reads it makes during hook invocations, for the CRD client's US Core FHIR API tests,
+and to read the targets of its Coverage Information responses in the "CRD client's FHIR server stores
+updates from coverage-information responses" test.
+
+| | Resource types | Access |
+| --- | --- | --- |
+| Required | Every resource type profiled in the selected US Core version (listed below) | Read and search |
+| Allowed, not required | The CRD request types: Appointment, CommunicationRequest, DeviceRequest, MedicationRequest, NutritionOrder, ServiceRequest and VisionPrescription. With US Core 3.1.1, also Coverage. | Read and search |
+| Not allowed | Any other resource type, and wildcard (`*`) resource scopes | Create, update or delete on any resource type |
+
+US Core resource types:
+- US Core 3.1.1: AllergyIntolerance, CarePlan, CareTeam, Condition, Device, DiagnosticReport,
+  DocumentReference, Encounter, Goal, Immunization, Location, Medication, MedicationRequest, Observation,
+  Organization, Patient, Practitioner, PractitionerRole, Procedure and Provenance.
+- US Core 6.1.0 and 7.0.0: AllergyIntolerance, CarePlan, CareTeam, Condition, Coverage, Device,
+  DiagnosticReport, DocumentReference, Encounter, Goal, Immunization, Location, Medication,
+  MedicationDispense, MedicationRequest, Observation, Organization, Patient, Practitioner,
+  PractitionerRole, Procedure, Provenance, QuestionnaireResponse, RelatedPerson, ServiceRequest and
+  Specimen.
+
+Additional details:
+- Read and search can be granted as a single SMART v2 scope (e.g., `user/Patient.rs`) or as separate
+  scopes (e.g., `user/Patient.r user/Patient.s`). For the US Core resource types, both read and search
+  must be granted. SMART v1 `read` scopes (e.g., `user/Patient.read`) are accepted with a warning.
+- All resource scopes must use the same level, either `user` or `patient`. If choosing patient scopes,
+  note that the token is used by default for complete testing of the CRD client's US Core FHIR API,
+  so either that single patient would need to demonstrate all US Core resources and must support
+  elements or another access token would need to be provided when testing the CRD client's FHIR API.
+- Scopes restricted by search parameters (e.g.,
+  `user/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory`)
+  do not grant access to all resources of the type, so they do not satisfy the requirement for that
+  US Core resource type.
+- The CRD request types are not required because Inferno can't know in advance which of them the CRD
+  client supports. Grant access to those the CRD client sends in hook requests: when Inferno returns a
+  Coverage Information response for one of them, it reads the resource with the access token to check
+  that the coverage-information extension was stored.
+
 #### Multiple Service Endpoints
 
 The v2.2.1 suite defines two sets of services [described here](Client-Prefetch-Verification#inferno-requested-prefetches).
