@@ -24,7 +24,8 @@ module DaVinciCRDTestKit
         - Granted patient- or user-level read and search access to all US Core resource
           types in the selected US Core version (required to verify the CRD client's support
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
-          hook request field). Read and search access to the CRD request types may also be granted.
+          hook request field). Read and search access may also be granted to the types that Inferno's
+          Coverage Information responses can target and, with US Core 3.1.1, to Coverage.
           See the [CRD Test Kit wiki](#{CRDClientOptions::ACCESS_TOKEN_SCOPES_WIKI_URL}) for the full list of scopes.
 
         Testers can make hook requests during this test, but Inferno will never return

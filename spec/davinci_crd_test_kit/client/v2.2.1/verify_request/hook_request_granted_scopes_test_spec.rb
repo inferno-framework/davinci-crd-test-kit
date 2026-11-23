@@ -30,13 +30,17 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
         'subject' => 'cds-service'
       }
     }
+    create_raw_hook_request(body.to_json, tags:)
+  end
+
+  def create_raw_hook_request(request_body, tags: ['appointment-book'])
     repo_create(
       :request,
       direction: 'incoming',
       url: 'https://example.com/cds-services/appointment-book-service',
       result:,
       test_session_id: test_session.id,
-      request_body: body.to_json,
+      request_body:,
       status: 200,
       tags:
     )
@@ -106,10 +110,79 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
       expect(extra_message).to include('Specimen')
     end
 
-    it 'passes when Coverage and ServiceRequest, which are not US Core 3.1.1 types, are also granted' do
-      create_hook_request(scope: resource_scopes(us_core_3_resources + ['Coverage', 'ServiceRequest']))
+    it 'passes when Coverage, which is not a US Core 3.1.1 type, is also granted' do
+      create_hook_request(scope: resource_scopes(us_core_3_resources + ['Coverage']))
       result = run(test)
       expect(result.result).to eq('pass')
+    end
+
+    it 'passes when ServiceRequest, which is not a US Core 3.1.1 type, is also granted' do
+      create_hook_request(scope: resource_scopes(us_core_3_resources + ['ServiceRequest']))
+      result = run(test)
+      expect(result.result).to eq('pass')
+    end
+
+    describe 'with malformed hook requests' do
+      it 'fails when the request body is not a JSON object' do
+        create_raw_hook_request('[1]')
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message)).to include('(Request 1) Request body is not a JSON object.')
+      end
+
+      it 'fails when the request body is the JSON null' do
+        create_raw_hook_request('null')
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message)).to include('(Request 1) Request body is not a JSON object.')
+      end
+
+      it 'fails when the request body is not valid JSON' do
+        create_raw_hook_request('')
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message)).to include(include('Request body contains invalid JSON.'))
+      end
+
+      it 'fails when the request has no fhirAuthorization' do
+        create_raw_hook_request('{}')
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message))
+          .to include('(Request 1) No `fhirAuthorization` field, so no scopes were granted.')
+      end
+
+      it 'fails when fhirAuthorization is not a JSON object' do
+        create_raw_hook_request({ 'fhirAuthorization' => 'abc' }.to_json)
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message)).to include('(Request 1) `fhirAuthorization` is not a JSON object.')
+      end
+
+      it 'fails when fhirAuthorization has no scope' do
+        create_raw_hook_request({ 'fhirAuthorization' => { 'access_token' => 'SAMPLE_TOKEN' } }.to_json)
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message))
+          .to include('(Request 1) No `fhirAuthorization.scope` field, so no scopes were granted.')
+      end
+
+      it 'fails when the scope is not a string' do
+        create_raw_hook_request({ 'fhirAuthorization' => { 'scope' => ['user/Patient.rs'] } }.to_json)
+        result = run(test)
+        expect(result.result).to eq('fail')
+        expect(result_messages.map(&:message)).to include('(Request 1) `fhirAuthorization.scope` is not a string.')
+      end
+
+      it 'fails when no resource scopes are granted' do
+        create_hook_request(scope: 'openid fhirUser')
+        result = run(test)
+        expect(result.result).to eq('fail')
+        messages = result_messages.map(&:message)
+        expect(messages)
+          .to include('(Request 1) No resource scopes were granted in the `fhirAuthorization.scope` field.')
+        expect(messages).to_not include(include('consistent level of scope'))
+      end
     end
 
     it 'passes with a warning when all granted scopes use SMART v1 read interactions' do
@@ -236,15 +309,20 @@ RSpec.describe DaVinciCRDTestKit::V221::HookRequestGrantedScopesTest do
         .to include(match(%r{create, update, or delete.*user/DeviceRequest\.cruds}))
     end
 
-    it 'fails when granted scopes use the SMART v1 write or * access levels' do
-      scope = "#{resource_scopes(us_core_6_7_resources - ['Patient', 'Condition'])} " \
-              'user/Patient.write user/Patient.read user/Condition.*'
+    it 'fails when granted scopes use the SMART v1 write access level' do
+      scope = "#{resource_scopes(us_core_6_7_resources - ['Patient'])} user/Patient.write user/Patient.read"
       create_hook_request(scope:)
       result = run(test)
       expect(result.result).to eq('fail')
-      write_message = result_messages.map(&:message).find { |m| m.include?('create, update, or delete') }
-      expect(write_message).to include('user/Patient.write')
-      expect(write_message).to include('user/Condition.*')
+      expect(result_messages.map(&:message)).to include(match(%r{create, update, or delete.*user/Patient\.write}))
+    end
+
+    it 'fails when granted scopes use the SMART v1 * access level' do
+      scope = "#{resource_scopes(us_core_6_7_resources - ['Condition'])} user/Condition.*"
+      create_hook_request(scope:)
+      result = run(test)
+      expect(result.result).to eq('fail')
+      expect(result_messages.map(&:message)).to include(match(%r{create, update, or delete.*user/Condition\.\*}))
     end
 
     it 'fails when a wildcard resource scope is granted' do

@@ -26,10 +26,9 @@ module DaVinciCRDTestKit
         During this test, Inferno verifies that the `fhirAuthorization.scope` field of each hook request:
         - grants read and search access, either as `rs` or as separate `r` and `s` scopes, to every
           resource type profiled in the selected version of the US Core IG.
-        - grants access to no other resource types, except the CRD request types (Appointment,
-          CommunicationRequest, DeviceRequest, MedicationRequest, NutritionOrder, ServiceRequest and
-          VisionPrescription, plus Coverage when US Core 3.1.1 is selected), which the CRD client may
-          but need not include.
+        - grants access to no other resource types, except the types that Inferno's Coverage Information
+          responses can target (#{CardsIdentification::COVERAGE_INFO_EXPECTED_RESOURCE_TYPES.join(', ')})
+          and, when US Core 3.1.1 is selected, Coverage, which the CRD client may but need not include.
         - grants no create, update or delete access.
         - does not use wildcard (`*`) resource scopes.
         - uses either user scopes or patient scopes, but not both.
@@ -58,9 +57,11 @@ module DaVinciCRDTestKit
 
         hook_requests.each_with_index do |request, request_index|
           request_body = parse_json_request_entity(request.request_body, 'Request body', request_index)
-          next unless request_body.present?
+          next unless request_body_object?(request_body, request.request_body, request_index)
 
-          resource_scopes = granted_resource_scopes(request_body)
+          resource_scopes = granted_resource_scopes(request_body, request_index)
+          next if resource_scopes.nil?
+
           check_granted_scopes_level(resource_scopes, request_index)
           check_granted_access(resource_scopes, request_index)
           check_granted_resources(resource_scopes, request_index)
@@ -78,11 +79,53 @@ module DaVinciCRDTestKit
         CRDClientOptions.optional_scope_resource_types(suite_options[:us_core_version])
       end
 
-      def granted_resource_scopes(request_body)
-        granted_scopes = request_body.dig('fhirAuthorization', 'scope')
-        return [] unless granted_scopes.is_a?(String)
+      # A nil parsed body means the body was not valid JSON (already reported), unless it was the JSON null.
+      def request_body_object?(request_body, raw_body, request_index)
+        return true if request_body.is_a?(Hash)
+        return false if request_body.nil? && raw_body.to_s.strip != 'null'
 
-        granted_scopes.split.filter_map { |scope| parse_resource_scope(scope) }
+        add_request_message('error', 'Request body is not a JSON object.', request_index)
+        false
+      end
+
+      # The resource scopes in fhirAuthorization.scope, or nil (with an error message) when there are none
+      # to check.
+      def granted_resource_scopes(request_body, request_index)
+        granted_scopes = granted_scope_string(request_body, request_index)
+        return if granted_scopes.nil?
+
+        resource_scopes = granted_scopes.split.filter_map { |scope| parse_resource_scope(scope) }
+        return resource_scopes if resource_scopes.present?
+
+        add_request_message('error', 'No resource scopes were granted in the `fhirAuthorization.scope` field.',
+                            request_index)
+        nil
+      end
+
+      def granted_scope_string(request_body, request_index)
+        fhir_authorization = request_body['fhirAuthorization']
+        unless fhir_authorization.is_a?(Hash)
+          add_request_message('error',
+                              if fhir_authorization.nil?
+                                'No `fhirAuthorization` field, so no scopes were granted.'
+                              else
+                                '`fhirAuthorization` is not a JSON object.'
+                              end,
+                              request_index)
+          return
+        end
+
+        scope = fhir_authorization['scope']
+        return scope if scope.is_a?(String)
+
+        add_request_message('error',
+                            if scope.nil?
+                              'No `fhirAuthorization.scope` field, so no scopes were granted.'
+                            else
+                              '`fhirAuthorization.scope` is not a string.'
+                            end,
+                            request_index)
+        nil
       end
 
       def parse_resource_scope(scope)
@@ -182,7 +225,7 @@ module DaVinciCRDTestKit
                           requested_scope_resources - optional_scope_resources
         return unless extra_resources.present?
 
-        add_request_message('error', 'Granted scopes included the following resource types ' \
+        add_request_message('error', 'Granted scopes include the following resource types ' \
                                      "beyond what was requested: #{extra_resources.join(', ')}.", request_index)
       end
 
@@ -190,7 +233,7 @@ module DaVinciCRDTestKit
         level = scopes_level(resource_scopes)
         if level.blank?
           add_request_message('error',
-                              'Requested scopes did not use a consistent level of scope (patient or user).',
+                              'Granted scopes did not use a consistent level of scope (patient or user).',
                               request_index)
           return
         end

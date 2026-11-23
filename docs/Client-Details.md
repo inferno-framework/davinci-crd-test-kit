@@ -381,8 +381,10 @@ updates from coverage-information responses" test.
 | | Resource types | Access |
 | --- | --- | --- |
 | Required | Every resource type profiled in the selected US Core version (listed below) | Read and search |
-| Allowed, not required | The CRD request types: Appointment, CommunicationRequest, DeviceRequest, MedicationRequest, NutritionOrder, ServiceRequest and VisionPrescription. With US Core 3.1.1, also Coverage. | Read and search |
-| Not allowed | Any other resource type, and wildcard (`*`) resource scopes | Create, update or delete on any resource type |
+| Allowed, not required | The types that Inferno's Coverage Information responses can target: Appointment, CommunicationRequest, DeviceRequest, Encounter, MedicationRequest, NutritionOrder, ServiceRequest and VisionPrescription. With US Core 3.1.1, also Coverage. | Read and search |
+
+Scopes for any other resource type, wildcard (`*`) resource scopes, and create, update or delete access
+on any resource type are not allowed.
 
 US Core resource types:
 - US Core 3.1.1: AllergyIntolerance, CarePlan, CareTeam, Condition, Device, DiagnosticReport,
@@ -406,10 +408,12 @@ Additional details:
   `user/Observation.rs?category=http://terminology.hl7.org/CodeSystem/observation-category|laboratory`)
   do not grant access to all resources of the type, so they do not satisfy the requirement for that
   US Core resource type.
-- The CRD request types are not required because Inferno can't know in advance which of them the CRD
-  client supports. Grant access to those the CRD client sends in hook requests: when Inferno returns a
-  Coverage Information response for one of them, it reads the resource with the access token to check
-  that the coverage-information extension was stored.
+- The Coverage Information target types are not required because Inferno can't know in advance which
+  of them the CRD client supports. Grant access to those the CRD client sends in hook requests: when
+  Inferno returns a Coverage Information response for one of them, it reads the resource with the
+  access token to check that the coverage-information extension was stored.
+- Coverage is not a US Core 3.1.1 resource type, but Inferno searches for the patient's active Coverage
+  during a hook invocation when none is prefetched, so access to it may be granted.
 
 #### Multiple Service Endpoints
 
