@@ -1,5 +1,6 @@
 require_relative '../../client_wait_messages'
 require_relative '../../client_input_helper'
+require_relative '../../crd_client_options'
 
 module DaVinciCRDTestKit
   module V221
@@ -23,7 +24,9 @@ module DaVinciCRDTestKit
         - Granted patient- or user-level read and search access to all US Core resource
           types in the selected US Core version (required to verify the CRD client's support
           of the US Core FHIR API and used to verify the `fhirAuthorization.scope`
-          hook request field).
+          hook request field). Read and search access may also be granted to the types that Inferno's
+          Coverage Information responses can target and, with US Core 3.1.1, to Coverage.
+          See the [CRD Test Kit wiki](#{CRDClientOptions::ACCESS_TOKEN_SCOPES_WIKI_URL}) for the full list of scopes.
 
         Testers can make hook requests during this test, but Inferno will never return
         a successful response while waiting here as hook requests are tested during other steps.
@@ -70,12 +73,11 @@ module DaVinciCRDTestKit
       end
 
       def us_core_version_resource_types
-        case suite_options[:us_core_version]
-        when CRDClientOptions::US_CORE_3
-          CRDClientOptions::US_CORE_3_RESOURCE_TYPES
-        when CRDClientOptions::US_CORE_6, CRDClientOptions::US_CORE_7
-          CRDClientOptions::US_CORE_6_7_RESOURCE_TYPES
-        end.join('`, `')
+        CRDClientOptions.us_core_resource_types(suite_options[:us_core_version]).join('`, `')
+      end
+
+      def optional_resource_types
+        CRDClientOptions.optional_scope_resource_types(suite_options[:us_core_version]).join('`, `')
       end
 
       def service_configuration_message(discovery_url, payer_id)
@@ -84,6 +86,9 @@ module DaVinciCRDTestKit
           - **Associated Payer**: #{payer_message(payer_id)}
           - **Access Scope**: Inferno has been granted patient- or user-level read and search access scopes for
                 all US Core #{us_core_version} profiled resource types (`#{us_core_version_resource_types}`).
+                Read and search access may also be granted for `#{optional_resource_types}`, but not for any
+                other resource types. No create, update or delete access or wildcard (`*`) scopes are granted.
+                See the [CRD Test Kit wiki](#{CRDClientOptions::ACCESS_TOKEN_SCOPES_WIKI_URL}) for details.
         MESSAGE
       end
 
